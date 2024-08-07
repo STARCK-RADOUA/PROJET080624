@@ -1,0 +1,1 @@
+// QRScanner.js component
