@@ -8,20 +8,19 @@ const LoadingScreen = ({ navigation }) => {
   const [isActivated, setIsActivated] = useState(false);
 
   useEffect(() => {
-    // Replace with actual device ID or user ID after login
-    const deviceId = Device.osBuildId; ;
+    const deviceId = Device.osBuildId;
 
-    // Polling for user activation status
     const intervalId = setInterval(() => {
+      console.log('Emitting checkActivation event...');
       socket.emit('checkActivation', { deviceId });
-    }, 4000); // Check every 3 seconds
+    }, 3000); // Check every 3 seconds
 
     socket.on('activationStatus', (status) => {
-        console.log(status)
+      console.log('Activation status received:', status);
       if (status.activated) {
         setIsActivated(true);
         clearInterval(intervalId);
-        navigation.replace('Services'); // Navigate to the main screen after activation
+        navigation.replace('Services');
       }
     });
 
