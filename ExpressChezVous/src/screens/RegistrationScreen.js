@@ -1,29 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import io from 'socket.io-client';
+import * as Device from 'expo-device';
 
-
-// or ES6+ destructured imports
-
-
-
-
-const socket = io('http://192.168.8.129:4000'); // Replace with your server URL
+const socket = io('http://192.168.8.129:4000'); // Remplacez par l'URL de votre serveur
 
 const RegistrationScreen = ({ navigation }) => {
+  const [deviceId, setDeviceId] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [phone, setphone] = useState('');
+  const [phone, setPhone] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
 
-  const handleConfirm = () => {
-    socket.emit('registerClient', { firstName, lastName, phone });
-    navigation.navigate('Loading');
-  };
-
   useEffect(() => {
+    // Récupération de l'ID unique de l'appareil avec Expo
+    const getDeviceId = async () => {
+      const id = Device.osBuildId; // Par exemple, en utilisant Device.osBuildId
+      setDeviceId(id);
+    };
+
+    getDeviceId();
+
+    // Vérification de la validité du formulaire
     setIsFormValid(firstName.trim() !== '' && lastName.trim() !== '' && phone.trim() !== '');
 
+    // Écoute de l'événement de registration côté serveur
     socket.on('clientRegistered', (data) => {
       console.log('Client registered:', data);
       navigation.reset({
@@ -35,14 +36,20 @@ const RegistrationScreen = ({ navigation }) => {
     return () => {
       socket.off('clientRegistered');
     };
-  }, [firstName, lastName, phone]);
+  }, [firstName, lastName, phone, deviceId]);
+
+  const handleConfirm = () => {
+    // Emission de l'événement avec les données de l'utilisateur + deviceId
+    socket.emit('registerClient', { firstName, lastName, phone, deviceId });
+    navigation.navigate('Loading');
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Complete your registration</Text>
       <TextInput style={styles.input} placeholder="First Name" value={firstName} onChangeText={setFirstName} />
       <TextInput style={styles.input} placeholder="Last Name" value={lastName} onChangeText={setLastName} />
-      <TextInput style={styles.input} placeholder="Phone Number" keyboardType="phone-pad" value={phone} onChangeText={setphone} />
+      <TextInput style={styles.input} placeholder="Phone Number" keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
       <TouchableOpacity style={[styles.button, !isFormValid && styles.disabledButton]} onPress={isFormValid ? handleConfirm : null} disabled={!isFormValid}>
         <Text style={styles.buttonText}>Confirm</Text>
       </TouchableOpacity>
