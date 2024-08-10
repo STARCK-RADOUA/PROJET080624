@@ -24,12 +24,12 @@ const AppNavigator = () => {
       <Stack.Screen name="QRScanner" component={QRScannerScreen} />
      
       <Stack.Screen name="Registration" component={RegistrationScreen} />
-       {/* 
-      <Stack.Screen name="Services" component={ServicesScreen} />
-      <Stack.Screen name="Home" component={HomeScreen} />
-      */} 
+       
       <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />
 
+      
+      <Stack.Screen name="Services" component={ServicesScreen} />
+      <Stack.Screen name="Home" component={HomeScreen} />
       
     </Stack.Navigator>
     </NavigationContainer>

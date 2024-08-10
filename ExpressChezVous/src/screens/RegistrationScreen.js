@@ -1,35 +1,39 @@
-// src/screens/RegistrationScreen.js
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import io from 'socket.io-client';
+
+const socket = io('http://192.168.8.129:4000'); // Replace with your server URL
 
 const RegistrationScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [phone, setphone] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
 
   const handleConfirm = () => {
-    setIsLoading(true);
-    navigation.navigate('Loading'); // Redirige vers l'écran de chargement
-    setTimeout(() => {
-      setIsLoading(false);
-      // Simuler l'activation du compte
-      navigation.replace('Home'); // Après l'activation, redirigez vers l'écran principal
-    }, 3000); // Simule une attente de 3 secondes
+    socket.emit('registerClient', { firstName, lastName, phone });
+    navigation.navigate('Loading');
   };
 
   useEffect(() => {
-    setIsFormValid(firstName.trim() !== '' && lastName.trim() !== '' && phoneNumber.trim() !== '');
-  }, [firstName, lastName, phoneNumber]);
+    setIsFormValid(firstName.trim() !== '' && lastName.trim() !== '' && phone.trim() !== '');
+
+    socket.on('clientRegistered', (data) => {
+      console.log('Client registered:', data);
+      navigation.replace('Services');
+    });
+
+    return () => {
+      socket.off('clientRegistered');
+    };
+  }, [firstName, lastName, phone]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Complete your registration</Text>
       <TextInput style={styles.input} placeholder="First Name" value={firstName} onChangeText={setFirstName} />
       <TextInput style={styles.input} placeholder="Last Name" value={lastName} onChangeText={setLastName} />
-      <TextInput style={styles.input} placeholder="Phone Number" keyboardType="phone-pad" value={phoneNumber} onChangeText={setPhoneNumber} />
+      <TextInput style={styles.input} placeholder="Phone Number" keyboardType="phone-pad" value={phone} onChangeText={setphone} />
       <TouchableOpacity style={[styles.button, !isFormValid && styles.disabledButton]} onPress={isFormValid ? handleConfirm : null} disabled={!isFormValid}>
         <Text style={styles.buttonText}>Confirm</Text>
       </TouchableOpacity>
