@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import io from 'socket.io-client';
 
+
+// or ES6+ destructured imports
+
+
+
+
 const socket = io('http://192.168.8.129:4000'); // Replace with your server URL
 
 const RegistrationScreen = ({ navigation }) => {
@@ -20,7 +26,10 @@ const RegistrationScreen = ({ navigation }) => {
 
     socket.on('clientRegistered', (data) => {
       console.log('Client registered:', data);
-      navigation.replace('Services');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Services' }],
+      });
     });
 
     return () => {
