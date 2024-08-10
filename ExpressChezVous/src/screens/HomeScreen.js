@@ -5,16 +5,14 @@ import io from 'socket.io-client';
 
 const socket = io('http://192.168.8.129:4000');
 
-const MenuScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const [menuItems, setMenuItems] = useState([]);
 
   useEffect(() => {
-    // Écouter l'événement 'activeProducts' du serveur
     socket.on('activeProducts', (products) => {
       setMenuItems(products);
     });
 
-    // Demander les produits actifs au serveur (si vous n'envoyez pas les produits automatiquement lors de la connexion)
     socket.emit('requestActiveProducts');
 
     return () => {
@@ -25,10 +23,15 @@ const MenuScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <MaterialIcons name="menu" size={24} color="black" />
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <MaterialIcons name="menu" size={24} color="black" />
+        </TouchableOpacity>
         <Image source={{ uri: 'https://example.com/logo.png' }} style={styles.logo} />
-        <FontAwesome name="bell" size={24} color="black" />
+        <TouchableOpacity onPress={() => alert('Notifications!')}>
+          <FontAwesome name="bell" size={24} color="black" />
+        </TouchableOpacity>
       </View>
+
       <ScrollView style={styles.menuList}>
         {menuItems.map((item, index) => (
           <TouchableOpacity key={index} style={styles.menuItem}>
@@ -42,6 +45,7 @@ const MenuScreen = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
+
       <View style={styles.footer}>
         <FontAwesome name="home" size={24} color="orange" />
         <MaterialIcons name="receipt" size={24} color="orange" />
@@ -108,4 +112,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MenuScreen;
+export default HomeScreen;
