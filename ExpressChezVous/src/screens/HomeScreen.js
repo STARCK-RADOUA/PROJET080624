@@ -1,14 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import io from 'socket.io-client';
+
+const socket = io('http://192.168.8.129:4000');
 
 const MenuScreen = () => {
-  const menuItems = [
-    { name: 'Cheese burger', description: 'Description', price: '$0,00', image: 'https://example.com/cheeseburger.png' },
-    { name: 'Doble tacos', description: 'Description', price: '$0,00', image: 'https://example.com/tacos.png' },
-    { name: 'Kebab', description: 'Description', price: '$0,00', image: 'https://example.com/kebab.png' },
-    { name: 'Pizza', description: 'Description', price: '$0,00', image: 'https://example.com/pizza.png' },
-  ];
+  const [menuItems, setMenuItems] = useState([]);
+
+  useEffect(() => {
+    // Écouter l'événement 'activeProducts' du serveur
+    socket.on('activeProducts', (products) => {
+      setMenuItems(products);
+    });
+
+    // Demander les produits actifs au serveur (si vous n'envoyez pas les produits automatiquement lors de la connexion)
+    socket.emit('requestActiveProducts');
+
+    return () => {
+      socket.off('activeProducts');
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -20,11 +32,11 @@ const MenuScreen = () => {
       <ScrollView style={styles.menuList}>
         {menuItems.map((item, index) => (
           <TouchableOpacity key={index} style={styles.menuItem}>
-            <Image source={{ uri: item.image }} style={styles.menuItemImage} />
+            <Image source={{ uri: item.image_url }} style={styles.menuItemImage} />
             <View style={styles.menuItemText}>
               <Text style={styles.menuItemName}>{item.name}</Text>
               <Text style={styles.menuItemDescription}>{item.description}</Text>
-              <Text style={styles.menuItemPrice}>{item.price}</Text>
+              <Text style={styles.menuItemPrice}>${item.price.toFixed(2)}</Text>
             </View>
             <MaterialIcons name="keyboard-arrow-right" size={24} color="orange" />
           </TouchableOpacity>
