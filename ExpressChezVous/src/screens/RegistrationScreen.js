@@ -29,7 +29,7 @@ const RegistrationScreen = ({ navigation }) => {
       console.log('Client registered:', data);
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Services' }],
+        routes: [{ name: 'Loading' }],
       });
     });
 

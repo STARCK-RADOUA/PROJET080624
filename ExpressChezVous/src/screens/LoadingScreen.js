@@ -1,9 +1,36 @@
-// src/screens/LoadingScreen.js
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import io from 'socket.io-client';
+import * as Device from 'expo-device';
+const socket = io('http://192.168.8.129:4000'); // Replace with your server's URL
 
-const LoadingScreen = () => {
+const LoadingScreen = ({ navigation }) => {
+  const [isActivated, setIsActivated] = useState(false);
+
+  useEffect(() => {
+    // Replace with actual device ID or user ID after login
+    const deviceId = Device.osBuildId; ;
+
+    // Polling for user activation status
+    const intervalId = setInterval(() => {
+      socket.emit('checkActivation', { deviceId });
+    }, 4000); // Check every 3 seconds
+
+    socket.on('activationStatus', (status) => {
+        console.log(status)
+      if (status.activated) {
+        setIsActivated(true);
+        clearInterval(intervalId);
+        navigation.replace('Services'); // Navigate to the main screen after activation
+      }
+    });
+
+    return () => {
+      clearInterval(intervalId);
+      socket.off('activationStatus');
+    };
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Votre compte est en cours d'activation</Text>
