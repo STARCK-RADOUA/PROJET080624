@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
-const socket = io('http://192.168.8.131:4000'); // Replace with your server's URL
+const socket = io('http://192.168.8.129:4000'); // Replace with your server's URL
 
 const LoadingScreen = ({ navigation }) => {
   const [isActivated, setIsActivated] = useState(false);
