@@ -6,7 +6,7 @@ import { styles } from './styles/loginstyle';
 
 const { width } = Dimensions.get('window');  // Obtenez la largeur de l'écran
 
-const socket = io('http://192.168.8.129:4000');  // Remplacez par l'URL de votre serveur
+const socket = io('http://192.168.1.35:4000');  // Remplacez par l'URL de votre serveur
 
 const LoginScreen = ({ navigation }) => {
 
