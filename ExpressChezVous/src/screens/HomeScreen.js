@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native'; // Assurez-vous que Text est importé ici
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import io from 'socket.io-client';
-import NotificationMenu from '../components/NotificationMenu'; // Import du menu des notifications
+import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 
-const socket = io('http://192.168.8.129:4000');
-const { width } = Dimensions.get('window');
+const socket = io('http://192.168.1.147:4000');
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const [menuItems, setMenuItems] = useState([]);
-  const [isNotificationMenuVisible, setIsNotificationMenuVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(width)).current;
+  const [selectedItem, setSelectedItem] = useState(null); // State to hold the selected item
+  const bottomSheetRef = useRef(null);
 
   useEffect(() => {
     socket.on('activeProducts', (products) => {
@@ -24,22 +24,10 @@ const HomeScreen = ({ navigation }) => {
     };
   }, []);
 
-  const toggleNotificationMenu = () => {
-    if (isNotificationMenuVisible) {
-      Animated.timing(slideAnim, {
-        toValue: width,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setIsNotificationMenuVisible(false));
-    } else {
-      setIsNotificationMenuVisible(true);
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  };
+  const onPress = useCallback((item) => {
+    setSelectedItem(item); // Set the selected item with all details
+    bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2); // Open the bottom sheet
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -48,14 +36,14 @@ const HomeScreen = ({ navigation }) => {
           <MaterialIcons name="menu" size={24} color="black" />
         </TouchableOpacity>
         <Image source={{ uri: 'https://example.com/logo.png' }} style={styles.logo} />
-        <TouchableOpacity onPress={toggleNotificationMenu}>
+        <TouchableOpacity onPress={() => {}}>
           <FontAwesome name="bell" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.menuList}>
-        {menuItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.menuItem}>
+        {menuItems.map((item) => (
+          <TouchableOpacity key={item.id} style={styles.menuItem} onPress={() => onPress(item)}>
             <Image source={{ uri: item.image_url }} style={styles.menuItemImage} />
             <View style={styles.menuItemText}>
               <Text style={styles.menuItemName}>{item.name}</Text>
@@ -67,16 +55,7 @@ const HomeScreen = ({ navigation }) => {
         ))}
       </ScrollView>
 
-      <View style={styles.footer}>
-        <FontAwesome name="home" size={24} color="orange" />
-        <MaterialIcons name="receipt" size={24} color="orange" />
-        <FontAwesome name="shopping-cart" size={24} color="orange" />
-        <FontAwesome name="user" size={24} color="orange" />
-      </View>
-
-      {isNotificationMenuVisible && (
-        <NotificationMenu slideAnim={slideAnim} toggleNotificationMenu={toggleNotificationMenu} />
-      )}
+      <PrductBottomSheetScreen ref={bottomSheetRef} item={selectedItem} />
     </View>
   );
 };
@@ -127,13 +106,6 @@ const styles = StyleSheet.create({
   menuItemPrice: {
     color: 'orange',
     fontWeight: 'bold',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 15,
-    borderTopWidth: 1,
-    borderColor: '#f0f0f0',
   },
 });
 

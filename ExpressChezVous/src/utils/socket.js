@@ -2,7 +2,7 @@
 import io from 'socket.io-client';
 
 // Connect to the server
-const socket = io('http://192.168.8.129:4000');
+const socket = io('http://192.168.1.147:4000');
  // Replace with your server's URL
  // Replace with your server URL
 
