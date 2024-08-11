@@ -15,11 +15,11 @@ const AppNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
-        <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+        {/*   <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="QRScanner" component={QRScannerScreen} />
-        <Stack.Screen name="Registration" component={RegistrationScreen} />
-        <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Registration" component={RegistrationScreen} />{/*     
+        <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  */} 
         <Stack.Screen name="Services" component={ServicesScreen} />
         <Stack.Screen 
           name="Home" 
