@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native'; // Assurez-vous que Text est importé ici
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import io from 'socket.io-client';
+import NotificationMenu from '../components/NotificationMenu'; // Import du menu des notifications
 
 const socket = io('http://192.168.8.129:4000');
+const { width } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const [menuItems, setMenuItems] = useState([]);
+  const [isNotificationMenuVisible, setIsNotificationMenuVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(width)).current;
 
   useEffect(() => {
     socket.on('activeProducts', (products) => {
@@ -20,6 +24,23 @@ const HomeScreen = ({ navigation }) => {
     };
   }, []);
 
+  const toggleNotificationMenu = () => {
+    if (isNotificationMenuVisible) {
+      Animated.timing(slideAnim, {
+        toValue: width,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setIsNotificationMenuVisible(false));
+    } else {
+      setIsNotificationMenuVisible(true);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -27,7 +48,7 @@ const HomeScreen = ({ navigation }) => {
           <MaterialIcons name="menu" size={24} color="black" />
         </TouchableOpacity>
         <Image source={{ uri: 'https://example.com/logo.png' }} style={styles.logo} />
-        <TouchableOpacity onPress={() => alert('Notifications!')}>
+        <TouchableOpacity onPress={toggleNotificationMenu}>
           <FontAwesome name="bell" size={24} color="black" />
         </TouchableOpacity>
       </View>
@@ -52,6 +73,10 @@ const HomeScreen = ({ navigation }) => {
         <FontAwesome name="shopping-cart" size={24} color="orange" />
         <FontAwesome name="user" size={24} color="orange" />
       </View>
+
+      {isNotificationMenuVisible && (
+        <NotificationMenu slideAnim={slideAnim} toggleNotificationMenu={toggleNotificationMenu} />
+      )}
     </View>
   );
 };
