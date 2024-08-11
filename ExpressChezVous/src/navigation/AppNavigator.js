@@ -2,14 +2,14 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons'; // Import the icon libraries
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import SplashScreen from '../screens/SplashScreen';
 import LoginScreen from '../screens/LoginScreen';
 import QRScannerScreen from '../screens/QRScannerScreen';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import LoadingScreen from '../screens/LoadingScreen';
 import ServicesScreen from '../screens/ServicesScreen';
-import DrawerNavigator from './DrawerNavigator'; // Import the DrawerNavigator
+import DrawerNavigator from './DrawerNavigator';
 import ReceiptScreen from '../screens/ReceiptScreen';
 import ShoppingCartScreen from '../screens/ShoppingCartScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
@@ -21,7 +21,7 @@ const AppNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
-        {/*   <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+    {/*   <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="QRScanner" component={QRScannerScreen} />
         <Stack.Screen name="Registration" component={RegistrationScreen} />{/*     
@@ -30,7 +30,7 @@ const AppNavigator = () => {
         <Stack.Screen 
           name="Home" 
           component={TabNavigator} 
-          options={{ headerShown: false }}  // Disable header for HomeScreen
+          options={{ headerShown: false }}  // Désactive l'en-tête pour HomeScreen
         />
       </Stack.Navigator>
     </NavigationContainer>
