@@ -43,6 +43,9 @@ const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
   const openNotification = (notification) => {
     setSelectedNotification(notification);
     setModalVisible(true);
+
+    // Marquer la notification comme lue
+    socket.emit('markAsRead', notification._id);
   };
 
   const renderNotificationItem = ({ item }) => (
@@ -77,6 +80,9 @@ const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
               <Text style={styles.modalTitle}>{selectedNotification.title}</Text>
               <Text style={styles.modalMessage}>{selectedNotification.message}</Text>
               <Text style={styles.modalTime}>{new Date(selectedNotification.created_at).toLocaleString()}</Text>
+              {selectedNotification.read_at && (
+                <Text style={styles.modalReadTime}>Read at: {new Date(selectedNotification.read_at).toLocaleString()}</Text>
+              )}
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>×</Text>
               </TouchableOpacity>
@@ -171,6 +177,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#888',
     marginBottom: 20,
+  },
+  modalReadTime: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 10,
   },
   closeButton: {
     position: 'absolute',
