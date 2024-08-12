@@ -1,43 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity, TouchableWithoutFeedback, FlatList, Modal } from 'react-native';
+import io from 'socket.io-client';
+import * as Device from 'expo-device';
 
-const { width, height } = Dimensions.get('window');
+let socket;
 
 const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
   const [notifications, setNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [deviceId, setDeviceId] = useState('');
 
   useEffect(() => {
-    // Exemple de notifications pour tester l'interface
-    const exampleNotifications = [
-      {
-        id: '1',
-        title: 'Mise à jour disponible',
-        message: 'Une nouvelle mise à jour de l\'application est disponible. Veuillez la télécharger dès que possible.',
-        time: '2024-08-11 14:00',
-      },
-      {
-        id: '2',
-        title: 'Nouvelle fonctionnalité',
-        message: 'Découvrez la nouvelle fonctionnalité "Mode sombre" dans les paramètres de votre application.',
-        time: '2024-08-11 13:45',
-      },
-      {
-        id: '3',
-        title: 'Promotion spéciale',
-        message: 'Profitez de 20% de réduction sur tous nos produits jusqu\'à la fin du mois.',
-        time: '2024-08-11 12:30',
-      },
-      {
-        id: '4',
-        title: 'Message important',
-        message: 'Votre abonnement arrive à expiration dans 3 jours. Renouvelez-le pour continuer à bénéficier de nos services.',
-        time: '2024-08-11 11:15',
-      },
-    ];
+    const getDeviceId = async () => {
+      const id = Device.osBuildId;
+      setDeviceId(id);
 
-    setNotifications(exampleNotifications);
+      if (!socket) {
+        socket = io('http://192.168.8.129:4000'); // Évitez de réinitialiser le socket à chaque fois
+      }
+
+      socket.emit('requestNotifications', id);
+
+      socket.on('allNotifications', (data) => {
+        console.log('Received notifications:', data); 
+        setNotifications(data);
+      });
+
+      socket.on('newNotification', (notification) => {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+      });
+    };
+
+    getDeviceId();
+
+    return () => {
+      socket.off('allNotifications');
+      socket.off('newNotification');
+    };
   }, []);
 
   const openNotification = (notification) => {
@@ -60,7 +60,7 @@ const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
           <FlatList
             data={notifications}
             renderItem={renderNotificationItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item._id}
             style={styles.notificationList}
           />
         </Animated.View>
@@ -76,7 +76,7 @@ const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{selectedNotification.title}</Text>
               <Text style={styles.modalMessage}>{selectedNotification.message}</Text>
-              <Text style={styles.modalTime}>{selectedNotification.time}</Text>
+              <Text style={styles.modalTime}>{new Date(selectedNotification.created_at).toLocaleString()}</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>×</Text>
               </TouchableOpacity>
