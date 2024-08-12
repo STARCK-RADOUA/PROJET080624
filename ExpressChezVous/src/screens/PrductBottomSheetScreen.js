@@ -26,7 +26,8 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
     extraFries: false,
   });
 
-  const [totalPrice, setTotalPrice] = useState(item.price);
+  // Use item price if item is defined, otherwise default to 0
+  const [totalPrice, setTotalPrice] = useState(item?.price || 0);
 
   const scrollTo = useCallback((destination) => {
     'worklet';
@@ -91,7 +92,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
         const url = `http://192.168.1.35:4000/api/order-items/${userId}/order-items`;
         const response = await axios.get(url);
 
-        const addedItem = response.data.find(orderItem => orderItem.product_id._id === item._id);
+        const addedItem = response.data.find(orderItem => orderItem.product_id._id === item?._id);
 
         if (addedItem) {
           setIsAddedToCart(true);
@@ -103,20 +104,24 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
       }
     };
 
-    checkIfItemIsInCart();
+    if (item) {
+      checkIfItemIsInCart();
+    }
   }, [item]);
 
   useEffect(() => {
-    const basePrice = item.price;
-    const extraPrice = Object.keys(extras)
-      .filter(extra => extras[extra])
-      .reduce((sum, extra) => {
-        const extraCost = item.options.find(opt => opt.name === extra)?.price || 0;
-        return sum + extraCost;
-      }, 0);
-    
-    setTotalPrice((basePrice + extraPrice) * quantity);
-  }, [quantity, extras]);
+    if (item) {
+      const basePrice = item.price;
+      const extraPrice = Object.keys(extras)
+        .filter(extra => extras[extra])
+        .reduce((sum, extra) => {
+          const extraCost = item.options?.find(opt => opt.name === extra)?.price || 0;
+          return sum + extraCost;
+        }, 0);
+
+      setTotalPrice((basePrice + extraPrice) * quantity);
+    }
+  }, [quantity, extras, item]);
 
   const handleQuantityChange = (type) => {
     if (type === 'increment') {
@@ -141,22 +146,22 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
         .filter(extra => extras[extra])
         .map(extra => ({
           name: extra,
-          price: item.options.find(opt => opt.name === extra)?.price || 0,
+          price: item.options?.find(opt => opt.name === extra)?.price || 0,
         }));
 
       const userId = await getClient();
-  
+
       await axios.post('http://192.168.1.35:4000/api/order-items', {
         userId: userId,
-        productId: item._id,
+        productId: item?._id,
         quantity,
         selectedItems,
       });
-  
+
       console.log('Item added to cart successfully');
-  
+
       setIsAddedToCart(true);
-  
+
       // Reset quantity and extras to initial state
       setQuantity(1);
       setExtras({
@@ -164,7 +169,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
         extraCheeseSlice: false,
         extraFries: false,
       });
-  
+
       // Close the bottom sheet
       scrollTo(0);
     } catch (error) {
@@ -172,10 +177,14 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
     }
   };
 
+  if (!item) {
+    return null; // If item is null or undefined, return nothing
+  }
+
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View style={[styles.bottomSheetContainer, rBottomSheetStyle]}>
-        {item && item.image_url ? (
+        {item.image_url ? (
           <Animated.Image
             source={{ uri: item.image_url }}
             style={[styles.productImage, rImageStyle]}
@@ -188,12 +197,10 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
         <View style={styles.contentContainer}>
           <View style={styles.container}>
             <View style={styles.header}>
-              {item && (
-                <>
-                  <Text style={styles.heading}>{item.name}</Text>
-                  <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
-                </>
-              )}
+              <>
+                <Text style={styles.heading}>{item.name}</Text>
+                <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
+              </>
               <TouchableOpacity>
                 <Text style={styles.heart}>❤️</Text>
               </TouchableOpacity>
