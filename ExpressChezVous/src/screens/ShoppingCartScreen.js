@@ -1,34 +1,60 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
-import { getUser } from '../services/userService';
+import { useFocusEffect } from '@react-navigation/native';
+import { getClient } from '../services/userService';
 
 const ShoppingCartScreen = () => {
   const [orderItems, setOrderItems] = useState([]);
+  const [expandedItemId, setExpandedItemId] = useState(null);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchOrderItems = async () => {
-      try {
-        const userId = await getUser();
-        console.log('User ID:', userId); // Debugging
+  const fetchOrderItems = async () => {
+    try {
+      const userId = await getClient();
 
-        const url = `http://192.168.1.35:4000/api/order-items/${userId}/order-items`;
-        console.log('Fetching order items from URL:', url); // Debugging
+      const url = `http://192.168.1.35:4000/api/order-items/${userId}/order-items`;
+      const response = await axios.get(url);
 
-        const response = await axios.get(url);
-        console.log('Order items received:', response.data); // Debugging
+      setOrderItems(response.data);
+    } catch (error) {
+      console.error('Failed to fetch order items:', error.message || error);
+      setError('Failed to fetch order items. Please check the console for details.');
+    }
+  };
 
-        setOrderItems(response.data);
-      } catch (error) {
-        console.error('Failed to fetch order items:', error.message || error);
-        setError('Failed to fetch order items. Please check the console for details.');
-      }
-    };
+  const deleteItem = async (itemId) => {
+    try {
+      await axios.delete(`http://192.168.1.35:4000/api/order-items/${itemId}`);
+      setOrderItems((prevItems) => prevItems.filter(item => item._id !== itemId));
+    } catch (error) {
+      console.error('Failed to delete item:', error.message || error);
+      setError('Failed to delete item. Please check the console for details.');
+    }
+  };
 
-    fetchOrderItems();
-  }, []);
+  const updateQuantity = (itemId, change) => {
+    setOrderItems(prevItems => 
+      prevItems.map(item => 
+        item._id === itemId ? { ...item, quantity: Math.max(1, item.quantity + change), price: item.product_id.price * Math.max(1, item.quantity + change) } : item
+      )
+    );
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrderItems();
+    }, [])
+  );
+
+  const handleItemPress = (itemId) => {
+    setExpandedItemId((prevId) => (prevId === itemId ? null : itemId));
+  };
+
+  const handleOrderNow = () => {
+    console.log('Order Now button pressed');
+  };
 
   return (
     <View style={styles.container}>
@@ -38,21 +64,51 @@ const ShoppingCartScreen = () => {
       {error ? (
         <Text style={styles.errorText}>{error}</Text>
       ) : (
-        <ScrollView style={styles.menuList}>
-          {orderItems.map((item, index) => (
-            <TouchableOpacity key={index} style={styles.menuItem}>
-              <Image source={{ uri: item.product_id.image_url }} style={styles.menuItemImage} />
-              <View style={styles.menuItemText}>
-                <Text style={styles.menuItemName}>{item.product_id.name}</Text>
-                <Text style={styles.menuItemDescription}>
-                  {item.selected_options.map(option => option.name).join(', ')}
-                </Text>
-                <Text style={styles.menuItemPrice}>${item.price.toFixed(2)}</Text>
-              </View>
-              <MaterialIcons name="keyboard-arrow-right" size={24} color="orange" />
+        <>
+          <ScrollView style={styles.menuList}>
+            {orderItems.map((item, index) => (
+              <TouchableOpacity key={index} style={styles.menuItem} onPress={() => handleItemPress(item._id)}>
+                <View style={styles.itemContainer}>
+                  <Image source={{ uri: item.product_id.image_url }} style={styles.menuItemImage} />
+                  <View style={styles.menuItemText}>
+                    <Text style={styles.menuItemName}>{item.product_id.name}</Text>
+                    <Text style={styles.menuItemDescription}>
+                      {item.selected_options.map(option => option.name).join(', ')}
+                    </Text>
+                    {expandedItemId === item._id && (
+                      <View style={styles.expandedSection}>
+                        <Text style={styles.expandedText}>Price: ${item.price.toFixed(2)}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.rightContainer}>
+                    <TouchableOpacity onPress={() => updateQuantity(item._id, 1)}>
+                      <MaterialIcons name="keyboard-arrow-up" size={24} color="brown" />
+                    </TouchableOpacity>
+                    <Text style={styles.quantityText}>{item.quantity}</Text>
+                    <TouchableOpacity onPress={() => updateQuantity(item._id, -1)}>
+                      <MaterialIcons name="keyboard-arrow-down" size={24} color="brown" />
+                    </TouchableOpacity>
+                    {expandedItemId === item._id && (
+                      <TouchableOpacity onPress={() => deleteItem(item._id)} style={styles.deleteButton}>
+                        <MaterialIcons name="delete" size={24} color="red" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <View style={styles.orderButtonContainer}>
+            <TouchableOpacity
+              style={[styles.orderButton, orderItems.length === 0 && styles.disabledOrderButton]}
+              onPress={handleOrderNow}
+              disabled={orderItems.length === 0}
+            >
+              <Text style={styles.orderButtonText}>Order Now</Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
+          </View>
+        </>
       )}
     </View>
   );
@@ -76,6 +132,7 @@ const styles = StyleSheet.create({
   },
   menuList: {
     paddingHorizontal: 20,
+    marginBottom: 70,
   },
   menuItem: {
     flexDirection: 'row',
@@ -84,6 +141,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginVertical: 10,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
   },
   menuItemImage: {
     width: 50,
@@ -97,12 +159,53 @@ const styles = StyleSheet.create({
   menuItemName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#FF8C00',
   },
   menuItemDescription: {
     color: '#777',
   },
-  menuItemPrice: {
-    color: 'orange',
+  expandedSection: {
+    marginTop: 5,
+  },
+  expandedText: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 5,
+  },
+  rightContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quantityText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginVertical: 5,
+  },
+  deleteButton: {
+    marginTop: 10,
+  },
+  orderButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+  },
+  orderButton: {
+    backgroundColor: 'orange',
+    paddingVertical: 15,
+    borderRadius: 25,
+    alignItems: 'center',
+  },
+  disabledOrderButton: {
+    backgroundColor: 'grey',
+  },
+  orderButtonText: {
+    color: 'white',
+    fontSize: 18,
     fontWeight: 'bold',
   },
   errorText: {

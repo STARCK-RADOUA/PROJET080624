@@ -1,4 +1,4 @@
-import React, { useCallback, useImperativeHandle, useState } from 'react';
+import React, { useCallback, useImperativeHandle, useState, useEffect } from 'react';
 import { Dimensions, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -8,7 +8,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { getUser } from '../services/userService'; // Import the getUser function
+import { getClient } from '../services/userService'; // Import the getClient function
 import axios from 'axios';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -19,62 +19,15 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
   const active = useSharedValue(false);
 
   const [quantity, setQuantity] = useState(1);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [extras, setExtras] = useState({
     extraBeefPatty: false,
     extraCheeseSlice: false,
     extraFries: false,
   });
 
-  const handleQuantityChange = (type) => {
-    if (type === 'increment') {
-      setQuantity(quantity + 1);
-    } else if (type === 'decrement' && quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
+  const [totalPrice, setTotalPrice] = useState(item.price);
 
-  const handleExtraChange = (extra) => {
-    setExtras((prevState) => ({
-      ...prevState,
-      [extra]: !prevState[extra],
-    }));
-  };
-
-  const handleAddToCart = async () => {
-    try {
-      const selectedItems = Object.keys(extras)
-        .filter(extra => extras[extra])
-        .map(extra => ({
-          name: extra,
-          price: item.options.find(opt => opt.name === extra)?.price || 0,
-        }));
-  
-      const userId = await getUser(); // Get the userId from the service
-  
-      await axios.post('http://192.168.1.35:4000/api/order-items', {
-        userId: userId,
-        productId: item._id,
-        quantity,
-        selectedItems,
-      });
-  
-      console.log('Item added to cart successfully');
-  
-      // Reset quantity and extras to initial state
-      setQuantity(1);
-      setExtras({
-        extraBeefPatty: false,
-        extraCheeseSlice: false,
-        extraFries: false,
-      });
-  
-      // Close the bottom sheet
-      scrollTo(0);
-    } catch (error) {
-      console.error('Failed to add item to cart:', error);
-    }
-  };
-  
   const scrollTo = useCallback((destination) => {
     'worklet';
     active.value = destination !== 0;
@@ -131,6 +84,94 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
     };
   });
 
+  useEffect(() => {
+    const checkIfItemIsInCart = async () => {
+      try {
+        const userId = await getClient();
+        const url = `http://192.168.1.35:4000/api/order-items/${userId}/order-items`;
+        const response = await axios.get(url);
+
+        const addedItem = response.data.find(orderItem => orderItem.product_id._id === item._id);
+
+        if (addedItem) {
+          setIsAddedToCart(true);
+        } else {
+          setIsAddedToCart(false);
+        }
+      } catch (error) {
+        console.error('Error checking if item is in cart:', error);
+      }
+    };
+
+    checkIfItemIsInCart();
+  }, [item]);
+
+  useEffect(() => {
+    const basePrice = item.price;
+    const extraPrice = Object.keys(extras)
+      .filter(extra => extras[extra])
+      .reduce((sum, extra) => {
+        const extraCost = item.options.find(opt => opt.name === extra)?.price || 0;
+        return sum + extraCost;
+      }, 0);
+    
+    setTotalPrice((basePrice + extraPrice) * quantity);
+  }, [quantity, extras]);
+
+  const handleQuantityChange = (type) => {
+    if (type === 'increment') {
+      setQuantity(quantity + 1);
+    } else if (type === 'decrement' && quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const handleExtraChange = (extra) => {
+    if (!isAddedToCart) {
+      setExtras((prevState) => ({
+        ...prevState,
+        [extra]: !prevState[extra],
+      }));
+    }
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      const selectedItems = Object.keys(extras)
+        .filter(extra => extras[extra])
+        .map(extra => ({
+          name: extra,
+          price: item.options.find(opt => opt.name === extra)?.price || 0,
+        }));
+
+      const userId = await getClient();
+  
+      await axios.post('http://192.168.1.35:4000/api/order-items', {
+        userId: userId,
+        productId: item._id,
+        quantity,
+        selectedItems,
+      });
+  
+      console.log('Item added to cart successfully');
+  
+      setIsAddedToCart(true);
+  
+      // Reset quantity and extras to initial state
+      setQuantity(1);
+      setExtras({
+        extraBeefPatty: false,
+        extraCheeseSlice: false,
+        extraFries: false,
+      });
+  
+      // Close the bottom sheet
+      scrollTo(0);
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+    }
+  };
+
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View style={[styles.bottomSheetContainer, rBottomSheetStyle]}>
@@ -150,54 +191,104 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
               {item && (
                 <>
                   <Text style={styles.heading}>{item.name}</Text>
-                  <Text style={styles.heading}>{item.price}</Text>
+                  <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
                 </>
               )}
               <TouchableOpacity>
                 <Text style={styles.heart}>❤️</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.optionalText}>(Optional)</Text>
-            <View style={styles.quantityContainer}>
-              <TouchableOpacity onPress={() => handleQuantityChange('decrement')}>
-                <Text style={styles.quantityButton}>-</Text>
-              </TouchableOpacity>
-              <Text style={styles.quantityText}>{quantity}</Text>
-              <TouchableOpacity onPress={() => handleQuantityChange('increment')}>
-                <Text style={styles.quantityButton}>+</Text>
-              </TouchableOpacity>
+            <View style={styles.quantityAndLabelContainer}>
+              <Text style={styles.extrasLabel}>Select Extras:</Text>
+              <View style={styles.quantityContainer}>
+                <TouchableOpacity onPress={() => handleQuantityChange('decrement')}>
+                  <Text style={styles.quantityButton}>-</Text>
+                </TouchableOpacity>
+                <Text style={styles.quantityText}>{quantity}</Text>
+                <TouchableOpacity onPress={() => handleQuantityChange('increment')}>
+                  <Text style={styles.quantityButton}>+</Text>
+                </TouchableOpacity>
+              </View>
             </View>
             <View style={styles.optionContainer}>
-              <TouchableOpacity style={styles.border} onPress={() => handleExtraChange('extraBeefPatty')}>
+              <TouchableOpacity
+                style={[
+                  styles.border,
+                  isAddedToCart && styles.borderDisabled
+                ]}
+                onPress={() => handleExtraChange('extraBeefPatty')}
+                disabled={isAddedToCart}
+              >
                 <View style={styles.optionTextContainer}>
                   <Text style={styles.optionText}>Extra Beef Patty</Text>
                   <Text style={styles.optionPrice}>+$1.00</Text>
                 </View>
-                <View style={styles.checkbox}>
-                  {extras.extraBeefPatty && <Text style={styles.checkboxChecked}>✔️</Text>}
+                <View
+                  style={[
+                    styles.checkbox,
+                    extras.extraBeefPatty && styles.checkboxChecked,
+                    isAddedToCart && styles.checkboxDisabled,
+                  ]}
+                >
+                  {extras.extraBeefPatty && <Text style={styles.checkboxTick}>✔️</Text>}
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.border} onPress={() => handleExtraChange('extraCheeseSlice')}>
+              <TouchableOpacity
+                style={[
+                  styles.border,
+                  isAddedToCart && styles.borderDisabled
+                ]}
+                onPress={() => handleExtraChange('extraCheeseSlice')}
+                disabled={isAddedToCart}
+              >
                 <View style={styles.optionTextContainer}>
                   <Text style={styles.optionText}>Extra Cheese Slice</Text>
                   <Text style={styles.optionPrice}>+$0.50</Text>
                 </View>
-                <View style={styles.checkbox}>
-                  {extras.extraCheeseSlice && <Text style={styles.checkboxChecked}>✔️</Text>}
+                <View
+                  style={[
+                    styles.checkbox,
+                    extras.extraCheeseSlice && styles.checkboxChecked,
+                    isAddedToCart && styles.checkboxDisabled,
+                  ]}
+                >
+                  {extras.extraCheeseSlice && <Text style={styles.checkboxTick}>✔️</Text>}
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.border} onPress={() => handleExtraChange('extraFries')}>
+              <TouchableOpacity
+                style={[
+                  styles.border,
+                  isAddedToCart && styles.borderDisabled
+                ]}
+                onPress={() => handleExtraChange('extraFries')}
+                disabled={isAddedToCart}
+              >
                 <View style={styles.optionTextContainer}>
                   <Text style={styles.optionText}>Extra Fries</Text>
                   <Text style={styles.optionPrice}>+$1.00</Text>
                 </View>
-                <View style={styles.checkbox}>
-                  {extras.extraFries && <Text style={styles.checkboxChecked}>✔️</Text>}
+                <View
+                  style={[
+                    styles.checkbox,
+                    extras.extraFries && styles.checkboxChecked,
+                    isAddedToCart && styles.checkboxDisabled,
+                  ]}
+                >
+                  {extras.extraFries && <Text style={styles.checkboxTick}>✔️</Text>}
                 </View>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
-              <Text style={styles.buttonText}>Add to cart</Text>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                isAddedToCart && styles.buttonDisabled
+              ]}
+              onPress={handleAddToCart}
+              disabled={isAddedToCart}
+            >
+              <Text style={styles.buttonText}>
+                {isAddedToCart ? 'Added to Cart' : 'Add to Cart'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -263,15 +354,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#FF8C00',
   },
-  optionalText: {
-    color: 'gray',
+  quantityAndLabelContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
+  },
+  extrasLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   quantityContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
   },
   quantityButton: {
     fontSize: 20,
@@ -296,6 +391,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  borderDisabled: {
+    opacity: 0.5,
+  },
   optionTextContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -316,10 +414,17 @@ const styles = StyleSheet.create({
     borderColor: '#FF8C00',
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 5,
   },
   checkboxChecked: {
+    backgroundColor: '#FF8C00',
+  },
+  checkboxDisabled: {
+    opacity: 0.5,
+  },
+  checkboxTick: {
     fontSize: 18,
-    color: '#FF8C00',
+    color: '#FFFFFF',
   },
   button: {
     marginTop: 20,
@@ -329,6 +434,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 40,
     marginRight: 40,
+  },
+  buttonDisabled: {
+    backgroundColor: '#cccccc',
   },
   buttonText: {
     color: 'white',
