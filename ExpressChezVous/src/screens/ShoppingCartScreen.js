@@ -14,7 +14,7 @@ const ShoppingCartScreen = () => {
     try {
       const userId = await getClient();
 
-      const url = `http://192.168.1.35:4000/api/order-items/${userId}/order-items`;
+      const url = `http://192.168.8.129:4000/api/order-items/${userId}/order-items`;
       const response = await axios.get(url);
 
       setOrderItems(response.data);
@@ -26,7 +26,7 @@ const ShoppingCartScreen = () => {
 
   const deleteItem = async (itemId) => {
     try {
-      await axios.delete(`http://192.168.1.35:4000/api/order-items/${itemId}`);
+      await axios.delete(`http://192.168.8.129:4000/api/order-items/${itemId}`);
       setOrderItems((prevItems) => prevItems.filter(item => item._id !== itemId));
     } catch (error) {
       console.error('Failed to delete item:', error.message || error);
