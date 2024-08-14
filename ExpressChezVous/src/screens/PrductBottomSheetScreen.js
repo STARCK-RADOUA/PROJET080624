@@ -90,6 +90,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
       try {
         const userId = await getClient();
         const url = `http://192.168.1.149:4000/api/order-items/${userId}/order-items`;
+
         const response = await axios.get(url);
 
         const addedItem = response.data.find(orderItem => orderItem.product_id._id === item?._id);
@@ -151,7 +152,9 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
 
       const userId = await getClient();
 
+
       await axios.post('http://192.168.1.149:4000/api/order-items', {
+
         userId: userId,
         productId: item?._id,
         quantity,

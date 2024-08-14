@@ -6,6 +6,8 @@ import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 
 const socket = io('http://192.168.1.149:4000');
+
+
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
@@ -15,17 +17,30 @@ const HomeScreen = ({ navigation }) => {
   const slideAnim = useRef(new Animated.Value(width)).current;
   const bottomSheetRef = useRef(null);
 
+  const fetchProducts = useCallback(() => {
+    socket.emit('requestActiveProducts');
+  }, []);
+
   useEffect(() => {
+    const interval = setInterval(fetchProducts, 1000); // Fetch every 5 seconds
+
     socket.on('activeProducts', (products) => {
-      setMenuItems(products);
+      // Compare the new products list with the current state
+      setMenuItems((prevItems) => {
+        if (JSON.stringify(prevItems) !== JSON.stringify(products)) {
+          return products; // Replace the entire list if there is a change
+        }
+        return prevItems; // No change, return the same list
+      });
     });
 
-    socket.emit('requestActiveProducts');
-
+    // Clean up the interval and socket listener on component unmount
     return () => {
+      clearInterval(interval);
       socket.off('activeProducts');
+      socket.disconnect();
     };
-  }, []);
+  }, [fetchProducts]);
 
   const toggleNotificationMenu = () => {
     if (isNotificationMenuVisible) {
@@ -46,7 +61,7 @@ const HomeScreen = ({ navigation }) => {
 
   const onPress = useCallback((item) => {
     setSelectedItem(item);
-    bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2); // Ouvre le bottom sheet
+    bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2); // Open the bottom sheet
   }, []);
 
   return (

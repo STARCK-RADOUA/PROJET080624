@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
+
 const socket = io('http://192.168.1.149:4000'); // Replace with your server's URL
 
 const LoadingScreen = ({ navigation }) => {

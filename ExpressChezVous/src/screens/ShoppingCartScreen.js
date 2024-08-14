@@ -16,6 +16,7 @@ const ShoppingCartScreen = () => {
       const userId = await getClient();
 
       const url = `http://192.168.1.149:4000/api/order-items/${userId}/order-items`;
+
       const response = await axios.get(url);
 
       setOrderItems(response.data);
@@ -37,6 +38,7 @@ const ShoppingCartScreen = () => {
       const updatedItems = orderItems.filter(item => item._id !== itemId);
       setOrderItems(updatedItems);
       calculateTotalPrice(updatedItems); // Recalculate total price after deletion
+
     } catch (error) {
       console.error('Failed to delete item:', error.message || error);
       setError('Failed to delete item. Please check the console for details.');
