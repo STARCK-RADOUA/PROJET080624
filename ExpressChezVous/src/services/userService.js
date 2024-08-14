@@ -10,7 +10,7 @@ export const getClient = async () => {
   try {
     const deviceId = getDeviceId();
 
-    const response = await axios.post('http://192.168.1.35:4000/api/sessions/get-client-id', {
+    const response = await axios.post('http://192.168.1.149:4000/api/sessions/get-client-id', {
       deviceId: deviceId,
     });
 

@@ -8,26 +8,35 @@ import { getClient } from '../services/userService';
 const ShoppingCartScreen = () => {
   const [orderItems, setOrderItems] = useState([]);
   const [expandedItemId, setExpandedItemId] = useState(null);
+  const [totalPrice, setTotalPrice] = useState(0); // Add state for total price
   const [error, setError] = useState('');
 
   const fetchOrderItems = async () => {
     try {
       const userId = await getClient();
 
-      const url = `http://192.168.1.35:4000/api/order-items/${userId}/order-items`;
+      const url = `http://192.168.1.149:4000/api/order-items/${userId}/order-items`;
       const response = await axios.get(url);
 
       setOrderItems(response.data);
+      calculateTotalPrice(response.data); // Calculate total price initially
     } catch (error) {
       console.error('Failed to fetch order items:', error.message || error);
       setError('Failed to fetch order items. Please check the console for details.');
     }
   };
 
+  const calculateTotalPrice = (items) => {
+    const total = items.reduce((sum, item) => sum + item.price, 0);
+    setTotalPrice(total);
+  };
+
   const deleteItem = async (itemId) => {
     try {
-      await axios.delete(`http://192.168.1.35:4000/api/order-items/${itemId}`);
-      setOrderItems((prevItems) => prevItems.filter(item => item._id !== itemId));
+      await axios.delete(`http://192.168.1.149:4000/api/order-items/${itemId}`);
+      const updatedItems = orderItems.filter(item => item._id !== itemId);
+      setOrderItems(updatedItems);
+      calculateTotalPrice(updatedItems); // Recalculate total price after deletion
     } catch (error) {
       console.error('Failed to delete item:', error.message || error);
       setError('Failed to delete item. Please check the console for details.');
@@ -35,11 +44,17 @@ const ShoppingCartScreen = () => {
   };
 
   const updateQuantity = (itemId, change) => {
-    setOrderItems(prevItems => 
-      prevItems.map(item => 
-        item._id === itemId ? { ...item, quantity: Math.max(1, item.quantity + change), price: item.product_id.price * Math.max(1, item.quantity + change) } : item
-      )
+    const updatedItems = orderItems.map(item => 
+      item._id === itemId 
+        ? { 
+            ...item, 
+            quantity: Math.max(1, item.quantity + change), 
+            price: item.product_id.price * Math.max(1, item.quantity + change) 
+          } 
+        : item
     );
+    setOrderItems(updatedItems);
+    calculateTotalPrice(updatedItems); // Recalculate total price on quantity change
   };
 
   useFocusEffect(
@@ -54,6 +69,7 @@ const ShoppingCartScreen = () => {
 
   const handleOrderNow = () => {
     console.log('Order Now button pressed');
+    console.log('Total price:', totalPrice);
   };
 
   return (
@@ -77,7 +93,7 @@ const ShoppingCartScreen = () => {
                     </Text>
                     {expandedItemId === item._id && (
                       <View style={styles.expandedSection}>
-                        <Text style={styles.expandedText}>Price: ${item.price.toFixed(2)}</Text>
+                        <Text style={styles.expandedText}>Price: €{item.price.toFixed(2)}</Text>
                       </View>
                     )}
                   </View>
@@ -105,7 +121,7 @@ const ShoppingCartScreen = () => {
               onPress={handleOrderNow}
               disabled={orderItems.length === 0}
             >
-              <Text style={styles.orderButtonText}>Order Now</Text>
+              <Text style={styles.orderButtonText}>Order Now - €{totalPrice.toFixed(2)}</Text>
             </TouchableOpacity>
           </View>
         </>

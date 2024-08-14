@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 
-const socket = io('http://192.168.1.35:4000');
+const socket = io('http://192.168.1.149:4000');
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
@@ -68,7 +68,7 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.menuItemText}>
               <Text style={styles.menuItemName}>{item.name}</Text>
               <Text style={styles.menuItemDescription}>{item.description}</Text>
-              <Text style={styles.menuItemPrice}>${item.price.toFixed(2)}</Text>
+              <Text style={styles.menuItemPrice}>€{item.price.toFixed(2)}</Text>
             </View>
             <MaterialIcons name="keyboard-arrow-right" size={24} color="orange" />
           </TouchableOpacity>
