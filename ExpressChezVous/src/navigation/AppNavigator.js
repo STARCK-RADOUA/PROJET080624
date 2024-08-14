@@ -13,6 +13,7 @@ import DrawerNavigator from './DrawerNavigator';
 import ReceiptScreen from '../screens/ReceiptScreen';
 import ShoppingCartScreen from '../screens/ShoppingCartScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
+import HomeScreen from '../screens/HomeScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -29,7 +30,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Services" component={ServicesScreen} />
         <Stack.Screen 
           name="Home" 
-          component={TabNavigator} 
+          component={DrawerNavigator} 
           options={{ headerShown: false }}  // Désactive l'en-tête pour HomeScreen
         />
       </Stack.Navigator>
@@ -37,63 +38,5 @@ const AppNavigator = () => {
   );
 };
 
-const TabNavigator = () => {
-  return (
-    <Tab.Navigator initialRouteName="Home">
-      <Tab.Screen
-        name="Home"
-        component={DrawerNavigator}
-        options={{
-          title: 'Home',
-          headerShown: false,
-          tabBarActiveTintColor: 'orange',
-          tabBarInactiveTintColor: 'black',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="home" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="ReceiptScreen"
-        component={ReceiptScreen}
-        options={{
-          title: 'Receipts',
-          headerShown: false,
-          tabBarActiveTintColor: 'orange',
-          tabBarInactiveTintColor: 'black',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="receipt" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="ShoppingCartScreen"
-        component={ShoppingCartScreen}
-        options={{
-          title: 'Orders',
-          headerShown: false,
-          tabBarActiveTintColor: 'orange',
-          tabBarInactiveTintColor: 'black',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="shopping-cart" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="UserProfileScreen"
-        component={UserProfileScreen}
-        options={{
-          title: 'Profile',
-          headerShown: false,
-          tabBarActiveTintColor: 'orange',
-          tabBarInactiveTintColor: 'black',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="user" color={color} size={size} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
 
 export default AppNavigator;

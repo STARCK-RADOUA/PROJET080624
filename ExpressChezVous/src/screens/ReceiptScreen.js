@@ -2,15 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, Modal, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
+import Header from '../components/Header';
+import useNotificationMenu from '../services/useNotificationMenu'; // Import the custom hook
+import NotificationMenu from '../components/NotificationMenu';
 
 const { width, height } = Dimensions.get('window');
 const socket = io('http://192.168.8.129:4000');
 
-const ReceiptScreen = () => {
+const ReceiptScreen = ({ navigation }) => {
+  const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu(); // Use the hook
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideAnimOrder = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -19,20 +23,14 @@ const ReceiptScreen = () => {
     socket.emit('requestOrders', deviceId);
 
     socket.on('allOrders', (data) => {
-        console.log('------------------------------------');
-        console.log('All Orders befooooooor:', data);
-        console.log('------------------------------------');
-      const validOrders = data.filter(order => order.OrderItem_id !== null);
       console.log('------------------------------------');
-      console.log('All Orders:', validOrders);
+      console.log('All Orders:', data);
       console.log('------------------------------------');
       setOrders(data);
     });
 
     socket.on('newOrder', (order) => {
-      if (order.OrderItem_id !== null) {
-        setOrders((prevOrders) => [order, ...prevOrders]);
-      }
+      setOrders((prevOrders) => [order, ...prevOrders]);
     });
 
     return () => {
@@ -46,7 +44,7 @@ const ReceiptScreen = () => {
     setModalVisible(true);
 
     Animated.parallel([
-      Animated.timing(slideAnim, {
+      Animated.timing(slideAnimOrder, {
         toValue: 1,
         duration: 500,
         useNativeDriver: true,
@@ -61,7 +59,7 @@ const ReceiptScreen = () => {
 
   const closeOrderDetails = () => {
     Animated.parallel([
-      Animated.timing(slideAnim, {
+      Animated.timing(slideAnimOrder, {
         toValue: 0,
         duration: 500,
         useNativeDriver: true,
@@ -77,32 +75,47 @@ const ReceiptScreen = () => {
     });
   };
 
-  const renderOrderItem = ({ item }) => {
-    const orderItem = item.OrderItem_id;
-    const product = orderItem && orderItem.product_id ? orderItem.product_id : null;
+  const renderOrderItem = ({ item }) => (
+    <TouchableOpacity style={styles.orderItem} onPress={() => openOrderDetails(item)}>
+      <View style={styles.orderInfo}>
+        <Text style={styles.productName}>Order ID: {item._id}</Text>
+        <Text style={styles.productPrice}>Total Price: ${item.total_price.toFixed(2)}</Text>
+        <Text style={styles.quantity}>Status: {item.status}</Text>
+      </View>
+      <View style={styles.statusWrapper}>
+        <Text style={styles.orderStatus}>{item.status}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
-    return (
-      <TouchableOpacity style={styles.orderItem} onPress={() => openOrderDetails(item)}>
-        <View style={styles.orderInfo}>
-          <Text style={styles.productName}>
-            {product ? product.name : 'Unknown Product'}
-          </Text>
-          <Text style={styles.productPrice}>
-            ${orderItem ? orderItem.price.toFixed(2) : 'N/A'}
-          </Text>
-          <Text style={styles.quantity}>
-            Quantity: {orderItem ? orderItem.quantity : 'N/A'}
-          </Text>
+  const renderProductItem = ({ item }) => (
+    <View style={styles.modalItem}>
+      <Text style={styles.productName}>{item.product_id.name}</Text>
+      <Text style={styles.productPrice}>Price: ${item.price.toFixed(2)}</Text>
+      <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
+      {item.selected_options && item.selected_options.length > 0 && (
+        <View>
+          <Text style={styles.modalItem}>Selected Options:</Text>
+          {item.selected_options.map((option, index) => (
+            <Text key={index} style={styles.optionItem}>
+              {option.name} - ${option.price.toFixed(2)}
+            </Text>
+          ))}
         </View>
-        <View style={styles.statusWrapper}>
-          <Text style={styles.orderStatus}>{item.status}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+      )}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
+      <Header navigation={navigation} toggleNotificationMenu={toggleNotificationMenu} />
+      {isNotificationMenuVisible && (
+        <NotificationMenu
+          slideAnim={slideAnim}
+          toggleNotificationMenu={toggleNotificationMenu}
+          socket={socket} // Pass the socket instance
+        />
+      )}
       <FlatList
         data={orders}
         renderItem={renderOrderItem}
@@ -117,34 +130,23 @@ const ReceiptScreen = () => {
           onRequestClose={closeOrderDetails}
         >
           <Animated.View style={[styles.modalOverlay, { opacity: opacityAnim }]}>
-            <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim.interpolate({
+            <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnimOrder.interpolate({
               inputRange: [0, 1],
               outputRange: [height, 0],
             }) }] }]}>
               <Text style={styles.modalTitle}>Order Details</Text>
+
+              <FlatList
+                data={selectedOrder.items}
+                renderItem={renderProductItem}
+                keyExtractor={(item) => item._id}
+              />
+
               <Text style={styles.modalItem}>
-                Product: {selectedOrder.OrderItem_id && selectedOrder.OrderItem_id.product_id ? selectedOrder.OrderItem_id.product_id.name : 'Unknown Product'}
+                Payment Method: {selectedOrder.payment_method}
               </Text>
               <Text style={styles.modalItem}>
-                Price: ${selectedOrder ? selectedOrder.total_price.toFixed(2) : 'N/A'}
-              </Text>
-              <Text style={styles.modalItem}>
-                Quantity: {selectedOrder.OrderItem_id ? selectedOrder.OrderItem_id.quantity : 'N/A'}
-              </Text>
-              <Text style={styles.modalItem}>Selected Options:</Text>
-              {selectedOrder.OrderItem_id && selectedOrder.OrderItem_id.selected_options.map((option, index) => (
-                <Text key={index} style={styles.optionItem}>
-                  {option.name} - ${option.price.toFixed(2)}
-                </Text>
-              ))}
-              <Text style={styles.modalItem}>
-                Payment Method: {selectedOrder ? selectedOrder.payment_method : 'N/A'}
-              </Text>
-              <Text style={styles.modalItem}>
-                Points Earned: {selectedOrder ? selectedOrder.points_earned || 0 : 'N/A'}
-              </Text>
-              <Text style={styles.modalItem}>
-                Status: {selectedOrder ? selectedOrder.status : 'N/A'}
+                Points Earned: {selectedOrder.points_earned || 0}
               </Text>
               <Text style={styles.modalItem}>
                 Address: {selectedOrder.address_id ? `${selectedOrder.address_id.address_line}, ${selectedOrder.address_id.building}, ${selectedOrder.address_id.floor}, ${selectedOrder.address_id.door_number}` : 'N/A'}
@@ -165,16 +167,17 @@ const ReceiptScreen = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
   },
   orderList: {
     paddingBottom: 20,
-    paddingTop: 20, // Ajoute un espace en haut de la liste
+    paddingTop: 20,
   },
   orderItem: {
     backgroundColor: '#fff',
@@ -260,6 +263,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
 
 export default ReceiptScreen;
