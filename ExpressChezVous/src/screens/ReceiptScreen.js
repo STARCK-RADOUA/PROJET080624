@@ -7,7 +7,7 @@ import useNotificationMenu from '../services/useNotificationMenu'; // Import the
 import NotificationMenu from '../components/NotificationMenu';
 
 const { width, height } = Dimensions.get('window');
-const socket = io('http://192.168.1.149:4000');
+const socket = io('http://192.168.8.119:4000');
 
 const ReceiptScreen = ({ navigation }) => {
   const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu(); // Use the hook

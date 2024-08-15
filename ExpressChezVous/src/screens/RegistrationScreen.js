@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
 
-const socket = io('http://192.168.1.149:4000'); // Remplacez par l'URL de votre serveur
+const socket = io('http://192.168.8.119:4000'); // Remplacez par l'URL de votre serveur
 
 const RegistrationScreen = ({ navigation }) => {
   const [deviceId, setDeviceId] = useState('');
@@ -14,6 +14,7 @@ const RegistrationScreen = ({ navigation }) => {
 
   useEffect(() => {
     // Récupération de l'ID unique de l'appareil avec Expo
+    
     const getDeviceId = async () => {
       const id = Device.osBuildId; // Par exemple, en utilisant Device.osBuildId
       setDeviceId(id);

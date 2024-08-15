@@ -17,6 +17,7 @@ const ClientChatScreen = () => {
                     admin_id: '66bac40871e4a7ed9e6fc705',
                     client_id: clientId,
                     
+
                 });
                 setChatId(response.data._id);
                 setMessages(response.data.messages);
@@ -29,7 +30,7 @@ const ClientChatScreen = () => {
 
         const interval = setInterval(async () => {
             try {
-                const response = await axios.get(`http://192.168.1.149:4000/api/chats/${chatId}`);
+                const response = await axios.get(`http://192.168.8.119:4000/api/chats/${chatId}`);
                 setMessages(response.data.messages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
@@ -41,7 +42,7 @@ const ClientChatScreen = () => {
 
     const sendMessage = () => {
         if (message.trim()) {
-            axios.post('http://192.168.1.149:4000/api/chats/send-message', {
+            axios.post('http://192.168.8.119:4000/api/chats/send-message', {
                 chatId,
                 sender: 'client',
                 content: message,

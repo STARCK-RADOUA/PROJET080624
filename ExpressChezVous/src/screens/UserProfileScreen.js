@@ -7,6 +7,7 @@ import useNotificationMenu from '../services/useNotificationMenu';
 import NotificationMenu from '../components/NotificationMenu';
 
 const socket = io('http://192.168.1.129:4000');
+
 const { width, height } = Dimensions.get('window');
 
 const UserProfileScreen = ({ navigation }) => {
