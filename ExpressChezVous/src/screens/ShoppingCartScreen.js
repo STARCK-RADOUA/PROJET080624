@@ -4,23 +4,31 @@ import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 import { getClient } from '../services/userService';
+import io from 'socket.io-client';
+import * as Device from 'expo-device';
+
+// Connect to the Socket.IO server
+const socket = io('http://192.168.8.119:4000'); // Use your backend server's IP address
 
 const ShoppingCartScreen = () => {
   const [orderItems, setOrderItems] = useState([]);
   const [expandedItemId, setExpandedItemId] = useState(null);
-  const [totalPrice, setTotalPrice] = useState(0); // Add state for total price
+  const [totalPrice, setTotalPrice] = useState(0); 
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Fetch device ID
+    const deviceId = Device.osBuildId;
+    console.log('Device ID:', deviceId);
+  }, []);
 
   const fetchOrderItems = async () => {
     try {
       const userId = await getClient();
-
-      const url = `http://192.168.1.149:4000/api/order-items/${userId}/order-items`;
-
+      const url = `http://192.168.8.119:4000/api/order-items/${userId}/order-items`;
       const response = await axios.get(url);
-
       setOrderItems(response.data);
-      calculateTotalPrice(response.data); // Calculate total price initially
+      calculateTotalPrice(response.data);
     } catch (error) {
       console.error('Failed to fetch order items:', error.message || error);
       setError('Failed to fetch order items. Please check the console for details.');
@@ -34,11 +42,10 @@ const ShoppingCartScreen = () => {
 
   const deleteItem = async (itemId) => {
     try {
-      await axios.delete(`http://192.168.1.149:4000/api/order-items/${itemId}`);
+      await axios.delete(`http://192.168.8.119:4000/api/order-items/${itemId}`);
       const updatedItems = orderItems.filter(item => item._id !== itemId);
       setOrderItems(updatedItems);
-      calculateTotalPrice(updatedItems); // Recalculate total price after deletion
-
+      calculateTotalPrice(updatedItems);
     } catch (error) {
       console.error('Failed to delete item:', error.message || error);
       setError('Failed to delete item. Please check the console for details.');
@@ -56,7 +63,7 @@ const ShoppingCartScreen = () => {
         : item
     );
     setOrderItems(updatedItems);
-    calculateTotalPrice(updatedItems); // Recalculate total price on quantity change
+    calculateTotalPrice(updatedItems);
   };
 
   useFocusEffect(
@@ -68,11 +75,27 @@ const ShoppingCartScreen = () => {
   const handleItemPress = (itemId) => {
     setExpandedItemId((prevId) => (prevId === itemId ? null : itemId));
   };
-
-  const handleOrderNow = () => {
-    console.log('Order Now button pressed');
-    console.log('Total price:', totalPrice);
+  const handleOrderNow = async () => {
+    try {
+      // Fetch device ID
+      const deviceId = Device.osBuildId;
+  
+    
+  
+      // Emit orderData, deviceId, and totalPrice to the backend
+      socket.emit('addOrder',  deviceId, totalPrice);
+  
+      console.log('Order Now button pressed');
+      console.log('Total price:', totalPrice);
+      console.log('Order Items:', orderItems);
+      console.log('Device ID:', deviceId);
+  
+    } catch (error) {
+      console.error('Failed to place the order:', error);
+      setError('Failed to place the order. Please check the console for details.');
+    }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -131,7 +154,6 @@ const ShoppingCartScreen = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

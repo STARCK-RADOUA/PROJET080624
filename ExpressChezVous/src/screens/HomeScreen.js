@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 
-const socket = io('http://192.168.1.149:4000');
+const socket = io('http://192.168.8.119:4000');
 
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');

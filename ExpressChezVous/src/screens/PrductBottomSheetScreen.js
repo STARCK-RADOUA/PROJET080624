@@ -89,7 +89,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
     const checkIfItemIsInCart = async () => {
       try {
         const userId = await getClient();
-        const url = `http://192.168.1.149:4000/api/order-items/${userId}/order-items`;
+        const url = `http://192.168.8.119:4000/api/order-items/${userId}/order-items`;
 
         const response = await axios.get(url);
 
@@ -153,7 +153,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
       const userId = await getClient();
 
 
-      await axios.post('http://192.168.1.149:4000/api/order-items', {
+      await axios.post('http://192.168.8.119:4000/api/order-items', {
 
         userId: userId,
         productId: item?._id,
