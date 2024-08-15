@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import { getClientId } from '../services/userService';
 
 const ClientChatScreen = () => {
     const [chatId, setChatId] = useState(null);
@@ -8,11 +9,14 @@ const ClientChatScreen = () => {
     const [message, setMessage] = useState('');
 
     useEffect(() => {
+        
         const initiateChat = async () => {
             try {
+                const clientId = await  getClientId() ;
                 const response = await axios.post('http://192.168.1.149:4000/api/chats/initiate', {
                     admin_id: '66bac40871e4a7ed9e6fc705',
-                    client_id: '66b83857e8ce33ce391313f4',
+                    client_id: clientId,
+                    
                 });
                 setChatId(response.data._id);
                 setMessages(response.data.messages);

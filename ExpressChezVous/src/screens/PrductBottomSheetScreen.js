@@ -8,7 +8,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { getClient } from '../services/userService'; // Import the getClient function
+import { getClientId } from '../services/userService'; // Import the getClient function
 import axios from 'axios';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -88,8 +88,8 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
   useEffect(() => {
     const checkIfItemIsInCart = async () => {
       try {
-        const userId = await getClient();
-        const url = `http://192.168.1.149:4000/api/order-items/${userId}/order-items`;
+        const clientId = await getClientId();
+        const url = `http://192.168.1.149:4000/api/order-items/${clientId}/order-items`;
 
         const response = await axios.get(url);
 
@@ -150,12 +150,12 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
           price: item.options?.find(opt => opt.name === extra)?.price || 0,
         }));
 
-      const userId = await getClient();
+      const clientId = await getClientId();
 
 
       await axios.post('http://192.168.1.149:4000/api/order-items', {
 
-        userId: userId,
+        clientId: clientId,
         productId: item?._id,
         quantity,
         selectedItems,

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import icon from '../assets/images/wave.png'; // Import your icon image
+import axios from 'axios';
+import { getClientId } from '../services/userService';
 
 const ServicesScreen = ({ navigation }) => {
   const services = [
@@ -16,6 +18,34 @@ const ServicesScreen = ({ navigation }) => {
       navigation.navigate('Home');
     }
   };
+
+
+  
+  useEffect(() => {
+    const createCart = async () => {
+      try {
+        // Fetch the client ID (or obtain it from user context)
+        const client_id = await getClientId();
+        
+        if (!client_id) {
+          throw new Error('Client ID is missing');
+        }
+
+        // Send a POST request to create the cart
+        const response = await axios.post('http://192.168.1.149:4000/api/carts/add', { client_id });
+        
+        // Handle the response
+        setCart(response.data); // Store the cart data
+      } catch (err) {
+        setError(err.message || 'Failed to create cart');
+        console.error('Error creating cart:', err);
+      }
+    };
+
+    // Call the createCart function
+    createCart();
+  }, []); // This will run when the component mounts
+
 
   return (
     <View style={styles.container}>

@@ -28,7 +28,7 @@ export const getClientById = async () => {
   try {
     const deviceId = getDeviceId();
 
-    const response = await axios.post('https://your-backend-url.com/api/sessions/get-client-details', {
+    const response = await axios.post('http://192.168.1.149:4000/api/sessions/get-client-details', {
       deviceId: deviceId,
     });
 
@@ -40,3 +40,26 @@ export const getClientById = async () => {
     throw error;
   }
 };
+
+
+
+export const getClientId = async () => {
+  try {
+    const deviceId = getDeviceId();
+
+    const response = await axios.post('http://192.168.1.149:4000/api/sessions/get-client-ide', {
+      deviceId: deviceId,
+    });
+    const clientId = response.data.clientId;
+    console.log(clientId)
+    return clientId;
+  } catch (error) {
+    console.error('Error fetching user ID:', error);
+    throw error;
+  }
+
+};
+
+
+
+
