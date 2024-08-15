@@ -11,7 +11,7 @@ export const CartProvider = ({ children }) => {
     const fetchCartItems = async () => {
       try {
         const userId = await getClient();
-        const url = `http://192.168.8.119:4000/api/order-items/${userId}/order-items`;
+        const url = `http://192.168.1.149:4000/api/order-items/${userId}/order-items`;
         const response = await axios.get(url);
         setCartItems(response.data);
       } catch (error) {

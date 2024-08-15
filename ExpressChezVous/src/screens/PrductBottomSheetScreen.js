@@ -154,7 +154,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
       const clientId = await getClientId();
 
 
-      await axios.post('http://192.168.8.119:4000/api/order-items', {
+      await axios.post('http://192.168.1.149:4000/api/order-items', {
 
         clientId: clientId,
         productId: item?._id,
