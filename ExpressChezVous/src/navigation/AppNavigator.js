@@ -14,6 +14,7 @@ import ReceiptScreen from '../screens/ReceiptScreen';
 import ShoppingCartScreen from '../screens/ShoppingCartScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
 import HomeScreen from '../screens/HomeScreen';
+import AdressForm from '../screens/AddressFormScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -28,6 +29,8 @@ const AppNavigator = () => {
         <Stack.Screen name="Registration" component={RegistrationScreen} />{/*     
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  */} 
         <Stack.Screen name="Services" component={ServicesScreen} />
+        <Stack.Screen name="AdressForm" component={AdressForm} />
+
         <Stack.Screen 
           name="Home" 
           component={DrawerNavigator} 

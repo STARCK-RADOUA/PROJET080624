@@ -35,7 +35,7 @@ const ClientChatScreen = () => {
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
-        }, 300); // Polling every 3 seconds
+        }, 3000); // Polling every 3 seconds
 
         return () => clearInterval(interval);
     }, [chatId]);
