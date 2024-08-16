@@ -1,3 +1,5 @@
+import {  BASE_URLIO } from '@env';
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity, TouchableWithoutFeedback, FlatList, Modal } from 'react-native';
 import io from 'socket.io-client';
@@ -17,7 +19,7 @@ const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
       setDeviceId(id);
 
       if (!socket) {
-        socket = io('http://192.168.8.119:4000'); // Évitez de réinitialiser le socket à chaque fois
+        socket = io(`${BASE_URLIO}`); // Évitez de réinitialiser le socket à chaque fois
       }
 
       socket.emit('requestNotifications', id);

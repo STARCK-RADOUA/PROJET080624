@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
@@ -5,7 +7,7 @@ import io from 'socket.io-client';
 import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 
-const socket = io('http://192.168.8.119:4000');
+const socket = io(`${BASE_URLIO}`);
 
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');

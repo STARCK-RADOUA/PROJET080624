@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 // useNotificationMenu.js
 import { useState, useRef } from 'react';
 import { Animated, Dimensions } from 'react-native';

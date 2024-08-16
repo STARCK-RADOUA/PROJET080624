@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import icon from '../assets/images/wave.png'; // Import your icon image
@@ -32,7 +34,7 @@ const ServicesScreen = ({ navigation }) => {
         }
 
         // Send a POST request to create the cart
-        const response = await axios.post('http://192.168.8.119:4000/api/carts/add', { client_id });
+        const response = await axios.post(`${BASE_URL}/api/carts/add`, { client_id });
         
         // Handle the response
         setCart(response.data); // Store the cart data

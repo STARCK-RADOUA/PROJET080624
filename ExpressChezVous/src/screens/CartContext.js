@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { getClient } from '../services/userService'; // Assuming this function gets the client/user ID
@@ -11,7 +13,7 @@ export const CartProvider = ({ children }) => {
     const fetchCartItems = async () => {
       try {
         const userId = await getClient();
-        const url = `http://192.168.8.119:4000/api/order-items/${userId}/order-items`;
+        const url = `${BASE_URL}/api/order-items/${userId}/order-items`;
         const response = await axios.get(url);
         setCartItems(response.data);
       } catch (error) {

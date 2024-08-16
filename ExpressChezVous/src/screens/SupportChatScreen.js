@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
@@ -13,7 +15,7 @@ const ClientChatScreen = () => {
         const initiateChat = async () => {
             try {
                 const clientId = await  getClientId() ;
-                const response = await axios.post('http://192.168.8.119:4000/api/chats/initiate', {
+                const response = await axios.post(`${BASE_URL}/api/chats/initiate`, {
                     admin_id: '66bac40871e4a7ed9e6fc705',
                     client_id: clientId,
                     
@@ -30,7 +32,7 @@ const ClientChatScreen = () => {
 
         const interval = setInterval(async () => {
             try {
-                const response = await axios.get(`http://192.168.8.119:4000/api/chats/${chatId}`);
+                const response = await axios.get(`${BASE_URL}/api/chats/${chatId}`);
                 setMessages(response.data.messages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
@@ -42,7 +44,7 @@ const ClientChatScreen = () => {
 
     const sendMessage = () => {
         if (message.trim()) {
-            axios.post('http://192.168.8.119:4000/api/chats/send-message', {
+            axios.post(`${BASE_URL}/api/chats/send-message`, {
                 chatId,
                 sender: 'client',
                 content: message,

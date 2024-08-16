@@ -1,9 +1,11 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
 
-const socket = io('http://192.168.8.119:4000'); // Remplacez par l'URL de votre serveur
+const socket = io(`${BASE_URLIO}`); // Remplacez par l'URL de votre serveur
 
 const RegistrationScreen = ({ navigation }) => {
   const [deviceId, setDeviceId] = useState('');

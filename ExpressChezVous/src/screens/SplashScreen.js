@@ -1,3 +1,4 @@
+
 // src/screens/SplashScreen.js
 
 import React from 'react';

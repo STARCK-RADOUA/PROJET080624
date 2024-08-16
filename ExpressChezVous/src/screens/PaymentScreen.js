@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
 import axios from 'axios';
@@ -15,7 +17,7 @@ const PaymentScreen = ({ route }) => {
 
     try {
       // Replace with your actual server URL
-      const serverUrl = `http://192.168.8.119:4000/api/orders/update/${orderId}`;
+      const serverUrl = `${BASE_URL}/api/orders/update/${orderId}`;
 
       const payload = {
         exchange: exchangeValue, // Send the exchange value
