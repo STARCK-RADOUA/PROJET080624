@@ -43,7 +43,7 @@ const AddressFormScreen = ({ navigation }) => {
       };
 
       // Send the data to your API endpoint
-      const response = await axios.post('http://192.168.1.149:4000/api/addresses', dataToSend);
+      const response = await axios.post('http://192.168.8.119:4000/api/addresses', dataToSend);
       console.log('Address saved:', response.data);
       
       // Navigate back or to another screen
