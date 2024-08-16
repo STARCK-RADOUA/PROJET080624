@@ -8,9 +8,9 @@ import io from 'socket.io-client';
 import * as Device from 'expo-device';
 
 // Connect to the Socket.IO server
-const socket = io('http://192.168.1.149:4000'); // Use your backend server's IP address
+const socket = io('http://192.168.8.119:4000'); // Use your backend server's IP address
 
-const ShoppingCartScreen = () => {
+const ShoppingCartScreen = ({ navigation }) => {
   const [orderItems, setOrderItems] = useState([]);
   const [expandedItemId, setExpandedItemId] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0); 
@@ -25,7 +25,7 @@ const ShoppingCartScreen = () => {
   const fetchOrderItems = async () => {
     try {
       const clientId = await getClientId();
-      const url = `http://192.168.1.149:4000/api/order-items/${clientId}/order-items`;
+      const url = `http://192.168.8.119:4000/api/order-items/${clientId}/order-items`;
       const response = await axios.get(url);
       setOrderItems(response.data);
       calculateTotalPrice(response.data);
@@ -42,7 +42,7 @@ const ShoppingCartScreen = () => {
 
   const deleteItem = async (itemId) => {
     try {
-      await axios.delete(`http://192.168.1.149:4000/api/order-items/${itemId}`);
+      await axios.delete(`http://192.168.8.119:4000/api/order-items/${itemId}`);
       const updatedItems = orderItems.filter(item => item._id !== itemId);
       setOrderItems(updatedItems);
       calculateTotalPrice(updatedItems);
@@ -89,7 +89,8 @@ const ShoppingCartScreen = () => {
       console.log('Total price:', totalPrice);
       console.log('Order Items:', orderItems);
       console.log('Device ID:', deviceId);
-  
+      
+      navigation.navigate('AdressForm');
     } catch (error) {
       console.error('Failed to place the order:', error);
       setError('Failed to place the order. Please check the console for details.');

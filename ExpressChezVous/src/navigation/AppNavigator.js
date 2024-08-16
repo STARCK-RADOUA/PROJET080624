@@ -29,13 +29,14 @@ const AppNavigator = () => {
         <Stack.Screen name="Registration" component={RegistrationScreen} />{/*     
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  */} 
         <Stack.Screen name="Services" component={ServicesScreen} />
-        <Stack.Screen name="AdressForm" component={AdressForm} />
+         <Stack.Screen name="AdressForm" component={AdressForm} />
 
         <Stack.Screen 
           name="Home" 
           component={DrawerNavigator} 
           options={{ headerShown: false }}  // Désactive l'en-tête pour HomeScreen
-        />
+        /> 
+      
       </Stack.Navigator>
     </NavigationContainer>
   );

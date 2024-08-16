@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
 
-const socket = io('http://192.168.1.149:4000'); // Replace with your server's URL
+const socket = io('http://192.168.8.119:4000'); // Replace with your server's URL
 
 const LoadingScreen = ({ navigation }) => {
   const [isActivated, setIsActivated] = useState(false);

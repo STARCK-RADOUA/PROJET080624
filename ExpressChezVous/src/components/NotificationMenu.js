@@ -17,7 +17,7 @@ const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
       setDeviceId(id);
 
       if (!socket) {
-        socket = io('http://192.168.1.149:4000'); // Évitez de réinitialiser le socket à chaque fois
+        socket = io('http://192.168.8.119:4000'); // Évitez de réinitialiser le socket à chaque fois
       }
 
       socket.emit('requestNotifications', id);
