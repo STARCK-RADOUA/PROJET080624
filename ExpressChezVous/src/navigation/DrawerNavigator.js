@@ -6,6 +6,8 @@ import ShoppingCartScreen from '../screens/ShoppingCartScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
 import SupportChat from '../screens/SupportChatScreen';
 import PaymentScreen from '../screens/PaymentScreen';
+import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
+
 
 
 import TabNavigator from './TabNavigator';
@@ -17,6 +19,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="Home" component={TabNavigator} />
       <Drawer.Screen name="SupportChat" component={SupportChat} />
       <Drawer.Screen name="PaymentScreen" component={PaymentScreen} />
+      <Drawer.Screen name="PaymentSucces" component={PaymentSuccessScreen} />
 
       <Drawer.Screen name="Logout" component={HomeScreen} />
     </Drawer.Navigator>
