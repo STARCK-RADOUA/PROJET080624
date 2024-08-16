@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, Modal, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
 import io from 'socket.io-client';
@@ -7,7 +9,7 @@ import useNotificationMenu from '../services/useNotificationMenu'; // Import the
 import NotificationMenu from '../components/NotificationMenu';
 
 const { width, height } = Dimensions.get('window');
-const socket = io('http://192.168.8.119:4000');
+const socket = io(`${BASE_URLIO}`);
 
 const ReceiptScreen = ({ navigation }) => {
   const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu(); // Use the hook

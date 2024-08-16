@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,7 +10,7 @@ import io from 'socket.io-client';
 import * as Device from 'expo-device';
 
 // Connect to the Socket.IO server
-const socket = io('http://192.168.8.119:4000'); // Use your backend server's IP address
+const socket = io(`${BASE_URLIO}`); // Use your backend server's IP address
 
 const ShoppingCartScreen = ({ navigation }) => {
   const [orderItems, setOrderItems] = useState([]);
@@ -25,7 +27,7 @@ const ShoppingCartScreen = ({ navigation }) => {
   const fetchOrderItems = async () => {
     try {
       const clientId = await getClientId();
-      const url = `http://192.168.8.119:4000/api/order-items/${clientId}/order-items`;
+      const url = `${BASE_URL}/api/order-items/${clientId}/order-items`;
       const response = await axios.get(url);
       setOrderItems(response.data);
       calculateTotalPrice(response.data);
@@ -42,7 +44,7 @@ const ShoppingCartScreen = ({ navigation }) => {
 
   const deleteItem = async (itemId) => {
     try {
-      await axios.delete(`http://192.168.8.119:4000/api/order-items/${itemId}`);
+      await axios.delete(`${BASE_URL}/api/order-items/${itemId}`);
       const updatedItems = orderItems.filter(item => item._id !== itemId);
       setOrderItems(updatedItems);
       calculateTotalPrice(updatedItems);

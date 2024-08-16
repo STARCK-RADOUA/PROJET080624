@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import * as Location from 'expo-location';  // Import expo-location for location fetching
@@ -67,7 +69,7 @@ const AddressFormScreen = ({ navigation }) => {
       };
 
       // Send the data to your API endpoint
-      const response = await axios.post('http://192.168.8.119:4000/api/addresses', dataToSend);
+      const response = await axios.post(`${BASE_URL}/api/addresses`, dataToSend);
       console.log('Address saved:', response.data);
       
       // Navigate back or to another screen

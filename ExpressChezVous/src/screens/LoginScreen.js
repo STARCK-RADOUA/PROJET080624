@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useEffect } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, ImageBackground, Dimensions, ActivityIndicator } from 'react-native';
 import * as Device from 'expo-device';  // Pour obtenir l'ID de l'appareil
@@ -6,7 +8,7 @@ import { styles } from './styles/loginstyle';
 
 const { width } = Dimensions.get('window');  // Obtenez la largeur de l'écran
 
-const socket = io('http://192.168.8.119:4000');  // Remplacez par l'URL de votre serveur
+const socket = io(`${BASE_URLIO}`);  // Remplacez par l'URL de votre serveur
 
 const LoginScreen = ({ navigation }) => {
 

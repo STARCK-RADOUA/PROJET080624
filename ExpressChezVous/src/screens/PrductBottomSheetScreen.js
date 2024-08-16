@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useCallback, useImperativeHandle, useState, useEffect } from 'react';
 import { Dimensions, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -89,7 +91,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
     const checkIfItemIsInCart = async () => {
       try {
         const clientId = await getClientId();
-        const url = `http://192.168.8.119:4000/api/order-items/${clientId}/order-items`;
+        const url = `${BASE_URL}/api/order-items/${clientId}/order-items`;
 
 
         const response = await axios.get(url);
@@ -154,7 +156,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
       const clientId = await getClientId();
 
 
-      await axios.post('http://192.168.8.119:4000/api/order-items', {
+      await axios.post(`${BASE_URL}/api/order-items`, {
 
         clientId: clientId,
         productId: item?._id,

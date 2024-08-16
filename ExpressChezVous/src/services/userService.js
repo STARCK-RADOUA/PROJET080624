@@ -1,3 +1,5 @@
+import { BASE_URL } from '@env';
+
 import axios from 'axios';
 import * as Device from 'expo-device';
 
@@ -11,7 +13,7 @@ export const getClient = async () => {
     const deviceId = getDeviceId();
 
 
-    const response = await axios.post('http://192.168.8.119:4000/api/sessions/get-client-id', {
+    const response = await axios.post(`${BASE_URL}/api/sessions/get-client-id`, {
 
       deviceId: deviceId,
     });
@@ -28,7 +30,7 @@ export const getClientById = async () => {
   try {
     const deviceId = getDeviceId();
 
-    const response = await axios.post('http://192.168.8.119:4000/api/sessions/get-client-details', {
+    const response = await axios.post(`${BASE_URL}/api/sessions/get-client-details`, {
       deviceId: deviceId,
     });
 
@@ -47,7 +49,7 @@ export const getClientId = async () => {
   try {
     const deviceId = getDeviceId();
 
-    const response = await axios.post('http://192.168.8.119:4000/api/sessions/get-client-ide', {
+    const response = await axios.post(`${BASE_URL}/api/sessions/get-client-ide`, {
       deviceId: deviceId,
     });
     const clientId = response.data.clientId;
