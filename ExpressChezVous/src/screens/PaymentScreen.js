@@ -1,35 +1,68 @@
-import { BASE_URL, BASE_URLIO } from '@env';
-
-import React, { useState } from 'react';
+import { BASE_URLIO } from '@env';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
-import axios from 'axios';
+import io from 'socket.io-client';
 
-const PaymentScreen = ({ route }) => {
-  const  orderId  = "66bea74097d7e61f1d6b3bd7"
-  const [selectedPayment, setSelectedPayment] = useState(null); // Default to null, no payment selected
-  const [exchangeValue, setExchangeValue] = useState(0); // Initial exchange value (numeric)
+const PaymentScreen = ({ navigation, route }) => {
+  const orderId = "66bea74097d7e61f1d6b3bd7"; // Ton ID de commande
+  const orderDetails = route.params; // Les détails de la commande passés depuis un autre écran
+  const [selectedPayment, setSelectedPayment] = useState(null); // Par défaut, aucun paiement sélectionné
+  const [exchangeValue, setExchangeValue] = useState(0); // Valeur initiale d'échange
   const [loading, setLoading] = useState(false);
+  const [socket, setSocket] = useState(null); // État pour stocker l'instance Socket.IO
+
+  // Initialiser la connexion Socket.IO
+  useEffect(() => {
+    const socketInstance = io(BASE_URLIO);
+    setSocket(socketInstance);
+
+    // Nettoyer la connexion lors du démontage du composant
+    return () => {
+      if (socketInstance) {
+        socketInstance.disconnect();
+      }
+    };
+  }, []);
 
   const handlePayment = async () => {
-    if (!selectedPayment) return;
+    if (!selectedPayment) {
+      return;
+    }
+
+    console.log('Order Details:', orderDetails);
 
     setLoading(true);
 
     try {
-      // Replace with your actual server URL
-      const serverUrl = `${BASE_URL}/api/orders/update/${orderId}`;
-
-      const payload = {
-        exchange: exchangeValue, // Send the exchange value
-        paymentMethod: selectedPayment === 'cash' ? 'cash' : 'TPE', // Send the payment method
+      const orderData = {
+        exchange: exchangeValue, // Envoi de la valeur d'échange
+        paymentMethod: selectedPayment === 'cash' ? 'cash' : 'TPE', // Envoi de la méthode de paiement
+        orderdetaille: orderDetails, // Détails de la commande
       };
+      console.log('------------------------------------');
+      console.log('........................................................');
+      console.log(orderData);
+      console.log('000000000000000000000000000000000000000000000000000000000000');
+      console.log('------------------------------------');
 
-      const response = await axios.put(serverUrl, payload);
-      Alert.alert('Success', 'Order updated successfully!');
-      console.log(response.data);
+      if (socket) {
+        // Émission des données vers le serveur via Socket.IO
+        socket.emit('addOrder', orderData);
+
+        // Écouter la réponse du serveur pour l'événement 'orderAdded'
+        socket.on('orderAdded', (order) => {
+          console.log('Order ajouté:', order);
+          Alert.alert('Succès', 'Votre commande est en cours de création!');
+          const dataToSend = {
+            order_id: order._id,
+      
+          };
+          navigation.replace('PaymentSuccessScreen', { data: dataToSend });
+        });
+      }
     } catch (error) {
-      console.error('Error updating order:', error);
-      Alert.alert('Error', 'Failed to update order.');
+      console.error('Erreur lors de la création de la commande:', error);
+      Alert.alert('Erreur', 'Échec de la mise à jour de la commande.');
     } finally {
       setLoading(false);
     }
@@ -44,14 +77,13 @@ const PaymentScreen = ({ route }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            value={`${exchangeValue} €`} // Always append "€" and disallow deletion
+            value={`${exchangeValue} €`}
             keyboardType="numeric"
             onChangeText={(text) => {
-              // Remove any non-numeric characters before setting the state
               const numericValue = text.replace(/[^0-9]/g, '');
-              setExchangeValue(numericValue || 0); // Default to 0 if input is empty
+              setExchangeValue(numericValue || 0);
             }}
-            editable={true} // User can only edit numbers, not the "€" symbol
+            editable={true}
           />
         </View>
       </View>
@@ -72,10 +104,10 @@ const PaymentScreen = ({ route }) => {
 
       <TouchableOpacity
         style={[
-          styles.okButton, 
-          { backgroundColor: selectedPayment ? '#00C851' : '#cccccc' } // Disable button if no selection
+          styles.okButton,
+          { backgroundColor: selectedPayment ? '#00C851' : '#cccccc' },
         ]}
-        disabled={!selectedPayment} // Button is disabled until a payment method is selected
+        disabled={!selectedPayment}
         onPress={handlePayment}
       >
         <Text style={styles.okText}>{loading ? 'Processing...' : 'Ok'}</Text>
@@ -84,7 +116,7 @@ const PaymentScreen = ({ route }) => {
   );
 };
 
-const { width } = Dimensions.get('window'); // Get device width for responsive design
+const { width } = Dimensions.get('window'); 
 
 const styles = StyleSheet.create({
   container: {
@@ -92,7 +124,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
     alignItems: 'center',
-    marginTop: 50, // Top margin for spacing
+    marginTop: 50,
   },
   title: {
     fontSize: 24,
@@ -115,7 +147,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingHorizontal: 15,
     paddingVertical: 10,
-    width: width * 0.6, // Responsive width
+    width: width * 0.6,
     justifyContent: 'center',
   },
   input: {
@@ -125,7 +157,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   paymentOption: {
-    width: width * 0.8, // Responsive width for buttons
+    width: width * 0.8,
     paddingVertical: 15,
     marginVertical: 10,
     borderRadius: 30,
@@ -145,8 +177,8 @@ const styles = StyleSheet.create({
   },
   okButton: {
     position: 'absolute',
-    bottom: 50, // Button at the bottom
-    width: width * 0.8, // Responsive width
+    bottom: 50,
+    width: width * 0.8,
     paddingVertical: 12,
     borderRadius: 25,
     alignItems: 'center',

@@ -1,7 +1,6 @@
 import { BASE_URL, BASE_URLIO } from '@env';
-
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
 
@@ -12,11 +11,12 @@ const RegistrationScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [cmpassword, setcmPassword] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     // Récupération de l'ID unique de l'appareil avec Expo
-    
     const getDeviceId = async () => {
       const id = Device.osBuildId; // Par exemple, en utilisant Device.osBuildId
       setDeviceId(id);
@@ -25,7 +25,13 @@ const RegistrationScreen = ({ navigation }) => {
     getDeviceId();
 
     // Vérification de la validité du formulaire
-    setIsFormValid(firstName.trim() !== '' && lastName.trim() !== '' && phone.trim() !== '');
+    setIsFormValid(
+      firstName.trim() !== '' &&
+      lastName.trim() !== '' &&
+      phone.trim() !== '' &&
+      password === cmpassword &&  // Validation des mots de passe
+      password.length >= 6  // Vérification de la longueur minimale du mot de passe
+    );
 
     // Écoute de l'événement de registration côté serveur
     socket.on('clientRegistered', (data) => {
@@ -39,12 +45,18 @@ const RegistrationScreen = ({ navigation }) => {
     return () => {
       socket.off('clientRegistered');
     };
-  }, [firstName, lastName, phone, deviceId]);
+  }, [firstName, lastName, phone, password, cmpassword, deviceId]);
 
   const handleConfirm = () => {
+    // Vérification supplémentaire avant d'envoyer les données
+    if (password !== cmpassword) {
+      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
+      return;
+    }
+
     // Emission de l'événement avec les données de l'utilisateur + deviceId
-    socket.emit('registerClient', { firstName, lastName, phone, deviceId });
-    navigation.navigate('Loading');
+    socket.emit('registerClient', { firstName, lastName, phone, password, deviceId });
+    navigation.replace('Loading');
   };
 
   return (
@@ -53,6 +65,23 @@ const RegistrationScreen = ({ navigation }) => {
       <TextInput style={styles.input} placeholder="First Name" value={firstName} onChangeText={setFirstName} />
       <TextInput style={styles.input} placeholder="Last Name" value={lastName} onChangeText={setLastName} />
       <TextInput style={styles.input} placeholder="Phone Number" keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
+      
+      {/* Champs pour le mot de passe */}
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry={true}
+        value={password}
+        onChangeText={setPassword}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        secureTextEntry={true}
+        value={cmpassword}
+        onChangeText={setcmPassword}
+      />
+
       <TouchableOpacity style={[styles.button, !isFormValid && styles.disabledButton]} onPress={isFormValid ? handleConfirm : null} disabled={!isFormValid}>
         <Text style={styles.buttonText}>Confirm</Text>
       </TouchableOpacity>

@@ -4,12 +4,17 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { getClientId } from '../services/userService';
-
-const ClientChatScreen = () => {
+import Header from '../components/Header';
+import useNotificationMenu from '../services/useNotificationMenu'; // Import the custom hook
+import NotificationMenu from '../components/NotificationMenu';
+import io from 'socket.io-client';
+const ClientChatScreen = ({ navigation }) => {
     const [chatId, setChatId] = useState(null);
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
+    const socket = io(`${BASE_URLIO}`);
 
+    const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
     useEffect(() => {
         
         const initiateChat = async () => {
@@ -55,6 +60,14 @@ const ClientChatScreen = () => {
 
     return (
         <View style={styles.container}>
+         <Header navigation={navigation} toggleNotificationMenu={toggleNotificationMenu} />
+      {isNotificationMenuVisible && (
+        <NotificationMenu
+          slideAnim={slideAnim}
+          toggleNotificationMenu={toggleNotificationMenu}
+          socket={socket} // Pass the socket instance
+        />
+      )}
             <FlatList
                 data={messages}
                 keyExtractor={(item, index) => index.toString()}

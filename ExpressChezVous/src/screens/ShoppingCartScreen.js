@@ -6,18 +6,24 @@ import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 import { getClientId } from '../services/userService';
+import Header from '../components/Header';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
+import useNotificationMenu from '../services/useNotificationMenu'; // Import the custom hook
+import NotificationMenu from '../components/NotificationMenu';
 
 // Connect to the Socket.IO server
-const socket = io(`${BASE_URLIO}`); // Use your backend server's IP address
+ // Use your backend server's IP address
 
 const ShoppingCartScreen = ({ navigation }) => {
   const [orderItems, setOrderItems] = useState([]);
   const [expandedItemId, setExpandedItemId] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0); 
+  const [order_id, setOrder_id] = useState(0); 
   const [error, setError] = useState('');
+  const socket = io(`${BASE_URLIO}`);
 
+  const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
   useEffect(() => {
     // Fetch device ID
     const deviceId = Device.osBuildId;
@@ -84,15 +90,20 @@ const ShoppingCartScreen = ({ navigation }) => {
   
     
   
-      // Emit orderData, deviceId, and totalPrice to the backend
-      socket.emit('addOrder',  deviceId, totalPrice);
+      const data = {
+     
+        totalPrice: totalPrice,
+        orderItems: orderItems,
+        deviceId: deviceId,
+      };
+      
   
       console.log('Order Now button pressed');
       console.log('Total price:', totalPrice);
       console.log('Order Items:', orderItems);
       console.log('Device ID:', deviceId);
       
-      navigation.navigate('AdressForm');
+      navigation.navigate('AdressForm',{ newOrder: data });
     } catch (error) {
       console.error('Failed to place the order:', error);
       setError('Failed to place the order. Please check the console for details.');
@@ -102,6 +113,15 @@ const ShoppingCartScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+
+<Header navigation={navigation} toggleNotificationMenu={toggleNotificationMenu} />
+      {isNotificationMenuVisible && (
+        <NotificationMenu
+          slideAnim={slideAnim}
+          toggleNotificationMenu={toggleNotificationMenu}
+          socket={socket} // Pass the socket instance
+        />
+      )}
       <View style={styles.header}>
         <Image source={{ uri: 'https://example.com/logo.png' }} style={styles.logo} />
       </View>

@@ -17,7 +17,10 @@ import ShoppingCartScreen from '../screens/ShoppingCartScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
 import HomeScreen from '../screens/HomeScreen';
 import AdressForm from '../screens/AddressFormScreen';
-
+import SupportChat from '../screens/SupportChatScreen';
+import Logout from '../screens/logout';
+import PaymentScreen from '../screens/PaymentScreen';
+import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -25,20 +28,25 @@ const AppNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
-    {/*   <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="QRScanner" component={QRScannerScreen} />
-        <Stack.Screen name="Registration" component={RegistrationScreen} />{/*     
-        <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  */} 
+      <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="QRScanner" component={QRScannerScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="Registration" component={RegistrationScreen} />  
+        <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Services" component={ServicesScreen} />
-         <Stack.Screen name="AdressForm" component={AdressForm} />
+
 
         <Stack.Screen 
           name="Home" 
           component={DrawerNavigator} 
           options={{ headerShown: false }}  // Désactive l'en-tête pour HomeScreen
         /> 
-      
+                <Stack.Screen name="SupportChat" component={SupportChat} />
+         <Stack.Screen name="AdressForm" component={AdressForm} />
+         <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+         <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen}options={{ headerShown: false }} />
+
+<Stack.Screen name="Logout" component={Logout}options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

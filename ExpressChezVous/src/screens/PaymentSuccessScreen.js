@@ -1,16 +1,63 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, SafeAreaView, TouchableOpacity, Animated, BackHandler, Alert } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import BottomSheet from './ChatSheetScreen'; // Import your BottomSheet component
+import io from 'socket.io-client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import BottomSheet from './ChatSheetScreen'; // Assuming this is a valid component
+import { BASE_URLIO } from '@env'; // Assuming you have environment variables
+import { getClientId } from '../services/userService';
+// Initialize Socket.IO connection
+const socket = io(BASE_URLIO);
 
-const PaymentSuccessScreen = () => {
+const PaymentSuccessScreen = ({ navigation, route }) => {
+  const { order_id } = route.params; // Assuming the order ID is passed via route params
   const totalTimeInSeconds = 5 * 60;
   const [progress, setProgress] = useState(0);
   const [remainingTime, setRemainingTime] = useState(5);
+  const [orderStatus, setOrderStatus] = useState('pending'); // State to track order status
 
   const animatedValue = useRef(new Animated.Value(0)).current;
-  const bottomSheetRef = useRef(null); // Ref for BottomSheet
+  const bottomSheetRef = useRef(null);
 
+  // Function to check order status via Socket.IO
+  const checkOrderStatus = async() => {
+    console.log('------------------------------------');
+    
+    const clientId = await getClientId();
+    console.log('-----------------screeeeeeen-------------------');
+    console.log(clientId);
+    console.log('------------------------------------');
+    console.log('------------------------------------');
+    socket.emit('checkOrderStatus', { clientId }); // Emit event to check order status
+    socket.on('orderStatusUpdate', (data) => {
+      setOrderStatus(data.status); // Update order status based on server response
+      if (data.status === 'delivered' || data.status === 'cancelled') {
+        clearInterval(statusInterval); // Stop checking when order is completed
+        navigation.navigate('OrderCompletedScreen'); // Navigate to a new screen
+      }
+    });
+  };
+
+  useEffect(() => {
+    // Start an interval to check the order status every 5 seconds
+    const statusInterval = setInterval(checkOrderStatus, 5000);
+
+    // Clean up the interval when component unmounts
+    return () => clearInterval(statusInterval);
+  }, []);
+  useEffect(() => {
+    const backAction = () => {
+      if (orderStatus === 'pending' || orderStatus === 'in_progress') {
+        Alert.alert("Attendez !", "Vous ne pouvez pas quitter cette page tant que la commande n'est pas livrée.");
+        return true; // Bloque le retour en arrière
+      }
+      return false; // Permet le retour si la commande est livrée ou annulée
+    };
+  
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+  
+    return () => backHandler.remove(); // Nettoyage à la sortie
+  }, [orderStatus]);
   useEffect(() => {
     const animateDeliveryImage = () => {
       animatedValue.setValue(0);
@@ -46,18 +93,50 @@ const PaymentSuccessScreen = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Prevent going back if order is still pending or in progress
+  useEffect(() => {
+    const backHandler = navigation.addListener('beforeRemove', (e) => {
+      if (orderStatus === 'pending' || orderStatus === 'in_progress') {
+        e.preventDefault(); // Block going back
+        Alert.alert(
+          "Attendez !",
+          "Vous ne pouvez pas quitter cette page tant que la commande n'est pas livrée.",
+          [{ text: "OK", onPress: () => {} }]
+        );
+      }
+    });
+
+    return () => {
+      backHandler();
+    };
+  }, [orderStatus, navigation]);
+
+  // Block the back button on Android devices
+  useEffect(() => {
+    const backAction = () => {
+      if (orderStatus === 'pending' || orderStatus === 'in_progress') {
+        Alert.alert("Attendez !", "Vous ne pouvez pas quitter cette page tant que la commande n'est pas livrée.");
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+
+    return () => backHandler.remove();
+  }, [orderStatus]);
+
   const openBottomSheet = () => {
     if (bottomSheetRef.current) {
-      const screenHeight = Dimensions.get('window').height; // Get height here
-      bottomSheetRef.current.scrollTo(-screenHeight + 50); // Open the BottomSheet
+      const screenHeight = Dimensions.get('window').height;
+      bottomSheetRef.current.scrollTo(-screenHeight + 50);
     }
   };
 
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [-Dimensions.get('window').width, Dimensions.get('window').width], // Access width directly
+    outputRange: [-Dimensions.get('window').width, Dimensions.get('window').width],
   });
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -86,7 +165,7 @@ const PaymentSuccessScreen = () => {
       </View>
 
       <View style={styles.successContainer}>
-        <Text style={styles.successText}>Votre paiement est réussi</Text>
+        <Text style={styles.successText}>Votre Comande est comfirmée</Text>
         <Image
           style={[styles.checkIcon, { width: Dimensions.get('window').width * 0.1, height: Dimensions.get('window').height * 0.05 }]} // Access width and height directly
           source={{

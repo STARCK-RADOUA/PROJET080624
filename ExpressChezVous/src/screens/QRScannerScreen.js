@@ -19,7 +19,7 @@ const QRScannerScreen = ({ navigation }) => {
 
   const handleBarCodeScanned = ({ type, data }) => {
     
-    navigation.navigate('Registration');
+    navigation.replace('Registration');
     setScanned(true);
   };
   

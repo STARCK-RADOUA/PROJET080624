@@ -25,7 +25,7 @@ const ReceiptScreen = ({ navigation }) => {
     socket.emit('requestOrders', deviceId);
 
     socket.on('allOrders', (data) => {
-      console.log('------------------------------------');
+      console.log('------------////////////////////////------------------------');
       console.log('All Orders:', data);
       console.log('------------------------------------');
       setOrders(data);
@@ -76,19 +76,37 @@ const ReceiptScreen = ({ navigation }) => {
       setSelectedOrder(null);
     });
   };
-
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending':
+        return { color: 'orange' }; // En orange
+      case 'in_progress':
+        return { color: 'blue' }; // En bleu
+      case 'delivered':
+        return { color: 'green' }; // En vert
+      case 'cancelled':
+        return { color: 'red' }; // En rouge
+      default:
+        return { color: 'black' }; // Couleur par défaut si le statut est inconnu
+    }
+  };
+  
   const renderOrderItem = ({ item }) => (
     <TouchableOpacity style={styles.orderItem} onPress={() => openOrderDetails(item)}>
-      <View style={styles.orderInfo}>
-        <Text style={styles.productName}>Order ID: {item._id}</Text>
-        <Text style={styles.productPrice}>Total Price: ${item.total_price.toFixed(2)}</Text>
-        <Text style={styles.quantity}>Status: {item.status}</Text>
-      </View>
-      <View style={styles.statusWrapper}>
-        <Text style={styles.orderStatus}>{item.status}</Text>
-      </View>
-    </TouchableOpacity>
+    <View style={styles.orderInfo}>
+      <Text style={styles.productName}>Order ID: {item._id}</Text>
+      <Text style={styles.productPrice}>
+        Total Price: {item.total_price ? `$${item.total_price.toFixed(2)}` : 'N/A'}
+      </Text>
+      <Text style={styles.quantity}>Status: {item.status}</Text>
+    </View>
+    <View style={styles.statusWrapper}>
+      <Text style={[styles.orderStatus, getStatusColor(item.status)]}>{item.status}</Text>
+    </View>
+  </TouchableOpacity>
+  
   );
+  
 
   const renderProductItem = ({ item }) => (
     <View style={styles.modalItem}>
@@ -194,7 +212,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
     borderLeftWidth: 5,
-    borderColor: '#007BFF',
+    borderColor: '#ffae00',
   },
   orderInfo: {
     flex: 1,

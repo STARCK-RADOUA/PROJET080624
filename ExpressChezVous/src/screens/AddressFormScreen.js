@@ -18,12 +18,12 @@ const addressValidationSchema = Yup.object().shape({
   comment: Yup.string(),
 });
 
-const AddressFormScreen = ({ navigation }) => {
+const AddressFormScreen = ({ navigation ,route}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [locationFetched, setLocationFetched] = useState(false); // Track if location is fetched
   const [userId, setUserId] = useState(null); // Add state for user_id
   const [location, setLocation] = useState(null); // Store user's location
-
+  
   // Fetch user ID on component mount (you can also pass it from props if you prefer)
   useEffect(() => {
     const fetchUserId = async () => {
@@ -51,6 +51,9 @@ const AddressFormScreen = ({ navigation }) => {
 
     if (location) {
       setLocation(location.coords); // Store the coordinates
+      console.log('------------yooooooooooooooooooooooooooooo------------------------');
+      console.log(location.coords);
+      console.log('------------------------------------');
       setLocationFetched(true); // Enable form fields once location is fetched
       Alert.alert('Location Fetched', 'Your current location has been successfully fetched.');
     } else {
@@ -64,16 +67,18 @@ const AddressFormScreen = ({ navigation }) => {
       // Combine form values with user_id and location (if fetched)
       const dataToSend = {
         ...values,
-        user_id: userId, // Include user_id in the request body
+        user_id: userId, 
+        newOrder: route.params,// Include user_id in the request body
         location: location ? `${location.latitude}, ${location.longitude}` : 'Location not fetched', // Send location if available
       };
-
+console.log('-------------q///////////////////////////////qq-----------------------');
+console.log( route.params);
+console.log('-------------daaaaaataaa yo send-----------------------');
       // Send the data to your API endpoint
-      const response = await axios.post(`${BASE_URL}/api/addresses`, dataToSend);
-      console.log('Address saved:', response.data);
+     
       
       // Navigate back or to another screen
-      navigation.goBack();
+      navigation.navigate('PaymentScreen', { data: dataToSend });
     } catch (error) {
       console.error('Error saving address:', error);
     }

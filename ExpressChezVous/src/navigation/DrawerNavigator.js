@@ -10,7 +10,7 @@ import SupportChat from '../screens/SupportChatScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 
-
+import Logout from '../screens/logout';
 
 import TabNavigator from './TabNavigator';
 const Drawer = createDrawerNavigator();
@@ -20,10 +20,10 @@ const DrawerNavigator = () => {
     <Drawer.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
       <Drawer.Screen name="Home" component={TabNavigator} />
       <Drawer.Screen name="SupportChat" component={SupportChat} />
-      <Drawer.Screen name="PaymentScreen" component={PaymentScreen} />
-      <Drawer.Screen name="PaymentSucces" component={PaymentSuccessScreen} />
+      
 
-      <Drawer.Screen name="Logout" component={HomeScreen} />
+      
+       <Drawer.Screen name="Logout" component={Logout} />   
     </Drawer.Navigator>
   );
 };
