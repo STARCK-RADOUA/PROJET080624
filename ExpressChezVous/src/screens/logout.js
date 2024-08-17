@@ -2,7 +2,7 @@ import { BASE_URL } from '@env';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { styles } from './styles/loginstyle'; // Assuming you have a style file
-import { getDeviceId } from '../services/userService';
+import { getDeviceIde } from '../services/userService';
 const ServicesScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
@@ -10,7 +10,7 @@ const ServicesScreen = ({ navigation }) => {
     setLoading(true);
     
     
-    const deviceId =await  getDeviceId(); // Replace with the actual user ID from context or storage
+    const deviceId =await  getDeviceIde(); // Replace with the actual user ID from context or storage
 
     try {
       const response = await fetch(`${BASE_URL}/api/clients/logout`, {
