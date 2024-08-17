@@ -54,7 +54,7 @@ const PaymentScreen = ({ navigation, route }) => {
           console.log('Order ajouté:', order);
           Alert.alert('Succès', 'Votre commande est en cours de création!');
           const dataToSend = {
-            order_id: order._id,
+            order_id: order,
       
           };
           navigation.replace('PaymentSuccessScreen', { data: dataToSend });

@@ -10,7 +10,6 @@ import { getClientId } from '../services/userService';
 const socket = io(BASE_URLIO);
 
 const PaymentSuccessScreen = ({ navigation, route }) => {
-  const { order_id } = route.params; // Assuming the order ID is passed via route params
   const totalTimeInSeconds = 5 * 60;
   const [progress, setProgress] = useState(0);
   const [remainingTime, setRemainingTime] = useState(5);
@@ -25,13 +24,18 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
     
     const clientId = await getClientId();
     console.log('-----------------screeeeeeen-------------------');
-    console.log(clientId);
+    console.log(route.params.data.order_id)
     console.log('------------------------------------');
-    console.log('------------------------------------');
-    socket.emit('checkOrderStatus', { clientId }); // Emit event to check order status
+    console.log('--------------AAAAAAAORDERTT----------------------');
+    const  order_id  = route.params.data.order_id; // Assuming the order ID is passed via route params
+    console.log(order_id)
+    socket.emit('checkOrderStatus', { order_id }); // Emit event to check order status
     socket.on('orderStatusUpdate', (data) => {
-      setOrderStatus(data.status); // Update order status based on server response
-      if (data.status === 'delivered' || data.status === 'cancelled') {
+      console.log(data.order[0].status);
+      const status = data.order[0].status
+      console.log(data)
+      setOrderStatus(data.order[0].status); // Update order status based on server response
+      if (data.order[0].status === 'delivered' || data.order[0].status === 'cancelled') {
         clearInterval(statusInterval); // Stop checking when order is completed
         navigation.navigate('OrderCompletedScreen'); // Navigate to a new screen
       }
@@ -41,7 +45,7 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
   useEffect(() => {
     // Start an interval to check the order status every 5 seconds
     const statusInterval = setInterval(checkOrderStatus, 5000);
-
+  
     // Clean up the interval when component unmounts
     return () => clearInterval(statusInterval);
   }, []);
