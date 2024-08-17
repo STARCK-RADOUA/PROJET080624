@@ -22,7 +22,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="SupportChat" component={SupportChat} />
       
 
-      
+      <Drawer.Screen name="FeedBack" component={FeedBackScreen} />
        <Drawer.Screen name="Logout" component={Logout} />   
     </Drawer.Navigator>
   );
