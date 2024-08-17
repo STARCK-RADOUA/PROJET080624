@@ -1,14 +1,10 @@
 import { BASE_URL, BASE_URLIO } from '@env';
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
-
-const socket = io(`${BASE_URLIO}`);
-
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -18,31 +14,34 @@ const HomeScreen = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const slideAnim = useRef(new Animated.Value(width)).current;
   const bottomSheetRef = useRef(null);
-
-  const fetchProducts = useCallback(() => {
-    socket.emit('requestActiveProducts');
-  }, []);
+  
+  // Re-establish the socket connection when HomeScreen is loaded
+  const socket = useRef(null);
 
   useEffect(() => {
-    const interval = setInterval(fetchProducts, 1000); // Fetch every 5 seconds
+    socket.current = io(`${BASE_URLIO}`);  // Establish socket connection
 
-    socket.on('activeProducts', (products) => {
-      // Compare the new products list with the current state
+    const fetchProducts = () => {
+      socket.current.emit('requestActiveProducts');
+    };
+
+    const interval = setInterval(fetchProducts, 1000); // Fetch every 1 second
+
+    socket.current.on('activeProducts', (products) => {
       setMenuItems((prevItems) => {
         if (JSON.stringify(prevItems) !== JSON.stringify(products)) {
-          return products; // Replace the entire list if there is a change
+          return products;  // Update if the product list has changed
         }
-        return prevItems; // No change, return the same list
+        return prevItems;  // No change, return the same list
       });
     });
 
-    // Clean up the interval and socket listener on component unmount
     return () => {
       clearInterval(interval);
-      socket.off('activeProducts');
-      socket.disconnect();
+      socket.current.off('activeProducts');
+      socket.current.disconnect();  // Disconnect socket when component unmounts
     };
-  }, [fetchProducts]);
+  }, []);
 
   const toggleNotificationMenu = () => {
     if (isNotificationMenuVisible) {
@@ -63,7 +62,7 @@ const HomeScreen = ({ navigation }) => {
 
   const onPress = useCallback((item) => {
     setSelectedItem(item);
-    bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2); // Open the bottom sheet
+    bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2);  // Open the bottom sheet
   }, []);
 
   return (

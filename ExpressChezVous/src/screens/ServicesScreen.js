@@ -37,9 +37,9 @@ const ServicesScreen = ({ navigation }) => {
         const response = await axios.post(`${BASE_URL}/api/carts/add`, { client_id });
         
         // Handle the response
-        setCart(response.data); // Store the cart data
+        // Store the cart data
       } catch (err) {
-        setError(err.message || 'Failed to create cart');
+      
         console.error('Error creating cart:', err);
       }
     };

@@ -1,8 +1,13 @@
-import { BASE_URL } from '@env';
+import { BASE_URL,BASE_URLIO } from '@env';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { styles } from './styles/loginstyle'; // Assuming you have a style file
 import { getDeviceIde } from '../services/userService';
+
+
+import io from 'socket.io-client';
+
+const socket = io(`${BASE_URLIO}`);
 const ServicesScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
@@ -24,6 +29,10 @@ const ServicesScreen = ({ navigation }) => {
       const data = await response.json();
 
       if (response.ok) {
+        if (socket.connected) {
+            socket.disconnect();
+          }
+  
         // Redirect to login screen after successful logout
         navigation.replace('Login');
       } else {
