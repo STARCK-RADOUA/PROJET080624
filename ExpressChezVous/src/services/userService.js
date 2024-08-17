@@ -4,9 +4,12 @@ import axios from 'axios';
 import * as Device from 'expo-device';
 
 // Function to get the device ID
-const getDeviceId = () => {
+exports.getDeviceId = () => {
   return Device.osBuildId; 
 };
+
+
+
 
 export const getClient = async () => {
   try {

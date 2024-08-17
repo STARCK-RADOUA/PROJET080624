@@ -9,6 +9,8 @@ import UserProfileScreen from '../screens/UserProfileScreen';
 import SupportChat from '../screens/SupportChatScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
+import FeedBackScreen from '../screens/FeedBackScreen';
+
 
 import Logout from '../screens/logout';
 
