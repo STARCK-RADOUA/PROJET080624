@@ -43,8 +43,8 @@
     "react-native-svg-circular-progress": "^1.0.4",
     "react-native-vector-icons": "^10.1.0",
     "socket.io-client": "^4.7.5",
-    "yup": "^1.4.0",
-    "undefined": "expo-camera/next"
+    "yup": "^1.4.0"
+   
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
