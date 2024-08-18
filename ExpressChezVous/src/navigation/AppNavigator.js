@@ -23,30 +23,28 @@ import PaymentScreen from '../screens/PaymentScreen';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
 const AppNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
-      <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="QRScanner" component={QRScannerScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Registration" component={RegistrationScreen} />  
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Services" component={ServicesScreen} />
 
-
+        {/* Renommer "Home" en "MainDrawerNavigator" pour éviter la redondance */}
         <Stack.Screen 
           name="Home" 
           component={DrawerNavigator} 
-          options={{ headerShown: false }}  // Désactive l'en-tête pour HomeScreen
+          options={{ headerShown: false }}  
         /> 
-                <Stack.Screen name="SupportChat" component={SupportChat} />
-         <Stack.Screen name="AdressForm" component={AdressForm} />
-         <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
-         <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen}options={{ headerShown: false }} />
-
-<Stack.Screen name="Logout" component={Logout}options={{ headerShown: false }} />
+        <Stack.Screen name="SupportChat" component={SupportChat} />
+        <Stack.Screen name="AdressForm" component={AdressForm} />
+        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+        <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Logout" component={Logout} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

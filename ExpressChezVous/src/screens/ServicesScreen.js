@@ -1,7 +1,7 @@
 import { BASE_URL, BASE_URLIO } from '@env';
 
-import React, { useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions ,Animated } from 'react-native';
 import icon from '../assets/images/wave.png'; // Import your icon image
 import axios from 'axios';
 import { getClientId } from '../services/userService';
@@ -14,7 +14,7 @@ const ServicesScreen = ({ navigation }) => {
     { name: 'Boutique cadeaux', image: 'https://example.com/coca-cola.png', test: true },
     { name: 'Marché', image: 'https://example.com/supermarket.png', test: true },
   ];
-
+  const animations = useRef(services.map(() => new Animated.Value(0))).current;
   const handleServicePress = (serviceName) => {
     if (serviceName === 'J’ai faim') {
       navigation.navigate('Home');
@@ -46,32 +46,54 @@ const ServicesScreen = ({ navigation }) => {
 
     // Call the createCart function
     createCart();
-  }, []); // This will run when the component mounts
+ // This will run when the component mounts
 
-
+    // Trigger animations with delay for each service item
+    animations.forEach((anim, index) => {
+      Animated.timing(anim, {
+        toValue: 1,
+        duration: 800,
+        delay: index * 200, // Delay each service's animation
+        useNativeDriver: true,
+      }).start();
+    });
+  }, []);
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Our Services</Text>
       <View style={styles.servicesContainer}>
-        {services.map((service, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[styles.serviceItem, service.test && styles.testService]}
-            onPress={() => handleServicePress(service.name)}
-            disabled={service.test}
-          >
-            <Image source={{ uri: service.image }} style={styles.serviceImage} />
-            <Text style={styles.serviceText}>{service.name}</Text>
-            {service.test && (
-              <Text style={styles.testLabel}>This service is in test</Text>
-            )}
-          </TouchableOpacity>
-        ))}
+        {services.map((service, index) => {
+          const scale = animations[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 1], // Scale from 0 to 1
+          });
+          const rotate = animations[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: ['0deg', '360deg'], // Rotate 360 degrees
+          });
+
+          return (
+            <Animated.View
+              key={index}
+              style={[
+                styles.serviceItem,
+                service.test && styles.testService,
+                { transform: [{ scale }, { rotate }] }, // Apply scale and rotation animations
+              ]}
+            >
+              <TouchableOpacity
+                onPress={() => handleServicePress(service.name)}
+                disabled={service.test}
+              >
+                <Image source={{ uri: service.image }} style={styles.serviceImage} />
+                <Text style={styles.serviceText}>{service.name}</Text>
+                {service.test && <Text style={styles.testLabel}>This service is in test</Text>}
+              </TouchableOpacity>
+            </Animated.View>
+          );
+        })}
       </View>
-      <Image
-        source={icon}
-        style={styles.bottomImage}
-      />
+      <Image source={icon} style={styles.bottomImage} />
     </View>
   );
 };

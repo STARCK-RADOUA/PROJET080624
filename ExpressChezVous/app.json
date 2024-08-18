@@ -16,6 +16,7 @@
       "bundleIdentifier": "com.anonymous.ExpressChezVous",
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to scan QR codes and take photos.",
+        "NSMicrophoneUsageDescription": "This app requires access to your microphone to record videos.",
         "NSLocationWhenInUseUsageDescription": "This app requires access to your location to provide accurate address services."
       }
     },
@@ -27,10 +28,21 @@
       "package": "com.anonymous.ExpressChezVous",
       "permissions": [
         "CAMERA",
+        "RECORD_AUDIO",
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION"
       ]
     },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }

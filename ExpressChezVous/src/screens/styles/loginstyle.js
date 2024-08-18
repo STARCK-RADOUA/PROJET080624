@@ -1,13 +1,10 @@
-
-
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    height: '55%',
+    height: '65%',
     resizeMode: 'cover',
-    
   },
   container1: {
     flex: 1,
@@ -15,40 +12,28 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageContainer: {
-    position: 'absolute',
-    top: '0%',
-    left: 0,
-    right: 0,
     alignItems: 'center',
   },
   image: {
-    resizeMode: 'cover',  // Vous pouvez utiliser 'contain' ou 'cover' selon l'effet désiré
+    resizeMode: 'cover',
   },
   container: {
-    marginTop: '90%',  // Ajustez la marge si nécessaire
     width: '80%',
-  
+    marginTop: '35%',
     alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: 'black',
   },
   input: {
     width: '100%',
     padding: 10,
     marginBottom: 15,
     backgroundColor: 'rgba(94, 85, 85, 0.11)',
-    borderRadius: 5,
+    borderRadius: 22,  // Rounded corners with radius 22
   },
   button: {
     width: '100%',
     padding: 15,
     backgroundColor: 'rgba(211, 143, 9, 0.81)',
-    borderRadius: 5,
+    borderRadius: 22,  // Rounded corners with radius 22
     alignItems: 'center',
     marginBottom: 10,
   },
@@ -57,7 +42,16 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   linkText: {
-    color: '#007bff',
+    color: '#9c5707',
+    fontSize: 18,
     textDecorationLine: 'underline',
+    marginLeft: '20%',  // Ajoute un espace entre le QR code et le texte
+    paddingRight: '5%',  // Ajoute un espace entre le QR code et le texte
+  },
+  horizontalLayout: {
+    flexDirection: 'row',  // Change the layout to horizontal
+    alignItems: 'center',
+    shadowColor: '#000',
+    marginTop: 5,
   },
 });

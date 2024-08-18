@@ -1,9 +1,10 @@
 import { BASE_URLIO, BASE_URL } from '@env';
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, ImageBackground, Dimensions, ActivityIndicator, Alert } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, TextInput, Image, TouchableOpacity, ImageBackground, Dimensions, ActivityIndicator, Alert, Animated } from 'react-native';
 import * as Device from 'expo-device';  // Pour obtenir l'ID de l'appareil
 import io from 'socket.io-client';
 import { styles } from './styles/loginstyle';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
 
@@ -15,33 +16,32 @@ const LoginScreen = ({ navigation }) => {
   const [phone, setPhone] = useState(''); // Store phone number
   const [password, setPassword] = useState(''); // Store password
 
+  // Animation for logo
+  const logoAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Start the animation*
+    autoLogin();
+    Animated.spring(logoAnim, {
+      toValue: 1,
+      friction: 2,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   // Auto-login function
   const autoLogin = async () => {
     const deviceId = Device.osBuildId;  // Récupérez l'ID de l'appareil
 
     if (deviceId) {
-      setLoading(true);  // Start loading indicator
+     // Start loading indicator
       socket.emit('autoLogin', { deviceId });  // Send device ID to the server
 
       socket.on('loginSuccess', () => {
-        setLoading(false);
+        console.log('Login successful');
         navigation.replace('Services');  // Automatically log in the user
       });
-
-      socket.on('loginFailure', (data) => {
-        setLoading(false);
-        if (data.message === 'Device ID not found') {
-          Alert.alert(
-            'Compte introuvable',
-            'Aucun compte lié à cet appareil. Veuillez créer un compte.',
-            [{ text: 'OK' }]
-          );
-        } else if (data.message === 'User account is disabled') {
-          navigation.replace('Loading');  // Navigate to loading screen if account is disabled
-        }
-      });
-    } else {
-      navigation.replace('QRScanner');  // Redirect to account creation if device ID is not found
     }
   };
 
@@ -88,13 +88,13 @@ const LoginScreen = ({ navigation }) => {
   return (
     <ImageBackground source={require('../assets/8498789sd.png')} style={styles.backgroundImage}>
       <View style={styles.container1}>
-        {/* Image container */}
-        <View style={styles.imageContainer}>
+        {/* Animated Logo */}
+        <Animated.View style={[styles.imageContainer, { transform: [{ scale: logoAnim }] }]}>
           <Image
             source={require('../assets/images/8498789.png')}
             style={[styles.image, { width: width, height: width }]}
           />
-        </View>
+        </Animated.View>
 
         {/* Input fields for manual login */}
         <View style={styles.container}>
@@ -118,9 +118,21 @@ const LoginScreen = ({ navigation }) => {
             <Text style={styles.buttonText}>Se connecter</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate('QRScanner')}>
-            <Text style={styles.linkText}>Créer un compte</Text>
-          </TouchableOpacity>
+          {/* Vertical Layout: QR Icon and Create Account */}
+          <View style={styles.horizontalLayout}>
+  {/* QR Icon */}
+
+  <TouchableOpacity onPress={() => navigation.navigate('Registration')}>
+    <Text style={styles.linkText}>Créer un compte</Text>
+  </TouchableOpacity>
+  <TouchableOpacity onPress={() => navigation.navigate('QRScanner')}>
+    <Icon name="qrcode-scan" size={40} color="#000" />
+  </TouchableOpacity>
+
+  {/* Create Account Text */}
+
+</View>
+
 
           {/* Loading indicator during login */}
           {loading && <ActivityIndicator size="large" color="#fff" />}

@@ -19,15 +19,15 @@ const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   return (
-    <Drawer.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
-      <Drawer.Screen name="Home" component={TabNavigator} />
+    <Drawer.Navigator initialRouteName="ExpressChezVous" screenOptions={{ headerShown: false }}>
+      {/* Renommer "Home" en "ExpressChezVous" */}
+      <Drawer.Screen name="ExpressChezVous"  text="Home" component={TabNavigator} />
       <Drawer.Screen name="SupportChat" component={SupportChat} />
-      
-
       <Drawer.Screen name="FeedBack" component={FeedBackScreen} />
-       <Drawer.Screen name="Logout" component={Logout} />   
+      <Drawer.Screen name="Logout" component={Logout} />   
     </Drawer.Navigator>
   );
 };
+
 
 export default DrawerNavigator;

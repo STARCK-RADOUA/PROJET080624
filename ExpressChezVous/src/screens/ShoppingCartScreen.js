@@ -122,9 +122,7 @@ const ShoppingCartScreen = ({ navigation }) => {
           socket={socket} // Pass the socket instance
         />
       )}
-      <View style={styles.header}>
-        <Image source={{ uri: 'https://example.com/logo.png' }} style={styles.logo} />
-      </View>
+     
       {error ? (
         <Text style={styles.errorText}>{error}</Text>
       ) : (
