@@ -1,27 +1,40 @@
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
-import React, { useCallback, useEffect, useImperativeHandle } from 'react';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  FlatList,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import React, { useCallback, useImperativeHandle, useState, useEffect } from 'react';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   Extrapolate,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
+import axios from 'axios';
+import { BASE_URL } from '@env'; // Adjust BASE_URL for the backend API
+import { getClientId } from '../services/userService';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50;
 
-const BottomSheet = React.forwardRef(({ children }, ref) => {
+const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
   const translateY = useSharedValue(0);
   const active = useSharedValue(false);
+  const [chatId, setChatId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
 
   const scrollTo = useCallback((destination) => {
     'worklet';
     active.value = destination !== 0;
-
     translateY.value = withSpring(destination, { damping: 50 });
   }, []);
 
@@ -29,10 +42,56 @@ const BottomSheet = React.forwardRef(({ children }, ref) => {
     return active.value;
   }, []);
 
-  useImperativeHandle(ref, () => ({ scrollTo, isActive }), [
-    scrollTo,
-    isActive,
-  ]);
+  useImperativeHandle(ref, () => ({ scrollTo, isActive }), [scrollTo, isActive]);
+
+  useEffect(() => {
+    const initiateChat = async () => {
+      try {
+        if (orderId) {
+          const clientId = await getClientId(); // Fetch client ID from your service
+          const response = await axios.post(`${BASE_URL}/api/driverChat/initiate`, {
+            driver_id: '66bac757e6e3c479f7b35d7e', // Example driver ID
+            client_id: clientId,
+            order_id: orderId, // Pass order ID for chat initiation
+          });
+          setChatId(response.data._id);
+          setMessages(response.data.messages);
+        }
+      } catch (error) {
+        console.error('Error initiating chat:', error);
+      }
+    };
+
+    initiateChat();
+
+    const interval = setInterval(async () => {
+      try {
+        if (chatId) {
+          const response = await axios.get(`${BASE_URL}/api/driverChat/${chatId}?order_id=${orderId}`);
+          setMessages(response.data.messages);
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [chatId, orderId]);
+
+  const sendMessage = () => {
+    if (message.trim()) {
+      axios.post(`${BASE_URL}/api/driverChat/send-message`, {
+        chatId,
+        sender: 'client',
+        content: message,
+      });
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { _id: prevMessages.length + 1, content: message, sender: 'client' },
+      ]);
+      setMessage('');
+    }
+  };
 
   const context = useSharedValue({ y: 0 });
   const gesture = Gesture.Pan()
@@ -69,7 +128,38 @@ const BottomSheet = React.forwardRef(({ children }, ref) => {
     <GestureDetector gesture={gesture}>
       <Animated.View style={[styles.bottomSheetContainer, rBottomSheetStyle]}>
         <View style={styles.line} />
-        {children}
+        
+        <FlatList
+          data={messages}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View
+              style={[
+                styles.messageContainer,
+                item.sender === 'client' ? styles.messageRight : styles.messageLeft,
+              ]}
+            >
+              <Text style={styles.messageText}>{item.content}</Text>
+            </View>
+          )}
+          style={styles.messageList}
+        />
+
+        {/* Input for Sending Messages */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.inputContainer}
+        >
+          <TextInput
+            style={styles.input}
+            placeholder="Type a message..."
+            value={message}
+            onChangeText={setMessage}
+          />
+          <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+            <Text style={styles.sendButtonText}>Send</Text>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Animated.View>
     </GestureDetector>
   );
@@ -91,6 +181,58 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginVertical: 15,
     borderRadius: 2,
+  },
+  messageList: {
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+  },
+  messageContainer: {
+    maxWidth: '80%',
+    padding: 10,
+    borderRadius: 20,
+    marginVertical: 5,
+  },
+  messageLeft: {
+    backgroundColor: '#E5E5EA',
+    alignSelf: 'flex-start',
+  },
+  messageRight: {
+    backgroundColor: '#FEA202',
+    alignSelf: 'flex-end',
+  },
+  messageText: {
+    color: 'white',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#F2F2F2',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5EA',
+    bottom: '5%',
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    paddingHorizontal: 10,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  sendButton: {
+    marginLeft: 10,
+    backgroundColor: '#FEA202',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+  sendButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

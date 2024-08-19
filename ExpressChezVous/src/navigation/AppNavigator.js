@@ -21,6 +21,8 @@ import SupportChat from '../screens/SupportChatScreen';
 import Logout from '../screens/logout';
 import PaymentScreen from '../screens/PaymentScreen';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
+import FeedBackScreen from '../screens/FeedBackScreen';
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -34,6 +36,8 @@ const AppNavigator = () => {
         <Stack.Screen name="Registration" component={RegistrationScreen} />  
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Services" component={ServicesScreen} />
+        <Stack.Screen name="feedback" component={FeedBackScreen} />
+
 
 
         <Stack.Screen 
