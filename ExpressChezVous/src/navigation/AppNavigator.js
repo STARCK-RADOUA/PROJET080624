@@ -22,7 +22,7 @@ import SupportChat from '../screens/SupportChatScreen';
 import Logout from '../screens/logout';
 import PaymentScreen from '../screens/PaymentScreen';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
-import QrcodeGeneratorScreenScreen from '../screens/QrcodeGeneratorScreen';
+import FeedBackScreen from '../screens/FeedBackScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,6 +37,8 @@ const AppNavigator = () => {
         <Stack.Screen name="RegistrationLC" component={RegistrationWithLocationScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Services" component={ServicesScreen} />
+        <Stack.Screen name="feedback" component={FeedBackScreen} />
+
 
         {/* Renommer "Home" en "MainDrawerNavigator" pour éviter la redondance */}
         <Stack.Screen 

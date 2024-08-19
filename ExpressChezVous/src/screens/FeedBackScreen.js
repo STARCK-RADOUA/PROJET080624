@@ -1,29 +1,41 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL } from '@env'; // Import the base URL from the .env file
 
-const FeedbackScreen = () => {
+const FeedbackScreen = ({ route, navigation }) => {
   const [feedback, setFeedback] = useState('');
   const [rating, setRating] = useState(0);
-  const [orderId, setOrderId] = useState(12345); // Replace this with the actual orderId
+  const [loading, setLoading] = useState(false); // State to handle loading animation
+
+  // Get orderId from route params (passed from PaymentSuccessScreen)
+  const { orderId } = route.params;
 
   const handleRating = (value) => {
     setRating(value);
   };
 
   const handleSendFeedback = async () => {
+    setLoading(true); // Start loading (Envoyer...)
+    
     try {
-      const response = await axios.post(`${BASE_URL}/api/orders/`, {
-        orderId: orderId, // Sending orderId along with feedback and rating
-        feedback: feedback,
-        rating: rating,
+      const response = await axios.post(`${BASE_URL}/api/orders/update/feedback`, {
+        orderId: orderId, // Send orderId along with feedback and rating
+        comment: feedback,
+        stars: rating,
       });
 
-      // Handle response
       console.log('Feedback sent successfully:', response.data);
+
+      // Simulate 3-second delay before navigating to HomeScreen
+      setTimeout(() => {
+        setLoading(false); // Stop loading after 3 seconds
+        navigation.replace('Home'); // Navigate to HomeScreen
+      }, 3000);
+
     } catch (error) {
+      setLoading(false); // Stop loading in case of error
       console.error('Error sending feedback:', error);
     }
   };
@@ -63,7 +75,15 @@ const FeedbackScreen = () => {
       />
 
       {/* Submit Button */}
-      <Button title="Envoyer" onPress={handleSendFeedback} color="#FFA500" />
+      {loading ? (
+        // Display an ActivityIndicator when loading
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Envoyer...</Text>
+          <ActivityIndicator size="small" color="#FFA500" />
+        </View>
+      ) : (
+        <Button title="Envoyer" onPress={handleSendFeedback} color="#FFA500" />
+      )}
     </View>
   );
 };
@@ -101,6 +121,16 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlignVertical: 'top',
     marginBottom: 20,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#FFA500',
+    marginRight: 10,
   },
 });
 
