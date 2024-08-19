@@ -24,18 +24,7 @@ const TabNavigator = () => {
           ),
         }}
       />
-      <Tab.Screen
-        name="ReceiptScreen"
-        component={ReceiptScreen}
-        options={{
-          title: 'Receipts',
-          tabBarActiveTintColor: 'orange',
-          tabBarInactiveTintColor: 'black',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="receipt" color={color} size={size} />
-          ),
-        }}
-      />
+     
       <Tab.Screen
         name="ShoppingCartScreen"
         component={ShoppingCartScreen}
