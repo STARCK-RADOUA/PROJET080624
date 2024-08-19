@@ -9,12 +9,11 @@ import ShoppingCartScreen from '../screens/ShoppingCartScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
 
 const Tab = createBottomTabNavigator();
-
 const TabNavigator = () => {
   return (
-    <Tab.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+    <Tab.Navigator initialRouteName="HomeScreen" screenOptions={{ headerShown: false }}>
       <Tab.Screen
-        name="Home"
+        name="HomeScreen"
         component={HomeScreen}
         options={{
           title: 'Home',
@@ -25,18 +24,7 @@ const TabNavigator = () => {
           ),
         }}
       />
-      <Tab.Screen
-        name="ReceiptScreen"
-        component={ReceiptScreen}
-        options={{
-          title: 'Receipts',
-          tabBarActiveTintColor: 'orange',
-          tabBarInactiveTintColor: 'black',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="receipt" color={color} size={size} />
-          ),
-        }}
-      />
+     
       <Tab.Screen
         name="ShoppingCartScreen"
         component={ShoppingCartScreen}

@@ -1,9 +1,9 @@
-import {  BASE_URLIO } from '@env';
-
+import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity, TouchableWithoutFeedback, FlatList, Modal } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, TouchableWithoutFeedback, FlatList, Modal } from 'react-native';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
+import axios from 'axios';
 
 let socket;
 
@@ -19,13 +19,13 @@ const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
       setDeviceId(id);
 
       if (!socket) {
-        socket = io(`${BASE_URLIO}`); // Évitez de réinitialiser le socket à chaque fois
+        socket = io(`${BASE_URLIO}`);
       }
 
       socket.emit('requestNotifications', id);
 
       socket.on('allNotifications', (data) => {
-        console.log('Received notifications:', data); 
+        console.log('Received notifications:', data);
         setNotifications(data);
       });
 
@@ -36,17 +36,31 @@ const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
 
     getDeviceId();
 
+    // Set up the interval to check for new notifications every 10 seconds
+    const interval = setInterval(async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/notifications`, { params: { deviceId } });
+        if (response.data) {
+          setNotifications((prevNotifications) => [
+            ...response.data.filter((notif) => !prevNotifications.some((n) => n._id === notif._id)),
+            ...prevNotifications,
+          ]);
+        }
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+      }
+    }, 10000); // Check every 10 seconds
+
     return () => {
+      clearInterval(interval); // Clear the interval when the component unmounts
       socket.off('allNotifications');
       socket.off('newNotification');
     };
-  }, []);
+  }, [deviceId]);
 
   const openNotification = (notification) => {
     setSelectedNotification(notification);
     setModalVisible(true);
-
-    // Marquer la notification comme lue
     socket.emit('markAsRead', notification._id);
   };
 

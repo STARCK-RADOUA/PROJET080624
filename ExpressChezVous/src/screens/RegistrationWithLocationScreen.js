@@ -2,19 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Animated, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import io from 'socket.io-client';
+import * as Location from 'expo-location';
 import * as Device from 'expo-device';
-import { BASE_URL, BASE_URLIO } from '@env';
+import io from 'socket.io-client';
+import { BASE_URLIO } from '@env';
 
 const socket = io(`${BASE_URLIO}`);
 
-const RegistrationScreen = ({ navigation }) => {
+const RegistrationWithLocationScreen = ({ navigation }) => {
   const [deviceId, setDeviceId] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [cmpassword, setcmPassword] = useState('');
+  const [location, setLocation] = useState(null);
+  const [isLocationObtained, setIsLocationObtained] = useState(false); // Vérifie si la localisation a été récupérée
   const [isFormValid, setIsFormValid] = useState(false);
   const [phoneError, setPhoneError] = useState('');
 
@@ -45,10 +48,11 @@ const RegistrationScreen = ({ navigation }) => {
       phone.trim() !== '' &&
       password === cmpassword &&
       password.length >= 6 &&
-      phoneError === ''
+      phoneError === '' &&
+      isLocationObtained // La localisation doit être obtenue pour valider le formulaire
     );
 
-    socket.on('clientRegistered', (data) => {
+    socket.on('clientRegisteredLC', (data) => {
       if (data.message === 'success') {
         Alert.alert('Success', data.details);
         navigation.reset({
@@ -61,9 +65,9 @@ const RegistrationScreen = ({ navigation }) => {
     });
 
     return () => {
-      socket.off('clientRegistered');
+      socket.off('clientRegisteredLC');
     };
-  }, [firstName, lastName, phone, password, cmpassword, deviceId, phoneError]);
+  }, [firstName, lastName, phone, password, cmpassword, deviceId, phoneError, isLocationObtained]);
 
   const handleConfirm = () => {
     if (password !== cmpassword) {
@@ -71,7 +75,7 @@ const RegistrationScreen = ({ navigation }) => {
       return;
     }
 
-    socket.emit('registerClient', { firstName, lastName, phone, password, deviceId });
+    socket.emit('registerClientLC', { firstName, lastName, phone, password, deviceId, location });
   };
 
   const animateButtonPress = () => {
@@ -89,6 +93,18 @@ const RegistrationScreen = ({ navigation }) => {
         useNativeDriver: true,
       })
     ]).start();
+  };
+
+  const handleGetLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Location permission is required to proceed.');
+      return;
+    }
+
+    let currentLocation = await Location.getCurrentPositionAsync({});
+    setLocation(currentLocation.coords);
+    setIsLocationObtained(true); // Localisation récupérée avec succès
   };
 
   return (
@@ -128,6 +144,16 @@ const RegistrationScreen = ({ navigation }) => {
         <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.inputIcon} />
         <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={true} placeholderTextColor="#ccc" value={cmpassword} onChangeText={setcmPassword} />
       </View>
+
+      {/* Bouton pour récupérer la localisation */}
+      <TouchableOpacity
+        style={styles.locationButton}
+        onPress={handleGetLocation}
+      >
+        <Text style={styles.buttonText}>Get Location</Text>
+      </TouchableOpacity>
+
+    
 
       <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
         <TouchableOpacity
@@ -203,6 +229,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
+  locationButton: {
+    width: '80%',
+    padding: 15,
+    backgroundColor: '#00AAFF',
+    borderRadius: 50,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  locationText: {
+    color: '#fff',
+    marginTop: 10,
+  },
 });
 
-export default RegistrationScreen;
+export default RegistrationWithLocationScreen;
