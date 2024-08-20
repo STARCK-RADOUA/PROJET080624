@@ -103,7 +103,7 @@ const ShoppingCartScreen = ({ navigation }) => {
       console.log('Order Items:', orderItems);
       console.log('Device ID:', deviceId);
       
-      navigation.navigate('AdressForm',{ newOrder: data });
+      navigation.replace('AdressForm',{ newOrder: data });
     } catch (error) {
       console.error('Failed to place the order:', error);
       setError('Failed to place the order. Please check the console for details.');
