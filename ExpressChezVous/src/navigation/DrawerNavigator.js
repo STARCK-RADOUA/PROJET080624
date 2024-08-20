@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, ImageBackground, StyleSheet, Text } from 'react-native';
+import { View, ImageBackground, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Importer l'icône QR
 import TabNavigator from './TabNavigator';
 import SupportChat from '../screens/SupportChatScreen';
 import FeedBackScreen from '../screens/FeedBackScreen';
 import Logout from '../screens/logout';
-import { BASE_URL, BASE_URLIO } from '@env';
-import axios from 'axios';
+import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
 import { getClientId } from '../services/userService';
+import { useNavigation } from '@react-navigation/native';
+
 const CustomDrawerContent = (props) => {
   const socket = io(BASE_URLIO);
   const [profileData, setProfileData] = useState({
@@ -16,66 +18,50 @@ const CustomDrawerContent = (props) => {
     phone: 'Loading...',
     points: 'Loading...',
   });
+  const navigation = useNavigation();
+
+  const handleQRCodePress = () => {
+    navigation.navigate('QrcodeGeneratorScreen'); // Navigue vers l'écran de génération de QR code
+  };
 
   // Utilisation de useEffect pour récupérer les données depuis une base de données ou une API
   useEffect(() => {
     const fetchData = async () => {
-     
-
-
-
-    
-        const clientId = await  getClientId() ;
-
-console.log('---------------ddddddddddddddddddddddddddeeeazzzartytuuoukjbjhcv---------------------');
-console.log(clientId);
-console.log('------------------------------------');
-        socket.emit('getUserByClientId', {clientId});
-
-
-        socket.on('userByClientId', async ({ user }) => {
-          try {
-            if(user){
-              console.log("ghhhhhhhhhhhhhhhhhhhkkkkkkkkkkkkkkkkkkkkkkh")
-              console.log(user)
-              setProfileData({
-                name: user.lastName+' '+user.firstName, // Nom récupéré de la base de données
-                phone: user.phone, // Téléphone récupéré de la base de données
-                points: user.points_earned,  });
-            }
-              // Points récupérés de la base de données
-             
-            
-          } catch (error) {
-            console.error('Error checking order status:', error);
-          }
-        });
-      
+      const clientId = await getClientId();
+      socket.emit('getUserByClientId', { clientId });
+      socket.on('userByClientId', async ({ user }) => {
+        if (user) {
+          setProfileData({
+            name: user.lastName + ' ' + user.firstName,
+            phone: user.phone,
+            points: user.points_earned,
+          });
+        }
+      });
     };
-
     fetchData();
   }, []);
 
   return (
-    <ImageBackground
-      source={require('../assets/8498789sd.png')} // Remplace par ton image
-      style={styles.backgroundImage}
-    >
+    <ImageBackground source={require('../assets/8498789sd.png')} style={styles.backgroundImage}>
       <DrawerContentScrollView {...props}>
         <View style={styles.profileContainer}>
           <View style={styles.profileInfo}>
-            {/* Nom et téléphone en disposition verticale */}
             <View style={styles.namePhoneColumn}>
               <Text style={styles.profileName}>{profileData.name}</Text>
               <Text style={styles.profileNumber}>{profileData.phone}</Text>
             </View>
-            {/* Points alignés horizontalement avec le bloc nom/téléphone */}
-            <Text style={styles.profilePoints}> {profileData.points}</Text>
+            <Text style={styles.profilePoints}>{profileData.points}</Text>
             <Text style={styles.profileNumber}> points</Text>
           </View>
         </View>
 
         <DrawerItemList {...props} />
+        {/* Icône QR et texte */}
+        <TouchableOpacity style={styles.qrButton} onPress={handleQRCodePress}>
+          <Icon name="qrcode-scan" size={30} color="#fff" />
+          <Text style={styles.qrText}>Generate QR Code</Text>
+        </TouchableOpacity>
       </DrawerContentScrollView>
     </ImageBackground>
   );
@@ -101,7 +87,7 @@ const DrawerNavigator = () => {
         overlayColor: 'rgba(0, 0, 0, 0.9)',
       }}
     >
-      <Drawer.Screen name="ExpressChezVous"  component={TabNavigator} />
+      <Drawer.Screen name="ExpressChezVous" component={TabNavigator} />
       <Drawer.Screen name="SupportChat" component={SupportChat} />
       <Drawer.Screen name="FeedBack" component={FeedBackScreen} />
       <Drawer.Screen name="Logout" component={Logout} />
@@ -123,20 +109,20 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   profileInfo: {
-    flexDirection: 'row', // Affiche les informations (nom/téléphone et points) horizontalement
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
     paddingHorizontal: 20,
   },
   namePhoneColumn: {
-    flexDirection: 'column', // Nom et téléphone alignés verticalement
+    flexDirection: 'column',
   },
   profileName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 4, // Espacement entre le nom et le téléphone
+    marginBottom: 4,
   },
   profileNumber: {
     fontSize: 14,
@@ -146,7 +132,21 @@ const styles = StyleSheet.create({
     fontSize: 45,
     fontWeight: 'bold',
     color: '#0fe668a9',
-    marginLeft: 20, // Espacement entre les points et le bloc nom/téléphone
+    marginLeft: 20,
+  },
+  qrButton: {
+    flexDirection: 'row', // Pour aligner l'icône et le texte horizontalement
+    backgroundColor: '#0e2c1a59',
+    padding: 10,
+    margin: 20,
+    alignItems: 'center',
+    borderRadius: 10,
+    marginTop: "100%",
+  },
+  qrText: {
+    fontSize: 18,
+    color: '#fff',
+    marginLeft: 10, // Espace entre l'icône et le texte
   },
 });
 

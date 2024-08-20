@@ -23,7 +23,7 @@ import Logout from '../screens/logout';
 import PaymentScreen from '../screens/PaymentScreen';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 import FeedBackScreen from '../screens/FeedBackScreen';
-
+import QrcodeGeneratorScreenScreen from '../screens/QrcodeGeneratorScreen';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const AppNavigator = () => {
@@ -46,6 +46,8 @@ const AppNavigator = () => {
           component={DrawerNavigator} 
           options={{ headerShown: false }}  
         /> 
+          <Stack.Screen name="QrcodeGeneratorScreen" component={QrcodeGeneratorScreenScreen} />
+
         <Stack.Screen name="SupportChat" component={SupportChat} />
         <Stack.Screen name="AdressForm" component={AdressForm} />
         <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
