@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { getClientId } from '../services/userService';
-import SimpleCrypto from 'react-native-simple-crypto'; // Importez la bibliothèque de cryptage
+import { v4 as uuidv4 } from 'uuid'; // Importer la bibliothèque uuid
 
 const QrcodeGeneratorScreen = () => {
   const [qrData, setQrData] = useState(null);
@@ -12,7 +12,9 @@ const QrcodeGeneratorScreen = () => {
     const generateQRCode = async () => {
       try {
         const clientId = await getClientId();
-        const uniqueId = Math.random().toString(36).substring(7); // Générer un identifiant unique
+
+        // Utiliser uuid pour générer un identifiant unique compatible avec React Native
+        const uniqueId = uuidv4();
 
         // Générer l'horodatage actuel et ajouter 1 minute pour l'expiration
         const timestamp = Date.now();
@@ -24,11 +26,8 @@ const QrcodeGeneratorScreen = () => {
           expirationTime, // Ajouter l'heure d'expiration
         };
 
-        // Crypter les informations avec AES
-        const secretKey = 'your_secret_key'; // Utiliser une clé secrète pour le cryptage
-        const encryptedQRInfo = await SimpleCrypto.AES.encrypt(JSON.stringify(qrInfo), SimpleCrypto.utils.convertUtf8ToBytes(secretKey));
-
-        setQrData(SimpleCrypto.utils.convertBytesToHex(encryptedQRInfo)); // Convertir en format Hexadécimal pour le QR code
+        // Encodage simple du QR code sans cryptage sécurisé pour éviter les problèmes de compatibilité
+        setQrData(JSON.stringify(qrInfo)); // Encodage en JSON pour le QR code
       } catch (error) {
         console.error('Erreur lors de la génération du QR code :', error);
       }
@@ -52,7 +51,7 @@ const QrcodeGeneratorScreen = () => {
         <>
           {qrData && (
             <QRCode
-              value={qrData} // Les informations cryptées du QR code
+              value={qrData} // Les informations du QR code encodées en JSON
               size={200}
               backgroundColor="white"
               color="black"

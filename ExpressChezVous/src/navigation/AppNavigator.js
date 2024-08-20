@@ -23,7 +23,7 @@ import Logout from '../screens/logout';
 import PaymentScreen from '../screens/PaymentScreen';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 import FeedBackScreen from '../screens/FeedBackScreen';
-
+import QrcodeGeneratorScreenScreen from '../screens/QrcodeGeneratorScreen';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const AppNavigator = () => {
