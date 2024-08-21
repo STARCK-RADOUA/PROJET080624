@@ -1,75 +1,95 @@
-import { BASE_URL, BASE_URLIO } from '@env';
-
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions ,Animated } from 'react-native';
-import icon from '../assets/images/wave.png'; // Import your icon image
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import axios from 'axios';
-import { getClientId } from '../services/userService';
+import { BASE_URL } from '@env';
 
 const ServicesScreen = ({ navigation }) => {
-  const services = [
-    { name: 'Service coursier', image: 'https://example.com/drinks.png', test: true },
-    { name: 'J’ai faim', image: 'https://example.com/package.png', test: false },
-    { name: 'Petits plaisirs ', image: 'https://example.com/food.png', test: true },
-    { name: 'Boutique cadeaux', image: 'https://example.com/coca-cola.png', test: true },
-    { name: 'Marché', image: 'https://example.com/supermarket.png', test: true },
-  ];
-  const animations = useRef(services.map(() => new Animated.Value(0))).current;
-  const handleServicePress = (serviceName) => {
-    if (serviceName === 'J’ai faim') {
-      navigation.navigate('Home');
+  const [services, setServices] = useState([]);
+  const [areAnimationsReady, setAnimationsReady] = useState(false); // Add a flag for animation readiness
+  const animations = useRef([]); // Store animation values
+
+  const fetchServices = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/services`);
+      const fetchedServices = response.data;
+      console.log('------------------------------------');
+      console.log('Fetched Services:', fetchedServices);
+      console.log('------------------------------------');
+
+      setServices(fetchedServices);
+
+      // Initialize animations based on the number of services
+      if (fetchedServices.length > 0) {
+        animations.current = fetchedServices.map(() => new Animated.Value(0)); // Create animations
+        setAnimationsReady(true); // Set the flag once animations are ready
+        triggerAnimations();
+      }
+    } catch (error) {
+      console.error('Error fetching services:', error);
     }
   };
 
+  // Trigger animations
+  const triggerAnimations = () => {
+    if (animations.current.length > 0) {
+      animations.current.forEach((anim, index) => {
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 800,
+          delay: index * 200, // Add delay for staggered animation
+          useNativeDriver: true,
+        }).start();
+      });
+    }
+  };
 
-  
   useEffect(() => {
-    const createCart = async () => {
-      try {
-        // Fetch the client ID (or obtain it from user context)
-        const client_id = await getClientId();
-        
-        if (!client_id) {
-          throw new Error('Client ID is missing');
-        }
-
-        // Send a POST request to create the cart
-        const response = await axios.post(`${BASE_URL}/api/carts/add`, { client_id });
-        
-        // Handle the response
-        // Store the cart data
-      } catch (err) {
-      
-        console.error('Error creating cart:', err);
-      }
-    };
-
-    // Call the createCart function
-    createCart();
- // This will run when the component mounts
-
-    // Trigger animations with delay for each service item
-    animations.forEach((anim, index) => {
-      Animated.timing(anim, {
-        toValue: 1,
-        duration: 800,
-        delay: index * 200, // Delay each service's animation
-        useNativeDriver: true,
-      }).start();
-    });
+    fetchServices();
   }, []);
+
+  const handleServicePress = (serviceName,serviceTest) => {
+
+    dataTosend = {
+        
+      serviceName: serviceName,
+      serviceTest: serviceTest,
+     
+    }
+
+
+console.log('------------------------------------');
+console.log('-------------------dataTosend-------------------');
+console.log(dataTosend);
+console.log('------------------------------------');
+
+    if (serviceName === 'J’ai faim' && !serviceTest) {
+   
+      navigation.navigate('Home',dataTosend);
+    }if (serviceName === 'Service coursier'&& !serviceTest) {
+      navigation.navigate('Home',dataTosend);
+    }if (serviceName === 'Petits plaisirs' && !serviceTest) {
+      navigation.navigate('Home',dataTosend);
+    }if (serviceName === 'Boutique cadeaux' && !serviceTest) {
+      navigation.navigate('Home',dataTosend);
+    }if (serviceName === 'Marché' && !serviceTest) {
+      navigation.navigate('Home',dataTosend);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Our Services</Text>
       <View style={styles.servicesContainer}>
-        {services.map((service, index) => {
-          const scale = animations[index].interpolate({
+        {areAnimationsReady && services.map((service, index) => {
+          // Safe access to animations only when animations are ready
+          const scale = animations.current[index]?.interpolate({
             inputRange: [0, 1],
-            outputRange: [0, 1], // Scale from 0 to 1
+            outputRange: [0, 1],
           });
-          const rotate = animations[index].interpolate({
+
+          const rotate = animations.current[index]?.interpolate({
             inputRange: [0, 1],
-            outputRange: ['0deg', '360deg'], // Rotate 360 degrees
+            outputRange: ['0deg', '360deg'],
           });
 
           return (
@@ -81,10 +101,7 @@ const ServicesScreen = ({ navigation }) => {
                 { transform: [{ scale }, { rotate }] }, // Apply scale and rotation animations
               ]}
             >
-              <TouchableOpacity
-                onPress={() => handleServicePress(service.name)}
-                disabled={service.test}
-              >
+              <TouchableOpacity onPress={() => handleServicePress(service.name,service.test)} disabled={service.test}>
                 <Image source={{ uri: service.image }} style={styles.serviceImage} />
                 <Text style={styles.serviceText}>{service.name}</Text>
                 {service.test && <Text style={styles.testLabel}>This service is in test</Text>}
@@ -93,7 +110,6 @@ const ServicesScreen = ({ navigation }) => {
           );
         })}
       </View>
-      <Image source={icon} style={styles.bottomImage} />
     </View>
   );
 };
@@ -152,13 +168,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 10,
     color: '#888',
-  },
-  bottomImage: {
-    position: 'absolute',
-    bottom: 0,
-    width: Dimensions.get('window').width,
-    height: '20%',
-    aspectRatio: 1, // Adjust aspect ratio if needed
   },
 });
 
