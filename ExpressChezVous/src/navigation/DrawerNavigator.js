@@ -91,7 +91,7 @@ const DrawerNavigator = () => {
       }}
     >
       <Drawer.Screen name="ExpressChezVous"  component={TabNavigator} />
-      <Drawer.Screen name="SupportChat" screenOptions={{
+      <Drawer.Screen name="Client" screenOptions={{
         headerShown: false,
         drawerStyle: {
           backgroundColor: '#860383b7',
@@ -102,7 +102,7 @@ const DrawerNavigator = () => {
           width: 280,
         }, overlayColor: 'rgba(0, 0, 0, 0.9)',}} component={SupportChat} />
   
-  <Drawer.Screen name="AdminChat" component={Another} />
+  <Drawer.Screen name="Admin" component={Another} />
 
       <Drawer.Screen name="Logout" component={Logout} />
     </Drawer.Navigator>

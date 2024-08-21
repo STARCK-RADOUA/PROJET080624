@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import io from 'socket.io-client';
 
-const ChatScreen = () => {
+const AdminChatScreen = () => {
   const clientId = '66c10e4d4eac0352b3aec084';  // Static clientId
   const adminId = '66bac40871e4a7ed9e6fc705';  // Static adminId
   const [messages, setMessages] = useState([]);  // Chat messages
   const [newMessage, setNewMessage] = useState('');  // Input message
   const [chatId, setChatId] = useState(null);  // Chat ID obtained after initiation
 
-  const socket = io('http://192.168.1.149:4000');  // Adjust to your server IP
+  // Set socket with query param to indicate admin role
+  const socket = io('http://192.168.1.149:4000', { query: { isAdmin: 'true' } });  // Adjust to your server IP
 
   useEffect(() => {
     // Initiate chat when the component mounts
@@ -20,7 +21,7 @@ const ChatScreen = () => {
     socket.on('chatDetails', (data) => {
       console.log('Chat details received:', data);
       setChatId(data.chatId);  // Set the chatId obtained from the server
-      setMessages(data.messages);  // Load initial messages
+      setMessages(data.messages);  // Load all messages (seen, unseen, old, new)
     });
 
     // Listen for new messages in real-time
@@ -43,7 +44,7 @@ const ChatScreen = () => {
     if (newMessage.trim() && chatId) {
       socket.emit('sendMessage', {
         chatId,
-        sender: 'admin',  // Assuming the client is sending the message
+        sender: 'admin',  // Admin is sending the message
         content: newMessage
       });
       setNewMessage('');  // Clear input after sending
@@ -126,4 +127,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatScreen;
+export default AdminChatScreen;
