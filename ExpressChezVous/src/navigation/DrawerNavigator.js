@@ -3,6 +3,8 @@ import { View, ImageBackground, StyleSheet, Text, TouchableOpacity } from 'react
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Importer l'icône QR
 import TabNavigator from './TabNavigator';
+import Another from '../screens/SupportChatScreen';
+
 import SupportChat from '../screens/SupportChatScreen';
 
 import Logout from '../screens/logout';
@@ -101,6 +103,8 @@ const DrawerNavigator = () => {
           width: 280,
         }, overlayColor: 'rgba(0, 0, 0, 0.9)',}} component={SupportChat} />
   
+  <Drawer.Screen name="AdminChat" component={Another} />
+
       <Drawer.Screen name="Logout" component={Logout} />
     </Drawer.Navigator>
   );
