@@ -1,6 +1,6 @@
 import { BASE_URL, BASE_URLIO } from '@env';
 
-import React, { useCallback, useImperativeHandle, useState, useEffect } from 'react';
+import React, { useCallback, useContext, useImperativeHandle, useState, useEffect } from 'react';
 import { Dimensions, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -12,14 +12,15 @@ import Animated, {
 } from 'react-native-reanimated';
 import { getClientId } from '../services/userService'; // Import the getClient function
 import axios from 'axios';
-
+import { DataContext } from '../navigation/DataContext';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT / 1.5;
 
 const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
   const translateY = useSharedValue(0);
   const active = useSharedValue(false);
-
+  const { sharedData } = useContext(DataContext);
+  const serviceName  = sharedData.serviceName;
   const [quantity, setQuantity] = useState(1);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [extras, setExtras] = useState({
@@ -91,7 +92,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
     const checkIfItemIsInCart = async () => {
       try {
         const clientId = await getClientId();
-        const url = `${BASE_URL}/api/order-items/${clientId}/order-items`;
+        const url = `${BASE_URL}/api/order-items/${clientId}/${serviceName}/order-items`;
 
 
         const response = await axios.get(url);
@@ -162,6 +163,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
         productId: item?._id,
         quantity,
         selectedItems,
+        serviceName: serviceName
       });
 
       console.log('Item added to cart successfully');

@@ -1,6 +1,6 @@
 import { BASE_URL, BASE_URLIO } from '@env';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState,useContext, useEffect, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
@@ -11,7 +11,7 @@ import io from 'socket.io-client';
 import * as Device from 'expo-device';
 import useNotificationMenu from '../services/useNotificationMenu'; // Import the custom hook
 import NotificationMenu from '../components/NotificationMenu';
-
+import { DataContext } from '../navigation/DataContext';
 // Connect to the Socket.IO server
  // Use your backend server's IP address
 
@@ -22,6 +22,8 @@ const ShoppingCartScreen = ({ navigation }) => {
   const [order_id, setOrder_id] = useState(0); 
   const [error, setError] = useState('');
   const socket = io(`${BASE_URLIO}`);
+  const { sharedData } = useContext(DataContext);
+  const serviceName  = sharedData.serviceName;
 
   const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
   useEffect(() => {
@@ -33,7 +35,7 @@ const ShoppingCartScreen = ({ navigation }) => {
   const fetchOrderItems = async () => {
     try {
       const clientId = await getClientId();
-      const url = `${BASE_URL}/api/order-items/${clientId}/order-items`;
+      const url = `${BASE_URL}/api/order-items/${clientId}/${serviceName}/order-items`;
       const response = await axios.get(url);
       setOrderItems(response.data);
       calculateTotalPrice(response.data);
