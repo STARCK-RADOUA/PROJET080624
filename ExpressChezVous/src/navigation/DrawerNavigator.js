@@ -5,7 +5,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Importer
 import TabNavigator from './TabNavigator';
 import SupportChat from '../screens/SupportChatScreen';
 
-import Another from '../screens/Another';
 
 import Logout from '../screens/logout';
 import { BASE_URLIO } from '@env';
