@@ -78,7 +78,7 @@ console.log('-------------daaaaaataaa yo send-----------------------');
      
       
       // Navigate back or to another screen
-      navigation.navigate('PaymentScreen', { data: dataToSend });
+      navigation.replace('PaymentScreen', { data: dataToSend });
     } catch (error) {
       console.error('Error saving address:', error);
     }

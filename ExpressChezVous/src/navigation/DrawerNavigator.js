@@ -4,7 +4,7 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Importer l'icône QR
 import TabNavigator from './TabNavigator';
 import SupportChat from '../screens/SupportChatScreen';
-import FeedBackScreen from '../screens/FeedBackScreen';
+
 import Logout from '../screens/logout';
 import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
@@ -59,11 +59,12 @@ const CustomDrawerContent = (props) => {
 
         <DrawerItemList {...props} />
         {/* Icône QR et texte */}
-        <TouchableOpacity style={styles.qrButton} onPress={handleQRCodePress}>
-          <Icon name="qrcode-scan" size={30} color="#fff" />
-          <Text style={styles.qrText}>Generate QR Code</Text>
-        </TouchableOpacity>
+      
       </DrawerContentScrollView>
+        <TouchableOpacity style={styles.qrButton} onPress={handleQRCodePress}>
+          <Icon name="qrcode-scan" size={200} color="#fff" />
+          <Text style={styles.qrText}>génère un code QR </Text>
+        </TouchableOpacity>
     </ImageBackground>
   );
 };
@@ -78,7 +79,7 @@ const DrawerNavigator = () => {
       screenOptions={{
         headerShown: false,
         drawerStyle: {
-          backgroundColor: '#a5a2a29e',
+          backgroundColor: '#868383b7',
           height: '100%',
           borderTopRightRadius: 25,
           borderBottomRightRadius: 25,
@@ -88,11 +89,18 @@ const DrawerNavigator = () => {
         overlayColor: 'rgba(0, 0, 0, 0.9)',
       }}
     >
-      <Drawer.Screen name="ExpressChezVous" component={TabNavigator} />
-      <Drawer.Screen name="SupportChat" component={SupportChat} />
-      <Drawer.Screen name="AdminChat" component={Another} />
-
-      <Drawer.Screen name="FeedBack" component={FeedBackScreen} />
+      <Drawer.Screen name="ExpressChezVous"  component={TabNavigator} />
+      <Drawer.Screen name="SupportChat" screenOptions={{
+        headerShown: false,
+        drawerStyle: {
+          backgroundColor: '#860383b7',
+          height: '100%',
+          borderTopRightRadius: 25,
+          borderBottomRightRadius: 25,
+          borderBottomLeftRadius: 25,
+          width: 280,
+        }, overlayColor: 'rgba(0, 0, 0, 0.9)',}} component={SupportChat} />
+  
       <Drawer.Screen name="Logout" component={Logout} />
     </Drawer.Navigator>
   );
@@ -138,18 +146,20 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   qrButton: {
-    flexDirection: 'row', // Pour aligner l'icône et le texte horizontalement
-    backgroundColor: '#0e2c1a59',
-    padding: 10,
-    margin: 20,
-    alignItems: 'center',
-    borderRadius: 10,
-    marginTop: "100%",
+    flexDirection: 'column', // Aligner en ligne
+    alignItems: 'center', // Centrer verticalement
+    backgroundColor: '#ffbf4800', // Couleur du fond
+   padding: 10,
+    borderRadius: 30,
+    marginTop: 20,
+    
+    bottom: 30,
   },
   qrText: {
+    color: '#fff', // Couleur du texte
     fontSize: 18,
-    color: '#fff',
-    marginLeft: 10, // Espace entre l'icône et le texte
+    fontWeight: 'bold',
+    marginLeft: 10 // Espace entre l'icône et le texte
   },
 });
 
