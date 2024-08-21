@@ -3,9 +3,9 @@ import { View, ImageBackground, StyleSheet, Text, TouchableOpacity } from 'react
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Importer l'icône QR
 import TabNavigator from './TabNavigator';
-import Another from '../screens/SupportChatScreen';
-
 import SupportChat from '../screens/SupportChatScreen';
+
+import Another from '../screens/Another';
 
 import Logout from '../screens/logout';
 import { BASE_URLIO } from '@env';
