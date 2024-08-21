@@ -10,6 +10,7 @@ import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
 import { getClientId } from '../services/userService';
 import { useNavigation } from '@react-navigation/native';
+import Another from '../screens/Another';
 
 const CustomDrawerContent = (props) => {
   const socket = io(BASE_URLIO);
@@ -89,6 +90,8 @@ const DrawerNavigator = () => {
     >
       <Drawer.Screen name="ExpressChezVous" component={TabNavigator} />
       <Drawer.Screen name="SupportChat" component={SupportChat} />
+      <Drawer.Screen name="AdminChat" component={Another} />
+
       <Drawer.Screen name="FeedBack" component={FeedBackScreen} />
       <Drawer.Screen name="Logout" component={Logout} />
     </Drawer.Navigator>
