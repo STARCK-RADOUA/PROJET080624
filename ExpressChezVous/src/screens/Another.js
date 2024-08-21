@@ -43,7 +43,7 @@ const ChatScreen = () => {
     if (newMessage.trim() && chatId) {
       socket.emit('sendMessage', {
         chatId,
-        sender: 'client',  // Assuming the client is sending the message
+        sender: 'admin',  // Assuming the client is sending the message
         content: newMessage
       });
       setNewMessage('');  // Clear input after sending

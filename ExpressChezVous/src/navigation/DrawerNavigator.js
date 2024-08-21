@@ -10,6 +10,7 @@ import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
 import { getClientId } from '../services/userService';
 import { useNavigation } from '@react-navigation/native';
+import Another from '../screens/Another';
 
 const CustomDrawerContent = (props) => {
   const socket = io(BASE_URLIO);
