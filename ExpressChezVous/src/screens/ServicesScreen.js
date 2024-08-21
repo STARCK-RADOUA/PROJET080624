@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect,useContext, useState, useRef } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import axios from 'axios';
 import { BASE_URL } from '@env';
-
-const ServicesScreen = ({ navigation }) => {
+import { DataContext } from '../navigation/DataContext';
+const ServicesScreen = ({ navigation,route }) => {
   const [services, setServices] = useState([]);
   const [areAnimationsReady, setAnimationsReady] = useState(false); // Add a flag for animation readiness
   const animations = useRef([]); // Store animation values
-
+  const { setSharedData } = useContext(DataContext);
   const fetchServices = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/services`);
@@ -47,34 +47,22 @@ const ServicesScreen = ({ navigation }) => {
     fetchServices();
   }, []);
 
-  const handleServicePress = (serviceName,serviceTest) => {
-
-    dataTosend = {
-        
+  const handleServicePress = (serviceName, serviceTest) => {
+    const dataToSend = {
       serviceName: serviceName,
       serviceTest: serviceTest,
-     
+    };
+  
+    setSharedData({ serviceName: serviceName, serviceTest: serviceTest });
+    if (!serviceTest) {
+      // Ensure parameters are passed correctly here
+      navigation.navigate('Home', dataToSend);
+
     }
-
-
-console.log('------------------------------------');
-console.log('-------------------dataTosend-------------------');
-console.log(dataTosend);
-console.log('------------------------------------');
-
-    if (serviceName === 'J’ai faim' && !serviceTest) {
-   
-      navigation.navigate('Home',dataTosend);
-    }if (serviceName === 'Service coursier'&& !serviceTest) {
-      navigation.navigate('Home',dataTosend);
-    }if (serviceName === 'Petits plaisirs' && !serviceTest) {
-      navigation.navigate('Home',dataTosend);
-    }if (serviceName === 'Boutique cadeaux' && !serviceTest) {
-      navigation.navigate('Home',dataTosend);
-    }if (serviceName === 'Marché' && !serviceTest) {
-      navigation.navigate('Home',dataTosend);
-    }
+  
+    console.log('Data to send:', dataToSend); // This should log the correct data
   };
+  
 
   return (
     <View style={styles.container}>

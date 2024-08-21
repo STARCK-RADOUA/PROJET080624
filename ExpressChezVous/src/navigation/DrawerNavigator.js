@@ -74,6 +74,8 @@ const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   return (
+  
+
     <Drawer.Navigator
       initialRouteName="ExpressChezVous"
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -106,6 +108,7 @@ const DrawerNavigator = () => {
 
       <Drawer.Screen name="Logout" component={Logout} />
     </Drawer.Navigator>
+  
   );
 };
 

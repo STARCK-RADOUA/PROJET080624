@@ -24,10 +24,12 @@ import PaymentScreen from '../screens/PaymentScreen';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 import FeedBackScreen from '../screens/FeedBackScreen';
 import QrcodeGeneratorScreenScreen from '../screens/QrcodeGeneratorScreen';
+import { DataProvider } from './DataContext'
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const AppNavigator = () => {
   return (
+    <DataProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
@@ -37,6 +39,7 @@ const AppNavigator = () => {
         <Stack.Screen name="RegistrationLC" component={RegistrationWithLocationScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Services" component={ServicesScreen} />
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="feedback" component={FeedBackScreen} />
 
 
@@ -55,6 +58,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Logout" component={Logout} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
+    </DataProvider>
   );
 };
 

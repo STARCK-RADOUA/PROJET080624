@@ -1,33 +1,41 @@
 import { BASE_URL, BASE_URLIO } from '@env';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useContext,useRef, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
-
+import { DataContext } from '../navigation/DataContext';
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ route,navigation}) => {
   const [menuItems, setMenuItems] = useState([]);
   const [isNotificationMenuVisible, setIsNotificationMenuVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const slideAnim = useRef(new Animated.Value(width)).current;
   const bottomSheetRef = useRef(null);
-  
+  const { sharedData } = useContext(DataContext);
+  const serviceName  = sharedData.serviceName;
+  const  serviceTest  = sharedData.serviceTest;
+  console.log('-------------lllllslslslsllslsllslslsllslsl-----------------------');
+console.log(serviceName,serviceTest);
+  console.log('------------------------------------');
   // Re-establish the socket connection when HomeScreen is loaded
   const socket = useRef(null);
 
   useEffect(() => {
     socket.current = io(`${BASE_URLIO}`);  // Establish socket connection
-
+  
     const fetchProducts = () => {
-      socket.current.emit('requestActiveProducts');
+      socket.current.emit('requestActiveProducts',(serviceName));
     };
 
     const interval = setInterval(fetchProducts, 1000); // Fetch every 1 second
 
     socket.current.on('activeProducts', (products) => {
+      console.log('------------------------------------');
+      console.log('Active Products:', products.service_type);
+      console.log('------------------------------------');
       setMenuItems((prevItems) => {
         if (JSON.stringify(prevItems) !== JSON.stringify(products)) {
           return products;  // Update if the product list has changed
