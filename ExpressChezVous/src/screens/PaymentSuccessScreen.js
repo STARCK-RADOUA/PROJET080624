@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, SafeAreaView, TouchableOpacity, Animated, BackHandler, Alert, Button } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, SafeAreaView, TouchableOpacity, Animated, BackHandler, Alert } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import axios from 'axios';
 import io from 'socket.io-client';
 import BottomSheet from './ChatSheetScreen'; // Assuming this is a valid component
 import { BASE_URLIO } from '@env'; // Assuming you have environment variables
@@ -13,100 +12,71 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
   const totalTimeInSeconds = 5 * 60;
   const [progress, setProgress] = useState(0);
   const [remainingTime, setRemainingTime] = useState(5);
-  const [orderStatus, setOrderStatus] = useState('pending'); // State to track order status
-  const [orderId, setOrderID] = useState(route.params.data.order_id || ''); // State to track order ID
-  const [clientId, setClientId] = useState(''); // To store client_id
-  const [driverId, setDriverId] = useState(''); // To store driver_id
-  const [isChatDisabled, setIsChatDisabled] = useState(true); // Start with chat disabled
-  const [redirectMessage, setRedirectMessage] = useState(''); // Track if the redirect message should be shown
-  const [showExitButton, setShowExitButton] = useState(false); // State to show/hide exit button
+  const [orderStatus, setOrderStatus] = useState('pending'); 
+  const [orderId, setOrderID] = useState(route.params.data.order_id || '');
+  const [clientId, setClientId] = useState('');
+  const [driverId, setDriverId] = useState('');
+  const [isChatDisabled, setIsChatDisabled] = useState(true); 
+  const [redirectMessage, setRedirectMessage] = useState('');
+  const [showExitButton, setShowExitButton] = useState(false); 
 
   const animatedValue = useRef(new Animated.Value(0)).current;
   const bottomSheetRef = useRef(null);
 
-  // Function to check order status via Socket.IO
-  const checkOrderStatus = async () => {
-    try {
-      console.log('Checking order status...');
-      socket.emit('checkOrderStatus', { order_id: orderId });
-
-      // Listen for updates on the order status
-      socket.once('orderStatusUpdate', async (data) => { // Use 'once' to avoid multiple listeners
-        const status = data.order[0].status;
-        const client_id = data.order[0].client_id;
-        const driver_id = data.order[0].driver_id;
-
-        setClientId(client_id);
-        setDriverId(driver_id);
-        setOrderStatus(status);
-
-        console.log('Order id:', route.params.data.order_id);
-        console.log('Order status:', status);
-        console.log('Client ID:', client_id, 'Driver ID:', driver_id);
-
-        // If the order is delivered, wait for 2 minutes before navigating to the HomeScreen
-        if (status === 'delivered') {
-          console.log('Order delivered, waiting for 2 minutes...');
-          setIsChatDisabled(true); // Disable the chat icon
-          setRedirectMessage('Votre commande a été livrée. Tu as 2 minutes dans le chat avec le livreur');
-          setShowExitButton(true); // Show exit button
-
-          setTimeout(() => {
-            setRedirectMessage('Order chat session completed. Redirecting to Home...');
-            setTimeout(() => {
-              console.log('2 minutes passed, navigating to feedback...');
-              navigation.replace('feedback', { orderId });
-            }, 5000); // Display the message for 5 seconds before redirecting
-          }, 120000); // 2 minutes = 120,000 milliseconds
-        }
-
-        // If the order status is 'cancelled', send an axios request to update 'active' to false
-        if (status === 'cancelled') {
-          try {
-            const response = await axios.patch(`${BASE_URLIO}/api/orders/${orderId}/cancel`, {
-              active: false,
-            });
-            console.log('Order cancelled and active status updated:', response.data);
-
-            // Show cancellation message and redirect to HomeScreen
-            Alert.alert('Order cancelled', 'Order was successfully cancelled.');
-            setTimeout(() => {
-              navigation.replace('Home'); // Replace the screen with HomeScreen after 3 seconds
-            }, 3000);
-          } catch (error) {
-            console.error('Error updating order status:', error);
-          }
-        }
-
-        // Enable chat and other functionalities when status is 'in_progress'
-        if (status === 'in_progress') {
-          setIsChatDisabled(false);
-        }
-      });
-    } catch (error) {
-      console.error('Error checking order status:', error);
-    }
-  };
-
+  // Emit orderId when component mounts to start watching order status
   useEffect(() => {
-    // Start an interval to check the order status every 5 seconds
-    const statusInterval = setInterval(checkOrderStatus, 5000);
+    socket.emit('watchOrderStatuss', { order_id: orderId });
+    
+    // Listen for order status updates
+    socket.on('orderStatusUpdates', (data) => {
+      const status = data.order.status;
+      const client_id = data.order.client_id;
+      const driver_id = data.order.driver_id;
 
-    // Clean up the interval and socket when the component unmounts
+      setClientId(client_id);
+      setDriverId(driver_id);
+      setOrderStatus(status);
+
+      // Handle order status logic based on received data
+      if (status === 'delivered') {
+        setIsChatDisabled(true);
+        setRedirectMessage('Votre commande a été livrée. Tu as 2 minutes dans le chat avec le livreur');
+        setShowExitButton(true);
+
+        setTimeout(() => {
+          setRedirectMessage('Order chat session completed. Redirecting to Home...');
+          setTimeout(() => {
+            navigation.replace('feedback', { orderId });
+          }, 5000);
+        }, 120000);
+      }
+
+      if (status === 'cancelled') {
+        Alert.alert('Order cancelled', 'Order was successfully cancelled.');
+        setTimeout(() => {
+          navigation.replace('Home');
+        }, 3000);
+      }
+
+      if (status === 'in_progress') {
+        setIsChatDisabled(false);
+      }
+    });
+
+    // Clean up socket on unmount
     return () => {
-      clearInterval(statusInterval);
-      socket.off('orderStatusUpdate'); // Clean up the socket listener
+      socket.off('orderStatusUpdates');
     };
   }, []);
 
-  // Handle back button press based on order status
+  // Handle back button press logic
   useEffect(() => {
     const backAction = () => {
       if (orderStatus === 'pending' || orderStatus === 'in_progress') {
         Alert.alert('Attendez !', 'Vous ne pouvez pas quitter cette page tant que la commande n\'est pas livrée.');
-        return true; // Block back button
+        return true;
       }
-      return false; // Allow back button
+      return false;
     };
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
@@ -153,7 +123,7 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
   }, [orderStatus]);
 
   const openBottomSheet = () => {
-    if (!isChatDisabled && bottomSheetRef.current) { // Disable chat when isChatDisabled is true
+    if (!isChatDisabled && bottomSheetRef.current) { 
       const screenHeight = Dimensions.get('window').height;
       bottomSheetRef.current.scrollTo(-screenHeight + 50);
     }
@@ -165,7 +135,6 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
   });
 
   const handleExitPress = () => {
-    // Redirect to feedback screen
     navigation.replace('feedback', { orderId });
   };
 
@@ -178,7 +147,7 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
             source={{
               uri: 'https://firebasestorage.googleapis.com/v0/b/deliver-90a33.appspot.com/o/2665038.png?alt=media&token=9d61891a-3fa0-4673-b035-e4d29126563a',
             }}
-            style={[styles.chatIcon, isChatDisabled ? styles.disabledChatIcon : null]} // Apply a disabled style if chat is disabled
+            style={[styles.chatIcon, isChatDisabled ? styles.disabledChatIcon : null]}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -247,14 +216,12 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
         )}
       </View>
 
-      {/* Display the redirect message when chat is disabled */}
       {redirectMessage ? (
         <View style={styles.redirectMessageContainer}>
           <Text style={styles.redirectMessage}>{redirectMessage}</Text>
         </View>
       ) : null}
 
-      {/* Show exit button when order is delivered */}
       {showExitButton && (
         <View style={styles.exitButtonContainer}>
           <TouchableOpacity style={styles.exitButton} onPress={handleExitPress}>
@@ -263,7 +230,6 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
         </View>
       )}
 
-      {/* Bottom Sheet */}
       <BottomSheet ref={bottomSheetRef} orderId={orderId} clientId={clientId}>
         <View>
           <Text style={{ padding: 20, fontSize: 16 }}>Chat with us</Text>
@@ -297,7 +263,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   disabledChatIcon: {
-    opacity: 0.3, // Make the chat icon look disabled
+    opacity: 0.3, 
   },
   title: {
     fontSize: 28,

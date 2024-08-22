@@ -19,7 +19,8 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import axios from 'axios';
-import { BASE_URL } from '@env'; // Adjust BASE_URL for the backend API
+import { io } from 'socket.io-client';
+import { BASE_URL } from '@env';
 import { getClientId } from '../services/userService';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -31,6 +32,8 @@ const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
   const [chatId, setChatId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
+  const [socket, setSocket] = useState(null);
+  const driverId = "66bac757e6e3c479f7b35d7e";
 
   const scrollTo = useCallback((destination) => {
     'worklet';
@@ -45,17 +48,29 @@ const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
   useImperativeHandle(ref, () => ({ scrollTo, isActive }), [scrollTo, isActive]);
 
   useEffect(() => {
+    // Initialize Socket.IO connection
+    const socketInstance = io(BASE_URL, {
+      transports: ['websocket'],
+    });
+    setSocket(socketInstance);
+
+    socketInstance.on('connect', () => {
+      console.log('Socket connected');
+    });
+
+    socketInstance.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+
     const initiateChat = async () => {
       try {
-        if (orderId) {
-          const clientId = await getClientId(); // Fetch client ID from your service
-          const response = await axios.post(`${BASE_URL}/api/driverChat/initiate`, {
-            driver_id: '66bac757e6e3c479f7b35d7e', // Example driver ID
-            client_id: clientId,
-            order_id: orderId, // Pass order ID for chat initiation
+        if (orderId && driverId) {
+          const clientId = await getClientId();
+          socketInstance.emit('initiateChats', {
+            orderId,
+            clientId,
+            driverId,
           });
-          setChatId(response.data._id);
-          setMessages(response.data.messages);
         }
       } catch (error) {
         console.error('Error initiating chat:', error);
@@ -64,31 +79,33 @@ const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
 
     initiateChat();
 
-    const interval = setInterval(async () => {
-      try {
-        if (chatId) {
-          const response = await axios.get(`${BASE_URL}/api/driverChat/${chatId}?order_id=${orderId}`);
-          setMessages(response.data.messages);
-        }
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      }
-    }, 3000);
+    // Listen for chat details
+    socketInstance.on('chatDetailss', (data) => {
+      setChatId(data.chatId);
+      setMessages(data.messages);
+    });
 
-    return () => clearInterval(interval);
-  }, [chatId, orderId]);
+    // Real-time message listener
+    socketInstance.on('newMessages', (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage.message]);
+    });
+
+    return () => {
+      if (socketInstance) {
+        socketInstance.disconnect();
+      }
+    };
+  }, [orderId, driverId]);
 
   const sendMessage = () => {
-    if (message.trim()) {
-      axios.post(`${BASE_URL}/api/driverChat/send-message`, {
+    if (message.trim() && chatId) {
+      // Emit sendMessages event through Socket.IO
+      socket.emit('sendMessages', {
         chatId,
         sender: 'client',
         content: message,
       });
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { _id: prevMessages.length + 1, content: message, sender: 'client' },
-      ]);
+      // Do not optimistically add the message to the UI. The real-time listener will do that when confirmed by the server.
       setMessage('');
     }
   };
@@ -145,7 +162,6 @@ const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
           style={styles.messageList}
         />
 
-        {/* Input for Sending Messages */}
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.inputContainer}
