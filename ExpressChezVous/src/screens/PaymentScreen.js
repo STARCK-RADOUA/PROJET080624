@@ -1,15 +1,19 @@
 import { BASE_URLIO } from '@env';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext,useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
 import io from 'socket.io-client';
-
+import { DataContext } from '../navigation/DataContext';
 const PaymentScreen = ({ navigation, route }) => {
   const orderId = "66bea74097d7e61f1d6b3bd7"; // Ton ID de commande
   const orderDetails = route.params; // Les détails de la commande passés depuis un autre écran
   const [selectedPayment, setSelectedPayment] = useState(null); // Par défaut, aucun paiement sélectionné
   const [exchangeValue, setExchangeValue] = useState(0); // Valeur initiale d'échange
   const [loading, setLoading] = useState(false);
-  const [socket, setSocket] = useState(null); // État pour stocker l'instance Socket.IO
+  const [socket, setSocket] = useState(null); 
+  const { sharedData } = useContext(DataContext);// État pour stocker l'instance Socket.IO
+  const serviceName  = sharedData.serviceName;
+  const  serviceTest  = sharedData.serviceTest;
+  const  serviceId  = sharedData.id;
 
   // Initialiser la connexion Socket.IO
   useEffect(() => {
@@ -29,7 +33,7 @@ const PaymentScreen = ({ navigation, route }) => {
       return;
     }
 
-    console.log('Order Details:', orderDetails);
+
 
     setLoading(true);
 
@@ -37,13 +41,11 @@ const PaymentScreen = ({ navigation, route }) => {
       const orderData = {
         exchange: exchangeValue, // Envoi de la valeur d'échange
         paymentMethod: selectedPayment === 'cash' ? 'cash' : 'TPE', // Envoi de la méthode de paiement
-        orderdetaille: orderDetails, // Détails de la commande
+        orderdetaille: orderDetails,
+        serviceTest: serviceTest,
+        serviceId: serviceId,
+         // Détails de la commande
       };
-      console.log('------------------------------------');
-      console.log('........................................................');
-      console.log(orderData);
-      console.log('000000000000000000000000000000000000000000000000000000000000');
-      console.log('------------------------------------');
 
       if (socket) {
         // Émission des données vers le serveur via Socket.IO
@@ -52,12 +54,18 @@ const PaymentScreen = ({ navigation, route }) => {
         // Écouter la réponse du serveur pour l'événement 'orderAdded'
         socket.on('orderAdded', (order) => {
           console.log('Order ajouté:', order);
-          Alert.alert('Succès', 'Votre commande est en cours de création!');
+        if(!serviceTest) { Alert.alert('Succès', 'Votre commande est en cours de création!');}
           const dataToSend = {
             order_id: order,
       
           };
-          navigation.replace('PaymentSuccessScreen', { data: dataToSend });
+            if(serviceTest){ 
+            Alert.alert('Échec', 'Service indisponible pour le moment');
+            navigation.replace('Home');
+          }
+          if(!serviceTest){  navigation.replace('PaymentSuccessScreen', { data: dataToSend });}
+        
+        
         });
       }
     } catch (error) {

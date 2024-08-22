@@ -85,8 +85,8 @@ const DrawerNavigator = () => {
           backgroundColor: '#868383b7',
           height: '100%',
           borderTopRightRadius: 25,
-          borderBottomRightRadius: 25,
-          borderBottomLeftRadius: 25,
+          borderBottomRightRadius: 45,
+     
           width: 280,
         },
         overlayColor: 'rgba(0, 0, 0, 0.9)',

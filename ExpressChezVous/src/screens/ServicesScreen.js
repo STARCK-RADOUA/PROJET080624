@@ -47,18 +47,19 @@ const ServicesScreen = ({ navigation,route }) => {
     fetchServices();
   }, []);
 
-  const handleServicePress = (serviceName, serviceTest) => {
+  const handleServicePress = (serviceName, serviceTest,id) => {
     const dataToSend = {
+      id: id,
       serviceName: serviceName,
       serviceTest: serviceTest,
     };
   
-    setSharedData({ serviceName: serviceName, serviceTest: serviceTest });
-    if (!serviceTest) {
+    setSharedData({ serviceName: serviceName, serviceTest: serviceTest, id: id });
+  
       // Ensure parameters are passed correctly here
       navigation.navigate('Home', dataToSend);
 
-    }
+    
   
     console.log('Data to send:', dataToSend); // This should log the correct data
   };
@@ -89,11 +90,12 @@ const ServicesScreen = ({ navigation,route }) => {
                 { transform: [{ scale }, { rotate }] }, // Apply scale and rotation animations
               ]}
             >
-              <TouchableOpacity onPress={() => handleServicePress(service.name,service.test)} disabled={service.test}>
+              <TouchableOpacity onPress={() => handleServicePress(service.name,service.test,service._id)} >
                 <Image source={{ uri: service.image }} style={styles.serviceImage} />
                 <Text style={styles.serviceText}>{service.name}</Text>
-                {service.test && <Text style={styles.testLabel}>This service is in test</Text>}
-              </TouchableOpacity>
+              
+              </TouchableOpacity> 
+               {service.test && <Text style={styles.testLabel}>Test</Text>}
             </Animated.View>
           );
         })}
@@ -151,11 +153,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   testLabel: {
-    position: 'absolute',
-    bottom: -20,
+  position: 'absolute',
+ 
+  bottom: -20,
+  justifyContent: 'bottom',
+  alignItems: 'button',
+
     textAlign: 'center',
-    fontSize: 10,
-    color: '#888',
+    fontSize: 20,
+    color: '#f8f8f8',
   },
 });
 

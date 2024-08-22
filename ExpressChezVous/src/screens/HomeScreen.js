@@ -17,39 +17,33 @@ const HomeScreen = ({ route,navigation}) => {
   const { sharedData } = useContext(DataContext);
   const serviceName  = sharedData.serviceName;
   const  serviceTest  = sharedData.serviceTest;
-  console.log('-------------lllllslslslsllslsllslslsllslsl-----------------------');
-console.log(serviceName,serviceTest);
-  console.log('------------------------------------');
+
   // Re-establish the socket connection when HomeScreen is loaded
   const socket = useRef(null);
 
   useEffect(() => {
     socket.current = io(`${BASE_URLIO}`);  // Establish socket connection
-  
-    const fetchProducts = () => {
-      socket.current.emit('requestActiveProducts',(serviceName));
-    };
 
-    const interval = setInterval(fetchProducts, 1000); // Fetch every 1 second
+  // Request active products when the component is mounted
+  socket.current.emit('requestActiveProducts', serviceName);
 
-    socket.current.on('activeProducts', (products) => {
-      console.log('------------------------------------');
-      console.log('Active Products:', products.service_type);
-      console.log('------------------------------------');
-      setMenuItems((prevItems) => {
-        if (JSON.stringify(prevItems) !== JSON.stringify(products)) {
-          return products;  // Update if the product list has changed
-        }
-        return prevItems;  // No change, return the same list
-      });
+  // Listen for real-time updates of active products
+  socket.current.on('activeProducts', (products) => {
+    console.log('Active Products:', products);
+    setMenuItems((prevItems) => {
+      if (JSON.stringify(prevItems) !== JSON.stringify(products)) {
+        return products;  // Update if the product list has changed
+      }
+      return prevItems;  // No change, return the same list
     });
+  });
 
-    return () => {
-      clearInterval(interval);
-      socket.current.off('activeProducts');
-      socket.current.disconnect();  // Disconnect socket when component unmounts
-    };
-  }, []);
+  // Clean up the socket when the component is unmounted
+  return () => {
+    socket.current.off('activeProducts');
+    socket.current.disconnect();
+  };
+}, [serviceName]);
 
   const toggleNotificationMenu = () => {
     if (isNotificationMenuVisible) {

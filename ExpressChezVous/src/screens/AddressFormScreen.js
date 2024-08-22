@@ -51,9 +51,7 @@ const AddressFormScreen = ({ navigation ,route}) => {
 
     if (location) {
       setLocation(location.coords); // Store the coordinates
-      console.log('------------yooooooooooooooooooooooooooooo------------------------');
-      console.log(location.coords);
-      console.log('------------------------------------');
+    
       setLocationFetched(true); // Enable form fields once location is fetched
       Alert.alert('Location Fetched', 'Your current location has been successfully fetched.');
     } else {
@@ -71,11 +69,7 @@ const AddressFormScreen = ({ navigation ,route}) => {
         newOrder: route.params,// Include user_id in the request body
         location: location ? `${location.latitude}, ${location.longitude}` : 'Location not fetched', // Send location if available
       };
-console.log('-------------q///////////////////////////////qq-----------------------');
-console.log( route.params);
-console.log('-------------daaaaaataaa yo send-----------------------');
-      // Send the data to your API endpoint
-     
+
       
       // Navigate back or to another screen
       navigation.replace('PaymentScreen', { data: dataToSend });
