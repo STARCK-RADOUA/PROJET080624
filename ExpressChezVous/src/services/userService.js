@@ -34,11 +34,11 @@ export const getClient = async () => {
   }
 };
 
-export const getClientById = async () => {
+export const getUserDetails = async () => {
   try {
     const deviceId = getDeviceId();
 
-    const response = await axios.post(`${BASE_URL}/api/sessions/get-client-details`, {
+    const response = await axios.post(`${BASE_URL}/api/sessions/get-user-details`, {
       deviceId: deviceId,
     });
 
