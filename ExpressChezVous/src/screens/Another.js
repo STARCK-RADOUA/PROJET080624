@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import io from 'socket.io-client';
-
+import { BASE_URL, BASE_URLIO } from '@env';
 const AdminChatScreen = () => {
   const clientId = '66c10e4d4eac0352b3aec084';  // Static clientId
   const adminId = '66bac40871e4a7ed9e6fc705';  // Static adminId
@@ -10,7 +10,7 @@ const AdminChatScreen = () => {
   const [chatId, setChatId] = useState(null);  // Chat ID obtained after initiation
 
   // Set socket with query param to indicate admin role
-  const socket = io('http://192.168.8.137:4000', { query: { isAdmin: 'true' } });  // Adjust to your server IP
+  const socket = io(BASE_URLIO, { query: { isAdmin: 'true' } });  // Adjust to your server IP
 
   useEffect(() => {
     // Initiate chat when the component mounts
