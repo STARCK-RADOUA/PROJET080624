@@ -226,72 +226,31 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
               </View>
             </View>
             <View style={styles.optionContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.border,
-                  isAddedToCart && styles.borderDisabled
-                ]}
-                onPress={() => handleExtraChange('extraBeefPatty')}
-                disabled={isAddedToCart}
-              >
-                <View style={styles.optionTextContainer}>
-                  <Text style={styles.optionText}>Extra Beef Patty</Text>
-                  <Text style={styles.optionPrice}>+$1.00</Text>
-                </View>
-                <View
+              {item.options?.map((option, index) => (
+                <TouchableOpacity
+                  key={index}
                   style={[
-                    styles.checkbox,
-                    extras.extraBeefPatty && styles.checkboxChecked,
-                    isAddedToCart && styles.checkboxDisabled,
+                    styles.border,
+                    isAddedToCart && styles.borderDisabled
                   ]}
+                  onPress={() => handleExtraChange(option.name)}
+                  disabled={isAddedToCart}
                 >
-                  {extras.extraBeefPatty && <Text style={styles.checkboxTick}>✔️</Text>}
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.border,
-                  isAddedToCart && styles.borderDisabled
-                ]}
-                onPress={() => handleExtraChange('extraCheeseSlice')}
-                disabled={isAddedToCart}
-              >
-                <View style={styles.optionTextContainer}>
-                  <Text style={styles.optionText}>Extra Cheese Slice</Text>
-                  <Text style={styles.optionPrice}>+$0.50</Text>
-                </View>
-                <View
-                  style={[
-                    styles.checkbox,
-                    extras.extraCheeseSlice && styles.checkboxChecked,
-                    isAddedToCart && styles.checkboxDisabled,
-                  ]}
-                >
-                  {extras.extraCheeseSlice && <Text style={styles.checkboxTick}>✔️</Text>}
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.border,
-                  isAddedToCart && styles.borderDisabled
-                ]}
-                onPress={() => handleExtraChange('extraFries')}
-                disabled={isAddedToCart}
-              >
-                <View style={styles.optionTextContainer}>
-                  <Text style={styles.optionText}>Extra Fries</Text>
-                  <Text style={styles.optionPrice}>+$1.00</Text>
-                </View>
-                <View
-                  style={[
-                    styles.checkbox,
-                    extras.extraFries && styles.checkboxChecked,
-                    isAddedToCart && styles.checkboxDisabled,
-                  ]}
-                >
-                  {extras.extraFries && <Text style={styles.checkboxTick}>✔️</Text>}
-                </View>
-              </TouchableOpacity>
+                  <View style={styles.optionTextContainer}>
+                    <Text style={styles.optionText}>{option.name}</Text>
+                    <Text style={styles.optionPrice}>+${option.price.toFixed(2)}</Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.checkbox,
+                      extras[option.name] && styles.checkboxChecked,
+                      isAddedToCart && styles.checkboxDisabled,
+                    ]}
+                  >
+                    {extras[option.name] && <Text style={styles.checkboxTick}>✔️</Text>}
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
             <TouchableOpacity
               style={[

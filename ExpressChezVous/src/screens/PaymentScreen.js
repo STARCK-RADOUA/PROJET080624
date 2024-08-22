@@ -1,26 +1,28 @@
 import { BASE_URLIO } from '@env';
-import React, { useState, useContext,useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
 import io from 'socket.io-client';
+import { LinearGradient } from 'expo-linear-gradient'; // Gradient for modern button look
 import { DataContext } from '../navigation/DataContext';
-const PaymentScreen = ({ navigation, route }) => {
-  const orderId = "66bea74097d7e61f1d6b3bd7"; // Ton ID de commande
-  const orderDetails = route.params; // Les détails de la commande passés depuis un autre écran
-  const [selectedPayment, setSelectedPayment] = useState(null); // Par défaut, aucun paiement sélectionné
-  const [exchangeValue, setExchangeValue] = useState(0); // Valeur initiale d'échange
-  const [loading, setLoading] = useState(false);
-  const [socket, setSocket] = useState(null); 
-  const { sharedData } = useContext(DataContext);// État pour stocker l'instance Socket.IO
-  const serviceName  = sharedData.serviceName;
-  const  serviceTest  = sharedData.serviceTest;
-  const  serviceId  = sharedData.id;
 
-  // Initialiser la connexion Socket.IO
+const PaymentScreen = ({ navigation, route }) => {
+  const orderId = "66bea74097d7e61f1d6b3bd7"; // Your Order ID
+  const orderDetails = route.params; // Order details passed from another screen
+  const [selectedPayment, setSelectedPayment] = useState(null); // No payment selected by default
+  const [exchangeValue, setExchangeValue] = useState(); // Initial exchange value
+  const [loading, setLoading] = useState(false);
+  const [socket, setSocket] = useState(null);
+  const { sharedData } = useContext(DataContext); // Socket.IO instance storage state
+  const serviceName = sharedData.serviceName;
+  const serviceTest = sharedData.serviceTest;
+  const serviceId = sharedData.id;
+
+  // Initialize the Socket.IO connection
   useEffect(() => {
     const socketInstance = io(BASE_URLIO);
     setSocket(socketInstance);
 
-    // Nettoyer la connexion lors du démontage du composant
+    // Clean up the connection when the component is unmounted
     return () => {
       if (socketInstance) {
         socketInstance.disconnect();
@@ -33,44 +35,42 @@ const PaymentScreen = ({ navigation, route }) => {
       return;
     }
 
-
-
     setLoading(true);
 
     try {
       const orderData = {
-        exchange: exchangeValue, // Envoi de la valeur d'échange
-        paymentMethod: selectedPayment === 'cash' ? 'cash' : 'TPE', // Envoi de la méthode de paiement
+        exchange: exchangeValue, // Send the exchange value
+        paymentMethod: selectedPayment === 'cash' ? 'cash' : 'TPE', // Send the payment method
         orderdetaille: orderDetails,
         serviceTest: serviceTest,
         serviceId: serviceId,
-         // Détails de la commande
       };
 
       if (socket) {
-        // Émission des données vers le serveur via Socket.IO
+        // Emit data to the server via Socket.IO
         socket.emit('addOrder', orderData);
 
-        // Écouter la réponse du serveur pour l'événement 'orderAdded'
+        // Listen for the server's response for the 'orderAdded' event
         socket.on('orderAdded', (order) => {
-          console.log('Order ajouté:', order);
-        if(!serviceTest) { Alert.alert('Succès', 'Votre commande est en cours de création!');}
+          console.log('Order added:', order);
+          if (!serviceTest) {
+            Alert.alert('Success', 'Your order is being created!');
+          }
           const dataToSend = {
             order_id: order,
-      
           };
-            if(serviceTest){ 
-            Alert.alert('Échec', 'Service indisponible pour le moment');
+          if (serviceTest) {
+            Alert.alert('Failure', 'Service unavailable at the moment');
             navigation.replace('Home');
           }
-          if(!serviceTest){  navigation.replace('PaymentSuccessScreen', { data: dataToSend });}
-        
-        
+          if (!serviceTest) {
+            navigation.replace('PaymentSuccessScreen', { data: dataToSend });
+          }
         });
       }
     } catch (error) {
-      console.error('Erreur lors de la création de la commande:', error);
-      Alert.alert('Erreur', 'Échec de la mise à jour de la commande.');
+      console.error('Error creating the order:', error);
+      Alert.alert('Error', 'Failed to update the order.');
     } finally {
       setLoading(false);
     }
@@ -78,7 +78,7 @@ const PaymentScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Paiement</Text>
+      <Text style={styles.title}>Payment</Text>
 
       <View style={styles.exchangeContainer}>
         <Text style={styles.label}>Exchange</Text>
@@ -89,7 +89,7 @@ const PaymentScreen = ({ navigation, route }) => {
             keyboardType="numeric"
             onChangeText={(text) => {
               const numericValue = text.replace(/[^0-9]/g, '');
-              setExchangeValue(numericValue || 0);
+              setExchangeValue(numericValue || '');
             }}
             editable={true}
           />
@@ -100,7 +100,7 @@ const PaymentScreen = ({ navigation, route }) => {
         style={[styles.paymentOption, selectedPayment === 'cash' && styles.selectedOption]}
         onPress={() => setSelectedPayment('cash')}
       >
-        <Text style={styles.paymentText}>Paiement espece</Text>
+        <Text style={styles.paymentText}>Cash Payment</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -111,89 +111,97 @@ const PaymentScreen = ({ navigation, route }) => {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[
-          styles.okButton,
-          { backgroundColor: selectedPayment ? '#00C851' : '#cccccc' },
-        ]}
+        style={styles.okButton}
         disabled={!selectedPayment}
         onPress={handlePayment}
       >
-        <Text style={styles.okText}>{loading ? 'Processing...' : 'Ok'}</Text>
+        <LinearGradient
+          colors={selectedPayment ? ['#4CAF50', '#087f23'] : ['#cccccc', '#bfbfbf']}
+          style={styles.okButtonGradient}
+        >
+          <Text style={styles.okText}>{loading ? 'Processing...' : 'Confirm Payment'}</Text>
+        </LinearGradient>
       </TouchableOpacity>
     </View>
   );
 };
 
-const { width } = Dimensions.get('window'); 
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#F9FAFB',
     alignItems: 'center',
-    marginTop: 50,
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#804000',
-    marginBottom: 30,
+    color: '#1A202C',
+    marginBottom: 40,
+    textAlign: 'center',
   },
   exchangeContainer: {
-    marginBottom: 40,
+    marginBottom: 30,
     alignItems: 'center',
+    width: '100%',
   },
   label: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 10,
+    color: '#4A5568',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 30,
+    backgroundColor: '#EDF2F7',
+    borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 10,
-    width: width * 0.6,
+    width: width * 0.8,
     justifyContent: 'center',
   },
   input: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#2D3748',
     textAlign: 'center',
   },
   paymentOption: {
     width: width * 0.8,
     paddingVertical: 15,
-    marginVertical: 10,
-    borderRadius: 30,
+    marginVertical: 12,
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FFD700',
+    borderColor: '#CBD5E0',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
+    elevation: 2,
   },
   selectedOption: {
-    backgroundColor: '#FFFACD',
+    backgroundColor: '#E6FFFA',
+    borderColor: '#38B2AC',
   },
   paymentText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#2C7A7B',
   },
   okButton: {
-    position: 'absolute',
-    bottom: 50,
     width: width * 0.8,
-    paddingVertical: 12,
-    borderRadius: 25,
+    marginVertical: 20,
+    borderRadius: 12,
+  },
+  okButtonGradient: {
+    paddingVertical: 15,
+    borderRadius: 12,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   okText: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
   },

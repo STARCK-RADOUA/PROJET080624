@@ -44,7 +44,7 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
         setShowExitButton(true);
 
         setTimeout(() => {
-          setRedirectMessage('Order chat session completed. Redirecting to Home...');
+          setRedirectMessage('Order chat session completed. Redirecting to feedback...');
           setTimeout(() => {
             navigation.replace('feedback', { orderId });
           }, 5000);
