@@ -10,7 +10,7 @@ const AdminChatScreen = () => {
   const [chatId, setChatId] = useState(null);  // Chat ID obtained after initiation
 
   // Set socket with query param to indicate admin role
-  const socket = io('http://192.168.0.109:4000', { query: { isAdmin: 'true' } });  // Adjust to your server IP
+  const socket = io('http://192.168.8.137:4000', { query: { isAdmin: 'true' } });  // Adjust to your server IP
 
   useEffect(() => {
     // Initiate chat when the component mounts

@@ -1,49 +1,50 @@
-import { BASE_URL, BASE_URLIO } from '@env';
-import React, { useState, useEffect, useContext,useRef, useCallback } from 'react';
+import { BASE_URLIO } from '@env';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 import { DataContext } from '../navigation/DataContext';
+
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-const HomeScreen = ({ route,navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [isNotificationMenuVisible, setIsNotificationMenuVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const slideAnim = useRef(new Animated.Value(width)).current;
   const bottomSheetRef = useRef(null);
   const { sharedData } = useContext(DataContext);
-  const serviceName  = sharedData.serviceName;
-  const  serviceTest  = sharedData.serviceTest;
-
-  // Re-establish the socket connection when HomeScreen is loaded
+  const serviceName = sharedData.serviceName;
+  
+  // Socket reference
   const socket = useRef(null);
 
   useEffect(() => {
-    socket.current = io(`${BASE_URLIO}`);  // Establish socket connection
+    // Establish socket connection
+    socket.current = io(`${BASE_URLIO}`);
 
-  // Request active products when the component is mounted
-  socket.current.emit('requestActiveProducts', serviceName);
+    // Request and listen for active products from the server
+    socket.current.emit('requestActiveProducts', serviceName);
 
-  // Listen for real-time updates of active products
-  socket.current.on('activeProducts', (products) => {
-    console.log('Active Products:', products);
-    setMenuItems((prevItems) => {
-      if (JSON.stringify(prevItems) !== JSON.stringify(products)) {
-        return products;  // Update if the product list has changed
-      }
-      return prevItems;  // No change, return the same list
+    // Real-time product updates
+    socket.current.on('activeProducts', (products) => {
+      setMenuItems((prevItems) => {
+        // Only update if the product list has changed
+        if (JSON.stringify(prevItems) !== JSON.stringify(products)) {
+          return products;
+        }
+        return prevItems;
+      });
     });
-  });
 
-  // Clean up the socket when the component is unmounted
-  return () => {
-    socket.current.off('activeProducts');
-    socket.current.disconnect();
-  };
-}, [serviceName]);
+    // Cleanup on unmount
+    return () => {
+      socket.current.off('activeProducts');
+      socket.current.disconnect();
+    };
+  }, [serviceName]);
 
   const toggleNotificationMenu = () => {
     if (isNotificationMenuVisible) {
@@ -64,7 +65,7 @@ const HomeScreen = ({ route,navigation}) => {
 
   const onPress = useCallback((item) => {
     setSelectedItem(item);
-    bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2);  // Open the bottom sheet
+    bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2); // Open bottom sheet
   }, []);
 
   return (
@@ -80,17 +81,21 @@ const HomeScreen = ({ route,navigation}) => {
       </View>
 
       <ScrollView style={styles.menuList}>
-        {menuItems.map((item, index) => (
-          <TouchableOpacity key={item.id || index} style={styles.menuItem} onPress={() => onPress(item)}>
-            <Image source={{ uri: item.image_url }} style={styles.menuItemImage} />
-            <View style={styles.menuItemText}>
-              <Text style={styles.menuItemName}>{item.name}</Text>
-              <Text style={styles.menuItemDescription}>{item.description}</Text>
-              <Text style={styles.menuItemPrice}>€{item.price.toFixed(2)}</Text>
-            </View>
-            <MaterialIcons name="keyboard-arrow-right" size={24} color="orange" />
-          </TouchableOpacity>
-        ))}
+        {menuItems.length === 0 ? (
+          <Text style={styles.noProductsText}>No products available</Text>
+        ) : (
+          menuItems.map((item, index) => (
+            <TouchableOpacity key={item.id || index} style={styles.menuItem} onPress={() => onPress(item)}>
+              <Image source={{ uri: item.image_url }} style={styles.menuItemImage} />
+              <View style={styles.menuItemText}>
+                <Text style={styles.menuItemName}>{item.name}</Text>
+                <Text style={styles.menuItemDescription}>{item.description}</Text>
+                <Text style={styles.menuItemPrice}>€{item.price.toFixed(2)}</Text>
+              </View>
+              <MaterialIcons name="keyboard-arrow-right" size={24} color="orange" />
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
 
       <PrductBottomSheetScreen ref={bottomSheetRef} item={selectedItem} />
@@ -119,14 +124,20 @@ const styles = StyleSheet.create({
   },
   menuList: {
     paddingHorizontal: 20,
+    marginTop: 10,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f9f9f9',
     borderRadius: 10,
-    padding: 10,
+    padding: 15,
     marginVertical: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
   },
   menuItemImage: {
     width: 50,
@@ -135,18 +146,27 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 15,
   },
   menuItemName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
   },
   menuItemDescription: {
     color: '#777',
+    marginTop: 5,
   },
   menuItemPrice: {
     color: 'orange',
     fontWeight: 'bold',
+    marginTop: 5,
+  },
+  noProductsText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: '#666',
   },
 });
 
