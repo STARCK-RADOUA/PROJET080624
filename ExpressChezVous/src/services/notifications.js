@@ -1,6 +1,8 @@
 // src/services/notifications.js
 import * as Notifications from 'expo-notifications';
 import { firebase } from '../../firebase'; // Assurez-vous que firebase est configuré
+import Toast from 'react-native-toast-message'; // Assurez-vous que Toast est correctement importé
+import CustomToast from '../components/CustomToast'; // Importer CustomToast
 
 export const registerForPushNotificationsAsync = async () => {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -23,11 +25,13 @@ export const saveTokenToFirestore = async (token) => {
   await userRef.set({ expoPushToken: token }, { merge: true });
 };
 
-export const addNotificationListeners = (Toast, notificationListener, responseListener) => {
+export const addNotificationListeners = (notificationListener, responseListener) => {
   notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
     console.log('Notification reçue :', notification);
+    
+    // Afficher la notification avec un Toast personnalisé
     Toast.show({
-      type: 'success',
+      type: 'custom', // Utilisation de 'custom' pour ton toast personnalisé
       text1: notification.request.content.title || 'Notification',
       text2: notification.request.content.body || 'Vous avez une nouvelle notification.',
     });
