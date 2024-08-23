@@ -1,6 +1,6 @@
 import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useState, useContext, useEffect, useCallback } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert, Modal, BackHandler } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
@@ -13,6 +13,7 @@ import NotificationMenu from '../components/NotificationMenu';
 import { DataContext } from '../navigation/DataContext';
 import { getUserDetails } from '../services/userService';
 
+
 const ShoppingCartScreen = ({ navigation }) => {
   const [orderItems, setOrderItems] = useState([]);
   const [expandedItemId, setExpandedItemId] = useState(null);
@@ -24,11 +25,14 @@ const ShoppingCartScreen = ({ navigation }) => {
   const socket = io(`${BASE_URLIO}`);
   const { sharedData } = useContext(DataContext);
   const serviceName = sharedData.serviceName;
-
+  const [hasUsedPoints, setHasUsedPoints] = useState(false); // New state to track if points were used
   const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
+  
+  const [isSystemPointModalVisible, setIsSystemPointModalVisible] = useState(false); // Modal visibility
 
   useEffect(() => {
     const fetchUserData = async () => {
+      console.log(sharedData, "dsfsfsgs");
       const user = await getUserDetails();
       setUserPointsEarned(user.points_earned); // Initialize points earned
     };
@@ -38,22 +42,34 @@ const ShoppingCartScreen = ({ navigation }) => {
     console.log('Device ID:', deviceId);
   }, []);
 
+  useEffect(() => {
+    // Create the interval
+    const interval = setInterval(() => {
+    
+    }, 3000); // Runs every 3 seconds
+  
+    // Cleanup the interval when the component unmounts
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array to run only once on mount
+
   const fetchOrderItems = async () => {
     try {
       const clientId = await getClientId();
-      const url = `${BASE_URL}/api/order-items/${clientId}/${serviceName}/order-items` ;
+      const url = `${BASE_URL}/api/order-items/${clientId}/${serviceName}/order-items`;
       const response = await axios.get(url);
       const fetchedItems = response.data.map(item => ({ ...item, free: false })); // Add 'free' flag to each item
       setOrderItems(fetchedItems);
       calculateTotalPrice(fetchedItems);
       calculateItemsInTheCart(fetchedItems);
+
+      // Update hasUsedPoints after fetching order items
+      setHasUsedPoints(fetchedItems.some(item => item.free)); // Check if any item is free (points used)
+
     } catch (error) {
       console.error('Failed to fetch order items:', error.message || error);
       setError('Failed to fetch order items. Please check the console for details.');
     }
   };
-
-
 
   const calculateTotalPrice = (items) => {
     const total = items.reduce((sum, item) => {
@@ -62,7 +78,6 @@ const ShoppingCartScreen = ({ navigation }) => {
     }, 0); 
     setTotalPrice(total);
   };
-  
 
   const calculateItemsInTheCart = (items) => {
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0); // Count total items based on quantity
@@ -79,17 +94,17 @@ const ShoppingCartScreen = ({ navigation }) => {
           if (item.free) {
             setUserPointsEarned(prevPoints => prevPoints + pointsRequired);
             setMyFreeItem(prev => prev - 1); // Decrease free items count
-            return { ...item, free: false };
+            return { ...item, free: false, disableDelete: false }; // Enable delete button again
           } else {
             // Ensure that the user has enough points and free items < items in cart
             if (userPointsEarned >= pointsRequired && myFreeItem < itemsInTheCart - 1) {
               setUserPointsEarned(prevPoints => prevPoints - pointsRequired);
               setMyFreeItem(prev => prev + 1); // Increase free items count
-              return { ...item, free: true };
+              return { ...item, free: true, disableDelete: false }; // Keep delete button enabled
             } else {
               // Alert if points are not enough or max free items exceeded
               Alert.alert("Not enough points", "You don't have enough points to take this item for free or too many free items.");
-              return item;
+              return { ...item, disableDelete: true }; // Disable delete button for this item
             }
           }
         }
@@ -103,23 +118,59 @@ const ShoppingCartScreen = ({ navigation }) => {
 
   const deleteItem = async (itemId) => {
     try {
+      const payableItemsCount = orderItems.filter(item => !item.free).length;
       const itemToDelete = orderItems.find(item => item._id === itemId);
+
+      // If points were used and there's only 1 payable item left, prevent deletion
+      if (hasUsedPoints && !itemToDelete.free && payableItemsCount === 1) {
+        Alert.alert("Cannot delete", "You need to keep at least one payable item in the cart.");
+        return;
+      }
+
+      // If the item is free, recover points when deleting
       if (itemToDelete.free) {
-        // Recover points when deleting a free item
         setUserPointsEarned(prevPoints => prevPoints + itemToDelete.quantity);
         setMyFreeItem(prev => prev - 1); // Decrease free items count
       }
 
+      // Proceed with deleting the item
       await axios.delete(`${BASE_URL}/api/order-items/${itemId}`);
       const updatedItems = orderItems.filter(item => item._id !== itemId);
       setOrderItems(updatedItems);
       calculateTotalPrice(updatedItems);
-      calculateItemsInTheCart(updatedItems); // Update item counter after deletion
+      calculateItemsInTheCart(updatedItems);
     } catch (error) {
       console.error('Failed to delete item:', error.message || error);
       setError('Failed to delete item. Please check the console for details.');
     }
   };
+
+  useEffect(() => {
+    setHasUsedPoints(orderItems.some(item => item.free)); // Update hasUsedPoints when orderItems change
+  }, [orderItems]);
+
+  useEffect(() => {
+    socket.emit('watchServicePointsStatuss', { serviceID: sharedData.id });
+
+    // Listen for order status updates
+    socket.on('oserviceStatusUpdates', (data) => {
+      console.log("service data is ", data);
+      
+      // Check if the system point is active and show the modal
+      if (!data.service.isSystemPoint) {
+        setIsSystemPointModalVisible(true);
+        
+      }else{
+        use =  getUserDetails() ;
+        setUserPointsEarned(use.points_earned)
+      }
+    });
+
+    // Clean up socket on unmount
+    return () => {
+      socket.off('oserviceStatusUpdates');
+    };
+  }, []);
 
   const updateQuantity = (itemId, change) => {
     setOrderItems(prevItems => {
@@ -127,7 +178,7 @@ const ShoppingCartScreen = ({ navigation }) => {
         if (item._id === itemId) {
           const newQuantity = Math.max(1, item.quantity + change); // Ensure quantity is at least 1
           const pointsNeeded = newQuantity - item.quantity; // Calculate points difference
-  
+
           // Handle the case where the item is marked as free
           if (item.free) {
             if (pointsNeeded > 0 && userPointsEarned >= pointsNeeded) {
@@ -139,7 +190,7 @@ const ShoppingCartScreen = ({ navigation }) => {
               setUserPointsEarned(prevPoints => prevPoints - pointsNeeded);
             }
           }
-  
+
           return {
             ...item,
             quantity: newQuantity,
@@ -148,13 +199,12 @@ const ShoppingCartScreen = ({ navigation }) => {
         }
         return item;
       });
-  
+
       calculateTotalPrice(updatedItems);
       calculateItemsInTheCart(updatedItems); // Update item counter after quantity change
       return updatedItems;
     });
   };
-  
 
   useFocusEffect(
     useCallback(() => {
@@ -167,7 +217,6 @@ const ShoppingCartScreen = ({ navigation }) => {
           console.error('Error in useFocusEffect:', error);
         }
       };
-
       fetchData();
     }, [])
   );
@@ -199,6 +248,28 @@ const ShoppingCartScreen = ({ navigation }) => {
   const shouldDisableSwitch = (item) => {
     return userPointsEarned === 0 && !item.free;
   };
+
+  const handleOkClick = () => {
+    setUserPointsEarned(0); // Set userPointsEarned to 0 when OK is clicked
+    setIsSystemPointModalVisible(false); // Close the modal
+  };
+
+  // Prevent back button when the modal is open
+  useEffect(() => {
+    const backAction = () => {
+      if (isSystemPointModalVisible) {
+        return true; // Block back button press when modal is open
+      }
+      return false; // Allow back button press otherwise
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+
+    return () => backHandler.remove(); // Cleanup backHandler on unmount
+  }, [isSystemPointModalVisible]);
 
   return (
     <View style={styles.container}>
@@ -244,8 +315,16 @@ const ShoppingCartScreen = ({ navigation }) => {
                       <MaterialIcons name="keyboard-arrow-down" size={24} color="brown" />
                     </TouchableOpacity>
                     {expandedItemId === item._id && (
-                      <TouchableOpacity onPress={() => deleteItem(item._id)} style={styles.deleteButton}>
-                        <MaterialIcons name="delete" size={24} color="red" />
+                      <TouchableOpacity
+                        onPress={() => deleteItem(item._id)}
+                        style={styles.deleteButton}
+                        disabled={!item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints} // Disable delete if points are used and only 1 payable item remains
+                      >
+                        <MaterialIcons 
+                          name="delete" 
+                          size={24} 
+                          color={(!item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints) ? "grey" : "red"} // Change color if the button is disabled
+                        />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -267,6 +346,24 @@ const ShoppingCartScreen = ({ navigation }) => {
           </View>
         </>
       )}
+
+      {/* System Point Modal */}
+      <Modal
+        transparent={true}
+        visible={isSystemPointModalVisible}
+        animationType="slide"
+        onRequestClose={() => {}} // Disable the back button
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Important Notice</Text>
+            <Text style={styles.modalText}>lAdmin Hayd No9at </Text>
+            <TouchableOpacity style={styles.okButton} onPress={handleOkClick}>
+              <Text style={styles.okButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -380,6 +477,46 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginTop: 20,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent background
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20, // Border radius for modern design
+    padding: 20,
+    alignItems: 'center',
+    elevation: 10, // Shadow for Android
+    shadowColor: '#000', // Shadow for iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  okButton: {
+    backgroundColor: 'orange',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10, // Button border radius
+  },
+  okButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
