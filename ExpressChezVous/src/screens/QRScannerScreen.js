@@ -1,50 +1,70 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { Camera } from 'expo-camera';
-
-const QRScannerScreen = ({ navigation }) => {
+import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
+import { BASE_URL} from '@env';
+const QrCodeScannerScreen = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const [qrData, setQrData] = useState(null);
 
+  // Demander la permission d'utiliser la caméra
   useEffect(() => {
     (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
-    navigation.navigate('Registration');
+  // Fonction appelée après le scan du QR code
+  const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
+    setQrData(data); // Données du QR code scanné
+
+    // Appeler l'API pour vérifier le QR code
+    try {
+      const response = await fetch(`${BASE_URL}/api/qr-codes/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ uniqueId: data }), // Envoyer le contenu du QR code au backend pour vérification
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Succès', 'QR Code validé avec succès');
+      } else {
+        Alert.alert('Erreur', result.error || 'Échec de la vérification du QR code');
+      }
+    } catch (error) {
+      Alert.alert('Erreur', 'Impossible de vérifier le QR code');
+    }
   };
 
   if (hasPermission === null) {
-    return (
-      <View style={styles.container}>
-        <Text>Requesting for camera permission</Text>
-      </View>
-    );
+    return <Text>Demande de permission pour la caméra...</Text>;
   }
   if (hasPermission === false) {
-    return (
-      <View style={styles.container}>
-        <Text>No access to camera</Text>
-      </View>
-    );
+    return <Text>Accès à la caméra refusé</Text>;
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Scan QR pour continuer</Text>
-      <Camera
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barCodeScannerSettings={{
-          barCodeTypes: ['qr'], // Customize the barcode types if needed
-        }}
-        style={StyleSheet.absoluteFillObject}
-      />
+      <View style={styles.scannerContainer}>
+        <BarCodeScanner
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject} // Occupe tout l'écran pour le scan
+        />
+        <Text style={styles.scannerText}>Scannez le QR code</Text>
+      </View>
+
       {scanned && (
-        <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />
+        <Button
+          title={'Scanner à nouveau'}
+          onPress={() => setScanned(false)}
+          color="#ff5a5f"
+        />
       )}
     </View>
   );
@@ -53,16 +73,30 @@ const QRScannerScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5A623',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f8f8f8',
   },
-  title: {
-    fontSize: 24,
+  scannerContainer: {
+    width: '100%',
+    height: '70%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    borderRadius: 20,
+    backgroundColor: '#000',
+  },
+  scannerText: {
+    position: 'absolute',
+    bottom: 20,
+    fontSize: 18,
+    color: '#fff',
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    backgroundColor: '#000000a0',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
   },
 });
 
-export default QRScannerScreen;
+export default QrCodeScannerScreen;

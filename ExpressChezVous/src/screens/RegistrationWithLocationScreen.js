@@ -53,6 +53,9 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
     );
 
     socket.on('clientRegisteredLC', (data) => {
+      console.log('------------------------------------');
+      console.log('Registered Client:', data);
+      console.log('------------------------------------');
       if (data.message === 'success') {
         Alert.alert('Success', data.details);
         navigation.reset({
