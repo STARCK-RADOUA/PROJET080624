@@ -1,33 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import { BASE_URL} from '@env';
+import { Camera, CameraType } from 'expo-camera/legacy';
+import { BASE_URL } from '@env';
+
+
 const QrCodeScannerScreen = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [qrData, setQrData] = useState(null);
+  const [type, setType] = useState(CameraType.back); // Set default camera type to back
+console.log('------------------------------------');
 
-  // Demander la permission d'utiliser la caméra
+console.log('------------------------------------');
+  // Request camera permission
   useEffect(() => {
     (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
   }, []);
 
-  // Fonction appelée après le scan du QR code
-  const handleBarCodeScanned = async ({ type, data }) => {
+  // Function to handle scanned QR code
+  const handleBarCodeScanned = async ({ data }) => {
     setScanned(true);
-    setQrData(data); // Données du QR code scanné
+    setQrData(data); // Data from scanned QR code
 
-    // Appeler l'API pour vérifier le QR code
+    // Call the API to verify the QR code
     try {
       const response = await fetch(`${BASE_URL}/api/qr-codes/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ uniqueId: data }), // Envoyer le contenu du QR code au backend pour vérification
+        body: JSON.stringify({ uniqueId: data }), // Send QR code data to the backend
       });
 
       const result = await response.json();
@@ -51,13 +56,15 @@ const QrCodeScannerScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.scannerContainer}>
-        <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          style={StyleSheet.absoluteFillObject} // Occupe tout l'écran pour le scan
-        />
-        <Text style={styles.scannerText}>Scannez le QR code</Text>
-      </View>
+      <Camera
+        style={styles.camera}
+        type={type}
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        barCodeScannerSettings={{
+          barCodeTypes: ['qr'], // Scan only QR codes
+        }}
+      />
+      <Text style={styles.scannerText}>Scannez le QR code</Text>
 
       {scanned && (
         <Button
@@ -77,14 +84,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f8f8f8',
   },
-  scannerContainer: {
+  camera: {
+    flex: 1,
     width: '100%',
     height: '70%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    borderRadius: 20,
-    backgroundColor: '#000',
   },
   scannerText: {
     position: 'absolute',
