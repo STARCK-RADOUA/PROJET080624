@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Animated, Easing, KeyboardAvoidingView, Platform, Dimensions, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -8,6 +8,7 @@ import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 
 const socket = io(`${BASE_URLIO}`);
+const { width, height } = Dimensions.get('window'); // Get device dimensions
 
 const RegistrationWithLocationScreen = ({ navigation }) => {
   const [deviceId, setDeviceId] = useState('');
@@ -17,7 +18,7 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [cmpassword, setcmPassword] = useState('');
   const [location, setLocation] = useState(null);
-  const [isLocationObtained, setIsLocationObtained] = useState(false); // Vérifie si la localisation a été récupérée
+  const [isLocationObtained, setIsLocationObtained] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [phoneError, setPhoneError] = useState('');
 
@@ -49,13 +50,10 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
       password === cmpassword &&
       password.length >= 6 &&
       phoneError === '' &&
-      isLocationObtained // La localisation doit être obtenue pour valider le formulaire
+      isLocationObtained
     );
 
     socket.on('clientRegisteredLC', (data) => {
-      console.log('------------------------------------');
-      console.log('Registered Client:', data);
-      console.log('------------------------------------');
       if (data.message === 'success') {
         Alert.alert('Success', data.details);
         navigation.reset({
@@ -99,7 +97,7 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
   };
 
   const handleGetLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
+    const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permission denied', 'Location permission is required to proceed.');
       return;
@@ -107,72 +105,78 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
 
     let currentLocation = await Location.getCurrentPositionAsync({});
     setLocation(currentLocation.coords);
-    setIsLocationObtained(true); // Localisation récupérée avec succès
+    setIsLocationObtained(true);
   };
 
   return (
-    <LinearGradient colors={['#0f2027', '#203a43', '#e4b50a']} style={styles.container}>
-      <Text style={styles.title}>Complete your registration</Text>
+    <KeyboardAvoidingView 
+      style={{ flex: 1 }} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+    >
+      <LinearGradient colors={['#0f2027', '#203a43', '#e4b50a']} style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          <Text style={styles.title}>Complete your registration</Text>
 
-      <View style={styles.inputContainer}>
-        <Ionicons name="person-outline" size={20} color="#fff" style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="First Name" placeholderTextColor="#ccc" value={firstName} onChangeText={setFirstName} />
-      </View>
+          <View style={styles.inputContainer}>
+            <Ionicons name="person-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <TextInput style={styles.input} placeholder="First Name" placeholderTextColor="#ccc" value={firstName} onChangeText={setFirstName} />
+          </View>
 
-      <View style={styles.inputContainer}>
-        <Ionicons name="person-outline" size={20} color="#fff" style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Last Name" placeholderTextColor="#ccc" value={lastName} onChangeText={setLastName} />
-      </View>
+          <View style={styles.inputContainer}>
+            <Ionicons name="person-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <TextInput style={styles.input} placeholder="Last Name" placeholderTextColor="#ccc" value={lastName} onChangeText={setLastName} />
+          </View>
 
-      <View style={styles.inputContainer}>
-        <Ionicons name="call-outline" size={20} color="#fff" style={styles.inputIcon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Phone Number"
-          keyboardType="phone-pad"
-          placeholderTextColor="#ccc"
-          value={phone}
-          onChangeText={setPhone}
-        />
-      </View>
+          <View style={styles.inputContainer}>
+            <Ionicons name="call-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Phone Number"
+              keyboardType="phone-pad"
+              placeholderTextColor="#ccc"
+              value={phone}
+              onChangeText={setPhone}
+            />
+          </View>
 
-      {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+          {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
 
-      <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} placeholderTextColor="#ccc" value={password} onChangeText={setPassword} />
-      </View>
+          <View style={styles.inputContainer}>
+            <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} placeholderTextColor="#ccc" value={password} onChangeText={setPassword} />
+          </View>
 
-      <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={true} placeholderTextColor="#ccc" value={cmpassword} onChangeText={setcmPassword} />
-      </View>
+          <View style={styles.inputContainer}>
+            <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={true} placeholderTextColor="#ccc" value={cmpassword} onChangeText={setcmPassword} />
+          </View>
 
-      {/* Bouton pour récupérer la localisation */}
-      <TouchableOpacity
-        style={styles.locationButton}
-        onPress={handleGetLocation}
-      >
-        <Text style={styles.buttonText}>Get Location</Text>
-      </TouchableOpacity>
+          {/* Horizontal location icon and confirm button */}
+          <View style={styles.horizontalContainer}>
+            <TouchableOpacity onPress={handleGetLocation}>
+              <Ionicons name="location-outline" size={40} color="white" style={styles.locationIcon} />
+              <Text style={styles.buttonText}>Catre</Text>
+            </TouchableOpacity>
 
-    
-
-      <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-        <TouchableOpacity
-          style={[styles.button, !isFormValid && styles.disabledButton]}
-          onPress={() => {
-            if (isFormValid) {
-              animateButtonPress();
-              handleConfirm();
-            }
-          }}
-          disabled={!isFormValid}
-        >
-          <Text style={styles.buttonText}>Confirm</Text>
-        </TouchableOpacity>
-      </Animated.View>
-    </LinearGradient>
+            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+              <TouchableOpacity
+                style={[styles.button, !isFormValid && styles.disabledButton]}
+                onPress={() => {
+                  if (isFormValid) {
+                    animateButtonPress();
+                    handleConfirm();
+                  }
+                }}
+                disabled={!isFormValid}
+              >
+                <Text style={styles.buttonText}>       Confirm      </Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        </ScrollView>
+      </LinearGradient>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -180,8 +184,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    paddingHorizontal: '9%',
+  },
+  scrollViewContent: {
+    justifyContent: 'center',
+    paddingTop: width * 0.5,
     alignItems: 'center',
-    padding: 20,
   },
   title: {
     fontSize: 28,
@@ -192,7 +200,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '80%',
+    width: '100%',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 10,
     marginBottom: 15,
@@ -208,7 +216,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    width: '80%',
+  
+    width: '100%',
     padding: 15,
     backgroundColor: '#ffaa00cf',
     borderRadius: 50,
@@ -232,17 +241,21 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
-  locationButton: {
-    width: '80%',
-    padding: 15,
-    backgroundColor: '#00AAFF',
+  horizontalContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    width: '100%',
+  },
+  locationIcon: {
+    width: '100%',
+    
+   
+    paddingRight: width * 0.1,
     borderRadius: 50,
     alignItems: 'center',
-    marginTop: 15,
-  },
-  locationText: {
-    color: '#fff',
-    marginTop: 10,
+  
   },
 });
 
