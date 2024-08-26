@@ -6,7 +6,6 @@ import { LinearGradient } from 'expo-linear-gradient'; // Gradient for modern bu
 import { DataContext } from '../navigation/DataContext';
 
 const PaymentScreen = ({ navigation, route }) => {
-  const orderId = "66bea74097d7e61f1d6b3bd7"; // Your Order ID
   const orderDetails = route.params; // Order details passed from another screen
   const [selectedPayment, setSelectedPayment] = useState(null); // No payment selected by default
   const [exchangeValue, setExchangeValue] = useState(); // Initial exchange value
