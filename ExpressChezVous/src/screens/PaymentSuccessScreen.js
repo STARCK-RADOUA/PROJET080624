@@ -107,6 +107,8 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
         setIsChatDisabled(true);
         setRedirectMessage('Votre commande a été livrée. Tu as 2 minutes dans le chat avec le livreur');
         setShowExitButton(true);
+          updateUserPoints(nezPoint);
+        updateOrderItems();
 
         setTimeout(() => {
           setRedirectMessage('Order chat session completed. Redirecting to feedback...');

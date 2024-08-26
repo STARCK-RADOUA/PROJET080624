@@ -46,16 +46,7 @@ const ShoppingCartScreen = ({ navigation }) => {
     console.log('Device ID:', deviceId);
   }, []);
 
-  useEffect(() => {
-    // Create the interval
-    const interval = setInterval(() => {
-    
-    }, 3000); // Runs every 3 seconds
-  
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(interval);
-  }, []); // Empty dependency array to run only once on mount
-
+ 
   const fetchOrderItems = async () => {
     try {
       const clientId = await getClientId();
@@ -210,21 +201,40 @@ const ShoppingCartScreen = ({ navigation }) => {
     });
   };
 
+
+  
   useFocusEffect(
     useCallback(() => {
+      // Reset states to their initial values when navigating back
+      setOrderItems([]); 
+      setExpandedItemId(null);
+      setTotalPrice(0);
+      setUserPointsEarned(0);
+      setMyFreeItem(0);
+      setItemsInTheCart(0);
+      setError('');
+      setHasUsedPoints(false);
+  
+      // Fetch data again if necessary
       const fetchData = async () => {
         try {
           const user = await getUserDetails();
-          setUserPointsEarned(user.points_earned);
-          await fetchOrderItems();
+          setUserPointsEarned(user.points_earned);  // Reset points to the user's initial value
+          await fetchOrderItems();  // Re-fetch the order items if necessary
         } catch (error) {
           console.error('Error in useFocusEffect:', error);
         }
       };
+  
       fetchData();
-    }, [])
+  
+      // Clean up if necessary (optional)
+      return () => {
+        // You can add any cleanup logic here if necessary
+      };
+    }, []) // Empty dependency array means this effect will run every time the screen comes into focus
   );
-
+  
   const handleItemPress = (itemId) => {
     setExpandedItemId((prevId) => (prevId === itemId ? null : itemId));
   };
