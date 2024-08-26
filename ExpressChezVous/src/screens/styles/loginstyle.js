@@ -6,18 +6,21 @@ const { width, height } = Dimensions.get('window');
 export const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    height: height * 0.65,  // Responsive height based on screen size
+    height: height * 0.51,  // Responsive height based on screen size
     resizeMode: 'cover',  // Cover the background while maintaining aspect ratio
   },
   container1: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: '5%',  // Responsive padding
+    paddingHorizontal: '5%',
+
+     // Responsive padding
   },
   imageContainer: {
     alignItems: 'center',
-    marginBottom: height * 0.05,  // Adjusted margin for responsiveness
+    marginBottom: height * 0.02,
+    // Adjusted margin for responsiveness
   },
   image: {
     width: width * 0.5,  // Set image width to 50% of screen width
@@ -26,7 +29,7 @@ export const styles = StyleSheet.create({
   },
   container: {
     width: '85%',  // Set container width to 85% of screen width for responsiveness
-    marginTop: height * 0.1,  // Adjust margin based on screen height
+    marginTop: height * 0.001,  // Adjust margin based on screen height
     alignItems: 'center',
   },
   input: {

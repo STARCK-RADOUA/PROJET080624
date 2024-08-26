@@ -88,15 +88,16 @@ const LoginScreen = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}  // Handle keyboard behavior on iOS
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}  // Adjust offset based on platform
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
-          <View style={styles.container1}>
-            {/* Animated Logo */}
-            <Animated.View style={[styles.imageContainer, { transform: [{ scale: logoAnim }] }]}>
+        {/* Animated Logo */}
+        <Animated.View style={[styles.imageContainer, { transform: [{ scale: logoAnim }] }]}>
               <Image
                 source={require('../assets/images/8498789.png')}
                 style={[styles.image, { width: width, height: width }]}
               />
             </Animated.View>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
+          <View style={styles.container1}>
+          
 
             {/* Input fields for manual login */}
             <View style={styles.container}>
@@ -136,6 +137,7 @@ const LoginScreen = ({ navigation }) => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      
     </ImageBackground>
   );
 };
