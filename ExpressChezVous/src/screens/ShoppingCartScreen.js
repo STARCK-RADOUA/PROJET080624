@@ -29,12 +29,16 @@ const ShoppingCartScreen = ({ navigation }) => {
   const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
   
   const [isSystemPointModalVisible, setIsSystemPointModalVisible] = useState(false); // Modal visibility
+  const { setSharedData } = useContext(DataContext);
 
+  const [userPoints, setUserPoints] = useState(0); // Track user's points
+
+  
   useEffect(() => {
     const fetchUserData = async () => {
-      console.log(sharedData, "dsfsfsgs");
       const user = await getUserDetails();
-      setUserPointsEarned(user.points_earned); // Initialize points earned
+      setUserPointsEarned(user.points_earned);
+      setUserPoints(user.points_earned);
     };
     fetchUserData();
 
@@ -233,6 +237,7 @@ const ShoppingCartScreen = ({ navigation }) => {
         orderItems: orderItems,
         deviceId: deviceId,
       };
+      setSharedData({ dicrPoints : userPointsEarned , firstPoints : userPoints , orders :orderItems });
       navigation.replace('AdressForm', { newOrder: data });
     } catch (error) {
       console.error('Failed to place the order:', error);
