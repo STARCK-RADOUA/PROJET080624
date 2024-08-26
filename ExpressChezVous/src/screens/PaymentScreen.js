@@ -8,7 +8,7 @@ import { DataContext } from '../navigation/DataContext';
 const PaymentScreen = ({ navigation, route }) => {
   const orderDetails = route.params; // Order details passed from another screen
   const [selectedPayment, setSelectedPayment] = useState(null); // No payment selected by default
-  const [exchangeValue, setExchangeValue] = useState(); // Initial exchange value
+  const [exchangeValue, setExchangeValue] = useState(0); // Initial exchange value
   const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
   const { sharedData } = useContext(DataContext); // Socket.IO instance storage state
@@ -115,7 +115,7 @@ const PaymentScreen = ({ navigation, route }) => {
         onPress={handlePayment}
       >
         <LinearGradient
-          colors={selectedPayment ? ['#4CAF50', '#087f23'] : ['#cccccc', '#bfbfbf']}
+          colors={selectedPayment ? ['#FF8C00', '#FF4500'] : ['#cccccc', '#bfbfbf']} // Orange gradient
           style={styles.okButtonGradient}
         >
           <Text style={styles.okText}>{loading ? 'Processing...' : 'Confirm Payment'}</Text>
@@ -131,14 +131,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFF5E1', // Light orange background
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1A202C',
+    color: '#FF4500', // Strong orange for title
     marginBottom: 40,
     textAlign: 'center',
   },
@@ -150,12 +150,12 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     marginBottom: 10,
-    color: '#4A5568',
+    color: '#FF6347', // Tomato orange for label
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EDF2F7',
+    backgroundColor: '#FFEFD5', // Lighter orange for input container
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#2D3748',
+    color: '#FF4500', // Strong orange for input text
     textAlign: 'center',
   },
   paymentOption: {
@@ -174,20 +174,20 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#CBD5E0',
+    borderColor: '#FF8C00', // Dark orange for border
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFF5E1', // Light orange for background
     elevation: 2,
   },
   selectedOption: {
-    backgroundColor: '#E6FFFA',
-    borderColor: '#38B2AC',
+    backgroundColor: '#FFE4B5', // Lighter shade of orange for selected
+    borderColor: '#FF4500', // Darker orange for selected border
   },
   paymentText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2C7A7B',
+    color: '#FF4500', // Strong orange for payment text
   },
   okButton: {
     width: width * 0.8,

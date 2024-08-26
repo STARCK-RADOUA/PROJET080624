@@ -156,8 +156,28 @@ const ShoppingCartScreen = ({ navigation }) => {
         setIsSystemPointModalVisible(true);
         
       }else{
-        use =  getUserDetails() ;
-        setUserPointsEarned(use.points_earned)
+        setOrderItems([]);
+        setExpandedItemId(null);
+        setTotalPrice(0);
+        setUserPointsEarned(0);
+        setMyFreeItem(0);
+        setItemsInTheCart(0);
+        setError('');
+        setHasUsedPoints(false);
+    
+        const fetchData = async () => {
+          try {
+            const user = await getUserDetails();
+            setUserPointsEarned(user.points_earned); // Reset points to the user's initial value
+            await fetchOrderItems(); // Re-fetch the order items if necessary
+    
+            // Fetch service data to check isSystemPoint and reset values if needed
+          } catch (error) {
+            console.error('Error in useFocusEffect:', error);
+          }
+        };
+    
+        fetchData();
       }
     });
 
@@ -201,7 +221,71 @@ const ShoppingCartScreen = ({ navigation }) => {
     });
   };
 
+  const getServiceById = async () => {
+    try {
+      // Construct the URL for the GET request
+      const url = `${BASE_URL}/api/services/${sharedData.id}`;
+  
+      // Make the GET request to the server
+      const response = await axios.get(url);
+  
+      // Check if isSystemPoint is true, then initiate certain values to 0
+      if (!response.data.isSystemPoint) {
+        setUserPointsEarned(0);
+        setUserPoints(0);
+        setTotalPrice(0);
+        setMyFreeItem(0);
+        setItemsInTheCart(0);
+        setHasUsedPoints(false);
+        console.log('isSystemPoint is true. Values set to 0.');
+      }
+  
+      // Return the service data (in case you need it elsewhere)
+      return response.data.isSystemPoint;
+    } catch (error) {
+      // Log the error to the console
+      console.error('Error fetching service:', error.response ? error.response.data : error.message);
+  
+      // Throw the error for further handling
+      throw error;
+    }
+  };
 
+  
+
+  useFocusEffect(
+    useCallback(() => {
+      // Reset states to their initial values when navigating back
+      setOrderItems([]);
+      setExpandedItemId(null);
+      setTotalPrice(0);
+      setUserPointsEarned(0);
+      setMyFreeItem(0);
+      setItemsInTheCart(0);
+      setError('');
+      setHasUsedPoints(false);
+  
+      const fetchData = async () => {
+        try {
+          const user = await getUserDetails();
+          setUserPointsEarned(user.points_earned); // Reset points to the user's initial value
+          await fetchOrderItems(); // Re-fetch the order items if necessary
+  
+          // Fetch service data to check isSystemPoint and reset values if needed
+          await getServiceById();
+        } catch (error) {
+          console.error('Error in useFocusEffect:', error);
+        }
+      };
+  
+      fetchData();
+  
+      return () => {
+        // Optional cleanup logic
+      };
+    }, []) // Empty dependency array means this effect will run every time the screen comes into focus
+  );
+  
   
   useFocusEffect(
     useCallback(() => {
@@ -235,6 +319,7 @@ const ShoppingCartScreen = ({ navigation }) => {
     }, []) // Empty dependency array means this effect will run every time the screen comes into focus
   );
   
+
   const handleItemPress = (itemId) => {
     setExpandedItemId((prevId) => (prevId === itemId ? null : itemId));
   };
@@ -265,7 +350,25 @@ const ShoppingCartScreen = ({ navigation }) => {
   };
 
   const handleOkClick = () => {
-    setUserPointsEarned(0); // Set userPointsEarned to 0 when OK is clicked
+         setOrderItems([]); 
+      setExpandedItemId(null);
+      setTotalPrice(0);
+      setUserPointsEarned(0);
+      setMyFreeItem(0);
+      setItemsInTheCart(0);
+      setError('');
+      setHasUsedPoints(false);
+       // Fetch data again if necessary
+       const fetchData = async () => {
+        try {
+          
+          await fetchOrderItems();  // Re-fetch the order items if necessary
+        } catch (error) {
+          console.error('Error in useFocusEffect:', error);
+        }
+      };
+  
+      fetchData();
     setIsSystemPointModalVisible(false); // Close the modal
   };
 

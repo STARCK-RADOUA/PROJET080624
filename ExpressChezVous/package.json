@@ -16,12 +16,14 @@
     "@react-navigation/stack": "^6.4.1",
     "axios": "^1.7.3",
     "expo": "~51.0.24",
+    "expo-barcode-scanner": "~13.0.1",
     "expo-camera": "~15.0.15",
     "expo-crypto": "~13.0.2",
     "expo-device": "~6.0.2",
     "expo-linear-gradient": "^13.0.2",
     "expo-location": "~17.0.1",
     "expo-notifications": "~0.28.16",
+    "expo-screen-capture": "~6.0.1",
     "expo-system-ui": "^3.0.7",
     "firebase": "^10.13.0",
     "formik": "^2.4.6",
@@ -40,9 +42,7 @@
     "react-native-vector-icons": "^10.1.0",
     "socket.io-client": "^4.7.5",
     "uuid": "^10.0.0",
-    "yup": "^1.4.0",
-    "expo-screen-capture": "~6.0.1",
-    "expo-barcode-scanner": "~13.0.1"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
