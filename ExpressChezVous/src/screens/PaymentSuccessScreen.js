@@ -108,22 +108,22 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
         setRedirectMessage('Votre commande a été livrée. Tu as 2 minutes dans le chat avec le livreur');
         setShowExitButton(true);
 
-        setTimeout(() => {
+    
           setRedirectMessage('Order chat session completed. Redirecting to feedback...');
-          setTimeout(() => {
+         
             navigation.replace('feedback', { orderId });
-          }, 5000);
-        }, 120000);
+        
+      
       }
 
       if (status === 'cancelled') {
         updateUserPoints(firstpoints);
 
-        Alert.alert('Order cancelled', 'Order was successfully cancelled.');
+        Alert.alert('Order cancelled', 'Order  cancelled.');
 
-        setTimeout(() => {
-          navigation.replace('Home');
-        }, 3000);
+        
+          navigation.replace('Services');
+       
       }
 
       if (status === 'in_progress') {
