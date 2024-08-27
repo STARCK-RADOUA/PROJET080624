@@ -78,39 +78,42 @@ const ShoppingCartScreen = ({ navigation }) => {
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0); // Count total items based on quantity
     setItemsInTheCart(totalItems);
   };
-
   const toggleFreeItem = (itemId) => {
-    setOrderItems(prevItems => {
-      const updatedItems = prevItems.map(item => {
+    setOrderItems((prevItems) => {
+      const updatedItems = prevItems.map((item) => {
         if (item._id === itemId) {
           const pointsRequired = item.quantity; // Points needed for the quantity of this item
-
-          // If the item is already free toggle it off and return points
+  
+          // If the item is already free, toggle it off and return points
           if (item.free) {
-            setUserPointsEarned(prevPoints => prevPoints + pointsRequired);
-            setMyFreeItem(prev => prev - 1); // Decrease free items count
-            return { ...item, free: false, disableDelete: false }; // Enable delete button again
+            setUserPointsEarned((prevPoints) => prevPoints + pointsRequired);
+            setMyFreeItem((prev) => prev - 1); // Decrease free items count
+            return { ...item, free: false };
           } else {
-            // Ensure that the user has enough points and free items < items in cart
-            if (userPointsEarned >= pointsRequired && myFreeItem < itemsInTheCart - 1) {
-              setUserPointsEarned(prevPoints => prevPoints - pointsRequired);
-              setMyFreeItem(prev => prev + 1); // Increase free items count
-              return { ...item, free: true, disableDelete: false }; // Keep delete button enabled
+            // Ensure user has enough points and at least one item remains paid
+            const payableItemsCount = prevItems.filter((i) => !i.free).length;
+            if (userPointsEarned >= pointsRequired && myFreeItem < itemsInTheCart - 1 && payableItemsCount > 1) {
+              setUserPointsEarned((prevPoints) => prevPoints - pointsRequired);
+              setMyFreeItem((prev) => prev + 1); // Increase free items count
+              return { ...item, free: true };
             } else {
-              // Alert if points are not enough or max free items exceeded
-              Alert.alert("Not enough points", "You don't have enough points to take this item for free or too many free items.");
-              return { ...item, disableDelete: true }; // Disable delete button for this item
+              // Alert if points are not enough or if all items would become free
+              Alert.alert(
+                "Not enough points",
+                "You must pay for at least one item and have enough points for a free item."
+              );
+              return item;
             }
           }
         }
         return item;
       });
-
+  
       calculateTotalPrice(updatedItems);
       return updatedItems;
     });
   };
-
+  
   const deleteItem = async (itemId) => {
     try {
       const payableItemsCount = orderItems.filter(item => !item.free).length;
