@@ -5,83 +5,65 @@ import { getClientId, getDeviceIde } from '../services/userService';
 import { Ionicons } from '@expo/vector-icons';
 import * as ScreenCapture from 'expo-screen-capture'; // Import ScreenCapture
 import { BASE_URL, BASE_URLIO } from '@env';
+
 const QrcodeGeneratorScreen = () => {
   const [qrData, setQrData] = useState(null);
   const [expiration, setExpiration] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30); // Timer set to 30 seconds
   
-  // Fonction pour appeler l'API du backend pour générer un QR Code
+  // Function to call backend API to generate a QR Code
   const generateQRCode = async () => {
     try {
       const clientId = await getClientId();
       const deviceId = await getDeviceIde();
-      console.log('Client ID:', clientId);
-      console.log('Device ID:', deviceId);
-
       const response = await fetch(`${BASE_URL}/api/qr-codes/generate`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ clientId, deviceId }), // Envoyer clientId et deviceId au backend
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, deviceId }),
       });
-
       const data = await response.json();
       
       if (response.ok) {
-        setQrData(data.uniqueId); // Utiliser l'ID unique généré par le backend pour le QR code
+        setQrData(data.uniqueId);
         setScanned(false);
         setExpiration(false);
-        setTimeLeft(30); // Réinitialiser le timer pour 30 secondes
-        console.log('QR Code généré:', data.uniqueId);
+        setTimeLeft(30);
       } else {
-        console.error('Erreur lors de la génération du QR code:', data.error);
+        console.error('Error generating QR code:', data.error);
       }
     } catch (error) {
-      console.error('Erreur lors de la génération du QR code:', error);
+      console.error('Error generating QR code:', error);
     }
   };
 
-  // Fonction pour empêcher les captures d'écran
+  // Prevent screen capture
   useEffect(() => {
     const preventScreenCapture = async () => {
       await ScreenCapture.preventScreenCaptureAsync();
     };
-
-    preventScreenCapture(); // Empêche les captures d'écran
-
+    preventScreenCapture();
     return () => {
-      ScreenCapture.allowScreenCaptureAsync(); // Autorise à nouveau les captures d'écran quand le composant est démonté
+      ScreenCapture.allowScreenCaptureAsync();
     };
   }, []);
 
-  // Regénérer le QR Code toutes les 30 secondes
+  // Regenerate the QR code every 30 seconds
   useEffect(() => {
-    generateQRCode(); // Génération initiale du QR code
-
-    const interval = setInterval(() => {
-      generateQRCode(); // Regénère toutes les 30 secondes
-    }, 30 * 1000); // Toutes les 30 secondes
-
-    const timeout = setTimeout(() => {
-      setExpiration(true);
-    }, 15 * 60 * 1000); // Expiration fixée à 15 minutes
-
-    // Compteur de 30 secondes
+    generateQRCode();
+    const interval = setInterval(generateQRCode, 30 * 1000);
     const countdown = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 30)); // Réinitialise le compteur toutes les 30 secondes
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 30));
     }, 1000);
-
     return () => {
-      clearTimeout(timeout);
-      clearInterval(countdown);
       clearInterval(interval);
+      clearInterval(countdown);
     };
   }, [scanned]);
 
   return (
     <View style={styles.container}>
+    <Text style={styles.parrainage }> Parrainage</Text>
       <View style={styles.qrContainer}>
         {expiration ? (
           <>
@@ -96,16 +78,19 @@ const QrcodeGeneratorScreen = () => {
         ) : (
           <View style={styles.qrCodeDisplay}>
             {qrData && (
-              <QRCode
-                value={qrData} // Affiche l'ID unique généré par le backend
-                size={250}
-                backgroundColor="white"
-                color="black"
-              />
+              <QRCode value={qrData} size={250} backgroundColor="white" color="black" />
             )}
             <Text style={styles.timerText}>{`Temps restant: ${timeLeft}s`}</Text>
           </View>
         )}
+      </View>
+
+      {/* Futuristic Styled Message */}
+      <View style={styles.infoContainer}>
+        <Ionicons name="information-circle-outline" size={30} color="#e9ab25" />
+        <Text style={styles.infoText}>
+          Si vous invitez un autre client via le QR code, vous gagnerez un point. Vous pouvez acheter n'importe quel produit, mais vous devez en acheter un payant.
+        </Text>
       </View>
     </View>
   );
@@ -116,22 +101,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f3d4ab52',
+    backgroundColor: '#f3d4ab2b',
     padding: 20,
   },
   qrContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f3d4ab60',
+    backgroundColor: '#e9ab25dd',
     borderRadius: 60,
     padding: 20,
   },
   qrCodeDisplay: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#ffffff',
     padding: 20,
     borderRadius: 60,
+    marginVertical: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 25,
+    elevation: 20,
   },
   expiredText: {
     fontSize: 18,
@@ -165,6 +156,41 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,
+  },
+  // New styles for the informational container
+  infoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0e6d2',
+    padding: 15,
+    borderRadius: 15,
+    marginTop: 30,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 10,
+    width: '90%',
+  },
+  infoText: {
+    color: '#333',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 1,
+    textAlign: 'center',
+  }, 
+   parrainage : {
+    fontSize: 35,
+    fontWeight: 'bold',
+    color: '#e9ab25',
+    textAlign: 'center',
+    marginBottom: 20,
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 10,
   },
 });
 

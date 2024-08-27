@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, FlatList,Dimensions, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import io from 'socket.io-client';
-import { BASE_URL, BASE_URLIO } from '@env';
-
-const ClientChatScreen = () => {
+import { BASE_URLIO } from '@env';
+import Header from '../components/Header';
+const { width, height } = Dimensions.get('window');
+const ClientChatScreen = ({ navigation }) => {
   const clientId = '66c10e4d4eac0352b3aec084';  // Static clientId
   const adminId = '66bac40871e4a7ed9e6fc705';  // Static adminId
   const [messages, setMessages] = useState([]);  // Chat messages
@@ -13,56 +14,49 @@ const ClientChatScreen = () => {
   const socket = io(BASE_URLIO);  // Adjust to your server IP
 
   useEffect(() => {
-    // Initiate chat when the component mounts
     console.log('Initiating chat between client and admin');
     socket.emit('initiateChat', { adminId, clientId });
 
-    // Listen for chat details from the server (only unseen messages)
     socket.on('chatDetails', (data) => {
-      console.log('Chat details received:', data);
       setChatId(data.chatId);  // Set the chatId obtained from the server
       setMessages(data.messages);  // Load only unseen messages from admin
     });
 
-    // Listen for new messages in real-time
     socket.on('newMessage', (messageData) => {
-      console.log('New message received:', messageData);
       setMessages((prevMessages) => [...prevMessages, messageData.message]);  // Append new message
     });
 
-    // Cleanup on component unmount
     return () => {
       socket.off('chatDetails');
       socket.off('newMessage');
       socket.disconnect();
-      console.log('Socket disconnected');
     };
   }, []);
 
-  // Handle sending a message
   const sendMessage = () => {
     if (newMessage.trim() && chatId) {
       socket.emit('sendMessage', {
         chatId,
         sender: 'client',  // Client is sending the message
-        content: newMessage
+        content: newMessage,
       });
       setNewMessage('');  // Clear input after sending
-
-      // Do NOT clear messages after sending
     }
   };
 
-  // Render each message
   const renderMessage = ({ item }) => (
-    <View style={styles.messageContainer}>
-      <Text style={styles.sender}>{item.sender}</Text>
+    <View style={item.sender === 'client' ? styles.messageContainerClient : styles.messageContainerAdmin}>
+      <Text style={styles.sender}>{item.sender === 'client' ? 'You' : 'Admin'}</Text>
       <Text style={styles.content}>{item.content}</Text>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+    
       <Text style={styles.chatTitle}>Chat {chatId ? 'Active' : 'Connecting...'}</Text>
 
       <FlatList
@@ -70,6 +64,7 @@ const ClientChatScreen = () => {
         renderItem={renderMessage}
         keyExtractor={(item, index) => index.toString()}
         style={styles.chatList}
+        contentContainerStyle={styles.chatContentContainer}
       />
 
       <View style={styles.inputContainer}>
@@ -78,54 +73,116 @@ const ClientChatScreen = () => {
           value={newMessage}
           onChangeText={setNewMessage}
           placeholder="Type a message"
+          placeholderTextColor="#888"
         />
-        <Button title="Send" onPress={sendMessage} disabled={!chatId} />
+        <TouchableOpacity style={styles.sendButton} onPress={sendMessage} disabled={!chatId}>
+          <Text style={styles.sendButtonText}>Send</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
   },
   chatTitle: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
-    marginBottom: 10,
+    textAlign: 'center',
+    alignContent: 'center',
+    paddingTop: Platform.OS === 'ios' ? height * 0.08 : height * 0.05,
+
+    color: '#333',
+    backgroundColor: '#e9ab25',
+    paddingRight: 20,
+    paddingBottom: 10,
+  
+    paddingLeft: 20,
+    margin: 10,
+    marginTop: 0,
+    marginBottom: 0,
+    paddingTop: height * (Platform.OS === 'ios' ? 0.07 : 0.05),
+    alignItems: 'center',
+backgroundColor: '#e9ab25',
+borderRadius: 20,
+    padding: 2,
+    marginVertical: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
+    elevation: 3,
   },
   chatList: {
     flex: 1,
-    marginBottom: 10,
+    paddingHorizontal: 10,
   },
-  messageContainer: {
+  chatContentContainer: {
+    paddingBottom: 20,
+  },
+  messageContainerClient: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#DCF8C6',
+    borderRadius: 20,
+    marginBottom: 10,
     padding: 10,
-    marginVertical: 5,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
+    maxWidth: '75%',
+  },
+  messageContainerAdmin: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    marginBottom: 10,
+    padding: 10,
+    maxWidth: '75%',
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
   sender: {
     fontWeight: 'bold',
+    color: '#555',
   },
   content: {
+    fontSize: 16,
     marginTop: 5,
+    color: '#333',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderTopWidth: 1,
     borderColor: '#ccc',
-    paddingTop: 10,
+    backgroundColor: '#df942400',
+    padding: 14,
+    justifyContent: 'space-between',
   },
   textInput: {
     flex: 1,
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     marginRight: 10,
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#e9ab1182',
+  },
+  sendButton: {
+    backgroundColor: '#e9ab25',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sendButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

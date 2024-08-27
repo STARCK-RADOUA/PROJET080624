@@ -1,19 +1,22 @@
 import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Image,TextInput, TouchableOpacity, StyleSheet, Modal, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import io from 'socket.io-client';
 import Header from '../components/Header';
 import useNotificationMenu from '../services/useNotificationMenu';
 import NotificationMenu from '../components/NotificationMenu';
 import { getClient , getUserDetails} from '../services/userService';
-
+import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 const socket = io(`${BASE_URLIO}`);
 
 const UserProfileScreen = ({ navigation }) => {
   const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
   
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [isPhoneModalVisible, setPhoneModalVisible] = useState(false);
   const [isPasswordModalVisible, setPasswordModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,6 +33,10 @@ const UserProfileScreen = ({ navigation }) => {
     const fetchUserData = async () => {
       const user = await getUserDetails();
       setPhoneNumber(user.phone);
+      setFirstName(user.firstName);
+      setLastName(user.lastName);
+
+
     };
     fetchUserData();
 
@@ -109,30 +116,42 @@ const UserProfileScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} toggleNotificationMenu={toggleNotificationMenu} />
-      {isNotificationMenuVisible && (
-        <NotificationMenu slideAnim={slideAnim} toggleNotificationMenu={toggleNotificationMenu} socket={socket} />
-      )}
+        <Header navigation={navigation} />
 
-      <View style={styles.profileContainer}>
+    
+<View style={styles.profileContainer}>
+<View style={styles.profileWrapper}>
+          <View style={styles.profileImageContainer}>
+            <Image
+                source={require('../assets/images/8498789.png')}
+              style={styles.profileImage}
+            />
+            <View style={styles.verifiedBadge}>
+              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" /> 
+            </View>
+          </View>
 
-        <View style={styles.row}>
-         
-          <Text style={styles.phoneNumber}>+212 {phoneNumber}</Text>
+       
+          <Text style={styles.userName}>{`${firstName} ${lastName}`}</Text>
+          </View>
 
-          <TouchableOpacity 
-            style={styles.changeNumberButton} 
-            onPress={() => setPhoneModalVisible(true)}>
-            <Text style={styles.buttonText}>Change</Text>
-          </TouchableOpacity>
-        </View>
+<View style={styles.row}>
+  <Text style={styles.phoneNumber}>+33 {phoneNumber}</Text>
+  
+  <TouchableOpacity 
+    style={styles.iconButton} 
+    onPress={() => setPhoneModalVisible(true)}>
+    <MaterialIcons name="edit" size={24} color="#e9ab25" />
+  </TouchableOpacity>
+</View>
 
-        <TouchableOpacity 
-          style={styles.changePasswordButton} 
-          onPress={() => setPasswordModalVisible(true)}>
-          <Text style={styles.buttonText}>Change Password</Text>
-        </TouchableOpacity>
-      </View>
+<TouchableOpacity 
+  style={styles.changePasswordButton} 
+  onPress={() => setPasswordModalVisible(true)}>
+  <Text style={styles.buttonText}>Change Password</Text>
+</TouchableOpacity>
+
+</View>
 
       {/* Modal for Changing Phone Number */}
       <Modal visible={isPhoneModalVisible} transparent animationType="slide">
@@ -252,20 +271,59 @@ const styles = StyleSheet.create({
   phoneNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    width: '70%',
-    height: 40,
-    paddingHorizontal: 15,
+    color: '#4A4A4A', // Darker color for futuristic look
+    
+    flex: 1,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start', // Align the number and icon side by side
     width: '100%',
-    marginBottom: 10,
+    marginBottom: 20,
+  },
+  iconButton: {
+    backgroundColor: '#E0F7FA', // Light futuristic color
+    padding: 10,
+    borderRadius: 50,
+    marginLeft: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   input: {
     
+  },
+  profileWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    padding: 50,
+
+  },
+  profileImageContainer: {
+    position: 'relative',
+    marginBottom: 10,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderColor: '#e9ab25',
+    borderWidth: 3,
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 2,
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#4A4A4A',
+    marginTop: 10,
   },
   inputSmall: {
     width: '65%',
@@ -275,22 +333,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   changeNumberButton: {
-    backgroundColor: '#FFA500',
+    backgroundColor: '#e9ab25',
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 15,
     marginLeft: 10,
   },
   changePasswordButton: {
-    backgroundColor: '#FFA500',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 30,
-    marginTop: 20,
+    backgroundColor: '#e9ab25', // Modern blue color
+    borderRadius: 30, // Rounder button for a more modern look
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    marginTop: 30,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 5, // Add shadow to enhance the button
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '600', // Slightly bolder text for modern feel
+    letterSpacing: 1.2,
   },
   modalOverlay: {
     flex: 1,
@@ -319,7 +384,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalButton: {
-    backgroundColor: '#FFA500',
+    backgroundColor: '#e9ab25',
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 40,
@@ -333,11 +398,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   modalCloseText: {
-    color: '#FFA500',
+    color: '#e9ab25',
     fontSize: 16,
   },
   validateButton: {
-    backgroundColor: '#FFA500',
+    backgroundColor: '#e9ab25',
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,

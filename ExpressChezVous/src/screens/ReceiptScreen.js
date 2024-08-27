@@ -128,14 +128,7 @@ const ReceiptScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} toggleNotificationMenu={toggleNotificationMenu} />
-      {isNotificationMenuVisible && (
-        <NotificationMenu
-          slideAnim={slideAnim}
-          toggleNotificationMenu={toggleNotificationMenu}
-          socket={socket} // Pass the socket instance
-        />
-      )}
+     <Header navigation={navigation} />
       <FlatList
         data={orders}
         renderItem={renderOrderItem}

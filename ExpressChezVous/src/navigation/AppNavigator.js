@@ -51,7 +51,7 @@ const AppNavigator = () => {
         /> 
           <Stack.Screen name="QrcodeGeneratorScreen" component={QrcodeGeneratorScreenScreen} />
 
-        <Stack.Screen name="SupportChat" component={SupportChat} />
+        <Stack.Screen name="SupportChat" component={SupportChat}   options={{ headerShown: false }}  />
         <Stack.Screen name="AdressForm" component={AdressForm} />
         <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
         <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen} options={{ headerShown: false }} />

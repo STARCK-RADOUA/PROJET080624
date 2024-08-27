@@ -1,11 +1,11 @@
 import { BASE_URL, BASE_URLIO } from '@env';
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import * as Location from 'expo-location';  // Import expo-location for location fetching
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { MaterialIcons } from '@expo/vector-icons';
 import { getClient } from '../services/userService'; // Add a function to get user ID
 
 // Validation schema using Yup
@@ -18,12 +18,12 @@ const addressValidationSchema = Yup.object().shape({
   comment: Yup.string(),
 });
 
-const AddressFormScreen = ({ navigation ,route}) => {
+const AddressFormScreen = ({ navigation, route }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [locationFetched, setLocationFetched] = useState(false); // Track if location is fetched
   const [userId, setUserId] = useState(null); // Add state for user_id
   const [location, setLocation] = useState(null); // Store user's location
-  
+
   // Fetch user ID on component mount (you can also pass it from props if you prefer)
   useEffect(() => {
     const fetchUserId = async () => {
@@ -42,7 +42,7 @@ const AddressFormScreen = ({ navigation ,route}) => {
   const fetchCurrentLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission Denied', 'Permission to access location was denied.');
+      Alert.alert('Permission Denied', 'You need to allow location access to continue.');
       return;
     }
 
@@ -51,7 +51,6 @@ const AddressFormScreen = ({ navigation ,route}) => {
 
     if (location) {
       setLocation(location.coords); // Store the coordinates
-    
       setLocationFetched(true); // Enable form fields once location is fetched
       Alert.alert('Location Fetched', 'Your current location has been successfully fetched.');
     } else {
@@ -65,12 +64,11 @@ const AddressFormScreen = ({ navigation ,route}) => {
       // Combine form values with user_id and location (if fetched)
       const dataToSend = {
         ...values,
-        user_id: userId, 
-        newOrder: route.params,// Include user_id in the request body
+        user_id: userId,
+        newOrder: route.params, // Include user_id in the request body
         location: location ? `${location.latitude}, ${location.longitude}` : 'Location not fetched', // Send location if available
       };
 
-      
       // Navigate back or to another screen
       navigation.replace('PaymentScreen', { data: dataToSend });
     } catch (error) {
@@ -80,128 +78,139 @@ const AddressFormScreen = ({ navigation ,route}) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Add New Address</Text>
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === "ios" ? "padding" : "height"} // Avoid layout shift when keyboard is visible
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>Add New Address</Text>
 
-      {/* Button to fetch current location */}
-      <TouchableOpacity
-        onPress={fetchCurrentLocation}
-        style={styles.locationButton}
-      >
-        <Text style={styles.locationButtonText}>
-          Get Current Location
-        </Text>
-      </TouchableOpacity>
+        <View style={styles.iconRow}>
+          {/* Location Icon Button */}
+          <TouchableOpacity onPress={fetchCurrentLocation} style={styles.iconButton}>
+            <MaterialIcons name="my-location" size={28} color="#fff" />
+          </TouchableOpacity>
 
-      {/* Disable the form until the location is fetched */}
-      <Formik
-        initialValues={{
-          address_line: '',
-          building: '',
-          floor: '',
-          door_number: '',
-          digicode: '',
-          comment: '',
-        }}
-        validationSchema={addressValidationSchema}
-        onSubmit={handleFormSubmit}
-      >
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
-          <>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Address Line *</Text>
-              <TextInput
-                style={[styles.input, !locationFetched && styles.disabledInput]}  // Disable input if location is not fetched
-                onChangeText={handleChange('address_line')}
-                onBlur={handleBlur('address_line')}
-                value={values.address_line}
-                placeholder="Enter your address"
-                editable={locationFetched}  // Disable editing if location is not fetched
-              />
-              {touched.address_line && errors.address_line && (
-                <Text style={styles.error}>{errors.address_line}</Text>
-              )}
-            </View>
+          {/* Inform user to grant location access */}
+          <Text style={styles.locationInfo}>
+            Please allow location access to proceed.
+          </Text>
+        </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Building</Text>
-              <TextInput
-                style={[styles.input, !locationFetched && styles.disabledInput]}
-                onChangeText={handleChange('building')}
-                onBlur={handleBlur('building')}
-                value={values.building}
-                placeholder="Building name or number"
-                editable={locationFetched}
-              />
-            </View>
+        <Formik
+          initialValues={{
+            address_line: '',
+            building: '',
+            floor: '',
+            door_number: '',
+            digicode: '',
+            comment: '',
+          }}
+          validationSchema={addressValidationSchema}
+          onSubmit={handleFormSubmit}
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+            <>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Address Line *</Text>
+                <TextInput
+                  style={[styles.input, !locationFetched && styles.disabledInput]}  // Disable input if location is not fetched
+                  onChangeText={handleChange('address_line')}
+                  onBlur={handleBlur('address_line')}
+                  value={values.address_line}
+                  placeholder="Enter your address"
+                  editable={locationFetched}  // Disable editing if location is not fetched
+                />
+                {touched.address_line && errors.address_line && (
+                  <Text style={styles.error}>{errors.address_line}</Text>
+                )}
+              </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Floor</Text>
-              <TextInput
-                style={[styles.input, !locationFetched && styles.disabledInput]}
-                onChangeText={handleChange('floor')}
-                onBlur={handleBlur('floor')}
-                value={values.floor}
-                placeholder="Floor number"
-                editable={locationFetched}
-              />
-            </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Building</Text>
+                <TextInput
+                  style={[styles.input, !locationFetched && styles.disabledInput]}
+                  onChangeText={handleChange('building')}
+                  onBlur={handleBlur('building')}
+                  value={values.building}
+                  placeholder="Building name or number"
+                  editable={locationFetched}
+                />
+              </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Door Number</Text>
-              <TextInput
-                style={[styles.input, !locationFetched && styles.disabledInput]}
-                onChangeText={handleChange('door_number')}
-                onBlur={handleBlur('door_number')}
-                value={values.door_number}
-                placeholder="Door number"
-                editable={locationFetched}
-              />
-            </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Floor</Text>
+                <TextInput
+                  style={[styles.input, !locationFetched && styles.disabledInput]}
+                  onChangeText={handleChange('floor')}
+                  onBlur={handleBlur('floor')}
+                  value={values.floor}
+                  placeholder="Floor number"
+                  editable={locationFetched}
+                />
+              </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Digicode</Text>
-              <TextInput
-                style={[styles.input, !locationFetched && styles.disabledInput]}
-                onChangeText={handleChange('digicode')}
-                onBlur={handleBlur('digicode')}
-                value={values.digicode}
-                placeholder="Enter digicode"
-                editable={locationFetched}
-              />
-            </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Door Number</Text>
+                <TextInput
+                  style={[styles.input, !locationFetched && styles.disabledInput]}
+                  onChangeText={handleChange('door_number')}
+                  onBlur={handleBlur('door_number')}
+                  value={values.door_number}
+                  placeholder="Door number"
+                  editable={locationFetched}
+                />
+              </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Comment</Text>
-              <TextInput
-                style={[styles.input, !locationFetched && styles.disabledInput]}
-                onChangeText={handleChange('comment')}
-                onBlur={handleBlur('comment')}
-                value={values.comment}
-                placeholder="Additional instructions"
-                multiline
-                editable={locationFetched}
-              />
-            </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Digicode</Text>
+                <TextInput
+                  style={[styles.input, !locationFetched && styles.disabledInput]}
+                  onChangeText={handleChange('digicode')}
+                  onBlur={handleBlur('digicode')}
+                  value={values.digicode}
+                  placeholder="Enter digicode"
+                  editable={locationFetched}
+                />
+              </View>
 
-            <TouchableOpacity
-              onPress={handleSubmit}
-              style={[styles.submitButton, (!locationFetched || isSubmitting) && styles.disabledButton]}
-              disabled={!locationFetched || isSubmitting}  // Disable button if location is not fetched
-            >
-              <Text style={styles.submitButtonText}>
-                {isSubmitting ? 'Submitting...' : 'Save Address'}
-              </Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </Formik>
-    </ScrollView>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Comment</Text>
+                <TextInput
+                  style={[styles.input, !locationFetched && styles.disabledInput]}
+                  onChangeText={handleChange('comment')}
+                  onBlur={handleBlur('comment')}
+                  value={values.comment}
+                  placeholder="Additional instructions"
+                  multiline
+                  editable={locationFetched}
+                />
+              </View>
+
+              {/* Confirm Button */}
+              <TouchableOpacity
+                onPress={handleSubmit}
+                style={[styles.submitButton, (!locationFetched || isSubmitting) && styles.disabledButton]}
+                disabled={!locationFetched || isSubmitting}  // Disable button if location is not fetched
+              >
+                <Text style={styles.submitButtonText}>
+                  {isSubmitting ? 'Submitting...' : 'Save Address'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Formik>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: '#f7f7f7',
+  },
+  scrollContainer: {
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#f7f7f7',
@@ -211,19 +220,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#333',
+    color: '#e9ab25',
   },
-  locationButton: {
-    backgroundColor: '#2196F3',
-    padding: 15,
-    borderRadius: 8,
+  iconRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
   },
-  locationButtonText: {
-    color: '#fff',
+  iconButton: {
+    backgroundColor: '#e9ab25',
+    padding: 12,
+    borderRadius: 50,
+    marginRight: 15,
+  },
+  locationInfo: {
     fontSize: 16,
-    fontWeight: 'bold',
+    color: '#333',
   },
   inputContainer: {
     marginBottom: 20,
@@ -252,11 +264,15 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   submitButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#e9ab25',
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 50,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 10,
   },
   disabledButton: {
     backgroundColor: 'gray',
