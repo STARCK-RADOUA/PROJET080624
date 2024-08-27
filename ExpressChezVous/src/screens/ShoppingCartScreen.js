@@ -27,10 +27,10 @@ const ShoppingCartScreen = ({ navigation }) => {
   const serviceName = sharedData.serviceName;
   const [hasUsedPoints, setHasUsedPoints] = useState(false); // New state to track if points were used
   const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
-  
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [isSystemPointModalVisible, setIsSystemPointModalVisible] = useState(false); // Modal visibility
   const { setSharedData } = useContext(DataContext);
-
+  const [isOrderButtonVisible, setIsOrderButtonVisible] = useState(true);
   const [userPoints, setUserPoints] = useState(0); // Track user's points
 
   
@@ -290,37 +290,7 @@ const ShoppingCartScreen = ({ navigation }) => {
   );
   
   
-  useFocusEffect(
-    useCallback(() => {
-      // Reset states to their initial values when navigating back
-      setOrderItems([]); 
-      setExpandedItemId(null);
-      setTotalPrice(0);
-      setUserPointsEarned(0);
-      setMyFreeItem(0);
-      setItemsInTheCart(0);
-      setError('');
-      setHasUsedPoints(false);
-  
-      // Fetch data again if necessary
-      const fetchData = async () => {
-        try {
-          const user = await getUserDetails();
-          setUserPointsEarned(user.points_earned);  // Reset points to the user's initial value
-          await fetchOrderItems();  // Re-fetch the order items if necessary
-        } catch (error) {
-          console.error('Error in useFocusEffect:', error);
-        }
-      };
-  
-      fetchData();
-  
-      // Clean up if necessary (optional)
-      return () => {
-        // You can add any cleanup logic here if necessary
-      };
-    }, []) // Empty dependency array means this effect will run every time the screen comes into focus
-  );
+
   
 
   const handleItemPress = (itemId) => {
@@ -336,7 +306,7 @@ const ShoppingCartScreen = ({ navigation }) => {
         deviceId: deviceId,
       };
       setSharedData({ dicrPoints : userPointsEarned , firstPoints : userPoints , orders :orderItems });
-      navigation.replace('AdressForm', { newOrder: data });
+      navigation.navigate('AdressForm', { newOrder: data });
     } catch (error) {
       console.error('Failed to place the order:', error);
       setError('Failed to place the order. Please check the console for details.');
@@ -375,6 +345,17 @@ const ShoppingCartScreen = ({ navigation }) => {
     setIsSystemPointModalVisible(false); // Close the modal
   };
 
+  const handleScroll = (event) => {
+    const currentScrollY = event.nativeEvent.contentOffset.y;
+    if (currentScrollY > lastScrollY) {
+      // Scrolling down
+      setIsOrderButtonVisible(false);
+    } else if (currentScrollY < lastScrollY) {
+      // Scrolling up
+      setIsOrderButtonVisible(true);
+    }
+    setLastScrollY(currentScrollY);
+  };
   // Prevent back button when the modal is open
   useEffect(() => {
     const backAction = () => {
@@ -392,37 +373,39 @@ const ShoppingCartScreen = ({ navigation }) => {
     return () => backHandler.remove(); // Cleanup backHandler on unmount
   }, [isSystemPointModalVisible]);
 
+ 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} toggleNotificationMenu={toggleNotificationMenu} />
-      {isNotificationMenuVisible && (
-        <NotificationMenu
-          slideAnim={slideAnim}
-          toggleNotificationMenu={toggleNotificationMenu}
-          socket={socket}
-        />
-      )}
-
+      <Header navigation={navigation} />
+      
       {error ? (
         <Text style={styles.errorText}>{error}</Text>
       ) : (
         <>
-          <ScrollView style={styles.menuList}>
+          <ScrollView 
+            style={styles.menuList}
+            onScroll={handleScroll}  // Attach the scroll event
+            scrollEventThrottle={16} // Control how often the scroll event is fired (16ms for smooth tracking)
+          >
             {orderItems.map((item, index) => (
               <TouchableOpacity key={index} style={styles.menuItem} onPress={() => handleItemPress(item._id)}>
                 <View style={styles.itemContainer}>
                   <Image source={{ uri: item.product_id.image_url }} style={styles.menuItemImage} />
                   <View style={styles.menuItemDetails}>
-                    <Text style={styles.priceText}>€{item.free ? 0 : item.price.toFixed(2)}</Text>
                     <Text style={styles.menuItemName}>{item.product_id.name}</Text>
-                    {shouldShowSwitch() && (
-                      <Switch
-                        style={styles.switchButton}
-                        value={item.free}
-                        onValueChange={() => toggleFreeItem(item._id)}
-                        disabled={shouldDisableSwitch(item)}
-                      />
-                    )}
+
+                    <View style={styles.priceSwitchContainer}>
+                      <Text style={styles.priceText}>€{item.free ? 0 : item.price.toFixed(2)}</Text>
+                      {shouldShowSwitch() && (
+                        <Switch
+                          style={styles.switchButton}
+                          value={item.free}
+                          onValueChange={() => toggleFreeItem(item._id)}
+                          disabled={shouldDisableSwitch(item)}
+                        />
+                      )}
+                    </View>
+                    
                     <Text style={styles.menuItemDescription}>
                       {item.selected_options.map(option => option.name).join(', ')}
                     </Text>
@@ -439,12 +422,12 @@ const ShoppingCartScreen = ({ navigation }) => {
                       <TouchableOpacity
                         onPress={() => deleteItem(item._id)}
                         style={styles.deleteButton}
-                        disabled={!item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints} // Disable delete if points are used and only 1 payable item remains
+                        disabled={!item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints} 
                       >
                         <MaterialIcons 
                           name="delete" 
                           size={24} 
-                          color={(!item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints) ? "grey" : "red"} // Change color if the button is disabled
+                          color={(!item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints) ? "grey" : "red"} 
                         />
                       </TouchableOpacity>
                     )}
@@ -453,27 +436,29 @@ const ShoppingCartScreen = ({ navigation }) => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <View style={styles.orderButtonContainer}>
-            <View style={styles.pointsCounter}>
-              <Text style={styles.pointsText}>{userPointsEarned} Points</Text>
+          {/* Show/hide the order button based on scroll */}
+          {isOrderButtonVisible && (
+            <View style={styles.orderButtonContainer}>
+              <View style={styles.pointsCounter}>
+                <Text style={styles.pointsText}>{userPointsEarned} Points</Text>
+              </View>
+              <TouchableOpacity
+                style={[styles.orderButton, orderItems.length === 0 && styles.disabledOrderButton]}
+                onPress={handleOrderNow}
+                disabled={orderItems.length === 0}
+              >
+                <Text style={styles.orderButtonText}>Order Now - €{totalPrice.toFixed(2)}</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={[styles.orderButton, orderItems.length === 0 && styles.disabledOrderButton]}
-              onPress={handleOrderNow}
-              disabled={orderItems.length === 0}
-            >
-              <Text style={styles.orderButtonText}>Order Now - €{totalPrice.toFixed(2)}</Text>
-            </TouchableOpacity>
-          </View>
+          )}
         </>
       )}
 
-      {/* System Point Modal */}
       <Modal
         transparent={true}
         visible={isSystemPointModalVisible}
         animationType="slide"
-        onRequestClose={() => {}} // Disable the back button
+        onRequestClose={() => {}} 
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -492,19 +477,23 @@ const ShoppingCartScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
   },
   menuList: {
-    paddingHorizontal: 20,
-    marginBottom: 70,
+    paddingHorizontal: 16,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    padding: 10,
-    marginVertical: 10,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 2,
+    marginVertical: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
+    elevation: 3,
   },
   itemContainer: {
     flexDirection: 'row',
@@ -512,8 +501,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   menuItemImage: {
-    width: 80,
-    height: 80,
+    width: 56,
+    height: 56,
     borderRadius: 10,
   },
   menuItemDetails: {
@@ -522,6 +511,7 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: 20,
+    marginTop: 15,
     fontWeight: 'bold',
     color: 'black',
     alignSelf: 'flex-start',
@@ -559,11 +549,14 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: '#ffffff00',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+  
+  },
+  priceSwitchContainer: {
+    flexDirection: 'row', 
     justifyContent: 'space-between',
   },
   pointsCounter: {
@@ -579,7 +572,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   orderButton: {
-    backgroundColor: 'orange',
+    backgroundColor: '#e9ab25',
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',
@@ -599,21 +592,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
     width: '80%',
     backgroundColor: 'white',
-    borderRadius: 20, // Border radius for modern design
+    borderRadius: 20,
     padding: 20,
     alignItems: 'center',
-    elevation: 10, // Shadow for Android
-    shadowColor: '#000', // Shadow for iOS
+    elevation: 10,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -629,10 +621,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   okButton: {
-    backgroundColor: 'orange',
+    backgroundColor: '#e9ab25',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 10, // Button border radius
+    borderRadius: 10,
   },
   okButtonText: {
     color: 'white',

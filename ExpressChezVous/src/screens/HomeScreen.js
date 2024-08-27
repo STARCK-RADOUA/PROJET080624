@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 import { DataContext } from '../navigation/DataContext';
-
+import Header from '../components/Header';
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
@@ -70,15 +70,7 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()}>
-          <MaterialIcons name="menu" size={24} color="black" />
-        </TouchableOpacity>
-        <Image source={{ uri: 'https://example.com/logo.png' }} style={styles.logo} />
-        <TouchableOpacity onPress={toggleNotificationMenu}>
-          <FontAwesome name="bell" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
+       <Header navigation={navigation} />
 
       <ScrollView style={styles.menuList}>
         {menuItems.length === 0 ? (
@@ -99,9 +91,7 @@ const HomeScreen = ({ navigation }) => {
       </ScrollView>
 
       <PrductBottomSheetScreen ref={bottomSheetRef} item={selectedItem} />
-      {isNotificationMenuVisible && (
-        <NotificationMenu slideAnim={slideAnim} toggleNotificationMenu={toggleNotificationMenu} />
-      )}
+    
     </View>
   );
 };

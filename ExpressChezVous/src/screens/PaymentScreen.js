@@ -115,7 +115,7 @@ const PaymentScreen = ({ navigation, route }) => {
         onPress={handlePayment}
       >
         <LinearGradient
-          colors={selectedPayment ? ['#FF8C00', '#FF4500'] : ['#cccccc', '#bfbfbf']} // Orange gradient
+          colors={selectedPayment ? ['#e9ab25', '#e9ab25a9'] : ['#cccccc', '#bfbfbf']} // Orange gradient
           style={styles.okButtonGradient}
         >
           <Text style={styles.okText}>{loading ? 'Processing...' : 'Confirm Payment'}</Text>
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FF4500', // Strong orange for title
+    color: '#e9ab25', // Strong orange for title
     marginBottom: 40,
     textAlign: 'center',
   },
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     marginBottom: 10,
-    color: '#FF6347', // Tomato orange for label
+    color: '#e9ab25', // Tomato orange for label
   },
   inputContainer: {
     flexDirection: 'row',
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#FF4500', // Strong orange for input text
+    color: '#e9ab25', // Strong orange for input text
     textAlign: 'center',
   },
   paymentOption: {
@@ -182,12 +182,12 @@ const styles = StyleSheet.create({
   },
   selectedOption: {
     backgroundColor: '#FFE4B5', // Lighter shade of orange for selected
-    borderColor: '#FF4500', // Darker orange for selected border
+    borderColor: '#e9ab25', // Darker orange for selected border
   },
   paymentText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF4500', // Strong orange for payment text
+    color: '#e9ab25', // Strong orange for payment text
   },
   okButton: {
     width: width * 0.8,

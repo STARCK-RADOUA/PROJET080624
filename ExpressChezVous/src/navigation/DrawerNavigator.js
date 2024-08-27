@@ -77,34 +77,27 @@ const DrawerNavigator = () => {
   
 
     <Drawer.Navigator
-      initialRouteName="ExpressChezVous"
+      initialRouteName="ExpressChezVous" 
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
+    
         drawerStyle: {
           backgroundColor: '#868383b7',
           height: '100%',
+          
           borderTopRightRadius: 25,
           borderBottomRightRadius: 45,
-     
+
           width: 280,
         },
         overlayColor: 'rgba(0, 0, 0, 0.9)',
       }}
     >
       <Drawer.Screen name="ExpressChezVous"  component={TabNavigator} />
-      <Drawer.Screen name="Client" screenOptions={{
-        headerShown: false,
-        drawerStyle: {
-          backgroundColor: '#860383b7',
-          height: '100%',
-          borderTopRightRadius: 25,
-          borderBottomRightRadius: 25,
-          borderBottomLeftRadius: 25,
-          width: 280,
-        }, overlayColor: 'rgba(0, 0, 0, 0.9)',}} component={SupportChat} />
+      <Drawer.Screen name="SupportChat" component={SupportChat} />
   
-  <Drawer.Screen name="Admin" component={Another} />
+
 
       <Drawer.Screen name="Logout" component={Logout} />
     </Drawer.Navigator>
@@ -149,7 +142,7 @@ const styles = StyleSheet.create({
     fontSize: 45,
     fontWeight: 'bold',
     color: '#0fe668a9',
-    marginLeft: 20,
+    marginLeft: 30,
   },
   qrButton: {
     flexDirection: 'column', // Aligner en ligne
