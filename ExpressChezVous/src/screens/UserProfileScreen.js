@@ -1,6 +1,6 @@
 import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Image,TextInput, TouchableOpacity, StyleSheet, Modal, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import io from 'socket.io-client';
 import Header from '../components/Header';
@@ -8,12 +8,15 @@ import useNotificationMenu from '../services/useNotificationMenu';
 import NotificationMenu from '../components/NotificationMenu';
 import { getClient , getUserDetails} from '../services/userService';
 import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 const socket = io(`${BASE_URLIO}`);
 
 const UserProfileScreen = ({ navigation }) => {
   const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
   
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [isPhoneModalVisible, setPhoneModalVisible] = useState(false);
   const [isPasswordModalVisible, setPasswordModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,6 +33,10 @@ const UserProfileScreen = ({ navigation }) => {
     const fetchUserData = async () => {
       const user = await getUserDetails();
       setPhoneNumber(user.phone);
+      setFirstName(user.firstName);
+      setLastName(user.lastName);
+
+
     };
     fetchUserData();
 
@@ -113,6 +120,20 @@ const UserProfileScreen = ({ navigation }) => {
 
     
 <View style={styles.profileContainer}>
+<View style={styles.profileWrapper}>
+          <View style={styles.profileImageContainer}>
+            <Image
+                source={require('../assets/images/8498789.png')}
+              style={styles.profileImage}
+            />
+            <View style={styles.verifiedBadge}>
+              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" /> 
+            </View>
+          </View>
+
+       
+          <Text style={styles.userName}>{`${firstName} ${lastName}`}</Text>
+          </View>
 
 <View style={styles.row}>
   <Text style={styles.phoneNumber}>+33 {phoneNumber}</Text>
@@ -251,7 +272,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#4A4A4A', // Darker color for futuristic look
-    marginBottom: 1,
+    
     flex: 1,
   },
   row: {
@@ -271,6 +292,38 @@ const styles = StyleSheet.create({
   },
   input: {
     
+  },
+  profileWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    padding: 50,
+
+  },
+  profileImageContainer: {
+    position: 'relative',
+    marginBottom: 10,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderColor: '#e9ab25',
+    borderWidth: 3,
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 2,
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#4A4A4A',
+    marginTop: 10,
   },
   inputSmall: {
     width: '65%',
