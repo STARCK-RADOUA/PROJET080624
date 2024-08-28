@@ -25,8 +25,9 @@ export const getClient = async () => {
 
       deviceId: deviceId,
     });
-
+console.log(response.data.userId,"ggggggggggggggg")
     const clientId = response.data.userId;
+    console.log(clientId)
     return clientId;
   } catch (error) {
     console.error('Error fetching user ID:', error);

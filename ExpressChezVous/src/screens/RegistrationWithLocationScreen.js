@@ -114,22 +114,23 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
-      <LinearGradient colors={['#0f2027', '#203a43', '#e4b50a']} style={styles.container}>
+      {/* Futuristic theme based on orange `#e9ab25` */}
+      <LinearGradient colors={['#0f2027', '#203a43', '#e9ab25']} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <Text style={styles.title}>Complete your registration</Text>
+          <Text style={styles.title}>Complete Your Registration</Text>
 
           <View style={styles.inputContainer}>
-            <Ionicons name="person-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <Ionicons name="person-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
             <TextInput style={styles.input} placeholder="First Name" placeholderTextColor="#ccc" value={firstName} onChangeText={setFirstName} />
           </View>
 
           <View style={styles.inputContainer}>
-            <Ionicons name="person-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <Ionicons name="person-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
             <TextInput style={styles.input} placeholder="Last Name" placeholderTextColor="#ccc" value={lastName} onChangeText={setLastName} />
           </View>
 
           <View style={styles.inputContainer}>
-            <Ionicons name="call-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <Ionicons name="call-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
@@ -143,20 +144,20 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
           {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
 
           <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <Ionicons name="lock-closed-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
             <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} placeholderTextColor="#ccc" value={password} onChangeText={setPassword} />
           </View>
 
           <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <Ionicons name="lock-closed-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
             <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={true} placeholderTextColor="#ccc" value={cmpassword} onChangeText={setcmPassword} />
           </View>
 
           {/* Horizontal location icon and confirm button */}
           <View style={styles.horizontalContainer}>
-            <TouchableOpacity onPress={handleGetLocation}>
-              <Ionicons name="location-outline" size={40} color="white" style={styles.locationIcon} />
-              <Text style={styles.buttonText}>Catre</Text>
+            <TouchableOpacity onPress={handleGetLocation} style={styles.locationButton}>
+              <Ionicons name="location-outline" size={40} color="white" />
+              <Text style={styles.locationButtonText}>Get Location</Text>
             </TouchableOpacity>
 
             <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
@@ -170,10 +171,15 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
                 }}
                 disabled={!isFormValid}
               >
-                <Text style={styles.buttonText}>       Confirm      </Text>
+                <Text style={styles.buttonText}>Confirm</Text>
               </TouchableOpacity>
             </Animated.View>
           </View>
+
+          {/* Information about location requirement */}
+          <Text style={styles.infoText}>
+            To verify you're not a robot or spam, please provide your location to proceed.
+          </Text>
         </ScrollView>
       </LinearGradient>
     </KeyboardAvoidingView>
@@ -188,14 +194,16 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     justifyContent: 'center',
-    paddingTop: width * 0.5,
+    paddingTop: width * 0.2,
     alignItems: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#fff',
+    color: '#e9ab25',
+    textAlign: 'center',
+    letterSpacing: 1.5,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -206,6 +214,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 10,
     paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#e9ab25',
   },
   inputIcon: {
     marginRight: 10,
@@ -216,13 +226,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-  
     width: '100%',
     padding: 15,
-    backgroundColor: '#ffaa00cf',
+    backgroundColor: '#e9ab25',
     borderRadius: 50,
     alignItems: 'center',
-    shadowColor: '#FFDD00',
+    shadowColor: '#e9ab25',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.8,
     shadowRadius: 25,
@@ -232,6 +241,7 @@ const styles = StyleSheet.create({
     color: '#191818',
     fontWeight: 'bold',
     fontSize: 16,
+    letterSpacing: 1.2,
   },
   disabledButton: {
     opacity: 0.5,
@@ -244,18 +254,34 @@ const styles = StyleSheet.create({
   horizontalContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     marginTop: 20,
     width: '100%',
   },
-  locationIcon: {
-    width: '100%',
-    
-   
-    paddingRight: width * 0.1,
+  locationButton: {
+    backgroundColor: '#e9ab25',
     borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    flexDirection: 'row',
     alignItems: 'center',
-  
+    justifyContent: 'center',
+    shadowColor: '#e9ab25',
+    shadowOpacity: 0.6,
+    shadowRadius: 20,
+  },
+  locationButtonText: {
+    color: '#fff',
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  infoText: {
+    color: '#e9ab25',
+    textAlign: 'center',
+    fontSize: 14,
+    marginTop: 30,
+    lineHeight: 20,
   },
 });
 

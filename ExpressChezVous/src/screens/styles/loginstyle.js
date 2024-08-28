@@ -17,6 +17,7 @@ export const styles = StyleSheet.create({
 
      // Responsive padding
   },
+  
   imageContainer: {
     alignItems: 'center',
     marginBottom: height * 0.02,

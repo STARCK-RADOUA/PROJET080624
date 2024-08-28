@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
 import { BASE_URL, BASE_URLIO } from '@env';
-
+import { getClient } from '../services/userService';
 const socket = io(`${BASE_URLIO}`);
 
 const RegistrationScreen = ({ navigation }) => {
@@ -48,8 +48,27 @@ const RegistrationScreen = ({ navigation }) => {
       phoneError === ''
     );
 
-    socket.on('clientRegistered', (data) => {
+    socket.on('clientRegistered', async(data) => {
       if (data.message === 'success') {
+
+        try {
+          const clientId = await getClient();
+          // Send the client ID to check if the cart exists or create a new one
+          const response = await axios.post(`${BASE_URL}/api/carts/add`, {
+            client_id: clientId,  // Make sure to send `client_id` as expected by the backend
+          });
+      
+          if (response.status === 201) {
+            console.log('New cart created:', response.data);
+          } else if (response.status === 200) {
+            console.log('Existing cart found:', response.data);
+          }
+      
+          // Proceed with the rest of your logic
+         
+        } catch (error) {
+          console.error('Error handling cart creation/check:', error);
+        }
         Alert.alert('Success', data.details);
         navigation.reset({
           index: 0,
@@ -70,7 +89,7 @@ const RegistrationScreen = ({ navigation }) => {
       Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
       return;
     }
-
+console.log(phone)
     socket.emit('registerClient', { firstName, lastName, phone, password, deviceId });
   };
 
@@ -92,21 +111,21 @@ const RegistrationScreen = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient colors={['#0f2027', '#203a43', '#e4b50a']} style={styles.container}>
+    <LinearGradient colors={['#0f2027', '#203a43', '#e9ab25']} style={styles.container}>
       <Text style={styles.title}>Complete your registration</Text>
 
       <View style={styles.inputContainer}>
-        <Ionicons name="person-outline" size={20} color="#fff" style={styles.inputIcon} />
+        <Ionicons name="person-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
         <TextInput style={styles.input} placeholder="First Name" placeholderTextColor="#ccc" value={firstName} onChangeText={setFirstName} />
       </View>
 
       <View style={styles.inputContainer}>
-        <Ionicons name="person-outline" size={20} color="#fff" style={styles.inputIcon} />
+        <Ionicons name="person-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
         <TextInput style={styles.input} placeholder="Last Name" placeholderTextColor="#ccc" value={lastName} onChangeText={setLastName} />
       </View>
 
       <View style={styles.inputContainer}>
-        <Ionicons name="call-outline" size={20} color="#fff" style={styles.inputIcon} />
+        <Ionicons name="call-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
         <TextInput
           style={styles.input}
           placeholder="Phone Number"
@@ -120,12 +139,12 @@ const RegistrationScreen = ({ navigation }) => {
       {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
 
       <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.inputIcon} />
+        <Ionicons name="lock-closed-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
         <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} placeholderTextColor="#ccc" value={password} onChangeText={setPassword} />
       </View>
 
       <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.inputIcon} />
+        <Ionicons name="lock-closed-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
         <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={true} placeholderTextColor="#ccc" value={cmpassword} onChangeText={setcmPassword} />
       </View>
 
@@ -158,7 +177,9 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#fff',
+    color: '#e9ab25',
+    textAlign: 'center',
+    letterSpacing: 1.5,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -169,6 +190,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 10,
     paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#e9ab25',
   },
   inputIcon: {
     marginRight: 10,
@@ -181,10 +204,10 @@ const styles = StyleSheet.create({
   button: {
     width: '80%',
     padding: 15,
-    backgroundColor: '#ffaa00cf',
+    backgroundColor: '#e9ab25',
     borderRadius: 50,
     alignItems: 'center',
-    shadowColor: '#FFDD00',
+    shadowColor: '#e9ab25',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.8,
     shadowRadius: 25,
@@ -194,6 +217,7 @@ const styles = StyleSheet.create({
     color: '#191818',
     fontWeight: 'bold',
     fontSize: 16,
+    letterSpacing: 1.2,
   },
   disabledButton: {
     opacity: 0.5,
