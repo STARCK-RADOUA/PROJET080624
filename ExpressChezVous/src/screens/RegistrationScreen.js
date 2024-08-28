@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
 import { BASE_URL, BASE_URLIO } from '@env';
-
+import { getClient } from '../services/userService';
 const socket = io(`${BASE_URLIO}`);
 
 const RegistrationScreen = ({ navigation }) => {
@@ -48,8 +48,27 @@ const RegistrationScreen = ({ navigation }) => {
       phoneError === ''
     );
 
-    socket.on('clientRegistered', (data) => {
+    socket.on('clientRegistered', async(data) => {
       if (data.message === 'success') {
+
+        try {
+          const clientId = await getClient();
+          // Send the client ID to check if the cart exists or create a new one
+          const response = await axios.post(`${BASE_URL}/api/carts/add`, {
+            client_id: clientId,  // Make sure to send `client_id` as expected by the backend
+          });
+      
+          if (response.status === 201) {
+            console.log('New cart created:', response.data);
+          } else if (response.status === 200) {
+            console.log('Existing cart found:', response.data);
+          }
+      
+          // Proceed with the rest of your logic
+         
+        } catch (error) {
+          console.error('Error handling cart creation/check:', error);
+        }
         Alert.alert('Success', data.details);
         navigation.reset({
           index: 0,
