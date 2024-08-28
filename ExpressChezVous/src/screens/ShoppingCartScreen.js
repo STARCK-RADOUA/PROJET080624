@@ -25,6 +25,10 @@ const ShoppingCartScreen = ({ navigation }) => {
   const socket = io(`${BASE_URLIO}`);
   const { sharedData } = useContext(DataContext);
   const serviceName = sharedData.serviceName;
+  const serviceTest = sharedData.serviceTest;
+  const serviceId = sharedData.id;
+
+
   const [hasUsedPoints, setHasUsedPoints] = useState(false); // New state to track if points were used
   const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -236,7 +240,7 @@ const ShoppingCartScreen = ({ navigation }) => {
       if (!response.data.isSystemPoint) {
         setUserPointsEarned(0);
         setUserPoints(0);
-        setTotalPrice(0);
+    
         setMyFreeItem(0);
         setItemsInTheCart(0);
         setHasUsedPoints(false);
@@ -305,7 +309,7 @@ const ShoppingCartScreen = ({ navigation }) => {
         orderItems: orderItems,
         deviceId: deviceId,
       };
-      setSharedData({ dicrPoints : userPointsEarned , firstPoints : userPoints , orders :orderItems });
+      setSharedData({ dicrPoints : userPointsEarned , firstPoints : userPoints , orders :orderItems ,  serviceName: serviceName, serviceTest: serviceTest, id: serviceId });
       navigation.navigate('AdressForm', { newOrder: data });
     } catch (error) {
       console.error('Failed to place the order:', error);

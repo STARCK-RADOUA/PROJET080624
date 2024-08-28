@@ -2,7 +2,6 @@ import { BASE_URLIO } from '@env';
 import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
 import io from 'socket.io-client';
-import { LinearGradient } from 'expo-linear-gradient'; // Gradient for modern button look
 import { DataContext } from '../navigation/DataContext';
 
 const PaymentScreen = ({ navigation, route }) => {
@@ -21,7 +20,6 @@ const PaymentScreen = ({ navigation, route }) => {
     const socketInstance = io(BASE_URLIO);
     setSocket(socketInstance);
 
-    // Clean up the connection when the component is unmounted
     return () => {
       if (socketInstance) {
         socketInstance.disconnect();
@@ -46,12 +44,9 @@ const PaymentScreen = ({ navigation, route }) => {
       };
 
       if (socket) {
-        // Emit data to the server via Socket.IO
         socket.emit('addOrder', orderData);
 
-        // Listen for the server's response for the 'orderAdded' event
         socket.on('orderAdded', (order) => {
-          console.log('Order added:', order);
           if (!serviceTest) {
             Alert.alert('Success', 'Your order is being created!');
           }
@@ -68,7 +63,6 @@ const PaymentScreen = ({ navigation, route }) => {
         });
       }
     } catch (error) {
-      console.error('Error creating the order:', error);
       Alert.alert('Error', 'Failed to update the order.');
     } finally {
       setLoading(false);
@@ -110,16 +104,11 @@ const PaymentScreen = ({ navigation, route }) => {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.okButton}
+        style={[styles.okButton, !selectedPayment && styles.disabledButton]}
         disabled={!selectedPayment}
         onPress={handlePayment}
       >
-        <LinearGradient
-          colors={selectedPayment ? ['#e9ab25', '#e9ab25a9'] : ['#cccccc', '#bfbfbf']} // Orange gradient
-          style={styles.okButtonGradient}
-        >
-          <Text style={styles.okText}>{loading ? 'Processing...' : 'Confirm Payment'}</Text>
-        </LinearGradient>
+        <Text style={styles.okText}>{loading ? 'Processing...' : 'Confirm Payment'}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -131,14 +120,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFF5E1', // Light orange background
+    backgroundColor: '#f7f7f73', // Dark futuristic background
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: 'bold',
-    color: '#e9ab25', // Strong orange for title
+    color: '#d69a17', // Futuristic orange for title
     marginBottom: 40,
     textAlign: 'center',
   },
@@ -148,14 +137,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 10,
-    color: '#e9ab25', // Tomato orange for label
+    color: '#271917', // Bright orange for label
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFEFD5', // Lighter orange for input container
+    backgroundColor: '#203a433e', // Dark background for input container
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -165,7 +154,7 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#e9ab25', // Strong orange for input text
+    color: '#d3a747', // Futuristic orange for input text
     textAlign: 'center',
   },
   paymentOption: {
@@ -174,30 +163,31 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FF8C00', // Dark orange for border
+    borderColor: '#e9ab25', // Bright orange for border
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF5E1', // Light orange for background
-    elevation: 2,
+    backgroundColor: '#50666d', // Dark background for option
+    elevation: 5,
   },
   selectedOption: {
-    backgroundColor: '#FFE4B5', // Lighter shade of orange for selected
-    borderColor: '#e9ab25', // Darker orange for selected border
+    backgroundColor: '#295061', // Darker shade for selected
+    borderColor: '#00ff2a', // Darker orange for selected border
   },
   paymentText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#e9ab25', // Strong orange for payment text
+    color: '#e6dbc5', // Futuristic orange for payment text
   },
   okButton: {
     width: width * 0.8,
     marginVertical: 20,
-    borderRadius: 12,
-  },
-  okButtonGradient: {
     paddingVertical: 15,
+    backgroundColor: '#e9ab25', // Solid orange button
     borderRadius: 12,
     alignItems: 'center',
+  },
+  disabledButton: {
+    backgroundColor: '#cccccc', // Grey background when disabled
   },
   okText: {
     color: '#ffffff',

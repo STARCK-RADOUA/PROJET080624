@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import { Camera, CameraType } from 'expo-camera/legacy';
 import { BASE_URL } from '@env';
+import { getClient } from '../services/userService';
 
-
-const QrCodeScannerScreen = () => {
+const QrCodeScannerScreen = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [qrData, setQrData] = useState(null);
+  
   const [type, setType] = useState(CameraType.back); // Set default camera type to back
-console.log('------------------------------------');
 
-console.log('------------------------------------');
   // Request camera permission
   useEffect(() => {
     (async () => {
@@ -22,6 +21,10 @@ console.log('------------------------------------');
 
   // Function to handle scanned QR code
   const handleBarCodeScanned = async ({ data }) => {
+    const clientId = await getClient();
+    console.log('------------------------------------');
+console.log('clientId:', clientId);
+console.log('------------------------------------');
     setScanned(true);
     setQrData(data); // Data from scanned QR code
 
@@ -32,13 +35,15 @@ console.log('------------------------------------');
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ uniqueId: data }), // Send QR code data to the backend
+        body: JSON.stringify({ uniqueId: data, newclientId: clientId }), // Send QR code data to the backend
       });
 
       const result = await response.json();
 
       if (response.ok) {
         Alert.alert('Succès', 'QR Code validé avec succès');
+        navigation.replace('Registration');
+
       } else {
         Alert.alert('Erreur', result.error || 'Échec de la vérification du QR code');
       }
