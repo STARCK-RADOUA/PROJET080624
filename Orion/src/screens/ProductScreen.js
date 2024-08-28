@@ -4,7 +4,7 @@ import axios from 'axios';
 import AddProductModal from '../components/AddProductModal';
 import ProductCard from '../components/ProductCad';
 import ProductModal from '../components/ProductModal';
-
+import { BASE_URL, BASE_URLIO } from '@env';
 const ProductScreen = () => {
   const [products, setProducts] = useState([]);      // List of products fetched from the backend
   const [loading, setLoading] = useState(true);      // Loading state for skeleton placeholder
@@ -15,7 +15,7 @@ const ProductScreen = () => {
 
   // Fetch products from the backend when the component is mounted
   useEffect(() => {
-    axios.get('http://192.168.1.11:4000/api/products/get')
+    axios.get(`${BASE_URL}/api/products/get`)
       .then(response => {
         setProducts(response.data);  // Update products state with data from API
         setLoading(false);  // Set loading to false once data is fetched

@@ -48,7 +48,7 @@ export default function ClientScreen() {
 
   const handleActivateDeactivate = async (clientId, isActive) => {
     try {
-      await axios.post(`http://192.168.1.11:4000/api/users/clients/${clientId}/activate`, { isActive });
+      await axios.post(`${BASE_URL}/api/users/clients/${clientId}/activate`, { isActive });
       fetchClients();
     } catch (error) {
       console.error('Error activating/deactivating client:', error);
@@ -57,7 +57,7 @@ export default function ClientScreen() {
 
   const handleToggleLoginStatus = async (clientId) => {
     try {
-      await axios.post(`http://192.168.1.11:4000/api/users/clients/${clientId}/toggle-login`);
+      await axios.post(`${BASE_URL}/api/users/clients/${clientId}/toggle-login`);
       fetchClients(); // Refresh client list after toggling login status
     } catch (error) {
       console.error('Error toggling login status:', error);
