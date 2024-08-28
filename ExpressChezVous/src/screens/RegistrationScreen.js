@@ -70,7 +70,7 @@ const RegistrationScreen = ({ navigation }) => {
       Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
       return;
     }
-
+console.log(phone)
     socket.emit('registerClient', { firstName, lastName, phone, password, deviceId });
   };
 

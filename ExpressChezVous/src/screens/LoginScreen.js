@@ -45,6 +45,8 @@ const LoginScreen = ({ navigation }) => {
   // Manual login function
   const manualLogin = async () => {
     const deviceId = Device.osBuildId;
+    console.log(deviceId)
+    console.log("fffffffffffffffffffff")
     if (!phone || !password) {
       Alert.alert('Erreur', 'Veuillez remplir les champs requis.');
       return;
@@ -123,7 +125,7 @@ const LoginScreen = ({ navigation }) => {
 
               {/* QR Icon and Create Account */}
               <View style={styles.horizontalLayout}>
-                <TouchableOpacity onPress={() => navigation.navigate('RegistrationLC')}>
+                <TouchableOpacity onPress={() => navigation.navigate('Registration')}>
                   <Text style={styles.linkText}>Créer un compte</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('QRScanner')}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ImageBackground, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, ImageBackground,Dimensions,Platform, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Importer l'icône QR
 import TabNavigator from './TabNavigator';
@@ -12,7 +12,7 @@ import io from 'socket.io-client';
 import { getClientId } from '../services/userService';
 import { useNavigation } from '@react-navigation/native';
 import Another from '../screens/Another';
-
+const { width, height } = Dimensions.get('window');
 const CustomDrawerContent = (props) => {
   const socket = io(BASE_URLIO);
   const [profileData, setProfileData] = useState({
@@ -109,7 +109,7 @@ const DrawerNavigator = () => {
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    height: '15%',
+    height: height * (Platform.OS === 'ios' ? 0.18 : 0.16),
     borderTopRightRadius: 25,
     borderBottomRightRadius: 25,
     borderBottomLeftRadius: 25,
