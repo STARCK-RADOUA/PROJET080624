@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
@@ -17,7 +19,7 @@ export default function DriverScreen() {
   const fetchClients = async () => {
     try {
       console.log('Attempting to fetch clients...');
-      const response = await axios.get('http://192.168.1.11:4000/api/users/drivers', {
+      const response = await axios.get(`${BASE_URL}/api/users/drivers`, {
         timeout: 5000,
         headers: {
           'Content-Type': 'application/json',

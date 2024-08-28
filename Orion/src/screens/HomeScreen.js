@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

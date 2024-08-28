@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions, Animated } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons'; // Modern icons from expo
@@ -18,7 +20,7 @@ export default function ClientScreen() {
   const fetchClients = async () => {
     try {
       console.log('Attempting to fetch clients...');
-      const response = await axios.get('http://192.168.1.11:4000/api/users/clients', {
+      const response = await axios.get(`${BASE_URL}/api/users/clients`, {
         timeout: 5000,
         headers: {
           'Content-Type': 'application/json',

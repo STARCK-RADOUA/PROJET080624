@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import io from 'socket.io-client';
@@ -9,7 +11,7 @@ const ClientChatScreen = () => {
   const [newMessage, setNewMessage] = useState('');  // Input message
   const [chatId, setChatId] = useState(null);  // Chat ID obtained after initiation
 
-  const socket = io("http://192.168.1.11:4000");  // Adjust to your server IP
+  const socket = io(BASE_URLIO);  // Adjust to your server IP
 
   useEffect(() => {
     // Initiate chat when the component mounts

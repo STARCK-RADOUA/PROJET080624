@@ -3,12 +3,13 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Animated, E
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
+import axios from 'axios';
 import * as Device from 'expo-device';
 import { BASE_URL, BASE_URLIO } from '@env';
 import { getClient } from '../services/userService';
 const socket = io(`${BASE_URLIO}`);
 
-const RegistrationScreen = ({ navigation }) => {
+const RegistrationScreen = ({ navigation,route }) => {
   const [deviceId, setDeviceId] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -19,7 +20,9 @@ const RegistrationScreen = ({ navigation }) => {
   const [phoneError, setPhoneError] = useState('');
 
   const buttonScale = useRef(new Animated.Value(1)).current;
-
+console.log('------------------------------------');
+console.log(route.params.uniqueId,"yuyuuyuyuyyuyuyuyuyuyuyuyuyuyuyuyyuy");
+console.log('------------------------------------');
   useEffect(() => {
     const getDeviceId = async () => {
       const id = Device.osBuildId;
@@ -90,7 +93,7 @@ const RegistrationScreen = ({ navigation }) => {
       return;
     }
 console.log(phone)
-    socket.emit('registerClient', { firstName, lastName, phone, password, deviceId });
+    socket.emit('registerClient', { firstName, lastName, phone, password, deviceId , token: route.params.uniqueId});
   };
 
   const animateButtonPress = () => {
