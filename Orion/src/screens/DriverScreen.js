@@ -1,90 +1,75 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions } from 'react-native';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions, Switch } from 'react-native';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import axios from 'axios';
+import AddUserModal from './../components/AddDriverModal'; // Import the AddUserModal component for adding drivers
 
 export default function DriverScreen() {
-  const [clients, setClients] = useState([]);
-  const [filteredClients, setFilteredClients] = useState([]);
-  const [selectedClient, setSelectedClient] = useState(null);
+  const [drivers, setDrivers] = useState([]);
+  const [filteredDrivers, setFilteredDrivers] = useState([]);
+  const [selectedDriver, setSelectedDriver] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [addModalVisible, setAddModalVisible] = useState(false); // Modal for adding new driver
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    fetchClients();
+    fetchDrivers();
   }, []);
 
-  const fetchClients = async () => {
+  const fetchDrivers = async () => {
     try {
-      console.log('Attempting to fetch clients...');
       const response = await axios.get('http://192.168.1.11:4000/api/users/drivers', {
         timeout: 5000,
         headers: {
           'Content-Type': 'application/json',
         },
       });
-
-      console.log('Response status:', response.status);
-      console.log('Response data:', response.data);
-
-      setClients(response.data);
-      setFilteredClients(response.data);  // Initialize filteredClients with all clients
+      setDrivers(response.data);
+      setFilteredDrivers(response.data);  // Initialize filteredDrivers with all drivers
     } catch (error) {
-      if (error.response) {
-        console.error('Error fetching clients (Server responded with an error):', error.response.data);
-        console.error('Status:', error.response.status);
-        console.error('Headers:', error.response.headers);
-      } else if (error.request) {
-        console.error('Error fetching clients (No response received):', error.request);
-      } else {
-        console.error('Error setting up the request:', error.message);
-      }
+      console.error('Error fetching drivers:', error);
     }
   };
 
   const handleSearch = (query) => {
-    setSearchQuery(query);
-
-    // Filter clients based on the search query (search by name or phone number)
-    const filtered = clients.filter(client =>
-      client.firstName.toLowerCase().includes(query.toLowerCase()) ||
-      client.lastName.toLowerCase().includes(query.toLowerCase()) ||
-      client.phone.toString().includes(query)
+    setSearchText(query);
+    const filtered = drivers.filter(driver =>
+      driver.firstName.toLowerCase().includes(query.toLowerCase()) ||
+      driver.lastName.toLowerCase().includes(query.toLowerCase()) ||
+      driver.phone.toString().includes(query)
     );
-
-    setFilteredClients(filtered);
+    setFilteredDrivers(filtered);
   };
 
-  const handleActivateDeactivate = async (clientId, isActive) => {
+  const handleActivateDeactivate = async (driverId, isActive) => {
     try {
-      await axios.post(`http://192.168.1.11:4000/api/users/driver/${clientId}/activate`, { isActive });
-      fetchClients();
+      await axios.post(`http://192.168.1.11:4000/api/users/driver/${driverId}/activate`, { isActive });
+      fetchDrivers();
     } catch (error) {
-      console.error('Error activating/deactivating client:', error);
+      console.error('Error activating/deactivating driver:', error);
     }
   };
 
-  const handleToggleLoginStatus = async (clientId) => {
+  const handleToggleLoginStatus = async (driverId) => {
     try {
-      await axios.post(`http://192.168.1.11:4000/api/users/driver/${clientId}/toggle-login`);
-      fetchClients(); // Refresh client list after toggling login status
+      await axios.post(`http://192.168.1.11:4000/api/users/driver/${driverId}/toggle-login`);
+      fetchDrivers(); // Refresh driver list after toggling login status
     } catch (error) {
       console.error('Error toggling login status:', error);
     }
   };
 
-
-  const handleCardPress = (client) => {
-    setSelectedClient(client);
+  const handleCardPress = (driver) => {
+    setSelectedDriver(driver);
     setIsModalVisible(true);
   };
 
   const closeModal = () => {
     setIsModalVisible(false);
-    setSelectedClient(null);
+    setSelectedDriver(null);
   };
 
-  const renderClientModal = () => (
+  const renderDriverModal = () => (
     <Modal
       animationType="slide"
       transparent={true}
@@ -93,13 +78,13 @@ export default function DriverScreen() {
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          {selectedClient && (
+          {selectedDriver && (
             <ScrollView>
-              <Text style={styles.modalTitle}>Client Information</Text>
-              <Text style={styles.modalText}>First Name: {selectedClient.firstName}</Text>
-              <Text style={styles.modalText}>Last Name: {selectedClient.lastName}</Text>
-              <Text style={styles.modalText}>points: {selectedClient.points_earned}</Text>
-              <Text style={styles.modalText}>Phone: {selectedClient.phone}</Text>
+              <Text style={styles.modalTitle}>Driver Information</Text>
+              <Text style={styles.modalText}>First Name: {selectedDriver.firstName}</Text>
+              <Text style={styles.modalText}>Last Name: {selectedDriver.lastName}</Text>
+              <Text style={styles.modalText}>Points Earned: {selectedDriver.points_earned}</Text>
+              <Text style={styles.modalText}>Phone: {selectedDriver.phone}</Text>
               <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
@@ -112,51 +97,60 @@ export default function DriverScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Drivervs List</Text>
+      <Text style={styles.title}>Driver List</Text>
 
-      {/* Search Input */}
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search by name or phone"
-        value={searchQuery}
-        onChangeText={handleSearch}
-      />
+      {/* Search Input and Add Button */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by name or service type..."
+          placeholderTextColor="#9ca3af"
+          value={searchText}
+          onChangeText={(text) => handleSearch(text)}
+        />
+        <TouchableOpacity style={styles.addButton} onPress={() => setAddModalVisible(true)}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
 
-      <ScrollView>
-        <View style={styles.cardContainer}>
-          {filteredClients.length > 0 ? (
-            filteredClients.map(client => (
-              <TouchableOpacity key={client._id} style={styles.card} onPress={() => handleCardPress(client)}>
-                <View style={styles.cardContent}>
-                  <View>
-                    <Text style={styles.cardTitle}>{client.firstName} {client.lastName}</Text>
-                    <Text style={styles.cardSubtitle}>{client.phone}</Text>
-                  </View>
-                  <View style={styles.iconContainer}>
-                    <TouchableOpacity onPress={() => handleActivateDeactivate(client._id, !client.activated)}>
-                      <MaterialIcons
-                        name={client.activated ? 'toggle-on' : 'toggle-off'}
-                        size={40}
-                        color={client.activated ? 'green' : 'gray'}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleToggleLoginStatus(client._id)}>
-                      <FontAwesome
-                        name={client.isLogin ? 'power-off' : 'power-off'}  // Change icon based on login status
-                        size={30}
-                        color={client.isLogin ? 'green' :'red' }  // Red if logged in, green if logged out
-                      />
-                    </TouchableOpacity>
-                  </View>
+      <ScrollView contentContainerStyle={styles.cardContainer}>
+        {filteredDrivers.length > 0 ? (
+          filteredDrivers.map(driver => (
+            <TouchableOpacity key={driver._id} style={styles.card} onPress={() => handleCardPress(driver)}>
+              <View style={styles.cardContent}>
+                <View>
+                  <Text style={styles.cardTitle}>{driver.firstName} {driver.lastName}</Text>
+                  <Text style={styles.cardSubtitle}>{driver.phone}</Text>
                 </View>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <Text>No clients available</Text>
-          )}
-        </View>
+                <View style={styles.iconContainer}>
+                  {/* Switch for Activation */}
+                  <Switch
+                    value={driver.activated}
+                    onValueChange={() => handleActivateDeactivate(driver._id, !driver.activated)}
+                    thumbColor={driver.activated ? '#f3b13e' : '#d1d5db'}
+                    trackColor={{ false: '#d1d5db', true: '#f3b13e' }}
+                  />
+                  {/* Power Icon */}
+                  <TouchableOpacity onPress={() => handleToggleLoginStatus(driver._id)}>
+                    <MaterialCommunityIcons
+                      name="power" // Modern rounded icon for login status
+                      size={30}
+                      color={driver.isLogin ? 'green' : 'red'}  // Green if logged in, red if logged out
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <Text>No drivers available</Text>
+        )}
       </ScrollView>
-      {renderClientModal()}
+
+      {renderDriverModal()}
+
+      {/* AddUserModal to add new drivers */}
+      <AddUserModal modalVisible={addModalVisible} setModalVisible={setAddModalVisible} />
     </View>
   );
 }
@@ -166,23 +160,46 @@ const screenWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    padding: 10,
+    backgroundColor: '#fff', // Changed to white background
+    paddingHorizontal: 10,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
-    marginVertical: 20,
-    textAlign: 'center',
+    marginBottom: 20,
+    textAlign: 'left', // Align title to the left
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   searchInput: {
-    height: 40,
-    borderColor: '#ccc',
+    flex: 1,
+    height: 50,
+    paddingLeft: 40,
+    borderColor: '#d1d5db',
     borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
+    borderRadius: 8,
+    backgroundColor: '#f9fafb',
+    color: '#111827',
+    marginRight: 10,
+  },
+  addButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#f3b13e',
+    borderColor: '#f3b13e',
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  addButtonText: {
+    color: '#1f2937',
+    fontSize: 14,
+    fontWeight: '500',
   },
   cardContainer: {
     flexDirection: 'column',
@@ -190,16 +207,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: screenWidth * 0.9,
-    backgroundColor: '#fff',
+    width: screenWidth - 40, // Make card width match the search form width
+    backgroundColor: '#FFF6EA', // Updated background color for the card
     borderRadius: 10,
     padding: 15,
     marginVertical: 10,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
   },
   cardContent: {
     flexDirection: 'row',

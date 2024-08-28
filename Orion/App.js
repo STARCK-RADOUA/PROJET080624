@@ -8,6 +8,7 @@ import NotificationScreen from './src/screens/NotificationScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import DriverScreen from './src/screens/DriverScreen';
 import ClientScreen from './src/screens/ClientScreen';
+import ProductScreen from './src/screens/ProductScreen';
 
 
 
@@ -34,7 +35,7 @@ export default function App() {
         case 'Clients':
           return <ClientScreen />;
           case 'Products':
-          return <ClientScreen />;
+          return <ProductScreen />;
       default:
         return <HomeScreen />;
     }
@@ -53,6 +54,7 @@ export default function App() {
           {TabButton(currentTab, setCurrentTab, "Search", "search-outline")}
           {TabButton(currentTab, setCurrentTab, "Clients", "people-outline")}
           {TabButton(currentTab, setCurrentTab, "Drivers", "car-outline")}
+          {TabButton(currentTab, setCurrentTab, "Products", "car-outline")}
           {TabButton(currentTab, setCurrentTab, "Services", "briefcase-outline")}
           {TabButton(currentTab, setCurrentTab, "Orders", "clipboard-outline")}
           {TabButton(currentTab, setCurrentTab, "Notifications", "notifications-outline")}
@@ -73,8 +75,8 @@ export default function App() {
         bottom: 0,
         left: 0,
         right: 0,
-        paddingHorizontal: 15,
-        paddingVertical: 20,
+        paddingHorizontal: 9,
+        paddingVertical: 7,
         borderRadius: showMenu ? 15 : 0,
         transform: [
           { scale: scaleValue },
@@ -160,7 +162,7 @@ const TabButton = (currentTab, setCurrentTab, title, iconName) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,  // Ensures the SafeAreaView takes full height
-    backgroundColor: '#5359D1',
+    backgroundColor: '#f3b13e',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },
