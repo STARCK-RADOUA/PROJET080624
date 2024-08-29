@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Modal, Pressable, ScrollView, Switch, TouchableOpacity, StyleSheet, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 const AddDriverModal = ({ modalVisible, setModalVisible }) => {
   const [firstName, setFirstName] = useState('');
@@ -31,7 +32,7 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
       isLogin,
     };
 
-    axios.post('http://192.168.1.11:4000/api/users/driver/add', userData)
+    axios.post(`${BASE_URL}/api/users/driver/add`, userData)
       .then(response => {
         console.log('User submitted:', response.data);
         setModalVisible(false);

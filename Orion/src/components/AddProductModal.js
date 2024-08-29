@@ -6,6 +6,7 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { firebase } from './../services/firebaseConfig';
 import * as FileSystem from 'expo-file-system';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 const AddProductModal = ({ modalVisible, setModalVisible }) => {
   const [productName, setProductName] = useState('');
@@ -71,7 +72,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
   };
 
   useEffect(() => {
-    axios.get('http://192.168.1.11:4000/api/services')
+    axios.get(`${BASE_URL}/api/services`)
       .then(response => {
         setServiceTypeOptions(response.data);
       })
@@ -100,7 +101,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
       options: options.filter(option => option.name && option.price),
     };
 
-    axios.post('http://192.168.1.11:4000/api/products/add', productData)
+    axios.post(`${BASE_URL}/api/products/add`	, productData)
       .then(response => {
         console.log('Product submitted:', response.data);
         setModalVisible(false);

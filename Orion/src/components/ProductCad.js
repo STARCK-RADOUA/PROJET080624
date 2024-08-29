@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text,Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 // Get screen width for responsive design
 const { width } = Dimensions.get('window');

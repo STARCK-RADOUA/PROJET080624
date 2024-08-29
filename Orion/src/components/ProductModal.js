@@ -6,6 +6,7 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { firebase } from './../services/firebaseConfig';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 const ProductModal = ({ visible, onClose, product }) => {
   if (!product) return null;
@@ -20,7 +21,7 @@ const ProductModal = ({ visible, onClose, product }) => {
 
   // Fetch service types
   useEffect(() => {
-    axios.get('http://192.168.1.11:4000/api/services')
+    axios.get(`${BASE_URL}/api/services`)
       .then(response => {
         setServiceTypeOptions(response.data);
       })
@@ -124,7 +125,7 @@ const ProductModal = ({ visible, onClose, product }) => {
       return;
     }
 
-    axios.put(`http://192.168.1.11:4000/api/products/update/${editableProduct._id}`, editableProduct)
+    axios.put(`${BASE_URL}/api/products/update/${editableProduct._id}`, editableProduct)
       .then(response => {
         console.log('Product updated successfully:', response.data);
         setIsEditing(false); // Exit editing mode
@@ -149,7 +150,7 @@ const ProductModal = ({ visible, onClose, product }) => {
         {
           text: 'Delete',
           onPress: () => {
-            axios.delete(`http://192.168.1.11:4000/api/products/delete/${editableProduct._id}`)
+            axios.delete(`${BASE_URL}/api/products/delete/${editableProduct._id}`)
               .then(response => {
                 console.log('Product deleted:', response.data);
                 onClose(); // Close the modal after deleting
