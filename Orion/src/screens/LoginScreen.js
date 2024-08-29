@@ -1,15 +1,10 @@
-import { BASE_URL, BASE_URLIO } from '@env';
-
-// LoginScreen.js
-
-
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import axios from 'axios';
-import * as Device from 'expo-device'; // Import expo-device for retrieving device info
+import * as Device from 'expo-device';
+import { BASE_URL } from '@env'; // Correct import for BASE_URL
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({ onLogin }) => {
   const [deviceId, setDeviceId] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -28,10 +23,11 @@ const LoginScreen = ({ navigation }) => {
     getDeviceId(); // Get the deviceId when the component mounts
   }, []);
 
-  console.log(deviceId)
+  console.log(deviceId);
+
   const handleLogin = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}}/api/admin/login`, {
+      const response = await axios.post(`${BASE_URL}/api/admin/login`, {
         deviceId,
         phone,
         password,
@@ -39,8 +35,7 @@ const LoginScreen = ({ navigation }) => {
 
       if (response.status === 200) {
         Alert.alert('Login Successful', 'Welcome!');
-        // Navigate to the TestScreen after successful login
-        navigation.navigate('Test');
+        onLogin(); // Trigger the onLogin function passed from App.js
       }
     } catch (error) {
       Alert.alert('Login Failed', error.response?.data?.message || 'An error occurred');
