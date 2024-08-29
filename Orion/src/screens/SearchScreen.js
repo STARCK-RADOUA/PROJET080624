@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 

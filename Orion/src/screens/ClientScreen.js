@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions, Animated, Switch } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Modern icons from expo
@@ -17,7 +19,8 @@ export default function ClientScreen() {
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get('http://192.168.1.11:4000/api/users/clients', {
+      console.log('Attempting to fetch clients...');
+      const response = await axios.get(`${BASE_URL}/api/users/clients`, {
         timeout: 5000,
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +48,7 @@ export default function ClientScreen() {
 
   const handleActivateDeactivate = async (clientId, isActive) => {
     try {
-      await axios.post(`http://192.168.1.11:4000/api/users/clients/${clientId}/activate`, { isActive });
+      await axios.post(`${BASE_URL}/api/users/clients/${clientId}/activate`, { isActive });
       fetchClients();
     } catch (error) {
       console.error('Error activating/deactivating client:', error);
@@ -54,7 +57,7 @@ export default function ClientScreen() {
 
   const handleToggleLoginStatus = async (clientId) => {
     try {
-      await axios.post(`http://192.168.1.11:4000/api/users/clients/${clientId}/toggle-login`);
+      await axios.post(`${BASE_URL}/api/users/clients/${clientId}/toggle-login`);
       fetchClients(); // Refresh client list after toggling login status
     } catch (error) {
       console.error('Error toggling login status:', error);

@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,7 +10,7 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Welcome, Mehdi!</Text>
+        <Text style={styles.headerText}>Welcome, TariQ!</Text>
         <Ionicons name="person-circle-outline" size={50} color="white" />
       </View>
     </ScrollView>

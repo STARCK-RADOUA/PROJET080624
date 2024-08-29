@@ -1,3 +1,5 @@
+import { BASE_URL, BASE_URLIO } from '@env';
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions, Switch } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,7 +20,8 @@ export default function DriverScreen() {
 
   const fetchDrivers = async () => {
     try {
-      const response = await axios.get('http://192.168.1.11:4000/api/users/drivers', {
+      console.log('Attempting to fetch clients...');
+      const response = await axios.get(`${BASE_URL}/api/users/drivers`, {
         timeout: 5000,
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +46,7 @@ export default function DriverScreen() {
 
   const handleActivateDeactivate = async (driverId, isActive) => {
     try {
-      await axios.post(`http://192.168.1.11:4000/api/users/driver/${driverId}/activate`, { isActive });
+      await axios.post(`${BASE_URL}/api/users/driver/${driverId}/activate`, { isActive });
       fetchDrivers();
     } catch (error) {
       console.error('Error activating/deactivating driver:', error);
@@ -52,7 +55,7 @@ export default function DriverScreen() {
 
   const handleToggleLoginStatus = async (driverId) => {
     try {
-      await axios.post(`http://192.168.1.11:4000/api/users/driver/${driverId}/toggle-login`);
+      await axios.post(`${BASE_URL}/api/users/driver/${driverId}/toggle-login`);
       fetchDrivers(); // Refresh driver list after toggling login status
     } catch (error) {
       console.error('Error toggling login status:', error);
