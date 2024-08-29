@@ -11,7 +11,7 @@ import ClientScreen from '../screens/ClientScreen';
 import ProductScreen from '../screens/ProductScreen';
 import SideMenu from '../components/SideMenu';
 
-export default function MainNavigator() {
+export default function MainNavigator({}) {
   const [currentTab, setCurrentTab] = useState("Home");
   const [showMenu, setShowMenu] = useState(false);
 
@@ -42,7 +42,7 @@ export default function MainNavigator() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <SideMenu currentTab={currentTab} setCurrentTab={setCurrentTab} styles={styles} />
+      <SideMenu   currentTab={currentTab} setCurrentTab={setCurrentTab} styles={styles} />
 
       <Animated.View style={{
         flex: 1,
@@ -100,18 +100,19 @@ export default function MainNavigator() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#10515a',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },
   profileIcon: {
-    marginTop: 8
+marginTop: 30,
+marginLeft: 15
   },
   profileName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: 'white',
-    marginTop: 20
+    color: '#d6c6b8',
+ 
   },
   menuIcon: {
     marginTop: 40,

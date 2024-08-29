@@ -1,26 +1,24 @@
-// App.js
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
-import LoginScreen from './src/screens/LoginScreen'; // Importer l'écran de connexion
-import MainNavigator from './src/navigation/MainNavigator'; // Importer la navigation principale
+import { AuthContext, AuthProvider } from './src/redux/AuthProvider'; // Import AuthProvider and AuthContext
+import LoginScreen from './src/screens/LoginScreen';
+import MainNavigator from './src/navigation/MainNavigator';
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Gérer l'état de la connexion
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
-      {!isLoggedIn ? (
-        <LoginScreen onLogin={handleLogin} />
-      ) : (
-        <MainNavigator />
-      )}
-    </SafeAreaView>
+    <AuthProvider>
+      <SafeAreaView style={styles.container}>
+        <AppContent />
+      </SafeAreaView>
+    </AuthProvider>
   );
 }
+
+const AppContent = () => {
+  const { isLoggedIn, login } = useContext(AuthContext); // Access the login function from context
+
+  return !isLoggedIn ? <LoginScreen onLogin={login} /> : <MainNavigator />;
+};
 
 const styles = StyleSheet.create({
   container: {
