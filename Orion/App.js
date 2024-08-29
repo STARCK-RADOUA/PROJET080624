@@ -1,7 +1,7 @@
+// App.js
 import React, { useRef, useState } from 'react';
-import { Animated, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'; // Import flat icons
-
+import { Animated, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from './src/screens/HomeScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import NotificationScreen from './src/screens/NotificationScreen';
@@ -9,8 +9,7 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import DriverScreen from './src/screens/DriverScreen';
 import ClientScreen from './src/screens/ClientScreen';
 import ProductScreen from './src/screens/ProductScreen';
-
-
+import SideMenu from './src/components/SideMenu'; // Import SideMenu
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState("Home");
@@ -30,12 +29,12 @@ export default function App() {
         return <NotificationScreen />;
       case 'Settings':
         return <SettingsScreen />;
-        case 'Drivers':
+      case 'Drivers':
         return <DriverScreen />;
-        case 'Clients':
-          return <ClientScreen />;
-          case 'Products':
-          return <ProductScreen />;
+      case 'Clients':
+        return <ClientScreen />;
+      case 'Products':
+        return <ProductScreen />;
       default:
         return <HomeScreen />;
     }
@@ -43,32 +42,11 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ justifyContent: 'flex-start', padding: 15 }}>
-        {/* Profile Section */}
-        <Ionicons name="person-circle" size={60} color="white" style={styles.profileIcon} />
-        <Text style={styles.profileName}>Mehi Saadi</Text>
-
-        <View style={{ flexGrow: 1, marginTop: 50 }}>
-          {/* Tab Buttons */}
-          {TabButton(currentTab, setCurrentTab, "Home", "home-outline")}
-          {TabButton(currentTab, setCurrentTab, "Search", "search-outline")}
-          {TabButton(currentTab, setCurrentTab, "Clients", "people-outline")}
-          {TabButton(currentTab, setCurrentTab, "Drivers", "car-outline")}
-          {TabButton(currentTab, setCurrentTab, "Products", "car-outline")}
-          {TabButton(currentTab, setCurrentTab, "Services", "briefcase-outline")}
-          {TabButton(currentTab, setCurrentTab, "Orders", "clipboard-outline")}
-          {TabButton(currentTab, setCurrentTab, "Notifications", "notifications-outline")}
-          {TabButton(currentTab, setCurrentTab, "Settings", "settings-outline")}
-        </View>
-
-        {/* Logout Button */}
-        <View>
-          {TabButton(currentTab, setCurrentTab, "LogOut", "log-out-outline")}
-        </View>
-      </View>
+      {/* Use SideMenu component */}
+      <SideMenu currentTab={currentTab} setCurrentTab={setCurrentTab} styles={styles} />
 
       <Animated.View style={{
-        flex: 1,  // Ensure the screen takes full height
+        flex: 1,
         backgroundColor: 'white',
         position: 'absolute',
         top: 0,
@@ -84,7 +62,7 @@ export default function App() {
         ]
       }}>
         <Animated.View style={{
-          flex: 1,  // Ensures the screen content takes full height
+          flex: 1,
           transform: [{
             translateY: closeButtonOffset
           }]
@@ -120,48 +98,9 @@ export default function App() {
   );
 }
 
-const TabButton = (currentTab, setCurrentTab, title, iconName) => {
-  return (
-    <TouchableOpacity onPress={() => {
-      if (title === "LogOut") {
-        // Log out actions
-      } else {
-        setCurrentTab(title);
-      }
-    }}>
-      <View style={{
-        flexDirection: "row",
-        alignItems: 'center',
-        paddingVertical: 8,
-        backgroundColor: currentTab === title ? 'white' : 'transparent',
-        paddingLeft: 13,
-        paddingRight: 35,
-        borderRadius: 8,
-        marginTop: 15
-      }}>
-
-        {/* Replace image with Ionicons icon */}
-        <Ionicons
-          name={iconName}
-          size={25}
-          color={currentTab === title ? "#5359D1" : "white"}
-        />
-
-        <Text style={{
-          fontSize: 15,
-          fontWeight: 'bold',
-          paddingLeft: 15,
-          color: currentTab === title ? "#5359D1" : "white"
-        }}>{title}</Text>
-
-      </View>
-    </TouchableOpacity>
-  );
-};
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,  // Ensures the SafeAreaView takes full height
+    flex: 1,
     backgroundColor: '#f3b13e',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',

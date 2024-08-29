@@ -5,7 +5,7 @@ import 'firebase/compat/storage'; // This is the correct import
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
     apiKey: "AIzaSyDADuvas0XD0e670921SnC49NirndOkUq8",
     authDomain: "expressechezvous.firebaseapp.com",
