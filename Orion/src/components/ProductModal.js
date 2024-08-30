@@ -261,7 +261,7 @@ const ProductModal = ({ visible, onClose, product }) => {
                 onValueChange={(itemValue) => handleInputChange('service_type', itemValue)}
               >
                 {serviceTypeOptions.map((option) => (
-                  <Picker.Item key={option.id} label={option.name} value={option.name} />
+                  <Picker.Item key={option._id} label={option.name} value={option.name} />
                 ))}
               </Picker>
             ) : (
