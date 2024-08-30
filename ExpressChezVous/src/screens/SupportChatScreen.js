@@ -2,20 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList,Dimensions, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
+import {getClientId} from '../services/userService'
 import Header from '../components/Header';
 const { width, height } = Dimensions.get('window');
+
+
 const ClientChatScreen = ({ navigation }) => {
-  const clientId = '66c10e4d4eac0352b3aec084';  // Static clientId
+
+   // Static clientId
   const adminId = '66bac40871e4a7ed9e6fc705';  // Static adminId
   const [messages, setMessages] = useState([]);  // Chat messages
   const [newMessage, setNewMessage] = useState('');  // Input message
   const [chatId, setChatId] = useState(null);  // Chat ID obtained after initiation
-
+ 
+  const userType = 'Client'
   const socket = io(BASE_URLIO);  // Adjust to your server IP
 
   useEffect(() => {
+    initiation() ;
+  }, []);
+
+  const initiation = async () =>{
+    const userId = await getClientId();
+    console.log("client is" , userId)
     console.log('Initiating chat between client and admin');
-    socket.emit('initiateChat', { adminId, clientId });
+    socket.emit('initiateChat', { adminId, userId ,userType });
 
     socket.on('chatDetails', (data) => {
       setChatId(data.chatId);  // Set the chatId obtained from the server
@@ -31,7 +42,8 @@ const ClientChatScreen = ({ navigation }) => {
       socket.off('newMessage');
       socket.disconnect();
     };
-  }, []);
+
+  }
 
   const sendMessage = () => {
     if (newMessage.trim() && chatId) {
