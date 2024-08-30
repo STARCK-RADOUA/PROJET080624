@@ -10,7 +10,8 @@ import DriverScreen from '../screens/DriverScreen';
 import ClientScreen from '../screens/ClientScreen';
 import ProductScreen from '../screens/ProductScreen';
 import SideMenu from '../components/SideMenu';
-
+import ServiceScreen from './src/screens/ServiceScreen'; // Import SideMenu
+import ChatHomeScreen from './src/screens/ChatHomeScreen';
 export default function MainNavigator({}) {
   const [currentTab, setCurrentTab] = useState("Home");
   const [showMenu, setShowMenu] = useState(false);
@@ -29,12 +30,16 @@ export default function MainNavigator({}) {
         return <NotificationScreen />;
       case 'Settings':
         return <SettingsScreen />;
+         case 'Services':
+        return <ServiceScreen />;
       case 'Drivers':
         return <DriverScreen />;
       case 'Clients':
         return <ClientScreen />;
       case 'Products':
         return <ProductScreen />;
+    case 'Chat':
+        return <ChatHomeScreen />;
       default:
         return <HomeScreen />;
     }
