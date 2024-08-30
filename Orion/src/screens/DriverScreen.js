@@ -1,65 +1,85 @@
-import { BASE_URL, BASE_URLIO } from '@env';
-
+import { BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions, Switch } from 'react-native';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import axios from 'axios';
-import AddUserModal from './../components/AddDriverModal'; // Import the AddUserModal component for adding drivers
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import io from 'socket.io-client';
+import AddUserModal from './../components/AddDriverModal';
+import DriverCard from './../components/DriverCard';
+import DriverModal from './../components/DriverModal';
 
 export default function DriverScreen() {
   const [drivers, setDrivers] = useState([]);
   const [filteredDrivers, setFilteredDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [addModalVisible, setAddModalVisible] = useState(false); // Modal for adding new driver
+  const [addModalVisible, setAddModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [filterActivated, setFilterActivated] = useState('all'); // New state for activated filter
+  const [filterIsLogin, setFilterIsLogin] = useState('all');     // New state for isLogin filter
 
   useEffect(() => {
-    fetchDrivers();
-  }, []);
+    const socket = io(BASE_URLIO);
 
-  const fetchDrivers = async () => {
-    try {
-      console.log('Attempting to fetch clients...');
-      const response = await axios.get(`${BASE_URL}/api/users/drivers`, {
-        timeout: 5000,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      setDrivers(response.data);
-      setFilteredDrivers(response.data);  // Initialize filteredDrivers with all drivers
-    } catch (error) {
-      console.error('Error fetching drivers:', error);
-    }
-  };
+    socket.emit('watchDrivers');
+    socket.on('driversUpdated', ({ drivers }) => {
+      console.log('driversUpdated event received:', drivers);
+      setDrivers(drivers);
+      applyFilters(drivers); // Apply filters to the initial data
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Connection error:', error);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from the socket server');
+    });
+
+    return () => {
+      console.log('Disconnecting from socket server...');
+      socket.disconnect();
+    };
+  }, []);
 
   const handleSearch = (query) => {
     setSearchText(query);
-    const filtered = drivers.filter(driver =>
-      driver.firstName.toLowerCase().includes(query.toLowerCase()) ||
-      driver.lastName.toLowerCase().includes(query.toLowerCase()) ||
-      driver.phone.toString().includes(query)
-    );
+    applyFilters(drivers, query, filterActivated, filterIsLogin);
+  };
+
+  const handleFilterActivated = (value) => {
+    setFilterActivated(value);
+    applyFilters(drivers, searchText, value, filterIsLogin);
+  };
+
+  const handleFilterIsLogin = (value) => {
+    setFilterIsLogin(value);
+    applyFilters(drivers, searchText, filterActivated, value);
+  };
+
+  const applyFilters = (drivers, searchQuery = searchText, activatedFilter = filterActivated, isLoginFilter = filterIsLogin) => {
+    let filtered = drivers;
+
+    if (searchQuery) {
+      filtered = filtered.filter(driver =>
+        driver.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        driver.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        driver.phone.toString().includes(searchQuery)
+      );
+    }
+
+    if (activatedFilter !== 'all') {
+      filtered = filtered.filter(driver =>
+        activatedFilter === 'activated' ? driver.activated : !driver.activated
+      );
+    }
+
+    if (isLoginFilter !== 'all') {
+      filtered = filtered.filter(driver =>
+        isLoginFilter === 'loggedIn' ? driver.isLogin : !driver.isLogin
+      );
+    }
+
     setFilteredDrivers(filtered);
-  };
-
-  const handleActivateDeactivate = async (driverId, isActive) => {
-    try {
-      await axios.post(`${BASE_URL}/api/users/driver/${driverId}/activate`, { isActive });
-      fetchDrivers();
-    } catch (error) {
-      console.error('Error activating/deactivating driver:', error);
-    }
-  };
-
-  const handleToggleLoginStatus = async (driverId) => {
-    try {
-      await axios.post(`${BASE_URL}/api/users/driver/${driverId}/toggle-login`);
-      fetchDrivers(); // Refresh driver list after toggling login status
-    } catch (error) {
-      console.error('Error toggling login status:', error);
-    }
   };
 
   const handleCardPress = (driver) => {
@@ -72,41 +92,15 @@ export default function DriverScreen() {
     setSelectedDriver(null);
   };
 
-  const renderDriverModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isModalVisible}
-      onRequestClose={closeModal}
-    >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          {selectedDriver && (
-            <ScrollView>
-              <Text style={styles.modalTitle}>Driver Information</Text>
-              <Text style={styles.modalText}>First Name: {selectedDriver.firstName}</Text>
-              <Text style={styles.modalText}>Last Name: {selectedDriver.lastName}</Text>
-              <Text style={styles.modalText}>Points Earned: {selectedDriver.points_earned}</Text>
-              <Text style={styles.modalText}>Phone: {selectedDriver.phone}</Text>
-              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          )}
-        </View>
-      </View>
-    </Modal>
-  );
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Driver List</Text>
 
-      {/* Search Input and Add Button */}
+      {/* Search Input and Filter Dropdowns */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by name or service type..."
+          placeholder="Search by name or phone..."
           placeholderTextColor="#9ca3af"
           value={searchText}
           onChangeText={(text) => handleSearch(text)}
@@ -116,43 +110,48 @@ export default function DriverScreen() {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.filterContainer}>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={filterActivated}
+            style={styles.filterPicker}
+            onValueChange={(itemValue) => handleFilterActivated(itemValue)}
+          >
+            <Picker.Item label="All" value="all" />
+            <Picker.Item label="Activated" value="activated" />
+            <Picker.Item label="Deactivated" value="deactivated" />
+          </Picker>
+        </View>
+
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={filterIsLogin}
+            style={styles.filterPicker}
+            onValueChange={(itemValue) => handleFilterIsLogin(itemValue)}
+          >
+            <Picker.Item label="All" value="all" />
+            <Picker.Item label="Logged In" value="loggedIn" />
+            <Picker.Item label="Logged Out" value="loggedOut" />
+          </Picker>
+        </View>
+      </View>
+
       <ScrollView contentContainerStyle={styles.cardContainer}>
         {filteredDrivers.length > 0 ? (
           filteredDrivers.map(driver => (
-            <TouchableOpacity key={driver._id} style={styles.card} onPress={() => handleCardPress(driver)}>
-              <View style={styles.cardContent}>
-                <View>
-                  <Text style={styles.cardTitle}>{driver.firstName} {driver.lastName}</Text>
-                  <Text style={styles.cardSubtitle}>{driver.phone}</Text>
-                </View>
-                <View style={styles.iconContainer}>
-                  {/* Switch for Activation */}
-                  <Switch
-                    value={driver.activated}
-                    onValueChange={() => handleActivateDeactivate(driver._id, !driver.activated)}
-                    thumbColor={driver.activated ? '#f3b13e' : '#d1d5db'}
-                    trackColor={{ false: '#d1d5db', true: '#f3b13e' }}
-                  />
-                  {/* Power Icon */}
-                  <TouchableOpacity onPress={() => handleToggleLoginStatus(driver._id)}>
-                    <MaterialCommunityIcons
-                      name="power" // Modern rounded icon for login status
-                      size={30}
-                      color={driver.isLogin ? 'green' : 'red'}  // Green if logged in, red if logged out
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableOpacity>
+            <DriverCard key={driver._id} driver={driver} onPress={handleCardPress} />
           ))
         ) : (
           <Text>No drivers available</Text>
         )}
       </ScrollView>
 
-      {renderDriverModal()}
+      <DriverModal
+        visible={isModalVisible}
+        onClose={closeModal}
+        driver={selectedDriver}
+      />
 
-      {/* AddUserModal to add new drivers */}
       <AddUserModal modalVisible={addModalVisible} setModalVisible={setAddModalVisible} />
     </View>
   );
@@ -163,7 +162,7 @@ const screenWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff', // Changed to white background
+    backgroundColor: '#fff',
     paddingHorizontal: 10,
     paddingBottom: 20,
   },
@@ -172,13 +171,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 20,
-    textAlign: 'left', // Align title to the left
+    textAlign: 'left',
   },
   searchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   searchInput: {
     flex: 1,
@@ -204,66 +203,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  pickerContainer: {
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  filterPicker: {
+    height: 50,
+    width: '100%',
+  },
   cardContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  card: {
-    width: screenWidth - 40, // Make card width match the search form width
-    backgroundColor: '#FFF6EA', // Updated background color for the card
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 10,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: '#888',
-  },
-  iconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: screenWidth * 0.85,
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  closeButton: {
-    backgroundColor: '#333',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
 });
+

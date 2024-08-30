@@ -1,33 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import io from 'socket.io-client';
-import AddProductModal from '../components/AddProductModal';
-import ProductCard from '../components/ProductCad';
-import ProductModal from '../components/ProductModal';
 import { BASE_URLIO } from '@env';
+import AddServiceModal from '../components/AddServiceModal';
+import ServiceCard from '../components/ServiceCard';
+import ServiceModal from '../components/ServiceModal';
 
-const ProductScreen = () => {
-  const [products, setProducts] = useState([]);      // List of products fetched from the backend
+const ServiceScreen = () => {
+  const [services, setServices] = useState([]);      // List of services fetched from the backend
   const [loading, setLoading] = useState(true);      // Loading state for skeleton placeholder
-  const [searchText, setSearchText] = useState('');  // Search text for filtering products
-  const [addModalVisible, setAddModalVisible] = useState(false);  // State for Add Product modal visibility
-  const [productModalVisible, setProductModalVisible] = useState(false);  // State for Product Details modal visibility
-  const [selectedProduct, setSelectedProduct] = useState(null);   // State for the selected product details
+  const [searchText, setSearchText] = useState('');  // Search text for filtering services
+  const [addModalVisible, setAddModalVisible] = useState(false);  // State for Add Service modal visibility
+  const [serviceModalVisible, setServiceModalVisible] = useState(false);  // State for Service Details modal visibility
+  const [selectedService, setSelectedService] = useState(null);   // State for the selected service details
 
-  // Fetch products via socket when the component is mounted
   useEffect(() => {
     console.log('Attempting to connect to the socket server...');
     const socket = io(BASE_URLIO);
 
-    // Emit the event to start watching products
-    socket.emit('watchProducts');
-    console.log('watchProducts event emitted');
+    // Emit the event to start watching services
+    socket.emit('watchServices');
+    console.log('watchServices event emitted');
 
     // Listen for updates from the server
-    socket.on('productsUpdated', ({ products }) => {
-      console.log('productsUpdated event received:', products);
-      setProducts(products);  // Update products state with data from the server
-      setLoading(false);  // Set loading to false once data is received
+    socket.on('servicesUpdated', ({ services }) => {
+      console.log('servicesUpdated event received:', services);
+      setServices(services); // Update the services state with the new data
+      setLoading(false); // Set loading to false after receiving the data
     });
 
     // Log if there's an error connecting to the socket
@@ -52,22 +51,21 @@ const ProductScreen = () => {
     };
   }, []);
 
-  // Filter products based on search input (by name or service type)
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    product.service_type.toLowerCase().includes(searchText.toLowerCase())
+  // Filter services based on search input (by name)
+  const filteredServices = services.filter(service =>
+    service.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  // Open the product details modal
-  const handleOpenProductModal = (product) => {
-    setSelectedProduct(product);
-    setProductModalVisible(true);
+  // Open the service details modal
+  const handleOpenServiceModal = (service) => {
+    setSelectedService(service);
+    setServiceModalVisible(true);
   };
 
-  // Close the product details modal
-  const handleCloseProductModal = () => {
-    setProductModalVisible(false);
-    setSelectedProduct(null);
+  // Close the service details modal
+  const handleCloseServiceModal = () => {
+    setServiceModalVisible(false);
+    setSelectedService(null);
   };
 
   // Render custom skeleton loader for loading state
@@ -86,11 +84,11 @@ const ProductScreen = () => {
     <View style={styles.appContainer}>
       {/* Header with Search Input */}
       <View style={styles.headerContainer}>
-        <Text style={styles.heading}>Products</Text>
+        <Text style={styles.heading}>Services</Text>
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by name or service type..."
+            placeholder="Search by name..."
             placeholderTextColor="#9ca3af"
             value={searchText}
             onChangeText={setSearchText}  // Update search text state
@@ -101,27 +99,27 @@ const ProductScreen = () => {
         </View>
       </View>
 
-      {/* Scrollable List of Products */}
+      {/* Scrollable List of Services */}
       <ScrollView contentContainerStyle={styles.cardList}>
         {loading ? (
           renderSkeleton()  // Render custom skeleton during loading
-        ) : filteredProducts.length > 0 ? (
-          filteredProducts.map((product, index) => (
-            <ProductCard key={index} product={product} onReadMore={() => handleOpenProductModal(product)} />
+        ) : filteredServices.length > 0 ? (
+          filteredServices.map((service, index) => (
+            <ServiceCard key={index} service={service} onReadMore={() => handleOpenServiceModal(service)} />
           ))
         ) : (
-          <Text style={styles.noResultsText}>No products found</Text>
+          <Text style={styles.noResultsText}>No services found</Text>
         )}
       </ScrollView>
 
-      {/* Add Product Modal */}
-      <AddProductModal modalVisible={addModalVisible} setModalVisible={setAddModalVisible} />
+      {/* Add Service Modal */}
+      <AddServiceModal modalVisible={addModalVisible} setModalVisible={setAddModalVisible} />
 
-      {/* Product Details Modal */}
-      <ProductModal
-        visible={productModalVisible}
-        onClose={handleCloseProductModal}
-        product={selectedProduct}
+      {/* Service Details Modal */}
+      <ServiceModal
+        visible={serviceModalVisible}
+        onClose={handleCloseServiceModal}
+        service={selectedService}
       />
     </View>
   );
@@ -202,4 +200,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductScreen;
+export default ServiceScreen;

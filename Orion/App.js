@@ -10,6 +10,8 @@ import DriverScreen from './src/screens/DriverScreen';
 import ClientScreen from './src/screens/ClientScreen';
 import ProductScreen from './src/screens/ProductScreen';
 import SideMenu from './src/components/SideMenu'; // Import SideMenu
+import ServiceScreen from './src/screens/ServiceScreen'; // Import SideMenu
+import ChatHomeScreen from './src/screens/ChatHomeScreen';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState("Home");
@@ -23,6 +25,8 @@ export default function App() {
     switch (currentTab) {
       case 'Home':
         return <HomeScreen />;
+        case 'Chat':
+        return <ChatHomeScreen />;
       case 'Search':
         return <SearchScreen />;
       case 'Notifications':
@@ -35,6 +39,8 @@ export default function App() {
         return <ClientScreen />;
       case 'Products':
         return <ProductScreen />;
+        case 'Services':
+        return <ServiceScreen />;
       default:
         return <HomeScreen />;
     }

@@ -21,6 +21,8 @@ const SideMenu = ({ currentTab, setCurrentTab, styles }) => {
         {TabButton({ currentTab, setCurrentTab, title: "Services", iconName: "briefcase-outline" })}
         {TabButton({ currentTab, setCurrentTab, title: "Orders", iconName: "clipboard-outline" })}
         {TabButton({ currentTab, setCurrentTab, title: "Notifications", iconName: "notifications-outline" })}
+        {TabButton({ currentTab, setCurrentTab, title: "Chat", iconName: "notifications-outline" })}
+
         {TabButton({ currentTab, setCurrentTab, title: "Settings", iconName: "settings-outline" })}
       </View>
 
