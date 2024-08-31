@@ -7,7 +7,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { firebase } from './../services/firebaseConfig';
 import * as FileSystem from 'expo-file-system';
 import { BASE_URL, BASE_URLIO } from '@env';
-
+import io from 'socket.io-client';
+const socket = io(`${BASE_URLIO}`);
 const AddProductModal = ({ modalVisible, setModalVisible }) => {
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
@@ -101,7 +102,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
       options: options.filter(option => option.name && option.price),
     };
 
-    axios.post(`${BASE_URL}/api/products/add`	, productData)
+    axios.post(`${BASE_URL}/api/products/add`	, productData,socket)
       .then(response => {
         console.log('Product submitted:', response.data);
         setModalVisible(false);

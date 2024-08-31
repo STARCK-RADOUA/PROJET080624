@@ -30,7 +30,7 @@ const RoomScreen = ({ route }) => {
       setMessages(prevMessages => [...prevMessages, message]);
     });
 
-    // Clean up on component unmount
+    // Clean up on component unmount777
     return () => {
       socketRef.current.disconnect();
     };

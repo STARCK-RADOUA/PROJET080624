@@ -62,6 +62,7 @@ const ClientChatScreen = ({ navigation }) => {
       <Text style={styles.content}>{item.content}</Text>
     </View>
   );
+  //8888888
 
   return (
     <KeyboardAvoidingView
