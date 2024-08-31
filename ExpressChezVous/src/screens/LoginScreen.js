@@ -32,7 +32,7 @@ const LoginScreen = ({ navigation }) => {
   // Auto-login function
   const autoLogin = async () => {
     const deviceId = Device.osBuildId;
-
+console.log(deviceId)
     if (deviceId) {
       socket.emit('autoLogin', { deviceId });
 
