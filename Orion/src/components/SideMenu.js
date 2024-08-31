@@ -14,15 +14,16 @@ const SideMenu = ({ currentTab, setCurrentTab }) => {
       <View style={{ flexGrow: 1, marginTop: 50 }}>
         {/* Tab Buttons */}
         {TabButton({ currentTab, setCurrentTab, title: "Home", iconName: "home-outline" })}
-        {TabButton({ currentTab, setCurrentTab, title: "Search", iconName: "search-outline" })}
+ {TabButton({ currentTab, setCurrentTab, title: "Notifications", iconName: "notifications-outline" })}
         {TabButton({ currentTab, setCurrentTab, title: "Clients", iconName: "people-outline" })}
         {TabButton({ currentTab, setCurrentTab, title: "Drivers", iconName: "car-outline" })}
         {TabButton({ currentTab, setCurrentTab, title: "Products", iconName: "pricetag-outline" })}
-        {TabButton({ currentTab, setCurrentTab, title: "Services", iconName: "briefcase-outline" })}
-        {TabButton({ currentTab, setCurrentTab, title: "Orders", iconName: "clipboard-outline" })}
-        {TabButton({ currentTab, setCurrentTab, title: "Notifications", iconName: "notifications-outline" })}
-        {TabButton({ currentTab, setCurrentTab, title: "Chat", iconName: "notifications-outline" })}
 
+        {TabButton({ currentTab, setCurrentTab, title: "Orders", iconName: "clipboard-outline" })}
+               {TabButton({ currentTab, setCurrentTab, title: "Services", iconName: "briefcase-outline" })}
+               {TabButton({ currentTab, setCurrentTab, title: "Historique", iconName: "time-outline" })}
+        {TabButton({ currentTab, setCurrentTab, title: "Chat", iconName: "send-outline" })}
+        {TabButton({ currentTab, setCurrentTab, title: "Search", iconName: "search-outline" })}
         {TabButton({ currentTab, setCurrentTab, title: "Settings", iconName: "settings-outline" })}
       </View>
 

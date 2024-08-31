@@ -125,7 +125,7 @@ const LoginScreen = ({ navigation }) => {
 
               {/* QR Icon and Create Account */}
               <View style={styles.horizontalLayout}>
-                <TouchableOpacity onPress={() => navigation.navigate('Registration')}>
+                <TouchableOpacity onPress={() => navigation.navigate('RegistrationLC')}>
                   <Text style={styles.linkText}>Créer un compte</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('QRScanner')}>
