@@ -29,6 +29,7 @@ const RoomScreen = ({ route }) => {
       scrollToBottom(); // Scroll to bottom when a new message arrives
     });
 
+
     return () => {
       socketRef.current.disconnect();
     };

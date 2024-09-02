@@ -8,8 +8,10 @@ import NotificationScreen from '../screens/NotificationScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import DriverScreen from '../screens/DriverScreen';
 import ClientScreen from '../screens/ClientScreen';
+import OrderScreen from '../screens/OrderScreen';
 import ProductScreen from '../screens/ProductScreen';
 import SideMenu from '../components/SideMenu';
+import NotificationMenu from '../components/NotificationMenu';
 import ServiceScreen from '../screens/ServiceScreen'; // Import SideMenu
 import ChatHomeScreen from '../screens/ChatHomeScreen';
 import OrdersScreen from '../screens/OrdersScreen';
@@ -28,7 +30,7 @@ export default function MainNavigator({}) {
       case 'Search':
         return <SearchScreen />;
       case 'Notifications':
-        return <NotificationScreen />;
+        return <NotificationMenu />;
       case 'Settings':
         return <SettingsScreen />;
          case 'Services':
@@ -42,7 +44,9 @@ export default function MainNavigator({}) {
         case 'Orders':
         return <OrdersScreen />;
     case 'Chat':
-        return <ChatHomeScreen />;
+        return <ChatHomeScreen />; 
+        case 'Orders':
+        return <OrderScreen />;
       default:
         return <HomeScreen />;
     }

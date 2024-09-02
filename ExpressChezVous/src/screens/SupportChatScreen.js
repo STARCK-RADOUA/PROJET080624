@@ -73,6 +73,7 @@ const ClientChatScreen = ({ navigation }) => {
       <Text style={styles.timestamp}>{formatTimestamp(item.timestamp)}</Text>
     </View>
   );
+  //8888888
 
   return (
     <KeyboardAvoidingView
