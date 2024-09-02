@@ -25,7 +25,7 @@ const LoginScreen = ({ navigation }) => {
   console.log(deviceId)
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://192.168.1.27:4000/api/users/login', {
+      const response = await axios.post('http://192.168.1.29:4000/api/users/login', {
         deviceId,
         phone,
         password,

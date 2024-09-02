@@ -15,6 +15,7 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
   const screenWidth = Dimensions.get('window').width;
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadButtonVisible, setUploadButtonVisible] = useState(false); // To control the visibility of the upload button
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -26,10 +27,17 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      setImageUrl(''); // Reset imageUrl when a new image is selected
+      setUploadButtonVisible(true); // Show upload button when a new image is selected
     }
   };
 
   const uploadMedia = async () => {
+    if (!image) {
+      Alert.alert('Error', 'Please select an image first.');
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -55,23 +63,37 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
       // Get the download URL of the uploaded image
       const downloadURL = await ref.getDownloadURL();
 
-      // Set the imageUrl to the download URL from Firebase
       setImageUrl(downloadURL);
-
       setUploading(false);
-      Alert.alert('Photo Uploaded!!!', imageUrl);
+      setUploadButtonVisible(false); // Hide upload button after successful upload
+      Alert.alert('Success', 'Photo uploaded successfully!');
     } catch (error) {
       console.error(error);
       setUploading(false);
+      Alert.alert('Error', 'Failed to upload the image. Please try again.');
     }
   };
 
+  const validateForm = () => {
+    if (!serviceName.trim()) {
+      Alert.alert('Validation Error', 'Service name is required.');
+      return false;
+    }
+    if (!imageUrl) {
+      Alert.alert('Validation Error', 'Image upload is required.');
+      return false;
+    }
+    return true;
+  };
+
   const submitForm = () => {
+    if (!validateForm()) return;
+
     const serviceData = {
       name: serviceName,
-      image: imageUrl,  // Use imageUrl from Firebase
-      test: testService, // Boolean value for test field
-      isSystemPoint: isSystemPoint, // Include the isSystemPoint field
+      image: imageUrl,
+      test: testService,
+      isSystemPoint: isSystemPoint,
     };
 
     axios.post(`${BASE_URL}/api/services/`, serviceData)
@@ -93,6 +115,7 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
     setTestService(false);
     setImage(null);
     setImageUrl('');  // Reset imageUrl
+    setUploadButtonVisible(false); // Reset upload button visibility
   };
 
   return (
@@ -139,18 +162,24 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
             <Text style={styles.label}>Image</Text>
             {image ? (
               <View style={styles.imageWrapper}>
-                <TouchableOpacity style={styles.uploadButton} onPress={uploadMedia}>
-                  {uploading ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                  ) : (
-                    <Text style={styles.uploadButtonText}>Upload</Text>
-                  )}
-                </TouchableOpacity>
+                {uploadButtonVisible && (
+                  <TouchableOpacity style={styles.uploadButton} onPress={uploadMedia}>
+                    {uploading ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={styles.uploadButtonText}>Upload</Text>
+                    )}
+                  </TouchableOpacity>
+                )}
                 <View style={styles.imageContainer}>
                   <Image source={{ uri: image }} style={styles.roundedImage} />
                   <TouchableOpacity
                     style={styles.deleteImageButton}
-                    onPress={() => setImage(null)}
+                    onPress={() => {
+                      setImage(null);
+                      setImageUrl(''); // Reset imageUrl when image is deleted
+                      setUploadButtonVisible(false); // Ensure the upload button reappears when a new image is picked
+                    }}
                   >
                     <Ionicons name="close-circle" size={24} color="#f3b13e" />
                   </TouchableOpacity>
@@ -180,7 +209,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Increase opacity
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     paddingVertical: "20%"
   },
   modalView: {
@@ -240,7 +269,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   imageWrapper: {
-    flexDirection: 'row', // Layout image and button in row
+    flexDirection: 'row',
     alignItems: 'center',
   },
   imageContainer: {
@@ -251,7 +280,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginLeft: 10, // Add space between upload button and image
+    marginLeft: 10,
     marginBottom: 10,
   },
   deleteImageButton: {
@@ -295,6 +324,3 @@ const styles = StyleSheet.create({
 });
 
 export default AddServiceModal;
-
-
-

@@ -12,6 +12,7 @@ import ProductScreen from '../screens/ProductScreen';
 import SideMenu from '../components/SideMenu';
 import ServiceScreen from '../screens/ServiceScreen'; // Import SideMenu
 import ChatHomeScreen from '../screens/ChatHomeScreen';
+import OrdersScreen from '../screens/OrdersScreen';
 export default function MainNavigator({}) {
   const [currentTab, setCurrentTab] = useState("Home");
   const [showMenu, setShowMenu] = useState(false);
@@ -38,6 +39,8 @@ export default function MainNavigator({}) {
         return <ClientScreen />;
       case 'Products':
         return <ProductScreen />;
+        case 'Orders':
+        return <OrdersScreen />;
     case 'Chat':
         return <ChatHomeScreen />;
       default:

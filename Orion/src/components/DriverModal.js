@@ -20,6 +20,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
         activated: isActive,
       }));
       await axios.post(`${BASE_URL}/api/users/driver/${editableDriver._id}/activate`, { isActive });
+      Alert.alert('Success', `Driver ${isActive ? 'activated' : 'deactivated'} successfully.`);
     } catch (error) {
       console.error('Error activating/deactivating driver:', error);
       Alert.alert('Error', 'Failed to update activation status. Please try again.');
@@ -38,6 +39,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
         isLogin: newLoginStatus,
       }));
       await axios.post(`${BASE_URL}/api/users/driver/${editableDriver._id}/toggle-login`);
+      Alert.alert('Success', `Login status ${newLoginStatus ? 'enabled' : 'disabled'} successfully.`);
     } catch (error) {
       console.error('Error toggling login status:', error);
       Alert.alert('Error', 'Failed to update login status. Please try again.');
@@ -146,13 +148,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginVertical: 8,
-    flexWrap: 'wrap', // Ensures the text doesn't overflow out of the modal
+    flexWrap: 'wrap',
   },
   label: {
     fontSize: 16,
     color: '#555',
     flex: 1,
-    flexWrap: 'wrap', // Keeps text within bounds
+    flexWrap: 'wrap',
   },
   textValue: {
     fontSize: 16,

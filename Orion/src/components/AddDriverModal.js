@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Modal, Pressable, ScrollView, Switch, TouchableOpacity, StyleSheet, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URL } from '@env';
 
 const AddDriverModal = ({ modalVisible, setModalVisible }) => {
   const [firstName, setFirstName] = useState('');
@@ -18,7 +18,39 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
 
   const screenWidth = Dimensions.get('window').width;
 
+  const validateForm = () => {
+    if (!firstName.trim()) {
+      Alert.alert('Validation Error', 'First Name is required');
+      return false;
+    }
+    if (!lastName.trim()) {
+      Alert.alert('Validation Error', 'Last Name is required');
+      return false;
+    }
+    if (!deviceId.trim()) {
+      Alert.alert('Validation Error', 'Device ID is required');
+      return false;
+    }
+    if (!phone.trim()) {
+      Alert.alert('Validation Error', 'Phone number is required');
+      return false;
+    }
+    if (!password.trim()) {
+      Alert.alert('Validation Error', 'Password is required');
+      return false;
+    }
+    if (isNaN(pointsEarned) || pointsEarned < 0) {
+      Alert.alert('Validation Error', 'Points Earned must be a positive number');
+      return false;
+    }
+    return true;
+  };
+
   const submitForm = () => {
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
     const userData = {
       firstName,
@@ -35,8 +67,8 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
     axios.post(`${BASE_URL}/api/users/driver/add`, userData)
       .then(response => {
         console.log('User submitted:', response.data);
-        setModalVisible(false);
         Alert.alert('Success', 'User added successfully!');
+        setModalVisible(false);
         resetForm();
       })
       .catch(error => {
@@ -72,7 +104,7 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
             <Ionicons name="close-circle" size={30} color="black" />
           </Pressable>
 
-          <Text style={styles.modalTitle}>Add New User</Text>
+          <Text style={styles.modalTitle}>Add New Driver</Text>
 
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
             <View>
@@ -138,8 +170,6 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
               />
             </View>
 
-      
-
             <View style={styles.switchContainer}>
               <Text style={styles.label}>Activated</Text>
               <Switch thumbColor="#f3b13e" value={activated} onValueChange={setActivated} />
@@ -155,7 +185,7 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.submitButtonText}>Submit User</Text>
+              <Text style={styles.submitButtonText}>Submit Driver</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -171,7 +201,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     paddingVertical : "20%"
-
   },
   modalView: {
     backgroundColor: 'white',

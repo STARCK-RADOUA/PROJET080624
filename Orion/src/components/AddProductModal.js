@@ -6,7 +6,7 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { firebase } from './../services/firebaseConfig';
 import * as FileSystem from 'expo-file-system';
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URL } from '@env';
 
 const AddProductModal = ({ modalVisible, setModalVisible }) => {
   const [productName, setProductName] = useState('');
@@ -16,7 +16,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
   const [isActive, setIsActive] = useState(true);
   const [options, setOptions] = useState([{ name: '', price: '' }]);
-  const [imageUrl, setImageUrl] = useState('');  // New state to store Firebase image URL
+  const [imageUrl, setImageUrl] = useState('');
   const screenWidth = Dimensions.get('window').width;
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -31,10 +31,16 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      setImageUrl(''); // Reset the imageUrl so that the upload button reappears
     }
   };
 
   const uploadMedia = async () => {
+    if (!image) {
+      Alert.alert('Error', 'Please select an image first.');
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -57,17 +63,15 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
 
       await ref.put(blob);
 
-      // Get the download URL of the uploaded image
       const downloadURL = await ref.getDownloadURL();
-
-      // Set the imageUrl to the download URL from Firebase
       setImageUrl(downloadURL);
 
       setUploading(false);
-      Alert.alert('Photo Uploaded!!!' , imageUrl);
+      Alert.alert('Success', 'Photo uploaded successfully!');
     } catch (error) {
       console.error(error);
       setUploading(false);
+      Alert.alert('Error', 'Failed to upload the image. Please try again.');
     }
   };
 
@@ -90,18 +94,44 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
     setOptions(newOptions);
   };
 
+  const validateForm = () => {
+    if (!productName.trim()) {
+      Alert.alert('Validation Error', 'Product name is required.');
+      return false;
+    }
+    if (!description.trim()) {
+      Alert.alert('Validation Error', 'Description is required.');
+      return false;
+    }
+    if (!price || isNaN(price)) {
+      Alert.alert('Validation Error', 'Valid price is required.');
+      return false;
+    }
+    if (!serviceType) {
+      Alert.alert('Validation Error', 'Service type is required.');
+      return false;
+    }
+    if (!imageUrl) {
+      Alert.alert('Validation Error', 'Image upload is required.');
+      return false;
+    }
+    return true;
+  };
+
   const submitForm = () => {
+    if (!validateForm()) return;
+
     const productData = {
       name: productName,
       description,
       price: parseFloat(price),
-      image_url: imageUrl,  // Use imageUrl from Firebase
+      image_url: imageUrl,
       service_type: serviceType,
       is_active: isActive,
       options: options.filter(option => option.name && option.price),
     };
 
-    axios.post(`${BASE_URL}/api/products/add`	, productData)
+    axios.post(`${BASE_URL}/api/products/add`, productData)
       .then(response => {
         console.log('Product submitted:', response.data);
         setModalVisible(false);
@@ -122,7 +152,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
     setIsActive(true);
     setOptions([{ name: '', price: '' }]);
     setImage(null);
-    setImageUrl('');  // Reset imageUrl
+    setImageUrl('');
   };
 
   return (
@@ -194,7 +224,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
             {/* Is Active Switch */}
             <View style={styles.switchContainer}>
               <Text style={styles.label}>Is Active</Text>
-              <Switch  thumbColor={"#f3b13e"} value={isActive} onValueChange={setIsActive} />
+              <Switch thumbColor={"#f3b13e"} value={isActive} onValueChange={setIsActive} />
             </View>
 
             {/* Options Section */}
@@ -238,22 +268,28 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
             <Text style={styles.label}>Image</Text>
             {image ? (
               <View style={styles.imageWrapper}>
-                <TouchableOpacity style={styles.uploadButton} onPress={uploadMedia}>
-                  {uploading ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                  ) : (
-                    <Text style={styles.uploadButtonText}>Upload</Text>
-                  )}
-                </TouchableOpacity>
                 <View style={styles.imageContainer}>
                   <Image source={{ uri: image }} style={styles.roundedImage} />
                   <TouchableOpacity
                     style={styles.deleteImageButton}
-                    onPress={() => setImage(null)}
+                    onPress={() => {
+                      setImage(null);
+                      setImageUrl(''); // Reset the imageUrl so the upload button reappears
+                    }}
                   >
                     <Ionicons name="close-circle" size={24} color="#f3b13e" />
                   </TouchableOpacity>
                 </View>
+                {!uploading && !imageUrl && (
+                  <TouchableOpacity style={styles.uploadButton} onPress={uploadMedia}>
+                    <Text style={styles.uploadButtonText}>Upload</Text>
+                  </TouchableOpacity>
+                )}
+                {uploading && (
+                  <View style={[styles.uploadButton, styles.uploadingButton]}>
+                    <ActivityIndicator size="small" color="#fff" />
+                  </View>
+                )}
               </View>
             ) : (
               <TouchableOpacity style={styles.pickImageButton} onPress={pickImage}>
@@ -381,16 +417,18 @@ const styles = StyleSheet.create({
     right: -10,
   },
   uploadButton: {
-    backgroundColor: 'white',
+    backgroundColor: '#f3b13e',
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#d1d5db',
     paddingVertical: 10,
     paddingHorizontal: 20,
+    marginLeft: 20, // Align button to the right of the image
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     shadowColor: '#000',
+  },
+  uploadingButton: {
+    backgroundColor: 'yellow',
   },
   uploadButtonText: {
     color: '#333',

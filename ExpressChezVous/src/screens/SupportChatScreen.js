@@ -1,65 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList,Dimensions, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Dimensions, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
-import {getClientId} from '../services/userService'
-import Header from '../components/Header';
+import { getClientId } from '../services/userService';
+
 const { width, height } = Dimensions.get('window');
 
-
 const ClientChatScreen = ({ navigation }) => {
-
-   // Static clientId
   const adminId = '66bac40871e4a7ed9e6fc705';  // Static adminId
   const [messages, setMessages] = useState([]);  // Chat messages
   const [newMessage, setNewMessage] = useState('');  // Input message
   const [chatId, setChatId] = useState(null);  // Chat ID obtained after initiation
- 
-  const userType = 'Client'
-  const socket = io(BASE_URLIO);  // Adjust to your server IP
+
+  const userType = 'Client';
+  const socket = useRef(io(BASE_URLIO)).current;  // Initialize socket.io client
+  const flatListRef = useRef(null);  // Reference for FlatList
 
   useEffect(() => {
-    initiation() ;
-  }, []);
+    const initiateChat = async () => {
+      const userId = await getClientId();
+      console.log("Client ID:", userId);
+      console.log('Initiating chat between client and admin');
+      
+      socket.emit('initiateChat', { adminId, userId, userType });
 
-  const initiation = async () =>{
-    const userId = await getClientId();
-    console.log("client is" , userId)
-    console.log('Initiating chat between client and admin');
-    socket.emit('initiateChat', { adminId, userId ,userType });
+      socket.on('chatDetails', (data) => {
+        setChatId(data.chatId);  // Set the chatId obtained from the server
+        setMessages(data.messages);  // Load messages from the server
+      });
 
-    socket.on('chatDetails', (data) => {
-      setChatId(data.chatId);  // Set the chatId obtained from the server
-      setMessages(data.messages);  // Load only unseen messages from admin
-    });
+      socket.on('newMessage', (messageData) => {
+        setMessages((prevMessages) => [...prevMessages, messageData.message]);  // Append new message
+      });
+    };
 
-    socket.on('newMessage', (messageData) => {
-      setMessages((prevMessages) => [...prevMessages, messageData.message]);  // Append new message
-    });
+    initiateChat();
 
     return () => {
       socket.off('chatDetails');
       socket.off('newMessage');
       socket.disconnect();
     };
+  }, []);
 
-  }
+  useEffect(() => {
+    // Scroll to the bottom of the FlatList when messages change
+    flatListRef.current?.scrollToEnd({ animated: true });
+  }, [messages]);
 
   const sendMessage = () => {
     if (newMessage.trim() && chatId) {
       socket.emit('sendMessage', {
         chatId,
-        sender: 'client',  // Client is sending the message
+        sender: 'client',
         content: newMessage,
       });
       setNewMessage('');  // Clear input after sending
     }
   };
 
+  const formatTimestamp = (timestamp) => {
+    const messageDate = new Date(timestamp);
+    const hours = messageDate.getHours().toString().padStart(2, '0');
+    const minutes = messageDate.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   const renderMessage = ({ item }) => (
     <View style={item.sender === 'client' ? styles.messageContainerClient : styles.messageContainerAdmin}>
       <Text style={styles.sender}>{item.sender === 'client' ? 'You' : 'Admin'}</Text>
       <Text style={styles.content}>{item.content}</Text>
+      <Text style={styles.timestamp}>{formatTimestamp(item.timestamp)}</Text>
     </View>
   );
 
@@ -68,7 +79,6 @@ const ClientChatScreen = ({ navigation }) => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-    
       <Text style={styles.chatTitle}>Chat {chatId ? 'Active' : 'Connecting...'}</Text>
 
       <FlatList
@@ -77,6 +87,7 @@ const ClientChatScreen = ({ navigation }) => {
         keyExtractor={(item, index) => index.toString()}
         style={styles.chatList}
         contentContainerStyle={styles.chatContentContainer}
+        ref={flatListRef}
       />
 
       <View style={styles.inputContainer}>
@@ -104,28 +115,14 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: 'bold',
     textAlign: 'center',
-    alignContent: 'center',
     paddingTop: Platform.OS === 'ios' ? height * 0.08 : height * 0.05,
-
     color: '#333',
     backgroundColor: '#e9ab25',
     paddingRight: 20,
     paddingBottom: 10,
-  
     paddingLeft: 20,
     margin: 10,
-    marginTop: 0,
-    marginBottom: 0,
-    paddingTop: height * (Platform.OS === 'ios' ? 0.07 : 0.05),
-    alignItems: 'center',
-backgroundColor: '#e9ab25',
-borderRadius: 20,
-    padding: 2,
-    marginVertical: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 5,
+    borderRadius: 20,
     elevation: 3,
   },
   chatList: {
@@ -162,12 +159,18 @@ borderRadius: 20,
     marginTop: 5,
     color: '#333',
   },
+  timestamp: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 5,
+    textAlign: 'right',
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderTopWidth: 1,
     borderColor: '#ccc',
-    backgroundColor: '#df942400',
+    backgroundColor: '#fff',
     padding: 14,
     justifyContent: 'space-between',
   },
@@ -181,7 +184,6 @@ borderRadius: 20,
     marginRight: 10,
     fontSize: 16,
     color: '#333',
-    backgroundColor: '#e9ab1182',
   },
   sendButton: {
     backgroundColor: '#e9ab25',

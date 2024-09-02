@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Switch, Text, Image, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
@@ -16,10 +15,11 @@ const ServiceModal = ({ visible, onClose, service }) => {
   const [image, setImage] = useState(editableService.image);
   const [uploading, setUploading] = useState(false);
   const [uploadButtonVisible, setUploadButtonVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     setEditableService({ ...service });
-    setImage(service.image);  // Set the initial image URL
+    setImage(service.image);
   }, [service]);
 
   const handleInputChange = (field, value) => {
@@ -40,6 +40,7 @@ const ServiceModal = ({ visible, onClose, service }) => {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
       setUploadButtonVisible(true);
+      setIsEditing(true); // Enable editing mode when an image is picked
     }
   };
 
@@ -72,11 +73,24 @@ const ServiceModal = ({ visible, onClose, service }) => {
 
       setUploading(false);
       setUploadButtonVisible(false);
-      Alert.alert('Photo Uploaded!!!');
+      Alert.alert('Success', 'Photo uploaded successfully!');
     } catch (error) {
       console.error(error);
       setUploading(false);
+      Alert.alert('Error', 'Failed to upload the image. Please try again.');
     }
+  };
+
+  const validateForm = () => {
+    if (!editableService.name.trim()) {
+      setErrorMessage('Service name is required.');
+      return false;
+    }
+    if (!editableService.image) {
+      setErrorMessage('Service image is required.');
+      return false;
+    }
+    return true;
   };
 
   const toggleEdit = () => {
@@ -84,6 +98,8 @@ const ServiceModal = ({ visible, onClose, service }) => {
   };
 
   const handleUpdateService = () => {
+    if (!validateForm()) return;
+
     axios.put(`${BASE_URL}/api/services/update/${editableService._id}`, editableService)
       .then(response => {
         console.log('Service updated successfully:', response.data);
@@ -200,6 +216,10 @@ const ServiceModal = ({ visible, onClose, service }) => {
               <Text style={styles.textValue}>{editableService.test ? 'Yes' : 'No'}</Text>
             )}
           </View>
+
+          {errorMessage ? (
+            <Text style={styles.errorMessage}>{errorMessage}</Text>
+          ) : null}
 
           {isEditing && (
             <TouchableOpacity
@@ -330,6 +350,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
+  },
+  errorMessage: {
+    color: 'red',
+    marginTop: 10,
+    fontSize: 14,
   },
 });
 

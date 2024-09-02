@@ -24,7 +24,7 @@ const TestScreen = () => {
   const fetchDriverId = async () => {
     try {
       if (deviceId) {
-        const response = await axios.post('http://192.168.1.27:4000/api/driver/device', {
+        const response = await axios.post('http://192.168.1.29:4000/api/driver/device', {
           deviceId: deviceId, // Pass deviceId here
         });
 
@@ -63,7 +63,7 @@ const TestScreen = () => {
     if (!driverId) return;
 
     // Connect to the Socket.IO server
-    const socket = io('http://192.168.1.27:4000'); // Replace with your server address
+    const socket = io('http://192.168.1.29:4000'); // Replace with your server address
 
     // Emit the driver's ID to the server once the connection is established
     socket.emit('driverConnected', driverId);
@@ -116,7 +116,7 @@ const TestScreen = () => {
   const updateDriverAvailability = async (newIsEnabled) => {
     try {
       if (driverId) {
-        await axios.post('http://192.168.1.27:4000/api/driver/updateAvailability', {
+        await axios.post('http://192.168.1.29:4000/api/driver/updateAvailability', {
           driverId: driverId, // Send driverId to the backend
           isDisponible: newIsEnabled, // Send the new availability status
         });

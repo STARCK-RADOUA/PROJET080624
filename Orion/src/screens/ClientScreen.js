@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import io from 'socket.io-client';
-import AddUserModal from './../components/AddDriverModal';  // If you have a specific component for adding clients, replace this import.
 import ClientCard from './../components/ClientCard';  // Create a separate ClientCard component similar to DriverCard.
 import ClientModal from './../components/ClientModal';  // Create a separate ClientModal component similar to DriverModal.
 
@@ -105,9 +104,7 @@ export default function ClientScreen() {
           value={searchText}
           onChangeText={(text) => handleSearch(text)}
         />
-        <TouchableOpacity style={styles.addButton} onPress={() => setAddModalVisible(true)}>
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
+       
       </View>
 
       <View style={styles.filterContainer}>
@@ -152,7 +149,6 @@ export default function ClientScreen() {
         client={selectedClient}
       />
 
-      <AddUserModal modalVisible={addModalVisible} setModalVisible={setAddModalVisible} />
     </View>
   );
 }

@@ -6,7 +6,7 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { firebase } from './../services/firebaseConfig';
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URL } from '@env';
 
 const ProductModal = ({ visible, onClose, product }) => {
   if (!product) return null;
@@ -17,7 +17,7 @@ const ProductModal = ({ visible, onClose, product }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [image, setImage] = useState(editableProduct.image_url);
   const [uploading, setUploading] = useState(false);
-  const [uploadButtonVisible, setUploadButtonVisible] = useState(false); // For upload button visibility
+  const [uploadButtonVisible, setUploadButtonVisible] = useState(false);
 
   // Fetch service types
   useEffect(() => {
@@ -32,7 +32,7 @@ const ProductModal = ({ visible, onClose, product }) => {
 
   useEffect(() => {
     setEditableProduct({ ...product });
-    setImage(product.image_url);  // Set the initial image URL
+    setImage(product.image_url);
   }, [product]);
 
   // Handle input changes
@@ -54,7 +54,8 @@ const ProductModal = ({ visible, onClose, product }) => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      setUploadButtonVisible(true); // Show upload button after selecting an image
+      setUploadButtonVisible(true);
+      setIsEditing(true);  // Enable editing mode when an image is picked
     }
   };
 
@@ -82,17 +83,17 @@ const ProductModal = ({ visible, onClose, product }) => {
 
       await ref.put(blob);
 
-      // Get the download URL from Firebase and update the product image URL
       const downloadURL = await ref.getDownloadURL();
       setImage(downloadURL);
-      handleInputChange('image_url', downloadURL); // Update product's image URL
+      handleInputChange('image_url', downloadURL);
 
       setUploading(false);
-      setUploadButtonVisible(false); // Hide upload button after success
-      Alert.alert('Photo Uploaded!!!');
+      setUploadButtonVisible(false);
+      Alert.alert('Success', 'Photo uploaded successfully!');
     } catch (error) {
       console.error(error);
       setUploading(false);
+      Alert.alert('Error', 'Failed to upload the image. Please try again.');
     }
   };
 
@@ -105,7 +106,7 @@ const ProductModal = ({ visible, onClose, product }) => {
   const addOption = () => {
     setEditableProduct({
       ...editableProduct,
-      options: [...editableProduct.options, { name: '', price: 0 }]
+      options: [...editableProduct.options, { name: '', price: 0 }],
     });
   };
 
@@ -114,29 +115,50 @@ const ProductModal = ({ visible, onClose, product }) => {
     const updatedOptions = editableProduct.options.filter((_, i) => i !== index);
     setEditableProduct({
       ...editableProduct,
-      options: updatedOptions
+      options: updatedOptions,
     });
+  };
+
+  // Validate form fields
+  const validateForm = () => {
+    if (!editableProduct.name.trim()) {
+      setErrorMessage('Product name is required.');
+      return false;
+    }
+    if (!editableProduct.description.trim()) {
+      setErrorMessage('Product description is required.');
+      return false;
+    }
+    if (!editableProduct.price || isNaN(editableProduct.price)) {
+      setErrorMessage('Please enter a valid price.');
+      return false;
+    }
+    if (!editableProduct.service_type) {
+      setErrorMessage('Please select a service type.');
+      return false;
+    }
+    if (!image) {
+      Alert.alert('Validation Error', 'Image is required. Please upload an image.');
+      return false;
+    }
+    return true;
   };
 
   // Handle product update with Axios
   const handleUpdateProduct = () => {
-    if (!editableProduct.price || isNaN(editableProduct.price)) {
-      setErrorMessage('Please enter a valid price.');
-      return;
-    }
+    if (!validateForm()) return;
 
     axios.put(`${BASE_URL}/api/products/update/${editableProduct._id}`, editableProduct)
       .then(response => {
         console.log('Product updated successfully:', response.data);
-        setIsEditing(false); // Exit editing mode
-        onClose(); // Close the modal after updating
+        setIsEditing(false);
+        onClose();
       })
       .catch(error => {
         setErrorMessage('Failed to update product. Please try again.');
         console.error('Error updating product:', error);
       });
   };
-
 
   const handleDeleteProduct = () => {
     Alert.alert(
@@ -153,7 +175,7 @@ const ProductModal = ({ visible, onClose, product }) => {
             axios.delete(`${BASE_URL}/api/products/delete/${editableProduct._id}`)
               .then(response => {
                 console.log('Product deleted:', response.data);
-                onClose(); // Close the modal after deleting
+                onClose();
                 Alert.alert('Success', 'Product deleted successfully!');
               })
               .catch(error => {
@@ -353,7 +375,6 @@ const ProductModal = ({ visible, onClose, product }) => {
 };
 
 const styles = StyleSheet.create({
-  // Style remains unchanged
   modalContainer: {
     flex: 1,
     justifyContent: 'center',

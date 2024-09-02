@@ -6,48 +6,49 @@ import { BASE_URLIO } from '@env';
 const RoomScreen = ({ route }) => {
   const { userId, firstName, lastName } = route.params;
   const socketRef = useRef(null);
+  const scrollViewRef = useRef(null); // Reference to ScrollView
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [chatId, setChatId] = useState(null); // Store chatId here
-  const adminId = '66bac40871e4a7ed9e6fc705'; // Replace with your actual static admin ID
-  const userType = 'Admin'; // Assuming this is an admin
+  const [chatId, setChatId] = useState(null);
+  const adminId = '66bac40871e4a7ed9e6fc705'; 
+  const userType = 'Admin'; 
 
   useEffect(() => {
-    // Initialize socket connection
     socketRef.current = io(BASE_URLIO);
 
-    // Join the chat room
     socketRef.current.emit('initiateChat', { adminId, userId, userType });
 
-    // Listen for chat details including chatId
     socketRef.current.on('chatDetails', ({ chatId, messages }) => {
-      setChatId(chatId); // Save chatId
+      setChatId(chatId);
       setMessages(messages);
+      scrollToBottom(); // Scroll to bottom when messages are loaded
     });
 
-    // Listen for new messages
     socketRef.current.on('newMessage', ({ message }) => {
       setMessages(prevMessages => [...prevMessages, message]);
+      scrollToBottom(); // Scroll to bottom when a new message arrives
     });
 
-    // Clean up on component unmount
     return () => {
       socketRef.current.disconnect();
     };
   }, [userId]);
 
+  const scrollToBottom = () => {
+    scrollViewRef.current?.scrollToEnd({ animated: true });
+  };
+
   const sendMessage = () => {
-    if (newMessage.trim() && chatId) { // Ensure chatId is available before sending a message
+    if (newMessage.trim() && chatId) {
       const messageData = {
-        chatId, // Use stored chatId
+        chatId,
         sender: `admin`,
         content: newMessage,
         senderType: userType,
       };
       
-      // Emit the message
       socketRef.current.emit('sendMessage', messageData);
-      setNewMessage(''); // Clear input field
+      setNewMessage('');
     } else {
       console.error("Cannot send message: chatId is missing");
     }
@@ -56,32 +57,43 @@ const RoomScreen = ({ route }) => {
   const formatTimestamp = (timestamp) => {
     const messageDate = new Date(timestamp);
     const now = new Date();
-    const timeDifference = now - messageDate;
-    const minutes = Math.floor(timeDifference / 60000);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    const weeks = Math.floor(days / 7);
-    const months = Math.floor(days / 30);
-    const years = Math.floor(months / 12);
-
-    if (minutes < 1) return 'Now';
-    if (minutes < 60) return `${minutes} minutes ago`;
-    if (hours < 24) return `${hours} hours ago`;
-    if (days < 7) return `${days} days ago`;
-    if (weeks < 4) return `${weeks} weeks ago`;
-    if (months < 12) return `${months} months ago`;
-    return `${years} years ago`;
+  
+    const isToday = messageDate.toDateString() === now.toDateString();
+  
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    };
+  
+    if (isToday) {
+      const hours = String(messageDate.getHours()).padStart(2, '0');
+      const minutes = String(messageDate.getMinutes()).padStart(2, '0');
+      return `Today, ${hours}:${minutes}`;
+    } else {
+      const oneWeekAgo = new Date(now);
+      oneWeekAgo.setDate(now.getDate() - 7);
+  
+      return formatDate(messageDate);
+    }
   };
+  
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.messagesContainer}>
+      <ScrollView 
+        ref={scrollViewRef} // Assign the reference to ScrollView
+        contentContainerStyle={styles.messagesContainer}
+      >
         {messages.map((message, index) => (
           <View
             key={index}
             style={[
               styles.messageWrapper,
-              message.sender === 'admin' ? styles.myMessage : styles.theirMessage, // Adjusting based on sender
+              message.sender === 'admin' ? styles.myMessage : styles.theirMessage,
             ]}
           >
             <View style={styles.avatar}>
@@ -136,7 +148,7 @@ const styles = StyleSheet.create({
   },
   myMessage: {
     alignSelf: 'flex-end',
-    flexDirection: 'row-reverse', // Avatar on the right side for admin's messages
+    flexDirection: 'row-reverse',
   },
   theirMessage: {
     alignSelf: 'flex-start',
@@ -163,10 +175,10 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   myMessageContent: {
-    backgroundColor: '#D1E7DD', // Light green for admin's messages
+    backgroundColor: '#D1E7DD',
   },
   theirMessageContent: {
-    backgroundColor: '#F8D7DA', // Light red for other messages
+    backgroundColor: '#F8D7DA',
   },
   messageHeader: {
     flexDirection: 'row',
