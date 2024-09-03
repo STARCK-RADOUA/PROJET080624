@@ -5,19 +5,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import DeliveredOrdersScreen from './DeliveredOrdersScreen';
 import CanceledOrderScreen from './CanceledOrderScreen';
+import OngoingOrdersScreen from './OngoingOrdersScreen';
 
-// Dummy components for the screens
-const OngoingOrdersScreen = () => (
-  <View style={styles.screenContainer}>
-    <Text>Ongoing Orders Screen</Text>
-  </View>
-);
 
-const UndeliveredOrdersScreen = () => (
-  <View style={styles.screenContainer}>
-    <Text>Undelivered Orders Screen</Text>
-  </View>
-);
 
 const OrdersScreen = ({ navigation }) => {
   return (
