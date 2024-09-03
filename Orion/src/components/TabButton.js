@@ -3,15 +3,16 @@ import { TouchableOpacity, View, Text, Alert, ActivityIndicator } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 import { BASE_URL } from '@env';
 import * as Device from 'expo-device';
-import { AuthContext } from '../redux/AuthProvider'; // Import AuthContext
-
-const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket }) => {
+import { AuthContext,AuthProvider } from '../redux/AuthProvider'; // Import AuthContext
+import LoginScreen from '../screens/LoginScreen';
+const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket,onLogin }) => {
   const [loading, setLoading] = useState(false);
-  const { logout } = useContext(AuthContext); // Use the logout function from AuthContext
+  const { logout } = useContext(AuthContext);
+  // Use the logout function from AuthContext
 
   const handleLogout = async () => {
     setLoading(true);
-    const deviceId = await Device.osBuildId;
+    const deviceId =  Device.osBuildId;
     console.log('------------------------------------');
     console.log('Logging out...', deviceId);
     console.log('------------------------------------');
@@ -24,14 +25,16 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket }) => {
         },
         body: JSON.stringify({ deviceId }),
       });
-
+   
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.status === 200) {
         if (socket && socket.connected) {
           socket.disconnect();
         }
-       // Clear authentication state
+   await logout();
+   
+   onLogin()  // Clear authentication state
         Alert.alert('Logout Successful', 'You have been logged out.');
       } else {
         Alert.alert('Logout Failed', data.errors ? data.errors.join(', ') : data.message);

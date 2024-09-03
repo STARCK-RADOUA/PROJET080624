@@ -193,24 +193,23 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingVertical : "20%"
+    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Darker background for modal container
+    paddingVertical: "20%",
   },
   modalView: {
-    backgroundColor: 'white',
+    backgroundColor: '#333', // Dark background for modal view
     borderRadius: 10,
     paddingTop: 20,
     paddingBottom: 20,
     paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.7, // Increase shadow opacity for a more pronounced effect
     shadowRadius: 3,
   },
   modalTitle: {
@@ -218,6 +217,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 15,
     textAlign: 'center',
+    color: '#1f695a', // White text for modal title
   },
   closeButton: {
     position: 'absolute',
@@ -229,15 +229,17 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 14,
     fontWeight: 'bold',
+    color: '#ddd', // Light gray color for labels
   },
   input: {
     width: '100%',
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#555', // Darker border color for inputs
     marginBottom: 10,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#444', // Darker background color for inputs
+    color: '#fff', // White text for inputs
   },
   switchContainer: {
     flexDirection: 'row',
@@ -252,7 +254,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   submitButtonText: {
-    color: 'white',
+    color: '#000', // Dark text for contrast with the submit button color
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',

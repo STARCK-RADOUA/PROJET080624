@@ -19,7 +19,6 @@ const ProductModal = ({ visible, onClose, product }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadButtonVisible, setUploadButtonVisible] = useState(false);
 
-  // Fetch service types
   useEffect(() => {
     axios.get(`${BASE_URL}/api/services`)
       .then(response => {
@@ -35,7 +34,6 @@ const ProductModal = ({ visible, onClose, product }) => {
     setImage(product.image_url);
   }, [product]);
 
-  // Handle input changes
   const handleInputChange = (field, value) => {
     setEditableProduct((prevProduct) => ({
       ...prevProduct,
@@ -43,7 +41,6 @@ const ProductModal = ({ visible, onClose, product }) => {
     }));
   };
 
-  // Pick image from library
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -55,11 +52,10 @@ const ProductModal = ({ visible, onClose, product }) => {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
       setUploadButtonVisible(true);
-      setIsEditing(true);  // Enable editing mode when an image is picked
+      setIsEditing(true);
     }
   };
 
-  // Upload media to Firebase
   const uploadMedia = async () => {
     setUploading(true);
 
@@ -97,12 +93,10 @@ const ProductModal = ({ visible, onClose, product }) => {
     }
   };
 
-  // Toggle editing mode
   const toggleEdit = () => {
     setIsEditing(!isEditing);
   };
 
-  // Handle adding a new option
   const addOption = () => {
     setEditableProduct({
       ...editableProduct,
@@ -110,7 +104,6 @@ const ProductModal = ({ visible, onClose, product }) => {
     });
   };
 
-  // Handle removing an option
   const removeOption = (index) => {
     const updatedOptions = editableProduct.options.filter((_, i) => i !== index);
     setEditableProduct({
@@ -119,7 +112,6 @@ const ProductModal = ({ visible, onClose, product }) => {
     });
   };
 
-  // Validate form fields
   const validateForm = () => {
     if (!editableProduct.name.trim()) {
       setErrorMessage('Product name is required.');
@@ -144,7 +136,6 @@ const ProductModal = ({ visible, onClose, product }) => {
     return true;
   };
 
-  // Handle product update with Axios
   const handleUpdateProduct = () => {
     if (!validateForm()) return;
 
@@ -197,12 +188,10 @@ const ProductModal = ({ visible, onClose, product }) => {
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalView}>
-          {/* Close Button */}
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close-circle" size={30} color="black" />
+            <Ionicons name="close-circle" size={30} color="#fff" />
           </TouchableOpacity>
 
-          {/* Product Image with Camera Icon */}
           <View style={styles.imageContainer}>
             {image ? (
               <Image source={{ uri: image }} style={styles.productImage} />
@@ -212,34 +201,34 @@ const ProductModal = ({ visible, onClose, product }) => {
               </View>
             )}
             <TouchableOpacity style={styles.cameraIcon} onPress={pickImage}>
-              <Ionicons name="camera-outline" size={24} color="white" />
+              <Ionicons name="camera-outline" size={24} color="#fff" />
             </TouchableOpacity>
           </View>
 
-          {/* Upload Button */}
           {uploadButtonVisible && (
             <TouchableOpacity style={styles.uploadButton} onPress={uploadMedia}>
               {uploading ? (
-                <ActivityIndicator size="small" color="yellow" />
+                <ActivityIndicator size="small" color="#ffbf00" />
               ) : (
                 <Text style={styles.uploadButtonText}>Upload</Text>
               )}
             </TouchableOpacity>
           )}
 
-          {/* Product Information */}
           <View style={styles.fieldRow}>
             {isEditing ? (
               <TextInput
                 style={styles.editInput}
                 value={editableProduct.name}
                 onChangeText={(value) => handleInputChange('name', value)}
+                placeholder="Product Name"
+                placeholderTextColor="#999"
               />
             ) : (
               <Text style={styles.name}>{editableProduct.name}</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="black" />
+              <Ionicons name="create-outline" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
 
@@ -249,12 +238,14 @@ const ProductModal = ({ visible, onClose, product }) => {
                 style={styles.editInput}
                 value={editableProduct.description}
                 onChangeText={(value) => handleInputChange('description', value)}
+                placeholder="Product Description"
+                placeholderTextColor="#999"
               />
             ) : (
               <Text style={styles.description}>{editableProduct.description}</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="black" />
+              <Ionicons name="create-outline" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
 
@@ -265,16 +256,17 @@ const ProductModal = ({ visible, onClose, product }) => {
                 value={String(editableProduct.price)}
                 onChangeText={(value) => handleInputChange('price', value)}
                 keyboardType="numeric"
+                placeholder="Product Price"
+                placeholderTextColor="#999"
               />
             ) : (
               <Text style={styles.price}>${editableProduct.price ? parseFloat(editableProduct.price).toFixed(2) : '0.00'}</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="black" />
+              <Ionicons name="create-outline" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
 
-          {/* Service Type */}
           <View style={styles.fieldRow}>
             {isEditing ? (
               <Picker
@@ -290,11 +282,10 @@ const ProductModal = ({ visible, onClose, product }) => {
               <Text style={styles.serviceType}>Service Type: {editableProduct.service_type}</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="black" />
+              <Ionicons name="create-outline" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
 
-          {/* Options */}
           <View style={styles.optionsContainer}>
             <Text style={styles.optionsTitle}>Options:</Text>
             {editableProduct.options.length > 0 ? (
@@ -312,6 +303,8 @@ const ProductModal = ({ visible, onClose, product }) => {
                             ...editableProduct.options.slice(index + 1),
                           ])
                         }
+                        placeholder="Option Name"
+                        placeholderTextColor="#999"
                       />
                       <TextInput
                         style={styles.optionPrice}
@@ -324,6 +317,8 @@ const ProductModal = ({ visible, onClose, product }) => {
                           ])
                         }
                         keyboardType="numeric"
+                        placeholder="Option Price"
+                        placeholderTextColor="#999"
                       />
                       <TouchableOpacity onPress={() => removeOption(index)}>
                         <Ionicons name="remove-circle" size={24} color="#C7253E" />
@@ -338,23 +333,20 @@ const ProductModal = ({ visible, onClose, product }) => {
                 </View>
               ))
             ) : (
-              <Text>No options available</Text>
+              <Text style={styles.noOptionsText}>No options available</Text>
             )}
 
-            {/* Add Option Button */}
             {isEditing && (
               <TouchableOpacity style={styles.addOptionButton} onPress={addOption}>
-                <Ionicons name="add-circle" size={30} color="#f3b13e" />
+                <Ionicons name="add-circle" size={30} color="#ffbf00" />
               </TouchableOpacity>
             )}
           </View>
 
-          {/* Error Message */}
           {errorMessage ? (
             <Text style={styles.errorMessage}>{errorMessage}</Text>
           ) : null}
 
-          {/* Update Button */}
           {isEditing && (
             <TouchableOpacity
               style={styles.updateButton}
@@ -364,7 +356,6 @@ const ProductModal = ({ visible, onClose, product }) => {
             </TouchableOpacity>
           )}
 
-          {/* Delete Button */}
           <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteProduct}>
             <Text style={styles.deleteButtonText}>Delete</Text>
           </TouchableOpacity>
@@ -379,17 +370,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   modalView: {
     width: '90%',
-    backgroundColor: 'white',
+    backgroundColor: '#333',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.5,
     shadowRadius: 5,
   },
   closeButton: {
@@ -406,27 +397,31 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#444',
+  },
+  imagePlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cameraIcon: {
     position: 'absolute',
     bottom: -10,
     right: -10,
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#ffbf00',
     padding: 5,
     borderRadius: 20,
   },
   uploadButton: {
-    backgroundColor: '#fff',
+    backgroundColor: '#555',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#666',
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginTop: 10,
   },
   uploadButtonText: {
-    color: '#333',
+    color: '#ffbf00',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -438,31 +433,32 @@ const styles = StyleSheet.create({
   },
   editInput: {
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#777',
     width: '85%',
     fontSize: 16,
     paddingVertical: 5,
+    color: '#fff',
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 10,
-    color: '#333',
+    color: '#ffbf00',
   },
   description: {
     fontSize: 16,
     marginTop: 5,
-    color: '#777',
+    color: '#bbb',
   },
   price: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#f3b13e',
+    color: '#ffbf00',
     marginTop: 10,
   },
   serviceType: {
     fontSize: 16,
-    color: '#555',
+    color: '#bbb',
     marginTop: 5,
   },
   optionsContainer: {
@@ -472,7 +468,7 @@ const styles = StyleSheet.create({
   optionsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ffbf00',
     marginBottom: 10,
   },
   optionRow: {
@@ -483,20 +479,24 @@ const styles = StyleSheet.create({
   },
   optionName: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
     width: '40%',
   },
   optionPrice: {
     fontSize: 16,
-    color: '#f3b13e',
+    color: '#ffbf00',
     width: '30%',
   },
   addOptionButton: {
     marginTop: 10,
     alignItems: 'center',
   },
+  noOptionsText: {
+    color: '#888',
+    fontSize: 14,
+  },
   updateButton: {
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#ffbf00',
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 8,
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   updateButtonText: {
-    color: 'white',
+    color: '#333',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   errorMessage: {
-    color: 'red',
+    color: '#C7253E',
     marginTop: 10,
     fontSize: 14,
   },

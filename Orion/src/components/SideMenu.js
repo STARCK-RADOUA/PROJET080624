@@ -4,7 +4,7 @@ import { View, Text,StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TabButton from './TabButton';  // Import TabButton component
 
-const SideMenu = ({ currentTab, setCurrentTab }) => {
+const SideMenu = ({ currentTab, setCurrentTab,onLogin }) => {
   return (
     <View style={{ justifyContent: 'flex-start', padding: 15 }}>
       {/* Profile Section */}
@@ -22,6 +22,7 @@ const SideMenu = ({ currentTab, setCurrentTab }) => {
         {TabButton({ currentTab, setCurrentTab, title: "Orders", iconName: "clipboard-outline" })}
                {TabButton({ currentTab, setCurrentTab, title: "Services", iconName: "briefcase-outline" })}
                {TabButton({ currentTab, setCurrentTab, title: "Historique", iconName: "time-outline" })}
+        {TabButton({ currentTab, setCurrentTab, title: "Analyse", iconName: "stats-chart-outline" })}
         {TabButton({ currentTab, setCurrentTab, title: "Chat", iconName: "send-outline" })}
         {TabButton({ currentTab, setCurrentTab, title: "Search", iconName: "search-outline" })}
         {TabButton({ currentTab, setCurrentTab, title: "Settings", iconName: "settings-outline" })}
@@ -29,7 +30,7 @@ const SideMenu = ({ currentTab, setCurrentTab }) => {
 
       {/* Logout Button */}
       <View>
-        {TabButton({ currentTab, setCurrentTab, title: "LogOut", iconName: "log-out-outline" })}
+        {TabButton({ currentTab, setCurrentTab, title: "LogOut", iconName: "log-out-outline",onLogin })}
       </View>
     </View>
   );

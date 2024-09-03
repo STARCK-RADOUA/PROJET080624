@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 
@@ -11,17 +10,37 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
 
   const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
 
+  // Animation for modal entry
+  const scaleAnim = new Animated.Value(0);
+
+  const animateIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 7,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const animateOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0,
+      friction: 7,
+      useNativeDriver: true,
+    }).start(() => onClose());
+  };
+
   return (
     <Modal
-      animationType="slide"
+      animationType="none"
       transparent={true}
       visible={visible}
-      onRequestClose={onClose}
+      onShow={animateIn}
+      onRequestClose={animateOut}
     >
       <View style={styles.modalContainer}>
-        <View style={styles.modalView}>
+        <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
           {/* Close Button */}
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
             <Ionicons name="close-circle" size={30} color="#ff5c5c" />
           </TouchableOpacity>
 
@@ -46,13 +65,13 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                   <View style={styles.imageContainer}>
                     <Image
                       source={{
-                        uri: item.product && item.product.image_url ? item.product.image_url : 'https://via.placeholder.com/150',
+                        uri: item.product?.image_url || 'https://via.placeholder.com/150',
                       }}
                       style={styles.productImage}
                     />
                   </View>
                   <View style={styles.productDetails}>
-                    <Text style={styles.productName}>{item.product ? item.product.name : 'Unavailable'}</Text>
+                    <Text style={styles.productName}>{item.product?.name || 'Unavailable'}</Text>
                     <Text style={styles.productQuantity}>Qty: {item.quantity}</Text>
                     <Text style={styles.productPrice}>€{item.price.toFixed(2)}</Text>
                   </View>
@@ -75,7 +94,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.totalText}>Total: €{order.total_price.toFixed(2)}</Text>
             </View>
           </ScrollView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -86,18 +105,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   modalView: {
     width: '90%',
-    backgroundColor: '#fff',
+    backgroundColor: '#1f1f1f',
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 10,
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 15,
   },
   closeButton: {
     position: 'absolute',
@@ -110,13 +129,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
-    color: '#555',
+    color: '#ccc',
   },
   sectionHeader: {
     fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 10,
-    color: '#333',
+    color: '#ffbf00',
   },
   productsContainer: {
     marginTop: 10,
@@ -124,13 +143,13 @@ const styles = StyleSheet.create({
   productContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#333',
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 5,
   },
   imageContainer: {
@@ -152,11 +171,11 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ffbf00',
   },
   productQuantity: {
     fontSize: 14,
-    color: '#555',
+    color: '#ccc',
   },
   productPrice: {
     fontSize: 14,
@@ -173,14 +192,14 @@ const styles = StyleSheet.create({
   totalContainer: {
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#333',
     borderRadius: 10,
     alignItems: 'center',
   },
   totalText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ffbf00',
   },
 });
 

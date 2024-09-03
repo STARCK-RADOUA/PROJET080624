@@ -114,23 +114,22 @@ const ClientModal = ({ visible, onClose, client }) => {
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Darker background
   },
   modalView: {
     width: '85%',
-    backgroundColor: 'white',
+    backgroundColor: '#333', // Dark background for modal view
     borderRadius: 12,
     padding: 20,
     alignItems: 'stretch',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.7, // Increased shadow opacity for more depth
     shadowRadius: 4,
   },
   closeButton: {
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f695a', // White text color for better contrast
     textAlign: 'center',
     marginVertical: 10,
   },
@@ -152,20 +151,20 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#555',
+    color: '#ddd', // Light gray for labels
     flex: 1,
     flexWrap: 'wrap',
   },
   textValue: {
     fontSize: 16,
-    color: '#000',
+    color: '#fff', // White text for values
     fontWeight: '500',
     flex: 2,
     textAlign: 'right',
   },
   separator: {
     height: 1,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#555', // Darker separator
     marginVertical: 15,
   },
 });

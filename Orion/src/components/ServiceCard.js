@@ -4,11 +4,13 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 const ServiceCard = ({ service, onReadMore }) => {
   return (
     <TouchableOpacity style={styles.cardContainer} onPress={onReadMore}>
-      <Image source={{ uri: service.image }} style={styles.cardImage} />
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{service.name}</Text>
-        <Text style={styles.cardSubtitle}>{service.isSystemPoint ? 'System Service' : 'Regular Service'}</Text>
-        <Text style={styles.cardTest}>{service.test ? 'Test Service' : 'Production Service'}</Text>
+        <Image source={{ uri: service.image }} style={styles.cardImage} />
+        <View style={styles.textContainer}>
+          <Text style={styles.cardTitle}>{service.name}</Text>
+          <Text style={styles.cardSubtitle}>{service.isSystemPoint ? 'System Service' : 'Regular Service'}</Text>
+          <Text style={styles.cardTest}>{service.test ? 'Test Service' : 'Production Service'}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -16,37 +18,47 @@ const ServiceCard = ({ service, onReadMore }) => {
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
+    backgroundColor: '#b4b4b4',
+    borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 15,
+    padding: 10,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 5,
+    elevation: 5,
+    flexDirection: 'row',
   },
   cardImage: {
-    width: '100%',
-    height: 150,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+    backgroundColor: '#eeebeb',
   },
   cardContent: {
-    padding: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  textContainer: {
+    flex: 1,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    color: '#1f695a',
+    marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+    color: '#dddddd',
+    marginBottom: 4,
   },
   cardTest: {
     fontSize: 12,
-    color: '#999',
+    color: '#888888',
   },
 });
 

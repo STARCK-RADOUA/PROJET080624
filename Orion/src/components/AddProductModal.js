@@ -309,30 +309,30 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Increase opacity
-    paddingVertical : "20%"
+    backgroundColor: '#8a8a8a50', // Darker background with higher opacity
+    paddingVertical: '20%',
   },
   modalView: {
-    backgroundColor: 'white',
-    borderRadius: 10,
+    backgroundColor: '#333', // Dark background for the modal
+    borderRadius: 15,
     paddingTop: 20,
     paddingBottom: 20,
     paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 15,
+    color: '#1f695a', // White text for better contrast
     textAlign: 'center',
   },
   closeButton: {
@@ -343,8 +343,9 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: 5,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
+    color: '#f0f0f0', // Lighter text color
     textAlign: 'left',
   },
   input: {
@@ -352,9 +353,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#333', // Dark border color
     marginBottom: 10,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#424242', // Darker input background
+    color: '#fff', // White text inside the input
   },
   switchContainer: {
     flexDirection: 'row',
@@ -362,9 +364,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   optionsTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#f0f0f0', // Lighter text color
   },
   optionContainer: {
     flexDirection: 'row',
@@ -374,6 +377,9 @@ const styles = StyleSheet.create({
   },
   optionInput: {
     width: '40%',
+    backgroundColor: '#424242',
+    color: '#fff',
+    borderColor: '#333',
   },
   addOptionButton: {
     marginLeft: 10,
@@ -387,7 +393,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 15,
-    backgroundColor: '#f1f1f1',
+    backgroundColor: '#444343', // Darker background for the image picker
     borderRadius: 10,
     marginBottom: 10,
   },
@@ -395,6 +401,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#fff',
   },
   imageWrapper: {
     flexDirection: 'row', // Layout image and button in row
@@ -417,33 +424,33 @@ const styles = StyleSheet.create({
     right: -10,
   },
   uploadButton: {
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#f3b13e', // Accent color for the upload button
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginLeft: 20, // Align button to the right of the image
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
     shadowColor: '#000',
   },
   uploadingButton: {
     backgroundColor: 'yellow',
   },
   uploadButtonText: {
-    color: '#333',
+    color: '#1e1e1e', // Darker text color on the upload button
     fontSize: 14,
     fontWeight: '500',
   },
   submitButton: {
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#f3b13e', // Accent color for the submit button
     padding: 15,
     borderRadius: 10,
     marginTop: 10,
     alignSelf: 'center',
   },
   submitButtonText: {
-    color: 'white',
+    color: '#1e1e1e', // Darker text color on the submit button
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',

@@ -14,8 +14,8 @@ export default function DriverScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filterActivated, setFilterActivated] = useState('all'); // New state for activated filter
-  const [filterIsLogin, setFilterIsLogin] = useState('all');     // New state for isLogin filter
+  const [filterActivated, setFilterActivated] = useState('all'); 
+  const [filterIsLogin, setFilterIsLogin] = useState('all');    
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
@@ -24,7 +24,7 @@ export default function DriverScreen() {
     socket.on('driversUpdated', ({ drivers }) => {
       console.log('driversUpdated event received:', drivers);
       setDrivers(drivers);
-      applyFilters(drivers); // Apply filters to the initial data
+      applyFilters(drivers); 
     });
 
     socket.on('connect_error', (error) => {
@@ -140,9 +140,11 @@ export default function DriverScreen() {
         {filteredDrivers.length > 0 ? (
           filteredDrivers.map(driver => (
             <DriverCard key={driver._id} driver={driver} onPress={handleCardPress} />
+
+            
           ))
         ) : (
-          <Text>No drivers available</Text>
+          <Text style={styles.noDriversText}>No drivers available</Text>
         )}
       </ScrollView>
 
@@ -162,14 +164,14 @@ const screenWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f4f4c3',
     paddingHorizontal: 10,
     paddingBottom: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#030e0f',
     marginBottom: 20,
     textAlign: 'left',
   },
@@ -199,7 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   addButtonText: {
-    color: '#1f2937',
+    color: '#fff',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -221,5 +223,42 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  driverItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#b4b4b4',
+    borderRadius: 10,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    shadowColor: '#b4b4b4',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.7,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  driverInfo: {
+    width: '100%',
+    flexDirection: 'column',
+  },
+  driverName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1f695a',
+  },
+  driverPhone: {
+    fontSize: 17,
+    color: '#272711',
+  },
+  driverStatus: {
+    fontSize: 15,
+    color: '#5c5b5b',
+  },
+  noDriversText: {
+    fontSize: 16,
+    color: '#5c5b5b',
+  },
 });
+
 

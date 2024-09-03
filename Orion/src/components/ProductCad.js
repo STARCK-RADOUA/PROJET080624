@@ -1,9 +1,7 @@
 import React from 'react';
-import { View, Text,Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BASE_URL, BASE_URLIO } from '@env';
 
-// Get screen width for responsive design
 const { width } = Dimensions.get('window');
 
 const ProductCard = ({ product, onReadMore }) => {
@@ -39,12 +37,12 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowColor: '#b4b4b4',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.7,
     shadowRadius: 5,
     elevation: 3,
-    backgroundColor: '#FFF6E9',
+    backgroundColor: '#b4b4b4',
     borderColor: '#FFF6E9',
   },
   imageContainer: {
@@ -67,19 +65,19 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 8,
-    fontSize: width * 0.04,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontSize: width * 0.05,
+    fontWeight: '700',
+    color: '#1f695a',
   },
   description: {
     marginBottom: 12,
-    fontSize: width * 0.03,
-    color: '#9ca3af',
+    fontSize: width * 0.033,
+    color: '#2d2e30',
   },
   price: {
-    fontSize: width * 0.04,
-    fontWeight: 'bold',
-    color: '#f3b13e',
+    fontSize: width * 0.046,
+    fontWeight: '700',
+    color: '#554c3c',
     marginBottom: 10,
   },
   optionsContainer: {
@@ -88,14 +86,14 @@ const styles = StyleSheet.create({
   },
   option: {
     fontSize: width * 0.03,
-    color: '#9ca3af',
+    color: '#66748d',
   },
   iconButton: {
     position: 'absolute',
     right: 10,
     bottom: 10,
     padding: 10,
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#da9820',
     borderRadius: 50,
   },
   icon: {

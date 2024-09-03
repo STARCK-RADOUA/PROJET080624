@@ -113,35 +113,37 @@ const DriverModal = ({ visible, onClose, driver }) => {
       </View>
     </Modal>
   );
-};
-
-const styles = StyleSheet.create({
+};const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   modalView: {
     width: '85%',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: '#333', // Fond sombre pour le modal
+    borderRadius: 15,
+    padding: 25,
     alignItems: 'stretch',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.6,
+    shadowRadius: 7,
+    elevation: 10, 
   },
   closeButton: {
-    alignSelf: 'flex-end',
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
   },
   name: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1f695a', // Texte en blanc pour le nom
     textAlign: 'center',
-    marginVertical: 10,
+    marginVertical: 15,
   },
   fieldRow: {
     flexDirection: 'row',
@@ -151,21 +153,49 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   label: {
-    fontSize: 16,
-    color: '#555',
-    flex: 1,
-    flexWrap: 'wrap',
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#ddd', // Couleur gris clair pour les labels
+    marginBottom: 5,
   },
   textValue: {
     fontSize: 16,
-    color: '#000',
+    color: '#fff', // Texte en blanc pour une meilleure lisibilité
     fontWeight: '500',
     flex: 2,
     textAlign: 'right',
   },
+  input: {
+    width: '100%',
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#555', // Bordure plus sombre pour les inputs
+    marginBottom: 10,
+    backgroundColor: '#444', // Fond plus sombre pour les inputs
+    color: '#fff', // Texte en blanc pour les inputs
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  submitButton: {
+    backgroundColor: '#f3b13e',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    alignSelf: 'center',
+  },
+  submitButtonText: {
+    color: '#000', // Texte sombre pour contraster avec la couleur du bouton
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   separator: {
     height: 1,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#555', // Séparateur plus sombre
     marginVertical: 15,
   },
 });

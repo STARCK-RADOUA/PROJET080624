@@ -203,29 +203,29 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingVertical: "20%"
+    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Darker background
+    paddingVertical: "20%",
   },
   modalView: {
-    backgroundColor: 'white',
+    backgroundColor: '#2c2c2c', // Dark background for the modal view
     borderRadius: 10,
     paddingTop: 20,
     paddingBottom: 20,
     paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.7, // Increased shadow opacity for more depth
     shadowRadius: 3,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#1f695a', // White text color for better contrast
     marginBottom: 15,
     textAlign: 'center',
   },
@@ -239,6 +239,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 14,
     fontWeight: 'bold',
+    color: '#dddddd', // Light gray for labels
     textAlign: 'left',
   },
   input: {
@@ -246,9 +247,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#444', // Darker border color
     marginBottom: 10,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#3a3a3a', // Darker background for inputs
+    color: '#ffffff', // White text for input fields
   },
   switchContainer: {
     flexDirection: 'row',
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 15,
-    backgroundColor: '#f1f1f1',
+    backgroundColor: '#444', // Darker background for image picker button
     borderRadius: 10,
     marginBottom: 10,
   },
@@ -267,6 +269,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#ffffff', // White text for image picker
   },
   imageWrapper: {
     flexDirection: 'row',
@@ -289,10 +292,10 @@ const styles = StyleSheet.create({
     right: -10,
   },
   uploadButton: {
-    backgroundColor: 'white',
+    backgroundColor: '#444', // Darker background for upload button
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#555', // Slightly lighter border color for contrast
     paddingVertical: 10,
     paddingHorizontal: 20,
     shadowOffset: { width: 0, height: 2 },
@@ -301,12 +304,12 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
   },
   uploadButtonText: {
-    color: '#333',
+    color: '#ffffff', // White text for the upload button
     fontSize: 14,
     fontWeight: '500',
   },
   submitButton: {
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#f3b13e', // Keep the accent color for the submit button
     padding: 15,
     borderRadius: 10,
     marginTop: 10,

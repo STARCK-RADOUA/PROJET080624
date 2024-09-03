@@ -41,7 +41,7 @@ export default function App() {
 }
 
 const AppContent = () => {
-  const { isLoggedIn, login } = useContext(AuthContext);
+  const { isLoggedIn, login ,logout} = useContext(AuthContext);
   const [expoPushToken, setExpoPushToken] = useState('');
   const notificationListener = useRef();
   const responseListener = useRef();
@@ -73,7 +73,7 @@ const AppContent = () => {
     };
   }, [isLoggedIn]);
 
-  return !isLoggedIn ? <LoginScreen onLogin={login} /> : <MainNavigator />;
+  return !isLoggedIn ? <LoginScreen onLogin={login} /> : <MainNavigator  onLogin={logout} />;
 };
 
 const styles = StyleSheet.create({

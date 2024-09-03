@@ -15,7 +15,8 @@ import NotificationMenu from '../components/NotificationMenu';
 import ServiceScreen from '../screens/ServiceScreen'; // Import SideMenu
 import ChatHomeScreen from '../screens/ChatHomeScreen';
 import OrdersScreen from '../screens/OrdersScreen';
-export default function MainNavigator({}) {
+import WarnScreen from '../screens/WarnScreen';
+export default function MainNavigator({onLogin}) {
   const [currentTab, setCurrentTab] = useState("Home");
   const [showMenu, setShowMenu] = useState(false);
 
@@ -44,9 +45,10 @@ export default function MainNavigator({}) {
         case 'Orders':
         return <OrdersScreen />;
     case 'Chat':
-        return <ChatHomeScreen />; 
-        case 'Orders':
-        return <OrderScreen />;
+        return <ChatHomeScreen />;  
+         case 'Analyse':
+        return <WarnScreen />; 
+
       default:
         return <HomeScreen />;
     }
@@ -54,7 +56,7 @@ export default function MainNavigator({}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <SideMenu   currentTab={currentTab} setCurrentTab={setCurrentTab} styles={styles} />
+      <SideMenu   currentTab={currentTab} setCurrentTab={setCurrentTab} styles={styles} onLogin/>
 
       <Animated.View style={{
         flex: 1,

@@ -75,17 +75,16 @@ const UserSearchModal = ({ visible, onClose, onUserSelect }) => {
 };
 
 const screenWidth = Dimensions.get('window').width;
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Dark background with higher opacity
   },
   modalView: {
     width: screenWidth - 40,
-    backgroundColor: 'white',
+    backgroundColor: '#2c2c2c', // Dark background for the modal
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
@@ -96,18 +95,20 @@ const styles = StyleSheet.create({
     right: 10,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#1f695a', // White text for better contrast
   },
   modalSearchInput: {
     width: '100%',
     height: 40,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#4c4c4c', // Darker input background
     borderRadius: 20,
     paddingHorizontal: 15,
     marginBottom: 15,
     fontSize: 16,
+    color: '#fff', // White text inside the input
   },
   modalUserList: {
     width: '100%',
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#f2f2f2',
+    borderBottomColor: '#555', // Darker border color
   },
   avatar: {
     width: 50,
@@ -126,17 +127,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
+    backgroundColor: '#3b3b3b', // Dark background for the avatar
   },
   avatarText: {
-    color: '#fff',
+    color: '#fff', // White text for avatar initials
     fontSize: 20,
     fontWeight: 'bold',
   },
   modalUserName: {
     fontSize: 16,
+    color: '#fff', // White text for the username
   },
   noUsersText: {
-    color: '#6e6e6e',
+    color: '#aaa', // Lighter gray for "no users" text
     textAlign: 'center',
     paddingTop: 20,
   },

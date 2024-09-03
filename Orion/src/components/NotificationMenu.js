@@ -1,17 +1,23 @@
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URLIO } from '@env';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity, TouchableWithoutFeedback, FlatList, Modal } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, FlatList, Modal, TextInput } from 'react-native';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
-import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
 
 let socket;
 
-const NotificationMenu = ({ navigation  }) => {
+const NotificationMenu = ({ navigation }) => {
   const [notifications, setNotifications] = useState([]);
+  const [filteredNotifications, setFilteredNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [deviceId, setDeviceId] = useState('');
+  const [searchText, setSearchText] = useState('');
+  const [isAscending, setIsAscending] = useState(true);
+
+  const slideAnim = useState(new Animated.Value(300))[0];
+  const fadeAnim = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
     const getDeviceId = async () => {
@@ -25,21 +31,33 @@ const NotificationMenu = ({ navigation  }) => {
       socket.emit('requestNotifications', id);
 
       socket.on('allNotifications', (data) => {
-        console.log('Received notifications:', data);
         setNotifications(data);
+        setFilteredNotifications(data);
       });
 
       socket.on('newNotification', (notification) => {
         setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setFilteredNotifications((prevNotifications) => [notification, ...prevNotifications]);
       });
     };
 
     getDeviceId();
 
- 
+    // Slide in animation
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+
+    // Fade-in animation
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
 
     return () => {
-    // Clear the interval when the component unmounts
       socket.off('allNotifications');
       socket.off('newNotification');
     };
@@ -51,32 +69,79 @@ const NotificationMenu = ({ navigation  }) => {
     socket.emit('markAsRead', notification._id);
   };
 
+  const handleSearch = (text) => {
+    setSearchText(text);
+    const filtered = notifications.filter(notification =>
+      notification.title.toLowerCase().includes(text.toLowerCase()) ||
+      notification.message.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredNotifications(filtered);
+  };
+
+  const handleSortByDate = () => {
+    const sorted = [...filteredNotifications].sort((a, b) => {
+      if (isAscending) {
+        return new Date(a.created_at) - new Date(b.created_at);
+      } else {
+        return new Date(b.created_at) - new Date(a.created_at);
+      }
+    });
+    setFilteredNotifications(sorted);
+    setIsAscending(!isAscending);
+  };
+
   const renderNotificationItem = ({ item }) => (
-    <TouchableOpacity onPress={() => openNotification(item)} style={styles.notificationItem}>
-      <Text style={styles.notificationTitle}>{item.title}</Text>
-      <Text style={styles.notificationMessage}>{item.message}</Text>
-    </TouchableOpacity>
+    <Animated.View style={[styles.notificationItem, { opacity: fadeAnim }]}>
+      <TouchableOpacity
+        onPress={() => openNotification(item)}
+        style={styles.notificationInfo}
+      >
+        <View style={styles.notificationTextContainer}>
+          <Text style={styles.notificationTitle}>{item.title}</Text>
+          <Text style={styles.notificationMessage}>{item.message}</Text>
+       
+      
+          <Text style={styles.notificationTimestamp}>{new Date(item.created_at).toLocaleString()}</Text>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   );
 
   return (
-    <TouchableOpacity style={styles.overlay}  activeOpacity={1}>
-      <TouchableWithoutFeedback>
-        <Animated.View style={[styles.notificationMenu]}>
-          <Text style={styles.notificationMenuTitle}>Notifications</Text>
-          <FlatList
-            data={notifications}
-            renderItem={renderNotificationItem}
-            keyExtractor={(item) => item._id}
-            style={styles.notificationList}
-          />
-        </Animated.View>
-      </TouchableWithoutFeedback>
+    <View style={styles.container}>
+      {/* Header Section */}
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Total: {filteredNotifications.length}</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by title or message"
+          value={searchText}
+          onChangeText={handleSearch}
+        />
+        <TouchableOpacity onPress={handleSortByDate} style={styles.sortButton}>
+          <Ionicons name="time-outline" size={24} color="#fff" />
+          <Text style={styles.sortButtonText}>Sort by Date</Text>
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        data={filteredNotifications}
+        renderItem={renderNotificationItem}
+        keyExtractor={(item) => item._id}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        showsVerticalScrollIndicator={false}
+        initialNumToRender={8}
+        maxToRenderPerBatch={8}
+        updateCellsBatchingPeriod={30}
+        windowSize={7}
+      />
 
       {selectedNotification && (
         <Modal
           transparent={true}
           visible={modalVisible}
           onRequestClose={() => setModalVisible(false)}
+          animationType="fade"
         >
           <TouchableOpacity style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
             <View style={styles.modalContent}>
@@ -93,82 +158,128 @@ const NotificationMenu = ({ navigation  }) => {
           </TouchableOpacity>
         </Modal>
       )}
-    </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-
-    width: '100%',
-    height: '100%',
-
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f4f4c3',
+    paddingTop: 10,
   },
-  notificationMenu: {
-   
-    width: '100%',
-  
-    backgroundColor: '#fff',
-    
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-  },
-  notificationMenuTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  notificationList: {
-    marginBottom: 20,
-  },
-  notificationItem: {
-    backgroundColor: '#f8f8f8',
-    padding: 15,
+  header: {
+    padding: 10,
+    backgroundColor: '#6472743e',
     borderRadius: 10,
+    marginHorizontal: 10,
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  notificationTitle: {
+  headerText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#030e0f',
+  },
+  searchInput: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginHorizontal: 10,
+    height: 40,
+    color: '#000',
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#156974',
+    padding: 10,
+    borderRadius: 5,
+  },
+  sortButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+  },
+  notificationItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#b4b4b4',
+    borderRadius: 10,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    shadowColor: '#b4b4b4',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.7,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  notificationInfo: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  notificationTextContainer: {
+    flex: 1,
+  },
+  notificationTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1f695a',
   },
   notificationMessage: {
-    fontSize: 14,
-    color: '#555',
+    fontSize: 17,
+    color: '#272711',
+  },
+  notificationDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  notificationTimestamp: {
+    fontSize: 15,
+    color: '#5c5b5b',
+    marginRight: 10,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#333',
+    marginHorizontal: 10,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
     width: '80%',
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
+    backgroundColor: '#2d2d2d',
+    padding: 25,
+    borderRadius: 15,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 10,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#00ffcc',
+    marginBottom: 15,
+    textAlign: 'center',
   },
   modalMessage: {
     fontSize: 16,
     marginBottom: 20,
     textAlign: 'center',
+    color: '#dddddd',
   },
   modalTime: {
     fontSize: 12,
@@ -188,7 +299,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 24,
-    color: '#888',
+    color: '#105245',
   },
 });
 
