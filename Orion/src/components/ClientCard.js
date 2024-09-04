@@ -6,15 +6,15 @@ const ClientCard = ({ client, onPress }) => {
     <TouchableOpacity style={styles.card} onPress={() => onPress(client)}>
       <View style={styles.cardContent}>
         <View style={styles.textContainer}>
-          <Text style={styles.cardTitle}>{client.firstName} {client.lastName}</Text>
-          <Text style={styles.cardSubtitle}>+33 {client.phone}</Text>
+          <Text style={styles.cardTitle}>🛡️   {client.firstName} {client.lastName}</Text>
+          <Text style={styles.cardSubtitle}>📞   +33 {client.phone}</Text>
         </View>
         <View style={styles.statusContainer}>
           <Text style={[styles.statusText, client.isLogin ? styles.loggedIn : styles.loggedOut]}>
-            {client.isLogin ? 'Logged In' : 'Logged Out'}
+            {client.isLogin ? '🔒  Logged In' : '🚪  Logged Out'}
           </Text>
           <Text style={[styles.statusText, client.activated ? styles.activated : styles.deactivated]}>
-            {client.activated ? 'Activated' : 'Deactivated'}
+            {client.activated ? '✅   Activated' : '❌   Deactivated'}
           </Text>
         </View>
       </View>
@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 20,
     fontWeight: '700',
+ 
     color: '#1f695a',
   },
   cardSubtitle: {

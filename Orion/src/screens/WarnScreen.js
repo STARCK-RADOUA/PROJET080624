@@ -139,11 +139,11 @@ const WarnList = () => {
         onPress={() => setSelectedWarn(item)}
       >
         <View style={styles.warnTextContainer}>
-          <Text style={styles.warnName}>{item.firstName} {item.lastName}</Text>
-          <Text style={styles.warnPhone}> +33 {item.phone}</Text>
+          <Text style={styles.warnName}> 👤     { item.firstName} {item.lastName}</Text>
+          <Text style={styles.warnPhone}>  📞      +33 {item.phone}</Text>
         </View>
         <View style={styles.warnDateContainer}>
-          <Text style={styles.warnTimestamp}>{moment(item.created_at).format('DD MMM YYYY, h:mm a')}</Text>
+          <Text style={styles.warnTimestamp}>  ⏰         {moment(item.created_at).format('DD MMM YYYY, h:mm a')}</Text>
           <Ionicons name="chevron-forward-outline" size={25} color="#156974" />
         </View>
       </TouchableOpacity>

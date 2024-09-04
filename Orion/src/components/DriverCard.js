@@ -6,15 +6,15 @@ const DriverCard = ({ driver, onPress }) => {
     <TouchableOpacity style={styles.card} onPress={() => onPress(driver)}>
       <View style={styles.cardContent}>
         <View style={styles.textContainer}>
-          <Text style={styles.cardTitle}>{driver.firstName} {driver.lastName}</Text>
-          <Text style={styles.cardSubtitle}>+33 {driver.phone}</Text>
+          <Text style={styles.cardTitle}>🚚    {driver.firstName} {driver.lastName}</Text>
+          <Text style={styles.cardSubtitle}> 📞     +33 {driver.phone}</Text>
         </View>
         <View style={styles.statusContainer}>
           <Text style={[styles.statusText, driver.isLogin ? styles.loggedIn : styles.loggedOut]}>
-            {driver.isLogin ? 'Logged In' : 'Logged Out'}
+            {driver.isLogin ? '🔒  Logged In' : '🚫   Logged Out'}
           </Text>
           <Text style={[styles.statusText, driver.activated ? styles.activated : styles.deactivated]}>
-            {driver.activated ? 'Activated' : 'Deactivated'}
+            {driver.activated ? '✅   Activated' : '❌   Deactivated'}
           </Text>
         </View>
       </View>
