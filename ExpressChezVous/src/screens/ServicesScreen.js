@@ -1,85 +1,72 @@
-import React, { useEffect,useContext, useState, useRef } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions, Animated } from 'react-native';
-import axios from 'axios';
-import { BASE_URL } from '@env';
+import React, { useEffect, useContext, useState, useRef } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import io from 'socket.io-client';
+import { BASE_URLIO } from '@env';
 import { DataContext } from '../navigation/DataContext';
-const ServicesScreen = ({ navigation,route }) => {
+
+const ServicesScreen = ({ navigation }) => {
   const [services, setServices] = useState([]);
-  const [areAnimationsReady, setAnimationsReady] = useState(false); // Add a flag for animation readiness
   const animations = useRef([]); // Store animation values
   const { setSharedData } = useContext(DataContext);
-  const fetchServices = async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}/api/services`);
-      const fetchedServices = response.data;
-      console.log('------------------------------------');
-      console.log('Fetched Services:', fetchedServices);
-      console.log('------------------------------------');
 
-      setServices(fetchedServices);
+  useEffect(() => {
+    const socket = io(BASE_URLIO);
+
+    socket.on('servicesUpdated', ({ services }) => {
+      setServices(services);
 
       // Initialize animations based on the number of services
-      if (fetchedServices.length > 0) {
-        animations.current = fetchedServices.map(() => new Animated.Value(0)); // Create animations
-        setAnimationsReady(true); // Set the flag once animations are ready
-        triggerAnimations();
+      if (services.length > 0) {
+        // Reset the animations array
+        animations.current = services.map(() => new Animated.Value(0)); // Ensure animations are mapped to services
+        triggerAnimations(); // Trigger animations
       }
-    } catch (error) {
-      console.error('Error fetching services:', error);
-    }
-  };
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   // Trigger animations
   const triggerAnimations = () => {
-    if (animations.current.length > 0) {
-      animations.current.forEach((anim, index) => {
+    animations.current.forEach((anim, index) => {
+      if (anim) {
         Animated.timing(anim, {
           toValue: 1,
           duration: 800,
-          delay: index * 200, // Add delay for staggered animation
+          delay: index * 200, // Stagger the animations
           useNativeDriver: true,
         }).start();
-      });
-    }
+      }
+    });
   };
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
-  const handleServicePress = (serviceName, serviceTest,id) => {
-    const dataToSend = {
-      id: id,
-      serviceName: serviceName,
-      serviceTest: serviceTest,
-    };
-  
-    setSharedData({ serviceName: serviceName, serviceTest: serviceTest, id: id });
-  
-      // Ensure parameters are passed correctly here
-      navigation.navigate('Home', dataToSend);
-
-    
-  
-    console.log('Data to send:', dataToSend); // This should log the correct data
+  const handleServicePress = (serviceName, serviceTest, id) => {
+    setSharedData({ serviceName, serviceTest, id });
+    navigation.navigate('Home', { serviceName, serviceTest, id });
   };
-  
 
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Our Services</Text>
       <View style={styles.servicesContainer}>
-        {areAnimationsReady && services.map((service, index) => {
-          // Safe access to animations only when animations are ready
+        {services.map((service, index) => {
+          // Ensure animations.current[index] exists before accessing it
           const scale = animations.current[index]?.interpolate({
             inputRange: [0, 1],
-            outputRange: [0, 1],
+            outputRange: [0.8, 1], // Scale from 0.8 to 1
           });
 
           const rotate = animations.current[index]?.interpolate({
             inputRange: [0, 1],
-            outputRange: ['0deg', '360deg'],
+            outputRange: ['0deg', '360deg'], // Rotate from 0 to 360 degrees
           });
+
+          // If scale or rotate is not defined, don't apply any transform
+          const animatedStyles = scale && rotate
+            ? { transform: [{ scale }, { rotate }] }
+            : {};
 
           return (
             <Animated.View
@@ -87,15 +74,14 @@ const ServicesScreen = ({ navigation,route }) => {
               style={[
                 styles.serviceItem,
                 service.test && styles.testService,
-                { transform: [{ scale }, { rotate }] }, // Apply scale and rotation animations
+                animatedStyles, // Apply the animation styles only if they are defined
               ]}
             >
-              <TouchableOpacity onPress={() => handleServicePress(service.name,service.test,service._id)} >
+              <TouchableOpacity onPress={() => handleServicePress(service.name, service.test, service._id)}>
                 <Image source={{ uri: service.image }} style={styles.serviceImage} />
                 <Text style={styles.serviceText}>{service.name}</Text>
-              
-              </TouchableOpacity> 
-               {service.test && <Text style={styles.testLabel}>Test</Text>}
+              </TouchableOpacity>
+              {service.test && <Text style={styles.testLabel}>Test</Text>}
             </Animated.View>
           );
         })}
@@ -153,12 +139,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   testLabel: {
-  position: 'absolute',
- 
-  bottom: -20,
-  justifyContent: 'bottom',
-  alignItems: 'button',
-
+    position: 'absolute',
+    bottom: -20,
     textAlign: 'center',
     fontSize: 20,
     color: '#f8f8f8',
