@@ -71,6 +71,7 @@ const UserProfileScreen = ({ navigation }) => {
 
   const handlePhoneChange = async () => {
     const id = await getClient(); 
+    console.log(id)
 
     setLoading(true);
     try {
@@ -159,7 +160,8 @@ const UserProfileScreen = ({ navigation }) => {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Change Phone Number</Text>
             <TextInput
-              inputMode="numeric"
+             
+                keyboardType="phone-pad"
               placeholder="Enter new phone number"
               value={phoneNumber}
               onChangeText={setPhoneNumber}
