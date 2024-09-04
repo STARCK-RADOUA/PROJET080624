@@ -11,11 +11,9 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
 
   const getDeviceId = async () => {
-    if (Device.isDevice) {
-      setDeviceId(Device.osBuildId);
-    } else {
-      Alert.alert('Error', 'Must use a physical device for Device ID.');
-    }
+
+      setDeviceId(Device.osBuildId); // Set deviceId using expo-device's osBuildId
+   
   };
 
   useEffect(() => {
@@ -25,7 +23,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}/api/users/login`, {
+      const response = await axios.post('http://192.168.8.131:4000/api/users/login', {
         deviceId,
         phone,
         password,
