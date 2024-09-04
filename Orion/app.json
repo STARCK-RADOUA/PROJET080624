@@ -28,7 +28,7 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "NOTIFICATIONS",
+        "NOTIFICATIONS"
      
       ],
       "package": "com.france.orion"
