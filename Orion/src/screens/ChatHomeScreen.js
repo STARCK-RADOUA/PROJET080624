@@ -23,6 +23,7 @@ const ChatScreenComponent = ({ navigation }) => {
 
     socket.on('chatMessagesUpdated', (data) => {
       data.messages.forEach(chat => {
+        console.log("jkgkjgjk",JSON.stringify(data))
         handleAddChat({
           _id: chat.clientId,
           firstName: chat.clientFullName.split(' ')[0],
@@ -129,29 +130,31 @@ const ChatScreenComponent = ({ navigation }) => {
         onChangeText={setSearchText}
       />
 
-      <ScrollView contentContainerStyle={styles.chatList}>
-        {filteredChats.map((chat, index) => (
-          <TouchableOpacity key={index} style={styles.chatItem} onPress={() => handleChatPress(chat)}>
-            <View style={[styles.avatar, { backgroundColor: chat.avatarColor }]}>
-              <Text style={styles.avatarText}>
-                {chat.firstName ? chat.firstName.charAt(0) : ''}
-              </Text>
-            </View>
-            <View style={styles.chatDetails}>
-              <Text style={[styles.chatName, chat.unread ? styles.unreadChatName : null]}>
-                {`${chat.firstName || ''} ${chat.lastName || ''}`}
-              </Text>
-              <Text style={styles.chatMessage}>
-                {chat.lastMessage && chat.lastMessage.content ? chat.lastMessage.content : ''}
-              </Text>
-            </View>
-            <Text style={styles.chatTime}>
-              {chat.lastMessage && chat.lastMessage.timestamp ? formatTime(chat.lastMessage.timestamp) : ''}
-            </Text>
-            {chat.unread && <View style={styles.unreadDot} />}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+<ScrollView contentContainerStyle={styles.chatList}>
+  {filteredChats.map((chat, index) => (
+    <TouchableOpacity key={index} style={styles.chatItem} onPress={() => handleChatPress(chat)}>
+      <View style={[styles.avatar, { backgroundColor: chat.avatarColor }]}>
+        <Text style={styles.avatarText}>
+          {chat.firstName ? chat.firstName.charAt(0) : ''}
+        </Text>
+      </View>
+      <View style={styles.chatDetails}>
+        <Text style={[styles.chatName, chat.unread ? styles.unreadChatName : null]}>
+          {`${chat.firstName || ''} ${chat.lastName || ''}`}
+        </Text>
+        <Text style={styles.chatMessage}>
+          {chat.lastMessage && chat.lastMessage.content ? chat.lastMessage.content : ''}
+        </Text>
+      </View>
+      <Text style={styles.chatTime}>
+        {chat.lastMessage && chat.lastMessage.timestamp ? formatTime(chat.lastMessage.timestamp) : ''}
+      </Text>
+      {chat.unread && chat.lastMessage.sender !== 'admin' && !chat.lastMessage.seen && (
+        <View style={styles.unreadDot} />
+      )}
+    </TouchableOpacity>
+  ))}
+</ScrollView>
 
       <UserSearchModal
         visible={modalVisible}

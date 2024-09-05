@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Dimensions, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import io from 'socket.io-client';
-import { BASE_URLIO } from '@env';
+import { BASE_URLIO  , BASE_URL} from '@env';
 import { getClientId } from '../services/userService';
+import { useFocusEffect } from '@react-navigation/native';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -16,6 +18,33 @@ const ClientChatScreen = ({ navigation }) => {
   const socket = useRef(io(BASE_URLIO)).current;  // Initialize socket.io client
   const flatListRef = useRef(null);  // Reference for FlatList
 
+
+  // UseFocusEffect to mark messages as seen
+  useFocusEffect(
+    React.useCallback(() => {
+      const markMessagesAsSeen = async () => {
+        try {
+          if (chatId) {
+            await axios.post(`${BASE_URL}/api/chats/mark-seenFC`, {
+              chatId,
+            });
+            console.log("Messages marked as seen");
+          }
+        } catch (error) {
+          console.error("Error marking messages as seen:", error);
+        }
+      };
+
+      markMessagesAsSeen();
+
+      return () => {
+        console.log("Cleanup on screen exit");
+      };
+    }, [chatId])
+  );
+
+
+
   useEffect(() => {
     const initiateChat = async () => {
       const userId = await getClientId();
@@ -25,8 +54,22 @@ const ClientChatScreen = ({ navigation }) => {
       socket.emit('initiateChat', { adminId, userId, userType });
 
       socket.on('chatDetails', (data) => {
-        setChatId(data.chatId);  // Set the chatId obtained from the server
-        setMessages(data.messages);  // Load messages from the server
+        console.log("gjjgr", data)
+        setChatId(data.chatId);
+
+       // Get the last message from the list of messages
+  const lastMessage = data.messages.length > 0 ? data.messages[data.messages.length - 1] : null;
+
+  // Check if the last message is from the admin and has already been seen
+  if (lastMessage && lastMessage.sender === 'admin' && !lastMessage.seen) {
+    console.log("Last message from admin has already been seen. Updating with only unseen messages.");
+
+    // Filter the unseen messages
+    const unseenMessages = data.messages.filter(message => !message.seen);
+
+    // Set the chatId and only unseen messages
+    setMessages(unseenMessages);
+  }
       });
 
       socket.on('newMessage', (messageData) => {
