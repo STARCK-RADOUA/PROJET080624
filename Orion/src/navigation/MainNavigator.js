@@ -1,6 +1,5 @@
-// src/navigation/MainNavigator.js
 import React, { useRef, useState } from 'react';
-import { Animated, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { Animated, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
@@ -12,11 +11,12 @@ import OrderScreen from '../screens/OrderScreen';
 import ProductScreen from '../screens/ProductScreen';
 import SideMenu from '../components/SideMenu';
 import NotificationMenu from '../components/NotificationMenu';
-import ServiceScreen from '../screens/ServiceScreen'; // Import SideMenu
+import ServiceScreen from '../screens/ServiceScreen'; 
 import ChatHomeScreen from '../screens/ChatHomeScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import WarnScreen from '../screens/WarnScreen';
-export default function MainNavigator({onLogin}) {
+
+export default function MainNavigator({ onLogin }) {
   const [currentTab, setCurrentTab] = useState("Home");
   const [showMenu, setShowMenu] = useState(false);
 
@@ -34,7 +34,7 @@ export default function MainNavigator({onLogin}) {
         return <NotificationMenu />;
       case 'Settings':
         return <SettingsScreen />;
-         case 'Services':
+      case 'Services':
         return <ServiceScreen />;
       case 'Drivers':
         return <DriverScreen />;
@@ -42,66 +42,76 @@ export default function MainNavigator({onLogin}) {
         return <ClientScreen />;
       case 'Products':
         return <ProductScreen />;
-        case 'Orders':
+      case 'Orders':
         return <OrdersScreen />;
-    case 'Chat':
-        return <ChatHomeScreen />;  
-         case 'Analyse':
-        return <WarnScreen />; 
-
+      case 'Chat':
+        return <ChatHomeScreen />;
+      case 'Analyse':
+        return <WarnScreen />;
       default:
         return <HomeScreen />;
     }
   };
 
+  // Get platform-specific margin
+  const platformSpecificMargin = showMenu
+    ? (Platform.OS === 'ios' ? 40 : 40)
+    : (Platform.OS !== 'ios' ? 40 : 20);
+
   return (
     <SafeAreaView style={styles.container}>
-      <SideMenu   currentTab={currentTab} setCurrentTab={setCurrentTab} styles={styles} onLogin/>
+      <SideMenu currentTab={currentTab} setCurrentTab={setCurrentTab} styles={styles} onLogin={onLogin} />
 
-      <Animated.View style={{
-        flex: 1,
-        backgroundColor: 'white',
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        paddingHorizontal: 9,
-        paddingVertical: 7,
-        borderRadius: showMenu ? 15 : 0,
-        transform: [
-          { scale: scaleValue },
-          { translateX: offsetValue }
-        ]
-      }}>
-        <Animated.View style={{
+      <Animated.View
+        style={{
           flex: 1,
-          transform: [{
-            translateY: closeButtonOffset
-          }]
-        }}>
-          <TouchableOpacity onPress={() => {
-            Animated.timing(scaleValue, {
-              toValue: showMenu ? 1 : 0.88,
-              duration: 300,
-              useNativeDriver: true
-            }).start();
+          backgroundColor: 'white',
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          paddingHorizontal: 9,
+          paddingVertical: 7,
+          borderRadius: showMenu ? 15 : 0,
+          transform: [{ scale: scaleValue }, { translateX: offsetValue }],
+        }}
+      >
+        <Animated.View
+          style={{
+            flex: 1,
+            transform: [{ translateY: closeButtonOffset }],
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              Animated.timing(scaleValue, {
+                toValue: showMenu ? 1 : 0.88,
+                duration: 300,
+                useNativeDriver: true,
+              }).start();
 
-            Animated.timing(offsetValue, {
-              toValue: showMenu ? 0 : 230,
-              duration: 300,
-              useNativeDriver: true
-            }).start();
+              Animated.timing(offsetValue, {
+                toValue: showMenu ? 0 : 230,
+                duration: 300,
+                useNativeDriver: true,
+              }).start();
 
-            Animated.timing(closeButtonOffset, {
-              toValue: !showMenu ? -30 : 0,
-              duration: 300,
-              useNativeDriver: true
-            }).start();
+              Animated.timing(closeButtonOffset, {
+                toValue: !showMenu ? -30 : 0,
+                duration: 300,
+                useNativeDriver: true,
+              }).start();
 
-            setShowMenu(!showMenu);
-          }}>
-            <Ionicons name={showMenu ? "close-outline" : "menu-outline"} size={30} color="black" style={styles.menuIcon} />
+              setShowMenu(!showMenu);
+            }}
+          >
+            <Ionicons
+              name={showMenu ? "close-outline" : "menu-outline"}
+              size={30}
+              color="black"
+              style={[styles.menuIcon, { marginTop: platformSpecificMargin }]} // Apply platform-specific margin
+            />
           </TouchableOpacity>
 
           {renderScreen()}
@@ -119,16 +129,15 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   profileIcon: {
-marginTop: 30,
-marginLeft: 15
+    marginTop: 30,
+    marginLeft: 15,
   },
   profileName: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#d6c6b8',
- 
   },
   menuIcon: {
-    marginTop: 40,
+    // Dynamic marginTop is handled in-line where the Ionicons component is used
   },
 });
