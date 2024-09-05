@@ -1,50 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import axios from 'axios';
 import * as Device from 'expo-device';
 import io from 'socket.io-client';
-import { BASE_URLIO ,BASE_URL} from '@env';
-
+import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
+import { BASE_URL ,BASE_URLIO} from '@env';
 const LoginScreen = ({ navigation }) => {
   const [deviceId, setDeviceId] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
-  const getDeviceId = async () => {
+  const { startTracking } = useContext(LocationContext); // Use the LocationContext
 
-      setDeviceId(Device.osBuildId); // Set deviceId using expo-device's osBuildId
-   
+  const getDeviceId = async () => {
+    setDeviceId(Device.osBuildId); // Set deviceId using expo-device's osBuildId
   };
 
   useEffect(() => {
     getDeviceId();
     autoLogin();
+    startTracking(deviceId);
   }, []);
-
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post('http://192.168.8.131:4000/api/users/login', {
-        deviceId,
-        phone,
-        password,
-      });
-
-      if (response.status === 200) {
-        Alert.alert('Login Successful', 'Welcome!');
-        navigation.navigate('Test');
-      }
-    } catch (error) {
-      Alert.alert('Login Failed', error.response?.data?.message || 'An error occurred');
-    }
-  };
-
   const autoLogin = async () => {
     const socket = io(BASE_URLIO);
     const deviceId = Device.osBuildId;
 
     if (deviceId) {
       socket.emit('autoLogin', { deviceId });
-
+      startTracking(deviceId);
       socket.on('loginSuccess', () => {
         Alert.alert('Login Successful', 'Welcome!');
         navigation.navigate('Test');
@@ -52,12 +35,33 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(`${BASE_URL}/api/users/login`, {
+        deviceId,
+        phone,
+        password,
+      });
+
+      if (response.status === 200) {
+        Alert.alert('Login Successful', 'Welcome!');
+        
+        // Start tracking after successful login
+        startTracking(deviceId);
+        
+        navigation.navigate('Test'); // Navigate to the main screen after login
+      }
+    } catch (error) {
+      Alert.alert('Login Failed', error.response?.data?.message || 'An error occurred');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/nimbusfont.png')} style={styles.logoH} />
-      
+
       <View style={styles.overlay} />
-      
+
       <View style={styles.containerH}>
         <View style={styles.inputContainer}>
           <TextInput
@@ -91,7 +95,7 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1B3B1F', // Dark military green background
+    backgroundColor: '#1B3B1F', 
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -104,7 +108,7 @@ const styles = StyleSheet.create({
   },
   containerH: {
     width: '100%',
-    backgroundColor: '#2C4231', // Dark military green with more opacity
+    backgroundColor: '#2C4231',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,
@@ -134,22 +138,22 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    borderColor: '#4A7A4C', // Military green border
+    borderColor: '#4A7A4C',
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: '#283C2B', // Darker green background for inputs
-    color: '#FFFFFF', // White text color
+    backgroundColor: '#283C2B',
+    color: '#FFFFFF',
   },
   loginButton: {
     width: '100%',
     height: 50,
-    backgroundColor: '#4CAF50', // Lighter green for contrast
+    backgroundColor: '#4CAF50',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    elevation: 3, // Add shadow for depth
+    elevation: 3,
   },
   loginButtonText: {
     color: '#FFFFFF',
