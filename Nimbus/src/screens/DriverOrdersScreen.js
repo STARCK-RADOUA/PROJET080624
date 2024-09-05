@@ -38,6 +38,19 @@ setDeviceId(Device.osBuildId);    };
 
     }
   }, [deviceId]);
+  useEffect(() => {
+    let interval;
+  
+    
+      // Start tracking when the modal is visible
+      interval = setInterval(() => {
+        startTracking(deviceId);
+      },    129000); // Adjust the interval time as needed (5000ms = 5 seconds)
+    
+  
+    // Cleanup interval when modal is closed
+    return () => clearInterval(interval);
+  }, [deviceId]);
   
 
   
@@ -236,8 +249,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   headerh: {
+    marginTop: 28,
+
     backgroundColor: '#2C4231',
-    paddingVertical: 20,
+    paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomLeftRadius: 95,
