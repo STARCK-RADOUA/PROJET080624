@@ -31,6 +31,7 @@ setDeviceId(Device.osBuildId);    };
   }, []);
 
   useEffect(() => {
+    getDeviceId()
     if (deviceId) {
       fetchDriverId();
       startTracking(deviceId);
@@ -38,12 +39,15 @@ setDeviceId(Device.osBuildId);    };
     }
   }, [deviceId]);
 
+  
   useEffect(() => {
     if (driverId) {
       const socket = io(BASE_URLIO);
       socket.emit('driverConnected', driverId);
 
       socket.on('connect', () => {
+        startTracking(deviceId);
+
         console.log('Connected to Socket.IO server');
       });
 
@@ -102,11 +106,9 @@ setDeviceId(Device.osBuildId);    };
   };
 
   const getDeviceId = async () => {
-    if (Device.isDevice) {
+   
       setDeviceId(Device.osBuildId);
-    } else {
-      Alert.alert('Error', 'Must use a physical device for Device ID.');
-    }
+    
   };
 
   useEffect(() => {
