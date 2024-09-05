@@ -1,16 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Switch, Alert } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Switch, Alert, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL } from '@env';
+import io from 'socket.io-client';
+
+const socket = io(BASE_URL);
 
 const DriverModal = ({ visible, onClose, driver }) => {
   if (!driver) return null;
 
   const [editableDriver, setEditableDriver] = useState({ ...driver });
+  const [location, setLocation] = useState(null); // Store real-time location data
 
   useEffect(() => {
     setEditableDriver({ ...driver });
+
+    // Listen for real-time location updates
+    socket.on('locationUpdateForAdmin', (data) => {
+      if (data.driverId === editableDriver._id) {
+        setLocation({ latitude: data.latitude, longitude: data.longitude });
+        console.log(`Driver ${data.driverId}: ${data.latitude}, ${data.longitude}`);
+      }
+    });
+
+    // Clean up on unmount
+    return () => {
+      socket.off('locationUpdateForAdmin');
+    };
   }, [driver]);
 
   const handleActivateDeactivate = async (isActive) => {
@@ -50,6 +67,26 @@ const DriverModal = ({ visible, onClose, driver }) => {
     }
   };
 
+  const openGoogleMaps = () => {
+    if (location) {
+      const url = `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`;
+      Linking.openURL(url).catch(err => console.error('Error opening Google Maps', err));
+    } else {
+      Alert.alert('Location unavailable', 'No real-time location available for this driver.');
+    }
+  };
+
+  const openWaze = () => {
+    if (location) {
+      const url = `waze://?ll=${location.latitude},${location.longitude}&navigate=yes`;
+      Linking.openURL(url).catch(err => {
+        Alert.alert("Can't open Waze", "Make sure Waze is installed on your device.");
+      });
+    } else {
+      Alert.alert('Location unavailable', 'No real-time location available for this driver.');
+    }
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -77,16 +114,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
             </Text>
           </View>
 
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>Points Earned:</Text>
-            <Text style={styles.textValue}>{editableDriver.points_earned}</Text>
-          </View>
-
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>User Type:</Text>
-            <Text style={styles.textValue}>{editableDriver.userType}</Text>
-          </View>
-
           <View style={styles.separator} />
 
           <View style={styles.fieldRow}>
@@ -109,11 +136,26 @@ const DriverModal = ({ visible, onClose, driver }) => {
             />
           </View>
 
+          {/* Button to open navigation apps */}
+          <View style={styles.fieldRow}>
+            <TouchableOpacity style={styles.navigateButton} onPress={openGoogleMaps}>
+              <Ionicons name="navigate-outline" size={24} color="white" />
+              <Text style={styles.navigateText}>Open in Google Maps</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.navigateButton} onPress={openWaze}>
+              <Ionicons name="navigate-outline" size={24} color="white" />
+              <Text style={styles.navigateText}>Open in Waze</Text>
+            </TouchableOpacity>
+          </View>
+
         </View>
       </View>
     </Modal>
   );
-};const styles = StyleSheet.create({
+};
+
+const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -122,7 +164,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
   },
   modalView: {
     width: '85%',
-    backgroundColor: '#333', // Fond sombre pour le modal
+    backgroundColor: '#333',
     borderRadius: 15,
     padding: 25,
     alignItems: 'stretch',
@@ -141,7 +183,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
   name: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1f695a', // Texte en blanc pour le nom
+    color: '#1f695a',
     textAlign: 'center',
     marginVertical: 15,
   },
@@ -155,47 +197,34 @@ const DriverModal = ({ visible, onClose, driver }) => {
   label: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#ddd', // Couleur gris clair pour les labels
+    color: '#ddd',
     marginBottom: 5,
   },
   textValue: {
     fontSize: 16,
-    color: '#fff', // Texte en blanc pour une meilleure lisibilité
+    color: '#fff',
     fontWeight: '500',
     flex: 2,
     textAlign: 'right',
   },
-  input: {
-    width: '100%',
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#555', // Bordure plus sombre pour les inputs
-    marginBottom: 10,
-    backgroundColor: '#444', // Fond plus sombre pour les inputs
-    color: '#fff', // Texte en blanc pour les inputs
-  },
-  switchContainer: {
+  navigateButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    backgroundColor: '#34C759',
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 5,
+    flex: 1,
+    justifyContent: 'center',
   },
-  submitButton: {
-    backgroundColor: '#f3b13e',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 10,
-    alignSelf: 'center',
-  },
-  submitButtonText: {
-    color: '#000', // Texte sombre pour contraster avec la couleur du bouton
-    fontSize: 16,
+  navigateText: {
+    color: '#fff',
+    marginLeft: 10,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
   separator: {
     height: 1,
-    backgroundColor: '#555', // Séparateur plus sombre
+    backgroundColor: '#555',
     marginVertical: 15,
   },
 });

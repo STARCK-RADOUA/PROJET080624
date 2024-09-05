@@ -27,18 +27,22 @@ const HomeScreen = ({ navigation }) => {
 
     // Request and listen for active products from the server
     socket.current.emit('requestActiveProducts', serviceName);
-
+socket.current.on('newactiveProducts', () => {
+  socket.current.emit('requestActiveProducts', serviceName);
+  
+})
     // Real-time product updates
-    socket.current.on('activeProducts', (products) => {
-      setMenuItems((prevItems) => {
-        // Only update if the product list has changed
-        if (JSON.stringify(prevItems) !== JSON.stringify(products)) {
-          return products;
-        }
-        return prevItems;
-      });
+    socket.current.on('activeProducts', (response) => {
+      if (Array.isArray(response.products)) {
+        setMenuItems((prevItems) => {
+          if (JSON.stringify(prevItems) !== JSON.stringify(response.products)) {
+            return response.products;
+          }
+          return prevItems;
+        });
+      }
     });
-
+    
     // Cleanup on unmount
     return () => {
       socket.current.off('activeProducts');
@@ -73,10 +77,10 @@ const HomeScreen = ({ navigation }) => {
        <Header navigation={navigation} />
 
       <ScrollView style={styles.menuList}>
-        {menuItems.length === 0 ? (
-          <Text style={styles.noProductsText}>No products available</Text>
-        ) : (
-          menuItems.map((item, index) => (
+      {menuItems && Array.isArray(menuItems) && menuItems.length === 0 ? (
+  <Text style={styles.noProductsText}>No products available</Text>
+) : (
+  menuItems.map((item, index) => (
             <TouchableOpacity key={item.id || index} style={styles.menuItem} onPress={() => onPress(item)}>
               <Image source={{ uri: item.image_url }} style={styles.menuItemImage} />
               <View style={styles.menuItemText}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState,useContext, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch, Image, Alert, Dimensions } from 'react-native';
 import { io } from 'socket.io-client';
 import moment from 'moment';
@@ -7,6 +7,7 @@ import { BASE_URLIO ,BASE_URL} from '@env';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import * as Device from 'expo-device';
+import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
 
 const { width, height } = Dimensions.get('window');
 
@@ -20,20 +21,36 @@ const DriverOrdersScreen = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
   const [activeStatusMessage, setActiveStatusMessage] = useState('Fetching status...');
-
+  const { startTracking } = useContext(LocationContext); 
   useEffect(() => {
     const fetchAndSetDeviceId = async () => {
       await getDeviceId();
     };
     fetchAndSetDeviceId();
+    startTracking(deviceId);
+
   }, []);
 
   useEffect(() => {
     if (deviceId) {
       fetchDriverId();
+      startTracking(deviceId);
+
     }
   }, [deviceId]);
+  useEffect(() => {
+    let interval;
+  
+  
+      // Start tracking when the modal is visible
+      interval = setInterval(() => {
+        startTracking(deviceId);
+      }, 5000); // Adjust the interval time as needed (5000ms = 5 seconds)
 
+  
+    // Cleanup interval when modal is closed
+    return () => clearInterval(interval);
+  }, [ deviceId]);
   useEffect(() => {
     if (driverId) {
       const socket = io(BASE_URLIO);
