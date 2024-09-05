@@ -17,9 +17,14 @@ const DriverModal = ({ visible, onClose, driver }) => {
   useEffect(() => {
     setEditableDriver({ ...driver });
     socket.emit('locationUpdateForAdminRequest', { deviceId: driver.deviceId });
-
+console.log('------------------------------------');
+console.log('Received location update:'+driver.deviceId );
+console.log('------------------------------------');
     // Listen for real-time location updates and connection status
     socket.on('locationUpdateForAdmin', ({ deviceId, latitude, longitude, isConnected }) => {
+      console.log('------------------------------------');
+      console.log('Received location update:', { deviceId, latitude, longitude, isConnected });
+      console.log('------------------------------------');
       if (deviceId === driver.deviceId) {
         setLocation({ latitude, longitude });
         setIsConnected(isConnected); // Update connection status
