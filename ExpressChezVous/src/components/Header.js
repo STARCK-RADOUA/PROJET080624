@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     margin: 10,
     marginTop: 0,
     marginBottom: 0,
-    paddingTop: height * (Platform.OS === 'ios' ? 0.07 : 0.05),
+    paddingTop: height * (Platform.OS === 'ios' ? 0.08 : 0.05),
     alignItems: 'center',
 backgroundColor: '#e9ab25',
 borderRadius: 20,
