@@ -2,8 +2,6 @@ import React, { useState,useContext, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch, Image, Alert, Dimensions } from 'react-native';
 import { io } from 'socket.io-client';
 import moment from 'moment';
-import { AppState } from 'react-native';
-
 import OrderDetailModal from '../components/OrderDetailModal';
 import { BASE_URLIO ,BASE_URL} from '@env';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,9 +22,6 @@ const DriverOrdersScreen = () => {
   const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
   const [activeStatusMessage, setActiveStatusMessage] = useState('Fetching status...');
   const { startTracking } = useContext(LocationContext); 
-  const socket = io(BASE_URLIO);
-  const [appState, setAppState] = useState(AppState.currentState);
-
   useEffect(() => {
     const fetchAndSetDeviceId = async () => {
 setDeviceId(Device.osBuildId);    };
@@ -42,35 +37,11 @@ setDeviceId(Device.osBuildId);    };
 
     }
   }, [deviceId]);
-  useEffect(() => {
-    const handleAppStateChange = (nextAppState) => {
-      if (appState.match(/inactive|background/) && nextAppState === 'active') {
-        console.log('App has come to the foreground!');
-        // Reconnect logic when app comes to the foreground
-        socket.connect();
-        startTracking(deviceId);
-
-      }
-
-      if (nextAppState === 'background') {
-        console.log('App is in the background or closed');
-        // Disconnect logic when app goes to the background or is closed
-        socket.disconnect();
-      }
-
-      setAppState(nextAppState);
-    };
-
-    AppState.addEventListener('change', handleAppStateChange);
-
-    return () => {
-      AppState.removeEventListener('change', handleAppStateChange);
-    };
-  }, [appState]);
-
+  
 
   useEffect(() => {
     if (driverId) {
+      const socket = io(BASE_URLIO);
       socket.emit('driverConnected', driverId);
 
       socket.on('connect', () => {
