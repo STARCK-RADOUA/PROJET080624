@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef  ,} from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import io from 'socket.io-client';
-import { BASE_URLIO } from '@env';
+import { BASE_URLIO  , BASE_URL} from '@env';
+import { useFocusEffect } from '@react-navigation/native';
+import axios from 'axios';
 
 const RoomScreen = ({ route }) => {
   const { userId, firstName, lastName } = route.params;
@@ -13,6 +15,30 @@ const RoomScreen = ({ route }) => {
   const adminId = '66bac40871e4a7ed9e6fc705'; 
   const userType = 'Admin'; 
 
+  // UseFocusEffect to mark messages as seen
+  useFocusEffect(
+    React.useCallback(() => {
+      const markMessagesAsSeen = async () => {
+        try {
+          if (chatId) {
+            await axios.post(`${BASE_URL}/api/chats/mark-seenFA`, {
+              chatId,
+            });
+            console.log("Messages marked as seen");
+          }
+        } catch (error) {
+          console.error("Error marking messages as seen:", error);
+        }
+      };
+
+      markMessagesAsSeen();
+
+      return () => {
+        console.log("Cleanup on screen exit");
+      };
+    }, [chatId])
+  );
+
   useEffect(() => {
     socketRef.current = io(BASE_URLIO);
 
@@ -23,6 +49,7 @@ const RoomScreen = ({ route }) => {
       setMessages(messages);
       scrollToBottom(); // Scroll to bottom when messages are loaded
     });
+    
 
     socketRef.current.on('newMessage', ({ message }) => {
       setMessages(prevMessages => [...prevMessages, message]);
@@ -117,15 +144,22 @@ const RoomScreen = ({ route }) => {
       </ScrollView>
 
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Type a message..."
-          value={newMessage}
-          onChangeText={setNewMessage}
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Text style={styles.sendButtonText}>Send</Text>
-        </TouchableOpacity>
+      <TextInput
+  style={[styles.input, !chatId && styles.disabledInput]} // Apply disabled style when chatId is null
+  placeholder="Type a message..."
+  value={newMessage}
+  onChangeText={setNewMessage}
+  editable={!!chatId} // Disable the input if chatId is null
+/>
+
+       <TouchableOpacity 
+  style={[styles.sendButton, !chatId && styles.disabledSendButton]} 
+  onPress={sendMessage}
+  disabled={!chatId} // Disable the button if chatId is null
+>
+  <Text style={styles.sendButtonText}>Send</Text>
+</TouchableOpacity>
+
       </View>
     </View>
   );
@@ -228,7 +262,14 @@ const styles = StyleSheet.create({
   sendButtonText: {
     color: '#ffffff',
     fontWeight: 'bold',
+  },disabledInput: {
+    backgroundColor: '#f0f0f0', // Lighter background for the disabled input
+    color: '#a0a0a0', // Change text color to grey to indicate disabled state
   },
+  disabledSendButton: {
+    backgroundColor: '#cccccc', // Greyed-out color for the disabled state
+  },
+    
 });
 
 export default RoomScreen;
