@@ -12,15 +12,18 @@ const DriverModal = ({ visible, onClose, driver }) => {
 
   const [editableDriver, setEditableDriver] = useState({ ...driver });
   const [location, setLocation] = useState(null); // Store real-time location data
+  const [isConnected, setIsConnected] = useState(false); // Store connection status
 
   useEffect(() => {
     setEditableDriver({ ...driver });
+    socket.emit('locationUpdateForAdminRequest', { deviceId: driver.deviceId });
 
-    // Listen for real-time location updates
-    socket.on('locationUpdateForAdmin', (data) => {
-      if (data.driverId === editableDriver._id) {
-        setLocation({ latitude: data.latitude, longitude: data.longitude });
-        console.log(`Driver ${data.driverId}: ${data.latitude}, ${data.longitude}`);
+    // Listen for real-time location updates and connection status
+    socket.on('locationUpdateForAdmin', ({ deviceId, latitude, longitude, isConnected }) => {
+      if (deviceId === driver.deviceId) {
+        setLocation({ latitude, longitude });
+        setIsConnected(isConnected); // Update connection status
+        console.log(`Driver's new location: Latitude ${latitude}, Longitude ${longitude}, Connected: ${isConnected}`);
       }
     });
 
@@ -67,24 +70,18 @@ const DriverModal = ({ visible, onClose, driver }) => {
     }
   };
 
+  // Open Google Maps with the driver's real-time location
   const openGoogleMaps = () => {
-    if (location) {
-      const url = `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`;
-      Linking.openURL(url).catch(err => console.error('Error opening Google Maps', err));
-    } else {
-      Alert.alert('Location unavailable', 'No real-time location available for this driver.');
-    }
+    const url = `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`;
+    Linking.openURL(url).catch(err => console.error('Error opening Google Maps', err));
   };
 
+  // Open Waze with the driver's real-time location
   const openWaze = () => {
-    if (location) {
-      const url = `waze://?ll=${location.latitude},${location.longitude}&navigate=yes`;
-      Linking.openURL(url).catch(err => {
-        Alert.alert("Can't open Waze", "Make sure Waze is installed on your device.");
-      });
-    } else {
-      Alert.alert('Location unavailable', 'No real-time location available for this driver.');
-    }
+    const url = `waze://?ll=${location.latitude},${location.longitude}&navigate=yes`;
+    Linking.openURL(url).catch(err => {
+      Alert.alert("Can't open Waze", "Make sure Waze is installed on your device.");
+    });
   };
 
   return (
@@ -114,7 +111,38 @@ const DriverModal = ({ visible, onClose, driver }) => {
             </Text>
           </View>
 
+          <View style={styles.fieldRow}>
+            <Text style={styles.label}>Points Earned:</Text>
+            <Text style={styles.textValue}>{editableDriver.points_earned}</Text>
+          </View>
+
+          <View style={styles.fieldRow}>
+            <Text style={styles.label}>User Type:</Text>
+            <Text style={styles.textValue}>{editableDriver.userType}</Text>
+          </View>
+
+          {/* Connection Status */}
+          <View style={styles.fieldRow}>
+            <Text style={styles.label}>Connection Status:</Text>
+            <Text style={[styles.textValue, { color: isConnected ? 'green' : 'red' }]}>
+              {isConnected ? 'Connected' : 'Disconnected'}
+            </Text>
+          </View>
+
           <View style={styles.separator} />
+
+          {/* Buttons to open navigation apps */}
+          <View style={styles.fieldRow}>
+            <TouchableOpacity style={styles.navigateButton} onPress={openGoogleMaps}>
+              <Ionicons name="navigate-outline" size={24} color="white" />
+              <Text style={styles.navigateText}>Google Maps</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.navigateButton} onPress={openWaze}>
+              <Ionicons name="navigate-outline" size={24} color="white" />
+              <Text style={styles.navigateText}>Waze</Text>
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.fieldRow}>
             <Text style={styles.label}>Activated:</Text>
@@ -136,19 +164,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
             />
           </View>
 
-          {/* Button to open navigation apps */}
-          <View style={styles.fieldRow}>
-            <TouchableOpacity style={styles.navigateButton} onPress={openGoogleMaps}>
-              <Ionicons name="navigate-outline" size={24} color="white" />
-              <Text style={styles.navigateText}>Open in Google Maps</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.navigateButton} onPress={openWaze}>
-              <Ionicons name="navigate-outline" size={24} color="white" />
-              <Text style={styles.navigateText}>Open in Waze</Text>
-            </TouchableOpacity>
-          </View>
-
         </View>
       </View>
     </Modal>
@@ -164,7 +179,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: '85%',
-    backgroundColor: '#333',
+    backgroundColor: '#333', 
     borderRadius: 15,
     padding: 25,
     alignItems: 'stretch',
@@ -183,7 +198,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1f695a',
+    color: '#1f695a', 
     textAlign: 'center',
     marginVertical: 15,
   },
@@ -197,12 +212,12 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#ddd',
+    color: '#ddd', 
     marginBottom: 5,
   },
   textValue: {
     fontSize: 16,
-    color: '#fff',
+    color: '#fff', 
     fontWeight: '500',
     flex: 2,
     textAlign: 'right',
@@ -210,7 +225,7 @@ const styles = StyleSheet.create({
   navigateButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#34C759',
+    backgroundColor: '#afb997',
     padding: 10,
     borderRadius: 8,
     marginVertical: 5,

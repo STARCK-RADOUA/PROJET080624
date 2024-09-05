@@ -24,10 +24,9 @@ const DriverOrdersScreen = () => {
   const { startTracking } = useContext(LocationContext); 
   useEffect(() => {
     const fetchAndSetDeviceId = async () => {
-      await getDeviceId();
-    };
+setDeviceId(Device.osBuildId);    };
     fetchAndSetDeviceId();
-    startTracking(deviceId);
+    startTracking(Device.osBuildId);
 
   }, []);
 
@@ -38,19 +37,7 @@ const DriverOrdersScreen = () => {
 
     }
   }, [deviceId]);
-  useEffect(() => {
-    let interval;
-  
-  
-      // Start tracking when the modal is visible
-      interval = setInterval(() => {
-        startTracking(deviceId);
-      }, 5000); // Adjust the interval time as needed (5000ms = 5 seconds)
 
-  
-    // Cleanup interval when modal is closed
-    return () => clearInterval(interval);
-  }, [ deviceId]);
   useEffect(() => {
     if (driverId) {
       const socket = io(BASE_URLIO);
