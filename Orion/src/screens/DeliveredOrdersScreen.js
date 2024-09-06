@@ -19,9 +19,9 @@ const DeliveredOrdersScreen = () => {
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
-
-    socket.on('orderHistoryUpdated', (data) => {
-      console.log('Order history updated:', JSON.stringify(data.orders));
+         
+    socket.emit('getDeliveredOrders') ;
+    socket.on('orderDeliverredUpdated', (data) => {
       setOrders(data.orders);
       setFilteredOrders(data.orders); // Show all orders by default
       setLoading(false); // Stop loading once data is fetched

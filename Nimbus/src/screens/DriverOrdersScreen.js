@@ -8,6 +8,8 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import * as Device from 'expo-device';
 import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
+import { useNavigation } from '@react-navigation/native';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -166,6 +168,12 @@ setDeviceId(Device.osBuildId);    };
     </>
   );
 
+  const navigation = useNavigation();
+
+  const handleNavigate = () => {
+    navigation.navigate('SupportChat'); // Replace 'YourTargetScreen' with the actual screen name
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerh}>
@@ -216,6 +224,9 @@ setDeviceId(Device.osBuildId);    };
       ) : (
         <View style={styles.disabledView}>
           <Text style={styles.disabledText}>Please enable availability to view orders.</Text>
+          <TouchableOpacity style={styles.navigateButton} onPress={handleNavigate}>
+            <Text style={styles.navigateButtonText}>Go to CHAT</Text>
+          </TouchableOpacity>
         </View>
       )}
 

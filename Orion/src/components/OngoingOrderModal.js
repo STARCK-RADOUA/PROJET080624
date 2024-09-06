@@ -1,15 +1,17 @@
-import { BASE_URL } from '@env';
+import { BASE_URL ,BASE_URLIO} from '@env';
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import axios from 'axios';
 import { Picker } from '@react-native-picker/picker'; // Correct Picker import
+import { io } from 'socket.io-client';
 
 const DeliveredOrderModal = ({ visible, onClose, order }) => {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [drivers, setDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
+  const socket = io(BASE_URLIO);
 
   if (!order) return null;
 
@@ -55,6 +57,8 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
       })
       .then(response => {
         console.log('Order affected successfully:', response.data);
+        socket.emit('watchOrderStatuss', { order_id: order.order_number });
+
         onClose(); // Close the modal after affecting the order
       })
       .catch(error => {
