@@ -152,14 +152,14 @@ const ShoppingCartScreen = ({ navigation }) => {
   }, [orderItems]);
 
   useEffect(() => {
-    socket.emit('watchServicePointsStatuss', { serviceID: sharedData.id });
 
-    // Listen for order status updates
-    socket.on('oserviceStatusUpdates', (data) => {
-      console.log("service data is ", data);
+    socket.on('servicesUpdated', ({ services })  => {
+      const filteredServices = services.filter(service => service._id === sharedData.id );
+
+      console.log("service data is ", filteredServices);
       
       // Check if the system point is active and show the modal
-      if (!data.service.isSystemPoint) {
+      if (!filteredServices.isSystemPoint) {
         setIsSystemPointModalVisible(true);
         
       }else{
