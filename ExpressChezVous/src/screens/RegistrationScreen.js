@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import axios from 'axios';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import { BASE_URL, BASE_URLIO } from '@env';
 import { getClient } from '../services/userService';
 const socket = io(`${BASE_URLIO}`);

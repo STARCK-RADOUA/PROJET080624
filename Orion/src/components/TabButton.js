@@ -3,6 +3,7 @@ import { TouchableOpacity, View, Text, Alert, ActivityIndicator } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 import { BASE_URL } from '@env';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import { AuthContext,AuthProvider } from '../redux/AuthProvider'; // Import AuthContext
 import LoginScreen from '../screens/LoginScreen';
 const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket,onLogin }) => {

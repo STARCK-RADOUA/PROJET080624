@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import io from 'socket.io-client';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 
 const socket = io(`${BASE_URLIO}`); // Replace with your server's URL
 

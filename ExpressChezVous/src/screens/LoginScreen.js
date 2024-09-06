@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, ImageBackground, Dimensions, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import io from 'socket.io-client';
 import { styles } from './styles/loginstyle';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, Modal, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
 import io from 'socket.io-client';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import Header from '../components/Header';
 import useNotificationMenu from '../services/useNotificationMenu'; // Import the custom hook
 import NotificationMenu from '../components/NotificationMenu';

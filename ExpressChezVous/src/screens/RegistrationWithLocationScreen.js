@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 

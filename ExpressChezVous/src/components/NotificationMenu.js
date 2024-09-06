@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, TouchableWithoutFeedback, FlatList, Modal } from 'react-native';
 import io from 'socket.io-client';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import axios from 'axios';
 
 let socket;

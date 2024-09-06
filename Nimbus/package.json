@@ -16,6 +16,7 @@
     "@react-navigation/stack": "^6.4.1",
     "axios": "^1.7.4",
     "expo": "~51.0.24",
+    "expo-dev-client": "^4.0.26",
     "expo-device": "~6.0.2",
     "expo-location": "~17.0.1",
     "expo-screen-capture": "^6.0.1",

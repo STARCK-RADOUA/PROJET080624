@@ -5,6 +5,7 @@ import io from 'socket.io-client';
 import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
 import { BASE_URL ,BASE_URLIO} from '@env';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 
 
 

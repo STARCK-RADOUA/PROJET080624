@@ -8,6 +8,7 @@ import { getClientId } from '../services/userService';
 import Header from '../components/Header';
 import io from 'socket.io-client';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import useNotificationMenu from '../services/useNotificationMenu'; 
 import NotificationMenu from '../components/NotificationMenu';
 import { DataContext } from '../navigation/DataContext';

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert, Switch, TouchableOpacity, ScrollView, Animated, Image } from 'react-native';
 import axios from 'axios';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import io from 'socket.io-client';
 import { Ionicons } from '@expo/vector-icons';
 

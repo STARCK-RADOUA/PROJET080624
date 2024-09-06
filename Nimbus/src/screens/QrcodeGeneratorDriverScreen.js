@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ScreenCapture from 'expo-screen-capture'; 
 import { BASE_URL, BASE_URLIO } from '@env';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 
 const QrcodeGeneratorDriverScreen = () => {
   const [qrData, setQrData] = useState(null);

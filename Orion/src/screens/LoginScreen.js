@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } fro
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import { BASE_URL, BASE_URLIO } from '@env';
 import io from 'socket.io-client';
 

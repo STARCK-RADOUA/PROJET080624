@@ -6,6 +6,7 @@ import MainNavigator from './src/navigation/MainNavigator';
 import * as Notifications from 'expo-notifications';
 import axios from 'axios';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import { BASE_URL } from '@env';
 
 export default function App() {

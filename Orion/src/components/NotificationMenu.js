@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, FlatList, Modal, TextInput } from 'react-native';
 import io from 'socket.io-client';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import { Ionicons } from '@expo/vector-icons';
 
 let socket;

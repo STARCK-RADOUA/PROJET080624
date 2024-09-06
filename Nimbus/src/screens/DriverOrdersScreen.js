@@ -9,6 +9,7 @@ import { BASE_URLIO ,BASE_URL} from '@env';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
 import { useNavigation } from '@react-navigation/native';
 

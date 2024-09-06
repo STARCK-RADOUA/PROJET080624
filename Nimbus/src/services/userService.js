@@ -2,6 +2,7 @@ import { BASE_URL } from '@env';
 
 import axios from 'axios';
 import DeviceInfo from 'react-native-device-info';
+import 'expo-dev-client';
 
 // Function to get the device ID
 const getDeviceId = () => {
