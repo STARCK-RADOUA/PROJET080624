@@ -5,8 +5,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import LoginScreen from './src/screens/LoginScreen';
-import SupportChat from './src/screens/SupportChatScreen';
-
 import OrderScreen from './src/screens/DriverOrdersScreen';
 import QrcodeGeneratorDriverScreen from './src/screens/QrcodeGeneratorDriverScreen';
 import { LocationProvider } from './src/utils/LocationContext'; // Import the LocationProvider
@@ -33,11 +31,6 @@ export default function App() {
               name="QrcodeGeneratorDriverScreen"
               component={QrcodeGeneratorDriverScreen}
               options={{ headerShown: true }}
-            />
-             <Stack.Screen
-              name="SupportChat"
-              component={SupportChat}
-              options={{ headerShown: false }}
             />
           </Stack.Navigator>
         </View>

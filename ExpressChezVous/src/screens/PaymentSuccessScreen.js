@@ -87,10 +87,10 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
     }
 };
 
-
   // Emit orderId when component mounts to start watching order status
   useEffect(() => {
     
+    socket.emit('watchOrderStatuss', { order_id: orderId });
     
     // Listen for order status updates
     socket.on('orderStatusUpdates', (data) => {
@@ -98,9 +98,6 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
       const client_id = data.order.client_id;
       const driver_id = data.order.driver_id;
 
-      console.log(status) ;
-      console.log(clientId) ;
-      console.log(driverId ,"d") ;
       setClientId(client_id);
       setDriverId(driver_id);
       setOrderStatus(status);

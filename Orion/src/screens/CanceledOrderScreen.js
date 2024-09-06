@@ -20,9 +20,8 @@ const CanceledOrderScreen = () => {
   useEffect(() => {
     const socket = io(BASE_URLIO);
 
-    socket.emit('getCancelledOrders');
-
     socket.on('orderCanceledUpdated', (data) => {
+      console.log('Order history updated:', JSON.stringify(data.orders));
       setOrders(data.orders);
       setFilteredOrders(data.orders); // Show all orders by default
       setLoading(false); // Stop loading once data is fetched

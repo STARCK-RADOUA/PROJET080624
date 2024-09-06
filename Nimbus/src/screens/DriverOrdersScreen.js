@@ -11,8 +11,6 @@ import axios from 'axios';
 import DeviceInfo from 'react-native-device-info';
 import 'expo-dev-client';
 import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
-import { useNavigation } from '@react-navigation/native';
-
 
 const { width, height } = Dimensions.get('window');
 
@@ -173,12 +171,6 @@ setDeviceId(DeviceInfo.getUniqueId());    };
     </>
   );
 
-  const navigation = useNavigation();
-
-  const handleNavigate = () => {
-    navigation.navigate('SupportChat'); // Replace 'YourTargetScreen' with the actual screen name
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.headerh}>
@@ -232,9 +224,6 @@ setDeviceId(DeviceInfo.getUniqueId());    };
       ) : (
         <View style={styles.disabledView}>
           <Text style={styles.disabledText}>Please enable availability to view orders.</Text>
-          <TouchableOpacity style={styles.navigateButton} onPress={handleNavigate}>
-            <Text style={styles.navigateButtonText}>Go to CHAT</Text>
-          </TouchableOpacity>
         </View>
       )}
 
