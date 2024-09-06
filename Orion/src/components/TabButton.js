@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { TouchableOpacity, View, Text, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BASE_URL } from '@env';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import { AuthContext,AuthProvider } from '../redux/AuthProvider'; // Import AuthContext
 import LoginScreen from '../screens/LoginScreen';
 const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket,onLogin }) => {
@@ -12,7 +12,7 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket,onLogin 
 
   const handleLogout = async () => {
     setLoading(true);
-    const deviceId =  Device.osBuildId;
+    const deviceId =  DeviceInfo.getUniqueId();
     console.log('------------------------------------');
     console.log('Logging out...', deviceId);
     console.log('------------------------------------');

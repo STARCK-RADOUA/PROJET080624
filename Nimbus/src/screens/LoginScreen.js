@@ -1,20 +1,26 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import axios from 'axios';
-import * as Device from 'expo-device';
 import io from 'socket.io-client';
 import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
 import { BASE_URL ,BASE_URLIO} from '@env';
+import DeviceInfo from 'react-native-device-info';
+
+
+
 const LoginScreen = ({ navigation }) => {
   const [deviceId, setDeviceId] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
   const { startTracking } = useContext(LocationContext); // Use the LocationContext
-
-  const getDeviceId = async () => {
-    setDeviceId(Device.osBuildId); // Set deviceId using expo-device's osBuildId
+  const getDeviceId = () => {
+    setDeviceId(DeviceInfo.getUniqueId()); 
+    console.log('------------------------------------');
+    console.log('Device ID:', deviceId);
+    console.log('------------------------------------');// This works for both Android and iOS
   };
+
 
   useEffect(() => {
     getDeviceId();
@@ -23,7 +29,7 @@ const LoginScreen = ({ navigation }) => {
   }, []);
   const autoLogin = async () => {
     const socket = io(BASE_URLIO);
-    const deviceId = Device.osBuildId;
+    const deviceId = DeviceInfo.getUniqueId();
 
     if (deviceId) {
       socket.emit('autoLogin', { deviceId });

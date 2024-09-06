@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import { BASE_URL, BASE_URLIO } from '@env';
 import { getClient } from '../services/userService';
 const socket = io(`${BASE_URLIO}`);
@@ -25,7 +25,7 @@ console.log(route.params.uniqueId,"yuyuuyuyuyyuyuyuyuyuyuyuyuyuyuyuyyuy");
 console.log('------------------------------------');
   useEffect(() => {
     const getDeviceId = async () => {
-      const id = Device.osBuildId;
+      const id = DeviceInfo.getUniqueId();
       setDeviceId(id);
     };
 

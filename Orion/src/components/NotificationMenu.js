@@ -2,7 +2,7 @@ import { BASE_URLIO } from '@env';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, FlatList, Modal, TextInput } from 'react-native';
 import io from 'socket.io-client';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import { Ionicons } from '@expo/vector-icons';
 
 let socket;
@@ -21,7 +21,7 @@ const NotificationMenu = ({ navigation }) => {
 
   useEffect(() => {
     const getDeviceId = async () => {
-      const id = Device.osBuildId;
+      const id = DeviceInfo.getUniqueId();
       setDeviceId(id);
 
       if (!socket) {
