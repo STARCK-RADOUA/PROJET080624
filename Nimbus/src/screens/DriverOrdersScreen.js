@@ -1,6 +1,8 @@
 import React, { useState,useContext, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch, Image, Alert, Dimensions } from 'react-native';
 import { io } from 'socket.io-client';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Importer l'icône QR
+
 import moment from 'moment';
 import OrderDetailModal from '../components/OrderDetailModal';
 import { BASE_URLIO ,BASE_URL} from '@env';
@@ -11,7 +13,7 @@ import { LocationContext } from '../utils/LocationContext'; // Import the Locati
 
 const { width, height } = Dimensions.get('window');
 
-const DriverOrdersScreen = () => {
+const DriverOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
@@ -154,7 +156,9 @@ setDeviceId(Device.osBuildId);    };
   const handleCloseModal = () => {
     setSelectedOrder(null);
   };
-
+  const handleQRCodePress = () => {
+    navigation.navigate('QrcodeGeneratorDriverScreen'); // Navigue vers l'écran de génération de QR code
+  };
   const renderSkeleton = () => (
     <>
       {[...Array(3)].map((_, index) => (
@@ -170,6 +174,9 @@ setDeviceId(Device.osBuildId);    };
     <View style={styles.container}>
       <View style={styles.headerh}>
         <View style={styles.headerv}>
+        <TouchableOpacity  style={styles.qr} onPress={handleQRCodePress}>
+          <Icon name="qrcode-scan" style={styles.qr1} size={45} color="#fff" />
+        </TouchableOpacity>
           <Text style={styles.headerText}>Driver Availability</Text>
           <Switch
             trackColor={{ false: '#7a2424', true: '#1c7745' }}
@@ -248,6 +255,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
   },
+   qr: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+   qr1: {
+    alignItems: 'center',
+    justifyContent: 'start',
+  },
   headerh: {
     marginTop: 28,
 
@@ -267,7 +288,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     color: '#A5A5A5',
-    fontSize: 18,
+    fontSize: 19,
   },
   card: {
     flexDirection: 'row',
