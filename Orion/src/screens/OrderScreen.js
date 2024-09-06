@@ -3,7 +3,7 @@ import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, Modal, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
 import io from 'socket.io-client';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 
 
 const { width, height } = Dimensions.get('window');
@@ -18,7 +18,7 @@ const OrderScreen = ({ navigation }) => {
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const deviceId = Device.osBuildId;
+    const deviceId = DeviceInfo.getUniqueId();
 
     socket.emit('requestOrders', deviceId);
 

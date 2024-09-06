@@ -7,7 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getClientId } from '../services/userService';
 import Header from '../components/Header';
 import io from 'socket.io-client';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import useNotificationMenu from '../services/useNotificationMenu'; 
 import NotificationMenu from '../components/NotificationMenu';
 import { DataContext } from '../navigation/DataContext';
@@ -46,7 +46,7 @@ const ShoppingCartScreen = ({ navigation }) => {
     };
     fetchUserData();
 
-    const deviceId = Device.osBuildId;
+    const deviceId = DeviceInfo.getUniqueId();
     console.log('Device ID:', deviceId);
   }, []);
 
@@ -303,7 +303,7 @@ const ShoppingCartScreen = ({ navigation }) => {
 
   const handleOrderNow = async () => {
     try {
-      const deviceId = Device.osBuildId;
+      const deviceId = DeviceInfo.getUniqueId();
       const data = {
         totalPrice: totalPrice,
         orderItems: orderItems,

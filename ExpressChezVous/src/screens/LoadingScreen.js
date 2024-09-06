@@ -3,7 +3,7 @@ import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import io from 'socket.io-client';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 
 const socket = io(`${BASE_URLIO}`); // Replace with your server's URL
 
@@ -11,7 +11,7 @@ const LoadingScreen = ({ navigation }) => {
   const [isActivated, setIsActivated] = useState(false);
 
   useEffect(() => {
-    const deviceId = Device.osBuildId;
+    const deviceId = DeviceInfo.getUniqueId();
 
     const intervalId = setInterval(() => {
       console.log('Emitting checkActivation event...');

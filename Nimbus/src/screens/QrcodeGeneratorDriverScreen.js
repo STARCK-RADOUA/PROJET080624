@@ -5,7 +5,7 @@ import { getDriverId, getDeviceIde } from '../services/userService'; // Remplace
 import { Ionicons } from '@expo/vector-icons';
 import * as ScreenCapture from 'expo-screen-capture'; 
 import { BASE_URL, BASE_URLIO } from '@env';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 
 const QrcodeGeneratorDriverScreen = () => {
   const [qrData, setQrData] = useState(null);
@@ -15,12 +15,12 @@ const QrcodeGeneratorDriverScreen = () => {
   const [deviceId, setDeviceId] = useState('');
   
   const getDeviceId = async () => {
-   await setDeviceId(Device.osBuildId);
+   await setDeviceId(DeviceInfo.getUniqueId());
     // Set deviceId using expo-device's osBuildId
   };
   // Fonction pour générer le QR code
   const generateQRCode = async () => {
-    try { const deviceId = Device.osBuildId;
+    try { const deviceId = DeviceInfo.getUniqueId();
         console.log('------------------------------------');
         console.log('Device ID:', deviceId);
         console.log('------------------------------------');

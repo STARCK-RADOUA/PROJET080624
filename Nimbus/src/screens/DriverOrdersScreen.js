@@ -8,14 +8,14 @@ import OrderDetailModal from '../components/OrderDetailModal';
 import { BASE_URLIO ,BASE_URL} from '@env';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
 import { useNavigation } from '@react-navigation/native';
 
 
 const { width, height } = Dimensions.get('window');
 
-const DriverOrdersScreen = ({ navigation }) => {
+const DriverOrdersScreen = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
@@ -28,9 +28,9 @@ const DriverOrdersScreen = ({ navigation }) => {
   const { startTracking } = useContext(LocationContext); 
   useEffect(() => {
     const fetchAndSetDeviceId = async () => {
-setDeviceId(Device.osBuildId);    };
+setDeviceId(DeviceInfo.getUniqueId());    };
     fetchAndSetDeviceId();
-    startTracking(Device.osBuildId);
+    startTracking(DeviceInfo.getUniqueId());
 
   }, []);
 
@@ -125,7 +125,7 @@ setDeviceId(Device.osBuildId);    };
 
   const getDeviceId = async () => {
    
-      setDeviceId(Device.osBuildId);
+      setDeviceId(DeviceInfo.getUniqueId());
     
   };
 

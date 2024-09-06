@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, ImageBackground, Dimensions, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import io from 'socket.io-client';
 import { styles } from './styles/loginstyle';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -31,7 +31,7 @@ const LoginScreen = ({ navigation }) => {
 
   // Auto-login function
   const autoLogin = async () => {
-    const deviceId = Device.osBuildId;
+    const deviceId = DeviceInfo.getUniqueId();
 console.log(deviceId)
     if (deviceId) {
       socket.emit('autoLogin', { deviceId });
@@ -44,7 +44,7 @@ console.log(deviceId)
 
   // Manual login function
   const manualLogin = async () => {
-    const deviceId = Device.osBuildId;
+    const deviceId = DeviceInfo.getUniqueId();
     console.log(deviceId)
     console.log("fffffffffffffffffffff")
     if (!phone || !password) {

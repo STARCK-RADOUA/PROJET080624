@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert, Switch, TouchableOpacity, ScrollView, Animated, Image } from 'react-native';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import io from 'socket.io-client';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -21,7 +21,7 @@ const TestScreen = () => {
 
   const getDeviceId = async () => {
     if (Device.isDevice) {
-      setDeviceId(Device.osBuildId);
+      setDeviceId(DeviceInfo.getUniqueId());
     } else {
       Alert.alert('Error', 'Must use a physical device for Device ID.');
     }

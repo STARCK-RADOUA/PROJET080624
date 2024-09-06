@@ -12,13 +12,19 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.riderhard.Nimbus",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "L'application utilise la localisation pour fournir des services basés sur la position.",
+        "NSLocationAlwaysUsageDescription": "L'application a besoin de votre localisation en permanence pour vous fournir les meilleurs services possibles."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.riderhard.Nimbus"
     },
     "web": {
       "favicon": "./assets/favicon.png"
