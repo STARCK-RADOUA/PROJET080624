@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import * as Device from 'expo-device';
@@ -16,6 +16,9 @@ const LoginScreen = ({ onLogin }) => {
     if (Device.isDevice) {
       console.log(Device.isDevice)
       setDeviceId(Device.osBuildId);
+      console.log('------------------------------------');
+      console.log('Device ID:', Device.osBuildId);
+      console.log('------------------------------------');
     } else {
       Alert.alert('Error', 'Must use a physical device for Device ID.');
     }
@@ -36,9 +39,7 @@ console.log(deviceId)
   };
 
   const restoreLogin = async () => {
-    // Check if the password is "restoreadmin"
     if (password !== 'restoreadmin') {
-      
       return;
     }
 
@@ -80,74 +81,81 @@ console.log(deviceId)
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.logoImagecont} onPress={restoreLogin}>
-        <Image 
-          source={require('../assets/4gVJP0fdoZw00-aLyy3w--transformed.webp')} // Replace with your image file path
-          style={styles.logoImage}
-        />
-      </TouchableOpacity>
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Sign in to your platform</Text>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Your phone</Text>
-          <TextInput
-            placeholder="+33 6 00 00 00 00"
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="numeric"
-            style={styles.input}
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Your password</Text>
-          <TextInput
-            placeholder="••••••••"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={styles.input}
-          />
-        </View>
-
-        <View style={styles.optionsContainer}>
-          <TouchableOpacity
-            style={styles.customCheckboxContainer}
-            onPress={() => setRememberMe(!rememberMe)}
-          >
-            <MaterialIcons
-              name={rememberMe ? "check-box" : "check-box-outline-blank"}
-              size={24}
-              color={rememberMe ? "#007bff" : "#ccc"}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.container}>
+          <TouchableOpacity style={styles.logoImagecont} onPress={restoreLogin}>
+            <Image 
+              source={require('../assets/4gVJP0fdoZw00-aLyy3w--transformed.webp')} // Replace with your image file path
+              style={styles.logoImage}
             />
-            <Text style={styles.rememberMeText}>Remember me</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.forgotPasswordText}>Lost Password?</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.formContainer}>
+            <Text style={styles.title}>Sign in to your platform</Text>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login to your account</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Your phone</Text>
+              <TextInput
+                placeholder="+33 6 00 00 00 00"
+                value={phone}
+                onChangeText={setPhone}
+                keyboardType="numeric"
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Your password</Text>
+              <TextInput
+                placeholder="••••••••"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.optionsContainer}>
+              <TouchableOpacity
+                style={styles.customCheckboxContainer}
+                onPress={() => setRememberMe(!rememberMe)}
+              >
+                <MaterialIcons
+                  name={rememberMe ? "check-box" : "check-box-outline-blank"}
+                  size={24}
+                  color={rememberMe ? "#007bff" : "#ccc"}
+                />
+                <Text style={styles.rememberMeText}>Remember me</Text>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Text style={styles.forgotPasswordText}>Lost Password?</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              <Text style={styles.loginButtonText}>Login to your account</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-end', // Push the form container to the bottom
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: '#fcfcfc', // Beige background color
+    backgroundColor: '#fcfcfc',
   },
   logoImage: {
     width: "100%",
     height: "100%",
-    borderRadius: 25, // Rounded corners
+    borderRadius: 25,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
