@@ -93,7 +93,7 @@ const ServicesScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFA500', // Orange background color
+    backgroundColor: '#e9ab25', // Orange background color
     alignItems: 'center',
     paddingTop: 50,
   },
