@@ -82,6 +82,9 @@ function configureNotifications() {
 async function registerForPushNotificationsAsync() {
   let token;
   if (Device.isDevice) {
+    console.log('------------------------------------');
+    console.log('Device ID:', Device.osBuildId);
+    console.log('------------------------------------');
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
@@ -100,6 +103,7 @@ async function registerForPushNotificationsAsync() {
       token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
       console.log('Push token generated:', token);
     } catch (error) {
+
       console.error('Error generating push token:', error);
     }
   } else {
