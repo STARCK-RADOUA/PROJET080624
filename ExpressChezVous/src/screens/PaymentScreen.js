@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f7f7f73', // Dark futuristic background
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'top',
   },
   title: {
     fontSize: 30,

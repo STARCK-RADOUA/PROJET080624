@@ -14,6 +14,7 @@ const LoginScreen = ({ onLogin }) => {
 
   const getDeviceId = async () => {
     if (Device.isDevice) {
+      console.log(Device.isDevice)
       setDeviceId(Device.osBuildId);
     } else {
       Alert.alert('Error', 'Must use a physical device for Device ID.');
@@ -23,7 +24,7 @@ const LoginScreen = ({ onLogin }) => {
   const autoLogin = async () => {
     const socket = io(`${BASE_URLIO}`);
     const deviceId = Device.osBuildId;
-
+console.log(deviceId)
     if (deviceId) {
       socket.emit('adminAutoLogin', { deviceId });
 

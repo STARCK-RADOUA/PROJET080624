@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
+    padding: 30,
     backgroundColor: '#f7f7f7',
   },
   title: {
