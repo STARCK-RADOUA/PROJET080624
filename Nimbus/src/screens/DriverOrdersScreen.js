@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
-const DriverOrdersScreen = ({ navigation }) => {
+const DriverOrdersScreen = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
@@ -42,20 +42,6 @@ setDeviceId(Device.osBuildId);    };
 
     }
   }, [deviceId]);
-  useEffect(() => {
-    let interval;
-  
-    
-      // Start tracking when the modal is visible
-      interval = setInterval(() => {
-        startTracking(deviceId);
-      },    129000); // Adjust the interval time as needed (5000ms = 5 seconds)
-    
-  
-    // Cleanup interval when modal is closed
-    return () => clearInterval(interval);
-  }, [deviceId]);
-  
 
   
   useEffect(() => {

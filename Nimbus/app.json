@@ -12,14 +12,26 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.riderhard.nimbus",
+    
+      "infoPlist": {
+        "UIBackgroundModes": ["fetch", "remote-notification"],
+        "NSUserTrackingUsageDescription": "This identifier will be used to send you notifications for important updates."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
-    },
+      },
+ 
+    "permissions": [
+      "NOTIFICATIONS"
+   
+    ],
+    "package": "com.riderhard.nimbus"
+     },
     "web": {
       "favicon": "./assets/favicon.png"
     }

@@ -9,7 +9,6 @@ import Header from '../components/Header';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
 import useNotificationMenu from '../services/useNotificationMenu'; 
-import NotificationMenu from '../components/NotificationMenu';
 import { DataContext } from '../navigation/DataContext';
 import { getUserDetails } from '../services/userService';
 
@@ -30,7 +29,6 @@ const ShoppingCartScreen = ({ navigation }) => {
 
 
   const [hasUsedPoints, setHasUsedPoints] = useState(false); // New state to track if points were used
-  const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isSystemPointModalVisible, setIsSystemPointModalVisible] = useState(false); // Modal visibility
   const { setSharedData } = useContext(DataContext);
