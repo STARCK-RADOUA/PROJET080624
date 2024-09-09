@@ -7,26 +7,23 @@ import { LocationContext } from '../utils/LocationContext'; // Import the Locati
 import { BASE_URL ,BASE_URLIO} from '@env';
 import { navigate } from '../utils/navigationRef';
 const LoginScreen = ({ navigation }) => {
-  const [deviceId, setDeviceId] = useState('');
+  const deviceId =Device.osBuildId;
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
   const { startTracking } = useContext(LocationContext); // Use the LocationContext
-
-  const getDeviceId = async () => {
-    setDeviceId(Device.osBuildId); // Set deviceId using expo-device's osBuildId
-  };
+  const socket = io(BASE_URLIO, {
+    query: {
+      deviceId:deviceId ,  // Pass the unique clientId
+    }
+  });
+ 
 
   useEffect(() => {
-    getDeviceId();
-    autoLogin();
     startTracking(deviceId);
+    autoLogin();
 
-    const socket = io(BASE_URLIO, {
-      query: {
-        deviceId:deviceId ,  // Pass the unique clientId
-      }
-    });
+    
 
 
 
@@ -36,22 +33,25 @@ const LoginScreen = ({ navigation }) => {
     // Listen for admin deactivation event
     socket.on('adminActivateDriver', () => {
       console.log('Admin actiiive driver');
-      // Navigate to Login screen when driver is deactivated
-autoLogin();    });
+      // Navigate to Login screen when driver is deactivated:
+      autoLogin();
+        });
 return () => {
-  socket.off('adminActivateClient');
+  socket.off('adminActivateDriver');
 };
+    
+
 }, []);
   const autoLogin = async () => {
-    const socket = io(BASE_URLIO);
     const deviceId = Device.osBuildId;
 
     if (deviceId) {
       socket.emit('autoLogin', { deviceId });
       startTracking(deviceId);
       socket.on('loginSuccess', () => {
-        Alert.alert('Login Successful', 'Welcome!');
         navigate('Test');
+       return socket.off('loginSuccess');
+
       });
     }
   };
@@ -65,7 +65,7 @@ return () => {
       });
 
       if (response.status === 200) {
-        Alert.alert('Login Successful', 'Welcome!');
+        Alert.alert('Login Successful', 'hi ,Welcome!');
         
         // Start tracking after successful login
         startTracking(deviceId);
