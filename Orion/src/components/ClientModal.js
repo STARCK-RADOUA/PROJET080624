@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Switch, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import { BASE_URL } from '@env';
-
+import { BASE_URL,BASE_URLIO } from '@env';
+import io from 'socket.io-client';
 const ClientModal = ({ visible, onClose, client }) => {
   if (!client) return null;
 
@@ -13,42 +13,53 @@ const ClientModal = ({ visible, onClose, client }) => {
     setEditableClient({ ...client });
   }, [client]);
 
-  const handleActivateDeactivate = async (isActive) => {
-    try {
-      setEditableClient((prevClient) => ({
-        ...prevClient,
-        activated: isActive,
-      }));
-      await axios.post(`${BASE_URL}/api/users/clients/${editableClient._id}/activate`, { isActive });
-      Alert.alert('Success', `Client ${isActive ? 'activated' : 'deactivated'} successfully.`);
-    } catch (error) {
-      console.error('Error activating/deactivating client:', error);
-      Alert.alert('Error', 'Failed to update activation status. Please try again.');
-      setEditableClient((prevClient) => ({
-        ...prevClient,
-        activated: !isActive,
-      }));
-    }
-  };
+ // Assuming you have already connected the admin to Socket.IO
+const socket = io(BASE_URLIO);
 
-  const handleToggleLoginStatus = async () => {
-    try {
-      const newLoginStatus = !editableClient.isLogin;
-      setEditableClient((prevClient) => ({
-        ...prevClient,
-        isLogin: newLoginStatus,
-      }));
-      await axios.post(`${BASE_URL}/api/users/clients/${editableClient._id}/toggle-login`);
-      Alert.alert('Success', `Login status ${newLoginStatus ? 'enabled' : 'disabled'} successfully.`);
-    } catch (error) {
-      console.error('Error toggling login status:', error);
-      Alert.alert('Error', 'Failed to update login status. Please try again.');
-      setEditableClient((prevClient) => ({
-        ...prevClient,
-        isLogin: !prevClient.isLogin,
-      }));
-    }
-  };
+// Function to activate or deactivate a client via Socket.IO
+const handleActivateDeactivate = (isActive) => {
+  try {
+    setEditableClient((prevClient) => ({
+      ...prevClient,
+      activated: isActive,
+    }));
+
+    // Send activation/deactivation event to server
+    socket.emit('adminActivateDeactivateClient', { clientId: editableClient._id, isActive,deviceId:editableClient.deviceId });
+
+    Alert.alert('Success', `Client ${isActive ? 'activated' : 'deactivated'} successfully.`);
+  } catch (error) {
+    console.error('Error activating/deactivating client:', error);
+    Alert.alert('Error', 'Failed to update activation status. Please try again.');
+    setEditableClient((prevClient) => ({
+      ...prevClient,
+      activated: !isActive,
+    }));
+  }
+};
+
+// Function to toggle the login status of a client via Socket.IO
+const handleToggleLoginStatus = () => {
+  try {
+    const newLoginStatus = !editableClient.isLogin;
+    setEditableClient((prevClient) => ({
+      ...prevClient,
+      isLogin: newLoginStatus,
+    }));
+
+    // Send toggle login status event to server
+    socket.emit('adminToggleLoginStatus', { clientId: editableClient._id,deviceId:editableClient.deviceId });
+
+    Alert.alert('Success', `Login status ${newLoginStatus ? 'enabled' : 'disabled'} successfully.`);
+  } catch (error) {
+    console.error('Error toggling login status:', error);
+    Alert.alert('Error', 'Failed to update login status. Please try again.');
+    setEditableClient((prevClient) => ({
+      ...prevClient,
+      isLogin: !prevClient.isLogin,
+    }));
+  }
+};
 
   return (
     <Modal

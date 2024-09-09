@@ -13,6 +13,7 @@ const LoginScreen = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const socketRef = useRef(null);
+  const deviceId =  Device.osBuildId;
 
   // Animation for logo
   const logoAnim = useRef(new Animated.Value(0)).current;
@@ -25,6 +26,11 @@ const LoginScreen = ({ navigation }) => {
       tension: 40,
       useNativeDriver: true,
     }).start();
+    const socket = io(BASE_URLIO, {
+      query: {
+        deviceId:deviceId ,  // Pass the unique clientId
+      }
+    });
 
     // Socket event listener for admin activation
     socket.on('adminActivateClient', () => {

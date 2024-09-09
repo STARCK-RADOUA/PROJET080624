@@ -6,22 +6,30 @@ import AppNavigator from './src/navigation/AppNavigator'; // Updated import path
 import { registerForPushNotificationsAsync, saveDriverPushToken, configureNotifications } from './src/utils/notificationService';
 import { BASE_URLIO } from '@env';
 import { navigate } from './src/utils/navigationRef'; // Import navigate function
+import * as Device from 'expo-device';
 
 export default function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const notificationListener = useRef();
   const responseListener = useRef();
   const socketRef = useRef(null);
-
+const deviceId =  Device.osBuildId;
   useEffect(() => {
     configureNotifications();
 
+console.log('------------------------------------');
+console.log('Client ID:', deviceId);
+console.log('------------------------------------');
     // Connect to Socket.IO
-    socketRef.current = io(BASE_URLIO);
+    const socket = io(BASE_URLIO, {
+      query: {
+        deviceId:deviceId ,  // Pass the unique clientId
+      }
+    });
 
     // Listen for admin deactivation event
-    socketRef.current.on('adminDeactivateClient', () => {
-      console.log('Admin deactivated Client');
+    socket.on('adminDeactivateClient', () => {
+      console.log('You have been deactivated by the admin');
       // Navigate to Login screen when driver is deactivated
       navigate('Login');
     });
