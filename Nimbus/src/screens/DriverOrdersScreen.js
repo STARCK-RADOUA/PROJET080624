@@ -50,6 +50,7 @@ setDeviceId(Device.osBuildId);    };
       socket.emit('driverConnected', driverId);
 
       socket.on('connect', () => {
+        
         startTracking(deviceId);
 
         console.log('Connected to Socket.IO server');
@@ -76,10 +77,15 @@ setDeviceId(Device.osBuildId);    };
   const updateDriverAvailability = async (newIsEnabled) => {
     try {
       if (driverId) {
+
         await axios.post(`${BASE_URL}/api/driver/updateAvailability`, {
           driverId,
           isDisponible: newIsEnabled,
         });
+console.log('------------------------------------');
+console.log(deviceId);
+console.log('------------------------------------');
+
       }
     } catch (error) {
       console.error('Error updating driver availability:', error);
@@ -115,6 +121,7 @@ setDeviceId(Device.osBuildId);    };
     
   };
 
+  
   useEffect(() => {
     const fetchDriverOrders = () => {
       const socket = io(BASE_URLIO);
