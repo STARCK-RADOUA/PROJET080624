@@ -35,10 +35,13 @@ const LoginScreen = ({ navigation }) => {
 
     // Listen for admin deactivation event
     socket.on('adminActivateDriver', () => {
-      console.log('Admin Activated driver');
+      console.log('Admin actiiive driver');
       // Navigate to Login screen when driver is deactivated
 autoLogin();    });
-  }, []);
+return () => {
+  socket.off('adminActivateClient');
+};
+}, []);
   const autoLogin = async () => {
     const socket = io(BASE_URLIO);
     const deviceId = Device.osBuildId;
