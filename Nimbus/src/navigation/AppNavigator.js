@@ -6,12 +6,13 @@ import LoginScreen from '../screens/LoginScreen';
 import OrderScreen from '../screens/DriverOrdersScreen';
 import QrcodeGeneratorDriverScreen from '../screens/QrcodeGeneratorDriverScreen';
 import SupportChat from '../screens/SupportChatScreen';
+import { navigationRef } from '../utils/navigationRef'; // Import navigationRef
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}> 
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
           name="Login"

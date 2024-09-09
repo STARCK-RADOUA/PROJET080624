@@ -7,8 +7,10 @@ export const LocationContext = createContext();
 
 export const LocationProvider = ({ children }) => {
   const [isTracking, setIsTracking] = useState(false);
+  const [locationSubscription, setLocationSubscription] = useState(null); // Stocke la souscription de localisation
   const socket = io(BASE_URLIO);
 
+  // Fonction pour démarrer le suivi de la localisation
   const startTracking = async (deviceId) => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -18,26 +20,41 @@ export const LocationProvider = ({ children }) => {
 
     setIsTracking(true);
 
-    Location.watchPositionAsync(
+    const subscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 5000, // Update every 5 seconds
-        distanceInterval: 5, // Update every 5 meters
+        timeInterval: 5000, // Mettre à jour toutes les 5 secondes
+        distanceInterval: 5, // Mettre à jour tous les 5 mètres
       },
       (location) => {
         const { latitude, longitude } = location.coords;
-        console.log('------------------------------------');
         console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-        console.log('------------------------------------');
         socket.emit('driverLocationUpdate', { deviceId, latitude, longitude });
       }
     );
+
+    setLocationSubscription(subscription); // Stocker la souscription pour arrêter plus tard
   };
 
+  // Fonction pour arrêter le suivi de la localisation
   const stopTracking = () => {
     setIsTracking(false);
+    if (locationSubscription) {
+      locationSubscription.remove(); // Arrêter l'écoute de la localisation
+      setLocationSubscription(null); // Réinitialiser la souscription
+    }
     socket.disconnect();
   };
+
+  // Nettoyage lors du démontage du composant
+  useEffect(() => {
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+      socket.disconnect();
+    };
+  }, [locationSubscription]);
 
   return (
     <LocationContext.Provider value={{ startTracking, stopTracking, isTracking }}>

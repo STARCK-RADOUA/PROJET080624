@@ -10,8 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import * as Device from 'expo-device';
 import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
-import { useNavigation } from '@react-navigation/native';
-
+import { navigate } from '../utils/navigationRef';
 
 const { width, height } = Dimensions.get('window');
 
@@ -50,7 +49,7 @@ setDeviceId(Device.osBuildId);    };
       socket.emit('driverConnected', driverId);
 
       socket.on('connect', () => {
-        
+
         startTracking(deviceId);
 
         console.log('Connected to Socket.IO server');
@@ -152,7 +151,7 @@ console.log('------------------------------------');
     setSelectedOrder(null);
   };
   const handleQRCodePress = () => {
-    navigation.navigate('QrcodeGeneratorDriverScreen'); // Navigue vers l'écran de génération de QR code
+    navigate('QrcodeGeneratorDriverScreen'); // Navigue vers l'écran de génération de QR code
   };
   const renderSkeleton = () => (
     <>
@@ -165,10 +164,9 @@ console.log('------------------------------------');
     </>
   );
 
-  const navigation = useNavigation();
 
   const handleNavigate = () => {
-    navigation.navigate('SupportChat'); // Replace 'YourTargetScreen' with the actual screen name
+    navigate('SupportChat'); // Replace 'YourTargetScreen' with the actual screen name
   };
 
   return (

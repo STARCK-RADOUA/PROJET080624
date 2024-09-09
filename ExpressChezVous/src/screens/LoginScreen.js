@@ -6,20 +6,18 @@ import { styles } from './styles/loginstyle';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { BASE_URL, BASE_URLIO } from '@env';
 const { width } = Dimensions.get('window');
-
-// Initialize the socket connection
 const socket = io(`${BASE_URLIO}`);
 
 const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const socketRef = useRef(null);
 
   // Animation for logo
   const logoAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Start the animation
     autoLogin();
     Animated.spring(logoAnim, {
       toValue: 1,
@@ -27,17 +25,31 @@ const LoginScreen = ({ navigation }) => {
       tension: 40,
       useNativeDriver: true,
     }).start();
+
+    // Socket event listener for admin activation
+    socket.on('adminActivateClient', () => {
+      console.log('Admin activated Client');
+      autoLogin();
+    });
+
+    return () => {
+      socket.off('adminActivateClient');
+    };
   }, []);
 
   // Auto-login function
   const autoLogin = async () => {
     const deviceId = Device.osBuildId;
-console.log(deviceId)
+    console.log(deviceId);
     if (deviceId) {
       socket.emit('autoLogin', { deviceId });
 
       socket.on('loginSuccess', () => {
-        navigation.replace('Services');
+        // Reset navigation stack and navigate to Services
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Services' }],
+        });
       });
     }
   };
@@ -45,8 +57,6 @@ console.log(deviceId)
   // Manual login function
   const manualLogin = async () => {
     const deviceId = Device.osBuildId;
-    console.log(deviceId)
-    console.log("fffffffffffffffffffff")
     if (!phone || !password) {
       Alert.alert('Erreur', 'Veuillez remplir les champs requis.');
       return;
@@ -58,7 +68,7 @@ console.log(deviceId)
       const payload = {
         phone: phone.trim(),
         password: password.trim(),
-        deviceId
+        deviceId,
       };
 
       const response = await fetch(`${BASE_URL}/api/clients/login`, {
@@ -72,7 +82,11 @@ console.log(deviceId)
       const data = await response.json();
 
       if (response.ok) {
-        navigation.replace('Services');
+        // Reset navigation stack and navigate to Services
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Services' }],
+        });
       } else {
         Alert.alert('Login Failed', data.errors ? data.errors.join(', ') : data.message);
       }
@@ -92,15 +106,13 @@ console.log(deviceId)
       >
         {/* Animated Logo */}
         <Animated.View style={[styles.imageContainer, { transform: [{ scale: logoAnim }] }]}>
-              <Image
-                source={require('../assets/images/8498789.png')}
-                style={[styles.image, { width: width, height: width }]}
-              />
-            </Animated.View>
+          <Image
+            source={require('../assets/images/8498789.png')}
+            style={[styles.image, { width: width, height: width }]}
+          />
+        </Animated.View>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
           <View style={styles.container1}>
-          
-
             {/* Input fields for manual login */}
             <View style={styles.container}>
               <TextInput
@@ -139,7 +151,6 @@ console.log(deviceId)
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      
     </ImageBackground>
   );
 };

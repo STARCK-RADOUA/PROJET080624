@@ -1,48 +1,69 @@
-// App.js
-import React, { useEffect, useState, useRef } from 'react';
-import AppNavigator from './src/navigation/AppNavigator';
-import Toast from 'react-native-toast-message';
-import CustomToast from './src/components/CustomToast'; // Import du composant personnalisé
-import { registerForPushNotificationsAsync, saveTokenToFirestore, addNotificationListeners } from './src/services/notifications';
+import React, { useEffect, useRef, useState } from 'react';
+import {  StyleSheet } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import io from 'socket.io-client';
+import AppNavigator from './src/navigation/AppNavigator'; // Updated import path
+import { registerForPushNotificationsAsync, saveDriverPushToken, configureNotifications } from './src/utils/notificationService';
+import { BASE_URLIO } from '@env';
+import { navigate } from './src/utils/navigationRef'; // Import navigate function
 
 export default function App() {
-  const [expoPushToken, setExpoPushToken] = useState(null);
+  const [expoPushToken, setExpoPushToken] = useState('');
   const notificationListener = useRef();
   const responseListener = useRef();
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    Toast.show({
-      type: 'custom', // Utiliser le type 'custom' pour le toast personnalisé
-      text1: 'Hello',
-      text2: 'This is something 👋',
+    configureNotifications();
+
+    // Connect to Socket.IO
+    socketRef.current = io(BASE_URLIO);
+
+    // Listen for admin deactivation event
+    socketRef.current.on('adminDeactivateClient', () => {
+      console.log('Admin deactivated Client');
+      // Navigate to Login screen when driver is deactivated
+      navigate('Login');
     });
 
+    // Handle push notifications
     registerForPushNotificationsAsync().then(token => {
+      setExpoPushToken(token);
       if (token) {
-        setExpoPushToken(token);
-        saveTokenToFirestore(token);
+        saveDriverPushToken(token);
       }
     });
 
-    const removeListeners = addNotificationListeners(Toast, notificationListener, responseListener);
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notification received in foreground:', notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      const targetScreen = response.notification.request.content.data.targetScreen;
+      if (targetScreen) {
+        console.log('Navigating to:', targetScreen);
+        //navigate(targetScreen);
+      }
+    });
 
     return () => {
-      removeListeners();
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
     };
   }, []);
 
   return (
     <>
-      <AppNavigator />
-      <Toast config={{
-        custom: (internalState) => (
-          <CustomToast
-            type={internalState.type}
-            message1={internalState.text1}
-            message2={internalState.text2}
-          />
-        )
-      }} />
-    </>
+    <AppNavigator />
+  </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

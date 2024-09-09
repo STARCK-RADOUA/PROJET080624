@@ -73,7 +73,7 @@ const ServicesScreen = ({ navigation }) => {
               key={index}
               style={[
                 styles.serviceItem,
-                service.test && styles.testService,
+                false && styles.testService,
                 animatedStyles, // Apply the animation styles only if they are defined
               ]}
             >
@@ -81,7 +81,7 @@ const ServicesScreen = ({ navigation }) => {
                 <Image source={{ uri: service.image }} style={styles.serviceImage} />
                 <Text style={styles.serviceText}>{service.name}</Text>
               </TouchableOpacity>
-              {service.test && <Text style={styles.testLabel}>Test</Text>}
+              {false && <Text style={styles.testLabel}>Test</Text>}
             </Animated.View>
           );
         })}

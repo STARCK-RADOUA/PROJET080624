@@ -1,17 +1,19 @@
-import { BASE_URLIO } from '@env';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, FlatList, Modal, TextInput } from 'react-native';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
 import { Ionicons } from '@expo/vector-icons';
+import AdminNotificationScreen from '../screens/AdminNotificationScreen'; // Importe ton composant
+import { BASE_URLIO } from '@env';
 
 let socket;
 
-const NotificationMenu = ({ navigation }) => {
+const NotificationMenu = () => {
   const [notifications, setNotifications] = useState([]);
   const [filteredNotifications, setFilteredNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [addNotificationVisible, setAddNotificationVisible] = useState(false); // Pour le modal d'ajout de notification
   const [deviceId, setDeviceId] = useState('');
   const [searchText, setSearchText] = useState('');
   const [isAscending, setIsAscending] = useState(true);
@@ -135,6 +137,33 @@ const NotificationMenu = ({ navigation }) => {
         updateCellsBatchingPeriod={30}
         windowSize={7}
       />
+
+      {/* Add Notification Button */}
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => setAddNotificationVisible(true)} // Ouvre le modal pour ajouter une notification
+      >
+        <Ionicons name="add" size={24} color="#fff" />
+        <Text style={styles.addButtonText}>Add Notification</Text>
+      </TouchableOpacity>
+
+      <Modal
+        transparent={true}
+        visible={addNotificationVisible}
+        onRequestClose={() => setAddNotificationVisible(false)}
+        animationType="slide"
+      >
+        <View style={styles.modalOverlay}>
+          
+            <AdminNotificationScreen />
+            <TouchableOpacity 
+              onPress={() => setAddNotificationVisible(false)}
+              style={styles.closeButton}
+            >
+              <Text style={styles.closeButtonText}>×</Text>
+            </TouchableOpacity>
+        </View>
+      </Modal>
 
       {selectedNotification && (
         <Modal
@@ -293,12 +322,28 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 10,
-    right: 10,
-    padding: 10,
+    top: "5%",
+    right: "5%",
+    padding: 0,
+    
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#1f695a',
+    padding: 15,
+    borderRadius: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: '#fff',
+    marginLeft: 10,
+    fontSize: 16,
   },
   closeButtonText: {
-    fontSize: 24,
+    fontSize: 39,
     color: '#105245',
   },
 });

@@ -29,7 +29,6 @@
       },
       "permissions": [
         "NOTIFICATIONS"
-     
       ],
       "package": "com.france.orion"
     },
@@ -40,6 +39,12 @@
       "eas": {
         "projectId": "e7053047-cf1d-400e-b255-1faee969efbb"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e7053047-cf1d-400e-b255-1faee969efbb"
     }
   }
 }

@@ -3,7 +3,7 @@ import { Animated, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from '
 import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
-import NotificationScreen from '../screens/NotificationScreen';
+import NotificationScreen from '../screens/AdminNotificationScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import DriverScreen from '../screens/DriverScreen';
 import ClientScreen from '../screens/ClientScreen';

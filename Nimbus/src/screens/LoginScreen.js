@@ -5,6 +5,7 @@ import * as Device from 'expo-device';
 import io from 'socket.io-client';
 import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
 import { BASE_URL ,BASE_URLIO} from '@env';
+import { navigate } from '../utils/navigationRef';
 const LoginScreen = ({ navigation }) => {
   const [deviceId, setDeviceId] = useState('');
   const [phone, setPhone] = useState('');
@@ -30,7 +31,7 @@ const LoginScreen = ({ navigation }) => {
       startTracking(deviceId);
       socket.on('loginSuccess', () => {
         Alert.alert('Login Successful', 'Welcome!');
-        navigation.navigate('Test');
+        navigate('Test');
       });
     }
   };
@@ -49,7 +50,7 @@ const LoginScreen = ({ navigation }) => {
         // Start tracking after successful login
         startTracking(deviceId);
         
-        navigation.navigate('Test'); // Navigate to the main screen after login
+        navigate('Test'); // Navigate to the main screen after login
       }
     } catch (error) {
       Alert.alert('Login Failed', error.response?.data?.message || 'An error occurred');

@@ -13,6 +13,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
   const [editableDriver, setEditableDriver] = useState({ ...driver });
   const [location, setLocation] = useState(null); // Store real-time location data
   const [isConnected, setIsConnected] = useState(false); // Store connection status
+  const [isDisponible, setDisponible] = useState(false); // Store connection status
 
   useEffect(() => {
     setEditableDriver({ ...driver });
@@ -21,13 +22,14 @@ console.log('------------------------------------');
 console.log('Received location update:'+driver.deviceId );
 console.log('------------------------------------');
     // Listen for real-time location updates and connection status
-    socket.on('locationUpdateForAdmin', ({ deviceId, latitude, longitude, isConnected }) => {
+    socket.on('locationUpdateForAdmin', ({ deviceId, latitude, longitude, isConnected, isDisponible }) => {
       console.log('------------------------------------');
-      console.log('Received location update:', { deviceId, latitude, longitude, isConnected });
+      console.log('Received location update:', { deviceId, latitude, longitude, isConnected ,isDisponible});
       console.log('------------------------------------');
       if (deviceId === driver.deviceId) {
         setLocation({ latitude, longitude });
         setIsConnected(isConnected); // Update connection status
+        setDisponible(isDisponible); // Update connection status
         console.log(`Driver's new location: Latitude ${latitude}, Longitude ${longitude}, Connected: ${isConnected}`);
       }
     });
@@ -131,6 +133,12 @@ console.log('------------------------------------');
             <Text style={styles.label}>Connection Status:</Text>
             <Text style={[styles.textValue, { color: isConnected ? 'green' : 'red' }]}>
               {isConnected ? 'Connected' : 'Disconnected'}
+            </Text>
+          </View> 
+           <View style={styles.fieldRow}>
+            <Text style={styles.label}>Disponibility Status:</Text>
+            <Text style={[styles.textValue, { color: isDisponible ? 'green' : 'red' }]}>
+              {isDisponible ? 'Disponible' : 'inDisponible'}
             </Text>
           </View>
 

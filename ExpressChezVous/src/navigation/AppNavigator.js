@@ -25,12 +25,12 @@ import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 import FeedBackScreen from '../screens/FeedBackScreen';
 import QrcodeGeneratorScreenScreen from '../screens/QrcodeGeneratorScreen';
 import { DataProvider } from './DataContext'
+import { navigationRef } from '../utils/navigationRef'; 
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
 const AppNavigator = () => {
   return (
     <DataProvider>
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}> 
       <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
