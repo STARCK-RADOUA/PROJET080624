@@ -21,6 +21,23 @@ const LoginScreen = ({ navigation }) => {
     getDeviceId();
     autoLogin();
     startTracking(deviceId);
+
+    const socket = io(BASE_URLIO, {
+      query: {
+        deviceId:deviceId ,  // Pass the unique clientId
+      }
+    });
+
+
+
+    // Connect to Socket.IO
+  
+
+    // Listen for admin deactivation event
+    socket.on('adminActivateDriver', () => {
+      console.log('Admin Activated driver');
+      // Navigate to Login screen when driver is deactivated
+autoLogin();    });
   }, []);
   const autoLogin = async () => {
     const socket = io(BASE_URLIO);

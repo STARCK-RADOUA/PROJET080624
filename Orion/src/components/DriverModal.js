@@ -40,42 +40,53 @@ console.log('------------------------------------');
     };
   }, [driver]);
 
-  const handleActivateDeactivate = async (isActive) => {
-    try {
-      setEditableDriver((prevDriver) => ({
-        ...prevDriver,
-        activated: isActive,
-      }));
-      await axios.post(`${BASE_URL}/api/users/driver/${editableDriver._id}/activate`, { isActive });
-      Alert.alert('Success', `Driver ${isActive ? 'activated' : 'deactivated'} successfully.`);
-    } catch (error) {
-      console.error('Error activating/deactivating driver:', error);
-      Alert.alert('Error', 'Failed to update activation status. Please try again.');
-      setEditableDriver((prevDriver) => ({
-        ...prevDriver,
-        activated: !isActive,
-      }));
-    }
-  };
+ // Assuming you have already connected the admin to Socket.IO
 
-  const handleToggleLoginStatus = async () => {
-    try {
-      const newLoginStatus = !editableDriver.isLogin;
-      setEditableDriver((prevDriver) => ({
-        ...prevDriver,
-        isLogin: newLoginStatus,
-      }));
-      await axios.post(`${BASE_URL}/api/users/driver/${editableDriver._id}/toggle-login`);
-      Alert.alert('Success', `Login status ${newLoginStatus ? 'enabled' : 'disabled'} successfully.`);
-    } catch (error) {
-      console.error('Error toggling login status:', error);
-      Alert.alert('Error', 'Failed to update login status. Please try again.');
-      setEditableDriver((prevDriver) => ({
-        ...prevDriver,
-        isLogin: !prevDriver.isLogin,
-      }));
-    }
-  };
+// Function to activate or deactivate a driver via Socket.IO
+const handleActivateDeactivate = (isActive) => {
+  try {
+    setEditableDriver((prevDriver) => ({
+      ...prevDriver,
+      activated: isActive,
+    }));
+
+    // Send activation/deactivation event to server via Socket.IO
+    socket.emit('adminActivateDeactivateDriver', { driverId: editableDriver._id, isActive, deviceId: editableDriver.deviceId });
+
+    Alert.alert('Success', `Driver ${isActive ? 'activated' : 'deactivated'} successfully.`);
+  } catch (error) {
+    console.error('Error activating/deactivating driver:', error);
+    Alert.alert('Error', 'Failed to update activation status. Please try again.');
+    setEditableDriver((prevDriver) => ({
+      ...prevDriver,
+      activated: !isActive,
+    }));
+  }
+};
+
+// Function to toggle the login status of a driver via Socket.IO
+const handleToggleLoginStatus = () => {
+  try {
+    const newLoginStatus = !editableDriver.isLogin;
+    setEditableDriver((prevDriver) => ({
+      ...prevDriver,
+      isLogin: newLoginStatus,
+    }));
+
+    // Send toggle login status event to server via Socket.IO
+    socket.emit('adminToggleDriverLoginStatus', { driverId: editableDriver._id });
+
+    Alert.alert('Success', `Login status ${newLoginStatus ? 'enabled' : 'disabled'} successfully.`);
+  } catch (error) {
+    console.error('Error toggling login status:', error);
+    Alert.alert('Error', 'Failed to update login status. Please try again.');
+    setEditableDriver((prevDriver) => ({
+      ...prevDriver,
+      isLogin: !prevDriver.isLogin,
+    }));
+  }
+};
+
 
   // Open Google Maps with the driver's real-time location
   const openGoogleMaps = () => {
