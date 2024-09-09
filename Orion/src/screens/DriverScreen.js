@@ -28,15 +28,15 @@ export default function DriverScreen() {
     });
 
     socket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
+      console.error('Erreur de connexion:', error);
     });
 
     socket.on('disconnect', () => {
-      console.log('Disconnected from the socket server');
+      console.log('Déconnecté du serveur socket');
     });
 
     return () => {
-      console.log('Disconnecting from socket server...');
+      console.log('Déconnexion du serveur socket...');
       socket.disconnect();
     };
   }, []);
@@ -94,19 +94,19 @@ export default function DriverScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Driver List</Text>
+      <Text style={styles.title}>Liste des livreurs</Text>
 
       {/* Search Input and Filter Dropdowns */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by name or phone..."
+          placeholder="Rechercher par nom ou téléphone..."
           placeholderTextColor="#9ca3af"
           value={searchText}
           onChangeText={(text) => handleSearch(text)}
         />
         <TouchableOpacity style={styles.addButton} onPress={() => setAddModalVisible(true)}>
-          <Text style={styles.addButtonText}>Add</Text>
+          <Text style={styles.addButtonText}>Ajouter</Text>
         </TouchableOpacity>
       </View>
 
@@ -117,9 +117,9 @@ export default function DriverScreen() {
             style={styles.filterPicker}
             onValueChange={(itemValue) => handleFilterActivated(itemValue)}
           >
-            <Picker.Item label="All" value="all" />
-            <Picker.Item label="Activated" value="activated" />
-            <Picker.Item label="Deactivated" value="deactivated" />
+            <Picker.Item label="Tous" value="all" />
+            <Picker.Item label="Activé" value="activated" />
+            <Picker.Item label="Désactivé" value="deactivated" />
           </Picker>
         </View>
 
@@ -129,9 +129,9 @@ export default function DriverScreen() {
             style={styles.filterPicker}
             onValueChange={(itemValue) => handleFilterIsLogin(itemValue)}
           >
-            <Picker.Item label="All" value="all" />
-            <Picker.Item label="Logged In" value="loggedIn" />
-            <Picker.Item label="Logged Out" value="loggedOut" />
+            <Picker.Item label="Tous" value="all" />
+            <Picker.Item label="Connecté" value="loggedIn" />
+            <Picker.Item label="Déconnecté" value="loggedOut" />
           </Picker>
         </View>
       </View>
@@ -140,11 +140,9 @@ export default function DriverScreen() {
         {filteredDrivers.length > 0 ? (
           filteredDrivers.map(driver => (
             <DriverCard key={driver._id} driver={driver} onPress={handleCardPress} />
-
-            
           ))
         ) : (
-          <Text style={styles.noDriversText}>No drivers available</Text>
+          <Text style={styles.noDriversText}>Aucun livreur disponible</Text>
         )}
       </ScrollView>
 
@@ -260,5 +258,3 @@ const styles = StyleSheet.create({
     color: '#5c5b5b',
   },
 });
-
-

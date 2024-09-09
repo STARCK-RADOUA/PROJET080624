@@ -122,7 +122,7 @@ const NotificationMenu = () => {
         />
         <TouchableOpacity onPress={handleSortByDate} style={styles.sortButton}>
           <Ionicons name="time-outline" size={24} color="#fff" />
-          <Text style={styles.sortButtonText}>Sort by Date</Text>
+          <Text style={styles.sortButtonText}>Trier par Date</Text>
         </TouchableOpacity>
       </View>
 

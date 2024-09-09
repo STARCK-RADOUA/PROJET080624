@@ -13,7 +13,7 @@ const ProductCard = ({ product, onReadMore }) => {
       <View style={styles.textContainer}>
         <Text style={styles.title}>{product.name}</Text>
         <Text style={styles.description}>{product.description}</Text>
-        <Text style={styles.price}>Price: ${product.price.toFixed(2)}</Text>
+        <Text style={styles.price}>Prix: ${product.price.toFixed(2)}</Text>
         <View style={styles.optionsContainer}>
           {product.options.map((option, index) => (
             <Text key={index} style={styles.option}>

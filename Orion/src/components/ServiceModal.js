@@ -40,7 +40,7 @@ const ServiceModal = ({ visible, onClose, service }) => {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
       setUploadButtonVisible(true);
-      setIsEditing(true); // Enable editing mode when an image is picked
+      setIsEditing(true);
     }
   };
 
@@ -73,21 +73,21 @@ const ServiceModal = ({ visible, onClose, service }) => {
 
       setUploading(false);
       setUploadButtonVisible(false);
-      Alert.alert('Success', 'Photo uploaded successfully!');
+      Alert.alert('Succès', 'Photo téléchargée avec succès!');
     } catch (error) {
       console.error(error);
       setUploading(false);
-      Alert.alert('Error', 'Failed to upload the image. Please try again.');
+      Alert.alert('Erreur', "Échec du téléchargement de l'image. Veuillez réessayer.");
     }
   };
 
   const validateForm = () => {
     if (!editableService.name.trim()) {
-      setErrorMessage('Service name is required.');
+      setErrorMessage('Le nom du service est requis.');
       return false;
     }
     if (!editableService.image) {
-      setErrorMessage('Service image is required.');
+      setErrorMessage('L\'image du service est requise.');
       return false;
     }
     return true;
@@ -102,37 +102,37 @@ const ServiceModal = ({ visible, onClose, service }) => {
 
     axios.put(`${BASE_URL}/api/services/update/${editableService._id}`, editableService)
       .then(response => {
-        console.log('Service updated successfully:', response.data);
+        console.log('Service mis à jour avec succès:', response.data);
         setIsEditing(false);
         onClose();
       })
       .catch(error => {
-        Alert.alert('Error', 'Failed to update service. Please try again.');
-        console.error('Error updating service:', error);
+        Alert.alert('Erreur', "Échec de la mise à jour du service. Veuillez réessayer.");
+        console.error('Erreur lors de la mise à jour du service:', error);
       });
   };
 
   const handleDeleteService = () => {
     Alert.alert(
-      'Delete Service',
-      'Are you sure you want to delete this service?',
+      'Supprimer le service',
+      'Êtes-vous sûr de vouloir supprimer ce service?',
       [
         {
-          text: 'Cancel',
+          text: 'Annuler',
           style: 'cancel',
         },
         {
-          text: 'Delete',
+          text: 'Supprimer',
           onPress: () => {
             axios.delete(`${BASE_URL}/api/services/delete/${editableService._id}`)
               .then(response => {
-                console.log('Service deleted:', response.data);
+                console.log('Service supprimé:', response.data);
                 onClose();
-                Alert.alert('Success', 'Service deleted successfully!');
+                Alert.alert('Succès', 'Service supprimé avec succès!');
               })
               .catch(error => {
-                console.error('Error deleting service:', error);
-                Alert.alert('Error', 'Failed to delete service. Please try again.');
+                console.error('Erreur lors de la suppression du service:', error);
+                Alert.alert('Erreur', 'Échec de la suppression du service. Veuillez réessayer.');
               });
           },
         },
@@ -171,7 +171,7 @@ const ServiceModal = ({ visible, onClose, service }) => {
               {uploading ? (
                 <ActivityIndicator size="small" color="yellow" />
               ) : (
-                <Text style={styles.uploadButtonText}>Upload</Text>
+                <Text style={styles.uploadButtonText}>Télécharger</Text>
               )}
             </TouchableOpacity>
           )}
@@ -192,7 +192,7 @@ const ServiceModal = ({ visible, onClose, service }) => {
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>System Point:</Text>
+            <Text style={styles.label}>Système du points:</Text>
             {isEditing ? (
               <Switch
                 value={editableService.isSystemPoint}
@@ -200,12 +200,12 @@ const ServiceModal = ({ visible, onClose, service }) => {
                 thumbColor={"#f3b13e"}
               />
             ) : (
-              <Text style={styles.textValue}>{editableService.isSystemPoint ? 'Yes' : 'No'}</Text>
+              <Text style={styles.textValue}>{editableService.isSystemPoint ? 'Oui' : 'Non'}</Text>
             )}
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Test Service:</Text>
+            <Text style={styles.label}>Service du test:</Text>
             {isEditing ? (
               <Switch
                 value={editableService.test}
@@ -213,7 +213,7 @@ const ServiceModal = ({ visible, onClose, service }) => {
                 thumbColor={"#f3b13e"}
               />
             ) : (
-              <Text style={styles.textValue}>{editableService.test ? 'Yes' : 'No'}</Text>
+              <Text style={styles.textValue}>{editableService.test ? 'Oui' : 'Non'}</Text>
             )}
           </View>
 
@@ -226,12 +226,12 @@ const ServiceModal = ({ visible, onClose, service }) => {
               style={styles.updateButton}
               onPress={handleUpdateService}
             >
-              <Text style={styles.updateButtonText}>Update</Text>
+              <Text style={styles.updateButtonText}>Mettre à jour</Text>
             </TouchableOpacity>
           )}
 
           <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteService}>
-            <Text style={styles.deleteButtonText}>Delete</Text>
+            <Text style={styles.deleteButtonText}>Supprimer</Text>
           </TouchableOpacity>
         </View>
       </View>

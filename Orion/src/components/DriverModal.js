@@ -18,9 +18,10 @@ const DriverModal = ({ visible, onClose, driver }) => {
   useEffect(() => {
     setEditableDriver({ ...driver });
     socket.emit('locationUpdateForAdminRequest', { deviceId: driver.deviceId });
-console.log('------------------------------------');
-console.log('Received location update:'+driver.deviceId );
-console.log('------------------------------------');
+    console.log('------------------------------------');
+    console.log('Mise à jour de la localisation reçue :', driver.deviceId);
+    console.log('------------------------------------');
+
     // Listen for real-time location updates and connection status
     socket.on('locationUpdateForAdmin', ({ deviceId, latitude, longitude, isConnected, isDisponible }) => {
       console.log('------------------------------------');
@@ -91,14 +92,14 @@ const handleToggleLoginStatus = () => {
   // Open Google Maps with the driver's real-time location
   const openGoogleMaps = () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`;
-    Linking.openURL(url).catch(err => console.error('Error opening Google Maps', err));
+    Linking.openURL(url).catch(err => console.error('Erreur lors de l\'ouverture de Google Maps', err));
   };
 
   // Open Waze with the driver's real-time location
   const openWaze = () => {
     const url = `waze://?ll=${location.latitude},${location.longitude}&navigate=yes`;
     Linking.openURL(url).catch(err => {
-      Alert.alert("Can't open Waze", "Make sure Waze is installed on your device.");
+      Alert.alert("Impossible d'ouvrir Waze", "Assurez-vous que Waze est installé sur votre appareil.");
     });
   };
 
@@ -118,30 +119,30 @@ const handleToggleLoginStatus = () => {
           <Text style={styles.name}>{editableDriver.firstName} {editableDriver.lastName}</Text>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Phone:</Text>
+            <Text style={styles.label}>Téléphone :</Text>
             <Text style={styles.textValue}>{editableDriver.phone}</Text>
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Device ID:</Text>
+            <Text style={styles.label}>ID de l'appareil :</Text>
             <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">
               {editableDriver.deviceId}
             </Text>
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Points Earned:</Text>
+            <Text style={styles.label}>Points accumulés :</Text>
             <Text style={styles.textValue}>{editableDriver.points_earned}</Text>
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>User Type:</Text>
+            <Text style={styles.label}>Type d'utilisateur :</Text>
             <Text style={styles.textValue}>{editableDriver.userType}</Text>
           </View>
 
           {/* Connection Status */}
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Connection Status:</Text>
+            <Text style={styles.label}>Statut de connexion :</Text>
             <Text style={[styles.textValue, { color: isConnected ? 'green' : 'red' }]}>
               {isConnected ? 'Connected' : 'Disconnected'}
             </Text>
@@ -169,7 +170,7 @@ const handleToggleLoginStatus = () => {
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Activated:</Text>
+            <Text style={styles.label}>Activé :</Text>
             <Switch
               value={editableDriver.activated}
               onValueChange={handleActivateDeactivate}
@@ -179,7 +180,7 @@ const handleToggleLoginStatus = () => {
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Login Status:</Text>
+            <Text style={styles.label}>Statut de connexion :</Text>
             <Switch
               value={editableDriver.isLogin}
               onValueChange={handleToggleLoginStatus}

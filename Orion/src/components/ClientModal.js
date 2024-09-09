@@ -77,31 +77,31 @@ const handleToggleLoginStatus = () => {
           <Text style={styles.name}>{editableClient.firstName} {editableClient.lastName}</Text>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Phone:</Text>
+            <Text style={styles.label}>Téléphone:</Text>
             <Text style={styles.textValue}>{editableClient.phone}</Text>
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Device ID:</Text>
+            <Text style={styles.label}>ID de l'appareil:</Text>
             <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">
               {editableClient.deviceId}
             </Text>
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Points Earned:</Text>
+            <Text style={styles.label}>Points accumulés:</Text>
             <Text style={styles.textValue}>{editableClient.points_earned}</Text>
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>User Type:</Text>
+            <Text style={styles.label}>Type d'utilisateur:</Text>
             <Text style={styles.textValue}>{editableClient.userType}</Text>
           </View>
 
           <View style={styles.separator} />
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Activated:</Text>
+            <Text style={styles.label}>Activé:</Text>
             <Switch
               value={editableClient.activated}
               onValueChange={handleActivateDeactivate}
@@ -111,7 +111,7 @@ const handleToggleLoginStatus = () => {
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>Login Status:</Text>
+            <Text style={styles.label}>Statut de connexion:</Text>
             <Switch
               value={editableClient.isLogin}
               onValueChange={handleToggleLoginStatus}
@@ -125,22 +125,23 @@ const handleToggleLoginStatus = () => {
     </Modal>
   );
 };
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Darker background
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
   },
   modalView: {
     width: '85%',
-    backgroundColor: '#333', // Dark background for modal view
+    backgroundColor: '#333',
     borderRadius: 12,
     padding: 20,
     alignItems: 'stretch',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7, // Increased shadow opacity for more depth
+    shadowOpacity: 0.7,
     shadowRadius: 4,
   },
   closeButton: {
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#1f695a', // White text color for better contrast
+    color: '#1f695a',
     textAlign: 'center',
     marginVertical: 10,
   },
@@ -162,20 +163,20 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#ddd', // Light gray for labels
+    color: '#ddd',
     flex: 1,
     flexWrap: 'wrap',
   },
   textValue: {
     fontSize: 16,
-    color: '#fff', // White text for values
+    color: '#fff',
     fontWeight: '500',
     flex: 2,
     textAlign: 'right',
   },
   separator: {
     height: 1,
-    backgroundColor: '#555', // Darker separator
+    backgroundColor: '#555',
     marginVertical: 15,
   },
 });

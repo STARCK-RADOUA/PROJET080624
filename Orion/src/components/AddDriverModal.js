@@ -20,27 +20,27 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
 
   const validateForm = () => {
     if (!firstName.trim()) {
-      Alert.alert('Validation Error', 'First Name is required');
+      Alert.alert('Erreur de validation', 'Le prénom est obligatoire');
       return false;
     }
     if (!lastName.trim()) {
-      Alert.alert('Validation Error', 'Last Name is required');
+      Alert.alert('Erreur de validation', 'Le nom est obligatoire');
       return false;
     }
     if (!deviceId.trim()) {
-      Alert.alert('Validation Error', 'Device ID is required');
+      Alert.alert('Erreur de validation', 'L\'ID de l\'appareil est obligatoire');
       return false;
     }
     if (!phone.trim()) {
-      Alert.alert('Validation Error', 'Phone number is required');
+      Alert.alert('Erreur de validation', 'Le numéro de téléphone est obligatoire');
       return false;
     }
     if (!password.trim()) {
-      Alert.alert('Validation Error', 'Password is required');
+      Alert.alert('Erreur de validation', 'Le mot de passe est obligatoire');
       return false;
     }
     if (isNaN(pointsEarned) || pointsEarned < 0) {
-      Alert.alert('Validation Error', 'Points Earned must be a positive number');
+      Alert.alert('Erreur de validation', 'Les points accumulés doivent être un nombre positif');
       return false;
     }
     return true;
@@ -66,14 +66,14 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
 
     axios.post(`${BASE_URL}/api/users/driver/add`, userData)
       .then(response => {
-        console.log('User submitted:', response.data);
-        Alert.alert('Success', 'User added successfully!');
+        console.log('Utilisateur soumis :', response.data);
+        Alert.alert('Succès', 'Le chauffeur a été ajouté avec succès !');
         setModalVisible(false);
         resetForm();
       })
       .catch(error => {
-        console.error('Error submitting user:', error);
-        Alert.alert('Error', 'Failed to add the user. Please try again.');
+        console.error('Erreur lors de l\'ajout de l\'utilisateur :', error);
+        Alert.alert('Erreur', 'Échec de l\'ajout du livreur. Veuillez réessayer.');
       })
       .finally(() => {
         setLoading(false);
@@ -104,79 +104,79 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
             <Ionicons name="close-circle" size={30} color="black" />
           </Pressable>
 
-          <Text style={styles.modalTitle}>Add New Driver</Text>
+          <Text style={styles.modalTitle}>Ajouter un nouveau livreur</Text>
 
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
             <View>
-              <Text style={styles.label}>First Name</Text>
+              <Text style={styles.label}>Prénom</Text>
               <TextInput
                 style={styles.input}
                 value={firstName}
                 onChangeText={setFirstName}
-                placeholder="Enter first name"
+                placeholder="Entrez le prénom"
               />
             </View>
 
             <View>
-              <Text style={styles.label}>Last Name</Text>
+              <Text style={styles.label}>Nom</Text>
               <TextInput
                 style={styles.input}
                 value={lastName}
                 onChangeText={setLastName}
-                placeholder="Enter last name"
+                placeholder="Entrez le nom"
               />
             </View>
 
             <View>
-              <Text style={styles.label}>Device ID</Text>
+              <Text style={styles.label}>ID de l'appareil</Text>
               <TextInput
                 style={styles.input}
                 value={deviceId}
                 onChangeText={setDeviceId}
-                placeholder="Enter device ID"
+                placeholder="Entrez l'ID de l'appareil"
               />
             </View>
 
             <View>
-              <Text style={styles.label}>Phone</Text>
+              <Text style={styles.label}>Téléphone</Text>
               <TextInput
                 style={styles.input}
                 value={phone}
                 onChangeText={setPhone}
-                placeholder="Enter phone number"
+                placeholder="Entrez le numéro de téléphone"
                 keyboardType="numeric"
               />
             </View>
 
             <View>
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label}>Mot de passe</Text>
               <TextInput
                 style={styles.input}
                 value={password}
                 onChangeText={setPassword}
-                placeholder="Enter password"
+                placeholder="Entrez le mot de passe"
                 secureTextEntry={true}
               />
             </View>
 
             <View>
-              <Text style={styles.label}>Points Earned</Text>
+              <Text style={styles.label}>Points accumulés</Text>
               <TextInput
                 style={styles.input}
                 value={pointsEarned.toString()}
                 onChangeText={setPointsEarned}
-                placeholder="Enter points"
+                placeholder="Entrez les points"
                 keyboardType="numeric"
               />
             </View>
 
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Activated</Text>
+              <Text style={styles.label}>Activé</Text>
               <Switch thumbColor="#f3b13e" value={activated} onValueChange={setActivated} />
             </View>
 
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Is Logged In</Text>
+              <Text style={styles.label}>Connecté</Text>
               <Switch thumbColor="#f3b13e" value={isLogin} onValueChange={setIsLogin} />
             </View>
           </ScrollView>
@@ -185,7 +185,7 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.submitButtonText}>Submit Driver</Text>
+              <Text style={styles.submitButtonText}>Soumettre le livreur</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -193,6 +193,7 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
     </Modal>
   );
 };
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,

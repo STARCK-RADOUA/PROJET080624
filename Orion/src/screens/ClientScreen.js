@@ -93,13 +93,13 @@ export default function ClientScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Client List</Text>
+      <Text style={styles.title}>Liste des clients</Text>
 
       {/* Search Input and Filter Dropdowns */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by name or phone..."
+          placeholder="Rechercher par nom ou téléphone..."
           placeholderTextColor="#9ca3af"
           value={searchText}
           onChangeText={(text) => handleSearch(text)}
@@ -114,9 +114,9 @@ export default function ClientScreen() {
             style={styles.filterPicker}
             onValueChange={(itemValue) => handleFilterActivated(itemValue)}
           >
-            <Picker.Item label="All" value="all" />
-            <Picker.Item label="Activated" value="activated" />
-            <Picker.Item label="Deactivated" value="deactivated" />
+            <Picker.Item label="Tous" value="all" />
+            <Picker.Item label="Activé" value="activated" />
+            <Picker.Item label="Désactivé" value="deactivated" />
           </Picker>
         </View>
 
@@ -126,9 +126,9 @@ export default function ClientScreen() {
             style={styles.filterPicker}
             onValueChange={(itemValue) => handleFilterIsLogin(itemValue)}
           >
-            <Picker.Item label="All" value="all" />
-            <Picker.Item label="Logged In" value="loggedIn" />
-            <Picker.Item label="Logged Out" value="loggedOut" />
+            <Picker.Item label="Tous" value="all" />
+            <Picker.Item label="Connecté" value="loggedIn" />
+            <Picker.Item label="Déconnecté" value="loggedOut" />
           </Picker>
         </View>
       </View>
@@ -139,7 +139,7 @@ export default function ClientScreen() {
             <ClientCard key={client._id} client={client} onPress={handleCardPress} />
           ))
         ) : (
-          <Text>No clients available</Text>
+          <Text>Aucun client disponible</Text>
         )}
       </ScrollView>
 
@@ -218,4 +218,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-

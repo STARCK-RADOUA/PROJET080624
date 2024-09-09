@@ -17,7 +17,7 @@ const ServiceScreen = () => {
   useEffect(() => {
     const socket = io(BASE_URLIO);
 
-    // Listen for the updated services data
+    // Écouter les données mises à jour des services
     socket.on('servicesUpdated', ({ services }) => {
       setServices(services);
       setLoading(false);
@@ -60,13 +60,13 @@ const ServiceScreen = () => {
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by name..."
+            placeholder="Rechercher par nom..."
             placeholderTextColor="#9ca3af"
             value={searchText}
             onChangeText={setSearchText}
           />
           <TouchableOpacity style={styles.addButton} onPress={() => setAddModalVisible(true)}>
-            <Text style={styles.addButtonText}>Add</Text>
+            <Text style={styles.addButtonText}>Ajouter</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -79,7 +79,7 @@ const ServiceScreen = () => {
             <ServiceCard key={index} service={service} onReadMore={() => handleOpenServiceModal(service)} />
           ))
         ) : (
-          <Text style={styles.noResultsText}>No services found</Text>
+          <Text style={styles.noResultsText}>Aucun service trouvé</Text>
         )}
       </ScrollView>
 

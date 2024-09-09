@@ -91,19 +91,21 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
   // Emit orderId when component mounts to start watching order status
   useEffect(() => {
     
-    
-    // Listen for order status updates
+    socket.emit('watchOrderStatuss', { order_id: orderId });
+
+    // Listen for order statusa updates
     socket.on('orderStatusUpdates', (data) => {
+      console.log('data fzfzfz' , data)
       const status = data.order.status;
       const client_id = data.order.client_id;
       const driver_id = data.order.driver_id;
 
       console.log(status) ;
       console.log(clientId) ;
-      console.log(driverId ,"d") ;
       setClientId(client_id);
       setDriverId(driver_id);
       setOrderStatus(status);
+      console.log(driverId ,"d") ;
 
       // Handle order status logic based on received data
       if (status === 'delivered') {
@@ -307,11 +309,13 @@ const PaymentSuccessScreen = ({ navigation, route }) => {
         </View>
       )}
 
-      <BottomSheet ref={bottomSheetRef} orderId={orderId} clientId={clientId}>
-        <View>
-          <Text style={{ padding: 20, fontSize: 16 }}>Chat with us</Text>
-        </View>
-      </BottomSheet>
+{orderStatus === 'in_progress' && (
+  <BottomSheet ref={bottomSheetRef} orderId={orderId} clientId={clientId} driverId={driverId} >
+    <View>
+      <Text style={{ padding: 20, fontSize: 16 }}>Chat with us</Text>
+    </View>
+  </BottomSheet>
+)}
     </SafeAreaView>
   );
 };

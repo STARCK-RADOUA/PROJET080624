@@ -15,9 +15,10 @@ import ServiceScreen from '../screens/ServiceScreen';
 import ChatHomeScreen from '../screens/ChatHomeScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import WarnScreen from '../screens/WarnScreen';
+import OrderChatHistoriqueScreen from '../screens/OrderChatHistoriqueScreen';
 
 export default function MainNavigator({ onLogin }) {
-  const [currentTab, setCurrentTab] = useState("Home");
+  const [currentTab, setCurrentTab] = useState("Accueil");
   const [showMenu, setShowMenu] = useState(false);
 
   const offsetValue = useRef(new Animated.Value(0)).current;
@@ -26,23 +27,25 @@ export default function MainNavigator({ onLogin }) {
 
   const renderScreen = () => {
     switch (currentTab) {
-      case 'Home':
+      case 'Accueil':
         return <HomeScreen />;
-      case 'Search':
+      case 'Recherche':
         return <SearchScreen />;
       case 'Notifications':
         return <NotificationMenu />;
-      case 'Settings':
+      case 'Paramètres':
         return <SettingsScreen />;
       case 'Services':
         return <ServiceScreen />;
-      case 'Drivers':
+      case 'Livreur':
         return <DriverScreen />;
       case 'Clients':
         return <ClientScreen />;
-      case 'Products':
+      case 'Historique Chat':
+        return <OrderChatHistoriqueScreen />;
+      case 'Produits':
         return <ProductScreen />;
-      case 'Orders':
+      case 'Commandes':
         return <OrdersScreen />;
       case 'Chat':
         return <ChatHomeScreen />;

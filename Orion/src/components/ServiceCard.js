@@ -8,8 +8,8 @@ const ServiceCard = ({ service, onReadMore }) => {
         <Image source={{ uri: service.image }} style={styles.cardImage} />
         <View style={styles.textContainer}>
           <Text style={styles.cardTitle}>{service.name}</Text>
-          <Text style={styles.cardSubtitle}>{service.isSystemPoint ? 'System Service' : 'Regular Service'}</Text>
-          <Text style={styles.cardTest}>{service.test ? 'Test Service' : 'Production Service'}</Text>
+          <Text style={styles.cardSubtitle}>{service.isSystemPoint ? 'Système du points activé' : 'Système du points désactivé'}</Text>
+          <Text style={styles.cardTest}>{service.test ? 'Système de Test est activé' : 'Système de Test est désactivé'}</Text>
         </View>
       </View>
     </TouchableOpacity>

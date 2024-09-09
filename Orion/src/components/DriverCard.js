@@ -11,10 +11,10 @@ const DriverCard = ({ driver, onPress }) => {
         </View>
         <View style={styles.statusContainer}>
           <Text style={[styles.statusText, driver.isLogin ? styles.loggedIn : styles.loggedOut]}>
-            {driver.isLogin ? '🔒  Logged In' : '🚫   Logged Out'}
+            {driver.isLogin ? '🔒  Connecté' : '🚫   Déconnecté'}
           </Text>
           <Text style={[styles.statusText, driver.activated ? styles.activated : styles.deactivated]}>
-            {driver.activated ? '✅   Activated' : '❌   Deactivated'}
+            {driver.activated ? '✅   Activé' : '❌   Désactivé'}
           </Text>
         </View>
       </View>

@@ -11,11 +11,11 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
   const [serviceName, setServiceName] = useState('');
   const [isSystemPoint, setIsSystemPoint] = useState(false);
   const [testService, setTestService] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');  // Store Firebase image URL
+  const [imageUrl, setImageUrl] = useState('');  // Stocker l'URL de l'image Firebase
   const screenWidth = Dimensions.get('window').width;
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadButtonVisible, setUploadButtonVisible] = useState(false); // To control the visibility of the upload button
+  const [uploadButtonVisible, setUploadButtonVisible] = useState(false); // Contrôler la visibilité du bouton de téléchargement
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -27,14 +27,14 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      setImageUrl(''); // Reset imageUrl when a new image is selected
-      setUploadButtonVisible(true); // Show upload button when a new image is selected
+      setImageUrl(''); // Réinitialiser imageUrl lorsqu'une nouvelle image est sélectionnée
+      setUploadButtonVisible(true); // Afficher le bouton de téléchargement après la sélection d'une image
     }
   };
 
   const uploadMedia = async () => {
     if (!image) {
-      Alert.alert('Error', 'Please select an image first.');
+      Alert.alert('Erreur', 'Veuillez sélectionner une image d\'abord.');
       return;
     }
 
@@ -48,7 +48,7 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
           resolve(xhr.response);
         };
         xhr.onerror = (e) => {
-          reject(new TypeError('Network request failed'));
+          reject(new TypeError('Erreur de requête réseau'));
         };
         xhr.responseType = 'blob';
         xhr.open('GET', uri, true);
@@ -60,27 +60,27 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
 
       await ref.put(blob);
 
-      // Get the download URL of the uploaded image
+      // Obtenez l'URL de téléchargement de l'image
       const downloadURL = await ref.getDownloadURL();
 
       setImageUrl(downloadURL);
       setUploading(false);
-      setUploadButtonVisible(false); // Hide upload button after successful upload
-      Alert.alert('Success', 'Photo uploaded successfully!');
+      setUploadButtonVisible(false); // Masquer le bouton de téléchargement après succès
+      Alert.alert('Succès', 'Photo téléchargée avec succès !');
     } catch (error) {
       console.error(error);
       setUploading(false);
-      Alert.alert('Error', 'Failed to upload the image. Please try again.');
+      Alert.alert('Erreur', 'Le téléchargement de l\'image a échoué. Veuillez réessayer.');
     }
   };
 
   const validateForm = () => {
     if (!serviceName.trim()) {
-      Alert.alert('Validation Error', 'Service name is required.');
+      Alert.alert('Erreur de validation', 'Le nom du service est requis.');
       return false;
     }
     if (!imageUrl) {
-      Alert.alert('Validation Error', 'Image upload is required.');
+      Alert.alert('Erreur de validation', 'Le téléchargement de l\'image est requis.');
       return false;
     }
     return true;
@@ -98,14 +98,14 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
 
     axios.post(`${BASE_URL}/api/services/`, serviceData)
       .then(response => {
-        console.log('Service submitted:', response.data);
+        console.log('Service soumis:', response.data);
         setModalVisible(false);
-        Alert.alert('Success', 'Service added successfully!');
+        Alert.alert('Succès', 'Service ajouté avec succès !');
         resetForm();
       })
       .catch(error => {
-        console.error('Error submitting service:', error);
-        Alert.alert('Error', 'Failed to add the service. Please try again.');
+        console.error('Erreur lors de la soumission du service:', error);
+        Alert.alert('Erreur', 'L\'ajout du service a échoué. Veuillez réessayer.');
       });
   };
 
@@ -114,8 +114,8 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
     setIsSystemPoint(false);
     setTestService(false);
     setImage(null);
-    setImageUrl('');  // Reset imageUrl
-    setUploadButtonVisible(false); // Reset upload button visibility
+    setImageUrl('');  // Réinitialiser imageUrl
+    setUploadButtonVisible(false); // Réinitialiser la visibilité du bouton de téléchargement
   };
 
   return (
@@ -132,33 +132,33 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
             <Ionicons name="close-circle" size={30} color="black" />
           </Pressable>
 
-          <Text style={styles.modalTitle}>Add New Service</Text>
+          <Text style={styles.modalTitle}>Ajouter un nouveau service</Text>
 
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            {/* Service Name */}
+            {/* Nom du service */}
             <View>
-              <Text style={styles.label}>Service Name</Text>
+              <Text style={styles.label}>Nom du service</Text>
               <TextInput
                 style={styles.input}
                 value={serviceName}
                 onChangeText={setServiceName}
-                placeholder="Enter service name"
+                placeholder="Entrez le nom du service"
               />
             </View>
 
-            {/* Is System Point Switch */}
+            {/* Point système */}
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Is System Point</Text>
+              <Text style={styles.label}>Système du points</Text>
               <Switch thumbColor={"#f3b13e"} value={isSystemPoint} onValueChange={setIsSystemPoint} />
             </View>
 
-            {/* Test Service Switch */}
+            {/* Service de test */}
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Test Service</Text>
+              <Text style={styles.label}>Système du test</Text>
               <Switch thumbColor={"#f3b13e"} value={testService} onValueChange={setTestService} />
             </View>
 
-            {/* Image Picker Section */}
+            {/* Sélection d'image */}
             <Text style={styles.label}>Image</Text>
             {image ? (
               <View style={styles.imageWrapper}>
@@ -167,7 +167,7 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
                     {uploading ? (
                       <ActivityIndicator size="small" color="#fff" />
                     ) : (
-                      <Text style={styles.uploadButtonText}>Upload</Text>
+                      <Text style={styles.uploadButtonText}>Télécharger</Text>
                     )}
                   </TouchableOpacity>
                 )}
@@ -177,8 +177,8 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
                     style={styles.deleteImageButton}
                     onPress={() => {
                       setImage(null);
-                      setImageUrl(''); // Reset imageUrl when image is deleted
-                      setUploadButtonVisible(false); // Ensure the upload button reappears when a new image is picked
+                      setImageUrl(''); // Réinitialiser imageUrl lors de la suppression de l'image
+                      setUploadButtonVisible(false); // Rendre le bouton de téléchargement visible à nouveau
                     }}
                   >
                     <Ionicons name="close-circle" size={24} color="#f3b13e" />
@@ -188,14 +188,14 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
             ) : (
               <TouchableOpacity style={styles.pickImageButton} onPress={pickImage}>
                 <Ionicons name="cloud-upload-outline" size={50} color="black" />
-                <Text style={styles.pickImageText}>SELECT A FILE</Text>
+                <Text style={styles.pickImageText}>SÉLECTIONNER UN FICHIER</Text>
               </TouchableOpacity>
             )}
           </ScrollView>
 
-          {/* Submit Button */}
+          {/* Bouton de soumission */}
           <TouchableOpacity style={styles.submitButton} onPress={submitForm}>
-            <Text style={styles.submitButtonText}>Submit Service</Text>
+            <Text style={styles.submitButtonText}>Soumettre le service</Text>
           </TouchableOpacity>
 
         </View>
@@ -203,29 +203,30 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
     </Modal>
   );
 };
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Darker background
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     paddingVertical: "20%",
   },
   modalView: {
-    backgroundColor: '#2c2c2c', // Dark background for the modal view
+    backgroundColor: '#2c2c2c',
     borderRadius: 10,
     paddingTop: 20,
     paddingBottom: 20,
     paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7, // Increased shadow opacity for more depth
+    shadowOpacity: 0.7,
     shadowRadius: 3,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1f695a', // White text color for better contrast
+    color: '#1f695a',
     marginBottom: 15,
     textAlign: 'center',
   },
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#dddddd', // Light gray for labels
+    color: '#dddddd',
     textAlign: 'left',
   },
   input: {
@@ -247,10 +248,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#444', // Darker border color
+    borderColor: '#444',
     marginBottom: 10,
-    backgroundColor: '#3a3a3a', // Darker background for inputs
-    color: '#ffffff', // White text for input fields
+    backgroundColor: '#3a3a3a',
+    color: '#ffffff',
   },
   switchContainer: {
     flexDirection: 'row',
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 15,
-    backgroundColor: '#444', // Darker background for image picker button
+    backgroundColor: '#444',
     borderRadius: 10,
     marginBottom: 10,
   },
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#ffffff', // White text for image picker
+    color: '#ffffff',
   },
   imageWrapper: {
     flexDirection: 'row',
@@ -292,10 +293,10 @@ const styles = StyleSheet.create({
     right: -10,
   },
   uploadButton: {
-    backgroundColor: '#444', // Darker background for upload button
+    backgroundColor: '#444',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#555', // Slightly lighter border color for contrast
+    borderColor: '#555',
     paddingVertical: 10,
     paddingHorizontal: 20,
     shadowOffset: { width: 0, height: 2 },
@@ -304,12 +305,12 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
   },
   uploadButtonText: {
-    color: '#ffffff', // White text for the upload button
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '500',
   },
   submitButton: {
-    backgroundColor: '#f3b13e', // Keep the accent color for the submit button
+    backgroundColor: '#f3b13e',
     padding: 15,
     borderRadius: 10,
     marginTop: 10,

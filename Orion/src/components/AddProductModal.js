@@ -31,13 +31,13 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      setImageUrl(''); // Reset the imageUrl so that the upload button reappears
+      setImageUrl(''); // Réinitialiser l'URL de l'image pour faire réapparaître le bouton de téléchargement
     }
   };
 
   const uploadMedia = async () => {
     if (!image) {
-      Alert.alert('Error', 'Please select an image first.');
+      Alert.alert('Erreur', 'Veuillez sélectionner une image d\'abord.');
       return;
     }
 
@@ -51,7 +51,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
           resolve(xhr.response);
         };
         xhr.onerror = (e) => {
-          reject(new TypeError('Network request failed'));
+          reject(new TypeError('Échec de la requête réseau'));
         };
         xhr.responseType = 'blob';
         xhr.open('GET', uri, true);
@@ -67,11 +67,11 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
       setImageUrl(downloadURL);
 
       setUploading(false);
-      Alert.alert('Success', 'Photo uploaded successfully!');
+      Alert.alert('Succès', 'Photo téléchargée avec succès!');
     } catch (error) {
       console.error(error);
       setUploading(false);
-      Alert.alert('Error', 'Failed to upload the image. Please try again.');
+      Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
     }
   };
 
@@ -81,7 +81,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
         setServiceTypeOptions(response.data);
       })
       .catch(error => {
-        console.error('Error fetching service types:', error);
+        console.error('Erreur lors de la récupération des types de service:', error);
       });
   }, []);
 
@@ -96,23 +96,23 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
 
   const validateForm = () => {
     if (!productName.trim()) {
-      Alert.alert('Validation Error', 'Product name is required.');
+      Alert.alert('Erreur de validation', 'Le nom du produit est requis.');
       return false;
     }
     if (!description.trim()) {
-      Alert.alert('Validation Error', 'Description is required.');
+      Alert.alert('Erreur de validation', 'La description est requise.');
       return false;
     }
     if (!price || isNaN(price)) {
-      Alert.alert('Validation Error', 'Valid price is required.');
+      Alert.alert('Erreur de validation', 'Un prix valide est requis.');
       return false;
     }
     if (!serviceType) {
-      Alert.alert('Validation Error', 'Service type is required.');
+      Alert.alert('Erreur de validation', 'Le type de service est requis.');
       return false;
     }
     if (!imageUrl) {
-      Alert.alert('Validation Error', 'Image upload is required.');
+      Alert.alert('Erreur de validation', 'Le téléchargement de l\'image est requis.');
       return false;
     }
     return true;
@@ -133,14 +133,14 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
 
     axios.post(`${BASE_URL}/api/products/add`, productData)
       .then(response => {
-        console.log('Product submitted:', response.data);
+        console.log('Produit soumis:', response.data);
         setModalVisible(false);
-        Alert.alert('Success', 'Product added successfully!');
+        Alert.alert('Succès', 'Produit ajouté avec succès!');
         resetForm();
       })
       .catch(error => {
-        console.error('Error submitting product:', error);
-        Alert.alert('Error', 'Failed to add the product. Please try again.');
+        console.error('Erreur lors de l\'ajout du produit:', error);
+        Alert.alert('Erreur', 'Échec de l\'ajout du produit. Veuillez réessayer.');
       });
   };
 
@@ -169,65 +169,65 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
             <Ionicons name="close-circle" size={30} color="black" />
           </Pressable>
 
-          <Text style={styles.modalTitle}>Add New Product</Text>
+          <Text style={styles.modalTitle}>Ajouter un nouveau produit</Text>
 
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            {/* Product Name */}
+            {/* Nom du produit */}
             <View>
-              <Text style={styles.label}>Product Name</Text>
+              <Text style={styles.label}>Nom du produit</Text>
               <TextInput
                 style={styles.input}
                 value={productName}
                 onChangeText={setProductName}
-                placeholder="Enter product name"
+                placeholder="Entrez le nom du produit"
               />
             </View>
 
-            {/* Product Description */}
+            {/* Description du produit */}
             <View>
               <Text style={styles.label}>Description</Text>
               <TextInput
                 style={styles.input}
                 value={description}
                 onChangeText={setDescription}
-                placeholder="Enter product description"
+                placeholder="Entrez la description du produit"
               />
             </View>
 
-            {/* Product Price */}
+            {/* Prix du produit */}
             <View>
-              <Text style={styles.label}>Price</Text>
+              <Text style={styles.label}>Prix</Text>
               <TextInput
                 style={styles.input}
                 value={price}
                 onChangeText={setPrice}
-                placeholder="Enter product price"
+                placeholder="Entrez le prix du produit"
                 keyboardType="numeric"
               />
             </View>
 
-            {/* Service Type Dropdown */}
+            {/* Type de service */}
             <View>
-              <Text style={styles.label}>Service Type</Text>
+              <Text style={styles.label}>Type de service</Text>
               <Picker
                 selectedValue={serviceType}
                 style={styles.input}
                 onValueChange={(itemValue) => setServiceType(itemValue)}
               >
-                <Picker.Item label="Select service type" value="" />
+                <Picker.Item label="Sélectionnez le type de service" value="" />
                 {serviceTypeOptions.map((option) => (
                   <Picker.Item key={option._id} label={option.name} value={option.name} />
                 ))}
               </Picker>
             </View>
 
-            {/* Is Active Switch */}
+            {/* Produit actif */}
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Is Active</Text>
+              <Text style={styles.label}>Est actif</Text>
               <Switch thumbColor={"#f3b13e"} value={isActive} onValueChange={setIsActive} />
             </View>
 
-            {/* Options Section */}
+            {/* Section des options */}
             <Text style={styles.optionsTitle}>Options</Text>
             {options.map((option, index) => (
               <View key={index} style={styles.optionContainer}>
@@ -239,7 +239,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
                     newOptions[index].name = text;
                     setOptions(newOptions);
                   }}
-                  placeholder="Option name"
+                  placeholder="Nom de l'option"
                 />
                 <TextInput
                   style={[styles.input, styles.optionInput]}
@@ -249,7 +249,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
                     newOptions[index].price = text;
                     setOptions(newOptions);
                   }}
-                  placeholder="Option price"
+                  placeholder="Prix de l'option"
                   keyboardType="numeric"
                 />
                 {index === options.length - 1 ? (
@@ -264,7 +264,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
               </View>
             ))}
 
-            {/* Image Picker Section */}
+            {/* Sélecteur d'image */}
             <Text style={styles.label}>Image</Text>
             {image ? (
               <View style={styles.imageWrapper}>
@@ -274,7 +274,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
                     style={styles.deleteImageButton}
                     onPress={() => {
                       setImage(null);
-                      setImageUrl(''); // Reset the imageUrl so the upload button reappears
+                      setImageUrl(''); // Réinitialiser l'URL de l'image pour faire réapparaître le bouton de téléchargement
                     }}
                   >
                     <Ionicons name="close-circle" size={24} color="#f3b13e" />
@@ -282,7 +282,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
                 </View>
                 {!uploading && !imageUrl && (
                   <TouchableOpacity style={styles.uploadButton} onPress={uploadMedia}>
-                    <Text style={styles.uploadButtonText}>Upload</Text>
+                    <Text style={styles.uploadButtonText}>Télécharger</Text>
                   </TouchableOpacity>
                 )}
                 {uploading && (
@@ -294,14 +294,14 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
             ) : (
               <TouchableOpacity style={styles.pickImageButton} onPress={pickImage}>
                 <Ionicons name="cloud-upload-outline" size={50} color="black" />
-                <Text style={styles.pickImageText}>SELECT A FILE</Text>
+                <Text style={styles.pickImageText}>SÉLECTIONNER UN FICHIER</Text>
               </TouchableOpacity>
             )}
           </ScrollView>
 
-          {/* Submit Button */}
+          {/* Bouton de soumission */}
           <TouchableOpacity style={styles.submitButton} onPress={submitForm}>
-            <Text style={styles.submitButtonText}>Submit Product</Text>
+            <Text style={styles.submitButtonText}>Soumettre le produit</Text>
           </TouchableOpacity>
 
         </View>
@@ -309,16 +309,17 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
     </Modal>
   );
 };
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#8a8a8a50', // Darker background with higher opacity
+    backgroundColor: '#8a8a8a50',
     paddingVertical: '20%',
   },
   modalView: {
-    backgroundColor: '#333', // Dark background for the modal
+    backgroundColor: '#333',
     borderRadius: 15,
     paddingTop: 20,
     paddingBottom: 20,
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 15,
-    color: '#1f695a', // White text for better contrast
+    color: '#1f695a',
     textAlign: 'center',
   },
   closeButton: {
@@ -345,7 +346,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#f0f0f0', // Lighter text color
+    color: '#f0f0f0',
     textAlign: 'left',
   },
   input: {
@@ -353,10 +354,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#333', // Dark border color
+    borderColor: '#333',
     marginBottom: 10,
-    backgroundColor: '#424242', // Darker input background
-    color: '#fff', // White text inside the input
+    backgroundColor: '#424242',
+    color: '#fff',
   },
   switchContainer: {
     flexDirection: 'row',
@@ -367,7 +368,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#f0f0f0', // Lighter text color
+    color: '#f0f0f0',
   },
   optionContainer: {
     flexDirection: 'row',
@@ -393,7 +394,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 15,
-    backgroundColor: '#444343', // Darker background for the image picker
+    backgroundColor: '#444343',
     borderRadius: 10,
     marginBottom: 10,
   },
@@ -404,7 +405,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   imageWrapper: {
-    flexDirection: 'row', // Layout image and button in row
+    flexDirection: 'row',
     alignItems: 'center',
   },
   imageContainer: {
@@ -415,7 +416,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginLeft: 10, // Add space between upload button and image
+    marginLeft: 10,
     marginBottom: 10,
   },
   deleteImageButton: {
@@ -424,11 +425,11 @@ const styles = StyleSheet.create({
     right: -10,
   },
   uploadButton: {
-    backgroundColor: '#f3b13e', // Accent color for the upload button
+    backgroundColor: '#f3b13e',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    marginLeft: 20, // Align button to the right of the image
+    marginLeft: 20,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
@@ -438,19 +439,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'yellow',
   },
   uploadButtonText: {
-    color: '#1e1e1e', // Darker text color on the upload button
+    color: '#1e1e1e',
     fontSize: 14,
     fontWeight: '500',
   },
   submitButton: {
-    backgroundColor: '#f3b13e', // Accent color for the submit button
+    backgroundColor: '#f3b13e',
     padding: 15,
     borderRadius: 10,
     marginTop: 10,
     alignSelf: 'center',
   },
   submitButtonText: {
-    color: '#1e1e1e', // Darker text color on the submit button
+    color: '#1e1e1e',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',

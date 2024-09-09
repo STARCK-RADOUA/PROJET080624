@@ -5,40 +5,47 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import DeliveredOrdersScreen from './DeliveredOrdersScreen';
 import CanceledOrderScreen from './CanceledOrderScreen';
-import OngoingOrdersScreen from './OngoingOrdersScreen';
-
-
+import OngoingOrdersScreen from './PendingOrdersScreen';
+import InProgreesgOrdersScreen from './InProgressOrderScreen';
 
 const OrdersScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Header Section */}
+      {/* Section d'en-tête */}
       <View style={styles.header}>
-        <Text style={styles.title}>Order Management Dashboard</Text>
+        <Text style={styles.title}>Tableau de gestion des commandes</Text>
       </View>
 
-      {/* Navigation Buttons */}
+      {/* Boutons de navigation */}
       <TouchableOpacity style={[styles.card, styles.yellowCard]} onPress={() => navigation.navigate('OngoingOrders')}>
         <Ionicons name="time-outline" size={32} color="white" style={styles.cardIcon} />
         <View style={styles.cardTextContainer}>
-          <Text style={styles.cardTitle}>Ongoing Orders</Text>
-          <Text style={styles.cardDescription}>View and manage ongoing orders</Text>
+          <Text style={styles.cardTitle}>Commandes en attente</Text>
+          <Text style={styles.cardDescription}>Voir et gérer les commandes en attente</Text>
+        </View>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.card, styles.blueCard]} onPress={() => navigation.navigate('InProgressOrders')}>
+        <Ionicons name="sync-outline" size={32} color="white" style={styles.cardIcon} />
+        <View style={styles.cardTextContainer}>
+          <Text style={styles.cardTitle}>Commandes en cours</Text>
+          <Text style={styles.cardDescription}>Voir l'historique des commandes en cours</Text>
         </View>
       </TouchableOpacity>
 
       <TouchableOpacity style={[styles.card, styles.greenCard]} onPress={() => navigation.navigate('DeliveredOrders')}>
         <Ionicons name="checkmark-done-outline" size={32} color="white" style={styles.cardIcon} />
         <View style={styles.cardTextContainer}>
-          <Text style={styles.cardTitle}>Delivered Orders</Text>
-          <Text style={styles.cardDescription}>View delivered orders history</Text>
+          <Text style={styles.cardTitle}>Commandes livrées</Text>
+          <Text style={styles.cardDescription}>Voir l'historique des commandes livrées</Text>
         </View>
       </TouchableOpacity>
 
       <TouchableOpacity style={[styles.card, styles.redCard]} onPress={() => navigation.navigate('UndeliveredOrders')}>
         <Ionicons name="alert-circle-outline" size={32} color="white" style={styles.cardIcon} />
         <View style={styles.cardTextContainer}>
-          <Text style={styles.cardTitle}>Undelivered Orders</Text>
-          <Text style={styles.cardDescription}>View undelivered orders history</Text>
+          <Text style={styles.cardTitle}>Commandes non livrées</Text>
+          <Text style={styles.cardDescription}>Voir l'historique des commandes non livrées</Text>
         </View>
       </TouchableOpacity>
     </ScrollView>
@@ -69,6 +76,11 @@ const App = () => {
         <Stack.Screen 
           name="UndeliveredOrders" 
           component={CanceledOrderScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="InProgressOrders" 
+          component={InProgreesgOrdersScreen} 
           options={{ headerShown: false }} 
         />
       </Stack.Navigator>
@@ -106,6 +118,9 @@ const styles = StyleSheet.create({
   },
   yellowCard: {
     backgroundColor: '#FFC107',
+  },
+  blueCard: {
+    backgroundColor: '#2196F3', // Blue color for "En cours" orders
   },
   greenCard: {
     backgroundColor: '#4CAF50',

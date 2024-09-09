@@ -14,21 +14,22 @@ const OngoingOrdersScreen = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
     socket.emit('getPendingOrders');
 
     socket.on('orderPendingUpdated', (data) => {
-      setOrders(data.orders);
-      setFilteredOrders(data.orders); // Show all orders by default
-      setLoading(false); // Stop loading once data is fetched
+      const sortedOrders = data.orders.sort((a, b) => new Date(b.delivery_time) - new Date(a.delivery_time));
+      setOrders(sortedOrders);
+      setFilteredOrders(sortedOrders);
+      setLoading(false); // Data is loaded, stop loading
     });
 
     socket.on('error', (err) => {
-      console.error('Socket error:', err.message);
-      setLoading(false); // Stop loading if there's an error
+      console.error('Erreur du socket:', err.message);
+      setLoading(false); // Stop loading in case of error
     });
 
     return () => {
@@ -60,36 +61,37 @@ const OngoingOrdersScreen = () => {
   };
 
   const handleShowAll = () => {
-    setFilteredOrders(orders); // Show all orders when "Show All" is pressed
+    setFilteredOrders(orders);
   };
 
   const handleCardPress = (order) => {
-    setSelectedOrder(order); // Set the selected order to display in the modal
+    setSelectedOrder(order);
   };
 
   const handleCloseModal = () => {
-    setSelectedOrder(null); // Close the modal
+    setSelectedOrder(null);
   };
 
+  // Skeleton for loading state
   const renderSkeleton = () => (
-    <>
-      {[...Array(3)].map((_, index) => (
-        <View key={index} style={styles.skeletonCard}>
-          <View style={styles.skeletonTitle} />
-          <View style={styles.skeletonDescription} />
-        </View>
-      ))}
-    </>
+    <View style={styles.skeletonCard}>
+      <View style={styles.skeletonIcon} />
+      <View style={styles.skeletonContent}>
+        <View style={styles.skeletonTitle} />
+        <View style={styles.skeletonText} />
+        <View style={styles.skeletonText} />
+      </View>
+    </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Pending Orders</Text>
+      <Text style={styles.header}>Commandes en attente</Text>
 
-      {/* Search Input */}
+      {/* Barre de recherche */}
       <TextInput
         style={styles.searchInput}
-        placeholder="Search by client or product name..."
+        placeholder="Rechercher par client ou produit..."
         value={searchQuery}
         onChangeText={filterOrdersBySearch}
       />
@@ -100,7 +102,7 @@ const OngoingOrdersScreen = () => {
           <Text style={styles.filterText}>{moment(filterDate).format('YYYY-MM-DD')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.showAllButton} onPress={handleShowAll}>
-          <Text style={styles.showAllText}>Show All</Text>
+          <Text style={styles.showAllText}>Afficher tout</Text>
         </TouchableOpacity>
       </View>
 
@@ -113,7 +115,7 @@ const OngoingOrdersScreen = () => {
             setShowDatePicker(false);
             if (selectedDate) {
               setFilterDate(selectedDate);
-              filterOrdersByDate(selectedDate); // Filter orders when a new date is selected
+              filterOrdersByDate(selectedDate);
             }
           }}
         />
@@ -124,16 +126,16 @@ const OngoingOrdersScreen = () => {
         keyExtractor={(item, index) => item?._id || index.toString()}
         renderItem={({ item }) => (
           loading ? (
-            renderSkeleton()
+            renderSkeleton() // Render skeleton during loading
           ) : (
             <TouchableOpacity onPress={() => handleCardPress(item)}>
               <View style={styles.card}>
                 <Image
-                  source={{ uri: 'https://img.icons8.com/ios-filled/50/000000/order-history.png' }}
+                  source={{ uri: 'https://img.icons8.com/ios-filled/50/000000/clock.png' }} // Updated icon for pending orders
                   style={styles.orderIcon}
                 />
                 <View style={styles.cardContent}>
-                  <Text style={styles.orderNumber}>Order #{item.order_number ?? 'N/A'}</Text>
+                  <Text style={styles.orderNumber}>Commande #{item.order_number ?? 'N/A'}</Text>
                   <Text style={styles.location}>{item.address_line}</Text>
                   <View style={styles.rightContainer}>
                     <Text style={styles.price}>€{item.total_price.toFixed(2)}</Text>
@@ -148,7 +150,7 @@ const OngoingOrdersScreen = () => {
 
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>
-          Total in Euros: €
+          Total en Euros: €
           {filteredOrders.reduce((total, order) => total + order.total_price, 0).toFixed(2)}
         </Text>
       </View>
@@ -173,6 +175,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#2d3436',
     marginBottom: 20,
   },
   searchInput: {
@@ -183,7 +186,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
     fontSize: 16,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#f9f2c3', // Soft yellow background
   },
   filterContainer: {
     flexDirection: 'row',
@@ -203,7 +206,7 @@ const styles = StyleSheet.create({
   showAllButton: {
     paddingVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#f3b13e', // Slightly darker yellow for buttons
     borderRadius: 8,
     marginLeft: 10,
   },
@@ -215,7 +218,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff8e6', // Pale yellow background for cards
     padding: 5,
     borderRadius: 10,
     marginBottom: 20,
@@ -226,8 +229,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   orderIcon: {
-    width: '15%',
-    height: '85%',
+    width: 50,
+    height: 50,
     resizeMode: 'contain',
     marginRight: 15,
   },
@@ -262,7 +265,7 @@ const styles = StyleSheet.create({
   totalContainer: {
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f9e7b2', // Subtle yellow for total container
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -271,24 +274,37 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   skeletonCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f9e7b2',
+    padding: 5,
+    borderRadius: 10,
+    marginBottom: 20,
     height: 100,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 8,
-    marginBottom: 15,
-    padding: 10,
+  },
+  skeletonIcon: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#f3d8a5',
+    borderRadius: 10,
+    marginRight: 15,
+  },
+  skeletonContent: {
+    flex: 1,
   },
   skeletonTitle: {
     width: '50%',
     height: 20,
-    backgroundColor: '#d4d4d4',
+    backgroundColor: '#f3d8a5',
     borderRadius: 4,
     marginBottom: 10,
   },
-  skeletonDescription: {
+  skeletonText: {
     width: '80%',
     height: 15,
-    backgroundColor: '#d4d4d4',
+    backgroundColor: '#f3d8a5',
     borderRadius: 4,
+    marginBottom: 10,
   },
 });
 

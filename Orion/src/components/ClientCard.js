@@ -11,10 +11,10 @@ const ClientCard = ({ client, onPress }) => {
         </View>
         <View style={styles.statusContainer}>
           <Text style={[styles.statusText, client.isLogin ? styles.loggedIn : styles.loggedOut]}>
-            {client.isLogin ? '🔒  Logged In' : '🚪  Logged Out'}
+            {client.isLogin ? '🔒  Connecté' : '🚪  Déconnecté'}
           </Text>
           <Text style={[styles.statusText, client.activated ? styles.activated : styles.deactivated]}>
-            {client.activated ? '✅   Activated' : '❌   Deactivated'}
+            {client.activated ? '✅   Activé' : '❌   Désactivé'}
           </Text>
         </View>
       </View>
@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 20,
     fontWeight: '700',
- 
     color: '#1f695a',
   },
   cardSubtitle: {

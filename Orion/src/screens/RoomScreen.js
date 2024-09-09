@@ -146,7 +146,7 @@ const RoomScreen = ({ route }) => {
       <View style={styles.inputContainer}>
       <TextInput
   style={[styles.input, !chatId && styles.disabledInput]} // Apply disabled style when chatId is null
-  placeholder="Type a message..."
+  placeholder="Ecrire un message..."
   value={newMessage}
   onChangeText={setNewMessage}
   editable={!!chatId} // Disable the input if chatId is null
@@ -157,7 +157,7 @@ const RoomScreen = ({ route }) => {
   onPress={sendMessage}
   disabled={!chatId} // Disable the button if chatId is null
 >
-  <Text style={styles.sendButtonText}>Send</Text>
+  <Text style={styles.sendButtonText}>Envoyer</Text>
 </TouchableOpacity>
 
       </View>

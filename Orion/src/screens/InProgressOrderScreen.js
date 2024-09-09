@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { BASE_URLIO } from '@env';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { io } from 'socket.io-client';
 import moment from 'moment';
-import DeliveredOrderModal from '../components/DeliverdOrderModal';
+import InProgressOrderModal from '../components/InProgressOrderModal';
 
-const DeliveredOrdersScreen = () => {
+const InProgreesgOrdersScreen = () => {
   const [commandes, setCommandes] = useState([]);
   const [commandesFiltrees, setCommandesFiltrees] = useState([]);
   const [dateFiltre, setDateFiltre] = useState(new Date());
@@ -18,9 +18,9 @@ const DeliveredOrdersScreen = () => {
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
-         
-    socket.emit('getDeliveredOrders');
-    socket.on('orderDeliverredUpdated', (data) => {
+    socket.emit('getInProgressOrders');
+
+    socket.on('orderInprogressUpdated', (data) => {
       setCommandes(data.orders);
       setCommandesFiltrees(data.orders); // Afficher toutes les commandes par défaut
       setChargement(false); // Arrêter le chargement une fois les données récupérées
@@ -47,14 +47,12 @@ const DeliveredOrdersScreen = () => {
     setRecherche(query);
     const filtrees = commandes.filter(commande => {
       const nomClient = commande.client_name ? commande.client_name.toLowerCase() : '';
-      const nomChauffeur = commande.driver_name ? commande.driver_name.toLowerCase() : '';
       const nomsProduits = commande.products
         .map(p => p.product?.name ? p.product.name.toLowerCase() : '')
         .join(' ');
       const texteRecherche = query.toLowerCase();
       return (
         nomClient.includes(texteRecherche) ||
-        nomChauffeur.includes(texteRecherche) ||
         nomsProduits.includes(texteRecherche)
       );
     });
@@ -86,12 +84,12 @@ const DeliveredOrdersScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Commandes Livrées</Text>
+      <Text style={styles.header}>Commandes en cours</Text>
 
       {/* Champ de recherche */}
       <TextInput
         style={styles.searchInput}
-        placeholder="Rechercher par client, chauffeur, ou nom de produit..."
+        placeholder="Rechercher par client ou nom de produit..."
         value={recherche}
         onChangeText={filtrerCommandesParRecherche}
       />
@@ -122,7 +120,7 @@ const DeliveredOrdersScreen = () => {
       )}
 
       <FlatList
-        data={chargement ? Array.from({ length: 3 }) : commandesFiltrees.sort((a, b) => moment(b.delivery_time) - moment(a.delivery_time))} // Trier les commandes par heure de livraison
+        data={chargement ? Array.from({ length: 3 }) : commandesFiltrees.sort((a, b) => moment(b.delivery_time) - moment(a.delivery_time))} // Trier par heure de livraison
         keyExtractor={(item, index) => item?._id || index.toString()}
         renderItem={({ item }) => (
           chargement ? (
@@ -130,7 +128,7 @@ const DeliveredOrdersScreen = () => {
           ) : (
             <TouchableOpacity onPress={() => appuyerCarteCommande(item)}>
               <View style={styles.card}>
-                <Ionicons name="checkmark-circle-outline" size={50} color="#4CAF50" style={styles.orderIcon} />
+                <Ionicons name="timer-outline" size={50} color="#1E90FF" style={styles.orderIcon} />
                 <View style={styles.cardContent}>
                   <Text style={styles.orderNumber}>Commande #{item.order_number ?? 'N/A'}</Text>
                   <Text style={styles.location}>{item.address_line}</Text>
@@ -153,7 +151,7 @@ const DeliveredOrdersScreen = () => {
       </View>
 
       {commandeSelectionnee && (
-        <DeliveredOrderModal
+        <InProgressOrderModal
           visible={!!commandeSelectionnee}
           onClose={fermerModal}
           order={commandeSelectionnee}
@@ -173,7 +171,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#388e3c',
+    color: '#1E90FF',
   },
   searchInput: {
     height: 40,
@@ -194,7 +192,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#1E90FF',
     borderRadius: 10,
     padding: 10,
   },
@@ -206,7 +204,7 @@ const styles = StyleSheet.create({
   showAllButton: {
     paddingVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: '#388e3c',
+    backgroundColor: '#4682B4',
     borderRadius: 8,
     marginLeft: 10,
   },
@@ -218,7 +216,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e8f5e9',
+    backgroundColor: '#E6F0FA',
     padding: 10,
     borderRadius: 10,
     marginBottom: 20,
@@ -240,7 +238,7 @@ const styles = StyleSheet.create({
   orderNumber: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#388e3c',
+    color: '#1E90FF',
     marginBottom: 5,
   },
   location: {
@@ -264,7 +262,7 @@ const styles = StyleSheet.create({
   totalContainer: {
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#1E90FF',
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -275,7 +273,7 @@ const styles = StyleSheet.create({
   },
   skeletonCard: {
     height: 100,
-    backgroundColor: '#e8f5e9',
+    backgroundColor: '#E6F0FA',
     borderRadius: 8,
     marginBottom: 15,
     padding: 10,
@@ -283,16 +281,16 @@ const styles = StyleSheet.create({
   skeletonTitle: {
     width: '50%',
     height: 20,
-    backgroundColor: '#c8e6c9',
+    backgroundColor: '#B0C4DE',
     borderRadius: 4,
     marginBottom: 10,
   },
   skeletonDescription: {
     width: '80%',
     height: 15,
-    backgroundColor: '#c8e6c9',
+    backgroundColor: '#B0C4DE',
     borderRadius: 4,
   },
 });
 
-export default DeliveredOrdersScreen;
+export default InProgreesgOrdersScreen;

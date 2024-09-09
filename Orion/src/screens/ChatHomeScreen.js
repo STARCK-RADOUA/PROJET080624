@@ -113,7 +113,7 @@ const ChatScreenComponent = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Chats</Text>
+        <Text style={styles.title}>Discussions</Text>
         <View style={styles.headerIcons}>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Ionicons name="add-circle-outline" size={28} color="black" />
@@ -124,7 +124,7 @@ const ChatScreenComponent = ({ navigation }) => {
 
       <TextInput
         style={styles.searchInput}
-        placeholder="Search"
+        placeholder="Chercher"
         placeholderTextColor="#9ca3af"
         value={searchText}
         onChangeText={setSearchText}

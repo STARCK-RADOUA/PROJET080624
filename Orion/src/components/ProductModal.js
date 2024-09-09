@@ -25,7 +25,7 @@ const ProductModal = ({ visible, onClose, product }) => {
         setServiceTypeOptions(response.data);
       })
       .catch(error => {
-        console.error('Error fetching service types:', error);
+        console.error('Erreur lors de la récupération des types de service:', error);
       });
   }, []);
 
@@ -67,7 +67,7 @@ const ProductModal = ({ visible, onClose, product }) => {
           resolve(xhr.response);
         };
         xhr.onerror = (e) => {
-          reject(new TypeError('Network request failed'));
+          reject(new TypeError('Échec de la requête réseau'));
         };
         xhr.responseType = 'blob';
         xhr.open('GET', uri, true);
@@ -85,11 +85,11 @@ const ProductModal = ({ visible, onClose, product }) => {
 
       setUploading(false);
       setUploadButtonVisible(false);
-      Alert.alert('Success', 'Photo uploaded successfully!');
+      Alert.alert('Succès', 'Photo téléchargée avec succès!');
     } catch (error) {
       console.error(error);
       setUploading(false);
-      Alert.alert('Error', 'Failed to upload the image. Please try again.');
+      Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
     }
   };
 
@@ -114,23 +114,23 @@ const ProductModal = ({ visible, onClose, product }) => {
 
   const validateForm = () => {
     if (!editableProduct.name.trim()) {
-      setErrorMessage('Product name is required.');
+      setErrorMessage('Le nom du produit est requis.');
       return false;
     }
     if (!editableProduct.description.trim()) {
-      setErrorMessage('Product description is required.');
+      setErrorMessage('La description du produit est requise.');
       return false;
     }
     if (!editableProduct.price || isNaN(editableProduct.price)) {
-      setErrorMessage('Please enter a valid price.');
+      setErrorMessage('Veuillez entrer un prix valide.');
       return false;
     }
     if (!editableProduct.service_type) {
-      setErrorMessage('Please select a service type.');
+      setErrorMessage('Veuillez sélectionner un type de service.');
       return false;
     }
     if (!image) {
-      Alert.alert('Validation Error', 'Image is required. Please upload an image.');
+      Alert.alert('Erreur de validation', 'L\'image est requise. Veuillez télécharger une image.');
       return false;
     }
     return true;
@@ -141,37 +141,37 @@ const ProductModal = ({ visible, onClose, product }) => {
 
     axios.put(`${BASE_URL}/api/products/update/${editableProduct._id}`, editableProduct)
       .then(response => {
-        console.log('Product updated successfully:', response.data);
+        console.log('Produit mis à jour avec succès:', response.data);
         setIsEditing(false);
         onClose();
       })
       .catch(error => {
-        setErrorMessage('Failed to update product. Please try again.');
-        console.error('Error updating product:', error);
+        setErrorMessage('Échec de la mise à jour du produit. Veuillez réessayer.');
+        console.error('Erreur lors de la mise à jour du produit:', error);
       });
   };
 
   const handleDeleteProduct = () => {
     Alert.alert(
-      'Delete Product',
-      'Are you sure you want to delete this product?',
+      'Supprimer le produit',
+      'Êtes-vous sûr de vouloir supprimer ce produit?',
       [
         {
-          text: 'Cancel',
+          text: 'Annuler',
           style: 'cancel',
         },
         {
-          text: 'Delete',
+          text: 'Supprimer',
           onPress: () => {
             axios.delete(`${BASE_URL}/api/products/delete/${editableProduct._id}`)
               .then(response => {
-                console.log('Product deleted:', response.data);
+                console.log('Produit supprimé:', response.data);
                 onClose();
-                Alert.alert('Success', 'Product deleted successfully!');
+                Alert.alert('Succès', 'Produit supprimé avec succès!');
               })
               .catch(error => {
-                console.error('Error deleting product:', error);
-                Alert.alert('Error', 'Failed to delete product. Please try again.');
+                console.error('Erreur lors de la suppression du produit:', error);
+                Alert.alert('Erreur', 'Échec de la suppression du produit. Veuillez réessayer.');
               });
           },
         },
@@ -210,7 +210,7 @@ const ProductModal = ({ visible, onClose, product }) => {
               {uploading ? (
                 <ActivityIndicator size="small" color="#ffbf00" />
               ) : (
-                <Text style={styles.uploadButtonText}>Upload</Text>
+                <Text style={styles.uploadButtonText}>Télécharger</Text>
               )}
             </TouchableOpacity>
           )}
@@ -221,7 +221,7 @@ const ProductModal = ({ visible, onClose, product }) => {
                 style={styles.editInput}
                 value={editableProduct.name}
                 onChangeText={(value) => handleInputChange('name', value)}
-                placeholder="Product Name"
+                placeholder="Nom du produit"
                 placeholderTextColor="#999"
               />
             ) : (
@@ -238,7 +238,7 @@ const ProductModal = ({ visible, onClose, product }) => {
                 style={styles.editInput}
                 value={editableProduct.description}
                 onChangeText={(value) => handleInputChange('description', value)}
-                placeholder="Product Description"
+                placeholder="Description du produit"
                 placeholderTextColor="#999"
               />
             ) : (
@@ -256,7 +256,7 @@ const ProductModal = ({ visible, onClose, product }) => {
                 value={String(editableProduct.price)}
                 onChangeText={(value) => handleInputChange('price', value)}
                 keyboardType="numeric"
-                placeholder="Product Price"
+                placeholder="Prix du produit"
                 placeholderTextColor="#999"
               />
             ) : (
@@ -279,7 +279,7 @@ const ProductModal = ({ visible, onClose, product }) => {
                 ))}
               </Picker>
             ) : (
-              <Text style={styles.serviceType}>Service Type: {editableProduct.service_type}</Text>
+              <Text style={styles.serviceType}>Type de service: {editableProduct.service_type}</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
               <Ionicons name="create-outline" size={20} color="#fff" />
@@ -303,7 +303,7 @@ const ProductModal = ({ visible, onClose, product }) => {
                             ...editableProduct.options.slice(index + 1),
                           ])
                         }
-                        placeholder="Option Name"
+                        placeholder="Nom de l'option"
                         placeholderTextColor="#999"
                       />
                       <TextInput
@@ -317,7 +317,7 @@ const ProductModal = ({ visible, onClose, product }) => {
                           ])
                         }
                         keyboardType="numeric"
-                        placeholder="Option Price"
+                        placeholder="Prix de l'option"
                         placeholderTextColor="#999"
                       />
                       <TouchableOpacity onPress={() => removeOption(index)}>
@@ -333,7 +333,7 @@ const ProductModal = ({ visible, onClose, product }) => {
                 </View>
               ))
             ) : (
-              <Text style={styles.noOptionsText}>No options available</Text>
+              <Text style={styles.noOptionsText}>Aucune option disponible</Text>
             )}
 
             {isEditing && (
@@ -352,12 +352,12 @@ const ProductModal = ({ visible, onClose, product }) => {
               style={styles.updateButton}
               onPress={handleUpdateProduct}
             >
-              <Text style={styles.updateButtonText}>Update</Text>
+              <Text style={styles.updateButtonText}>Mettre à jour</Text>
             </TouchableOpacity>
           )}
 
           <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteProduct}>
-            <Text style={styles.deleteButtonText}>Delete</Text>
+            <Text style={styles.deleteButtonText}>Supprimer</Text>
           </TouchableOpacity>
         </View>
       </View>

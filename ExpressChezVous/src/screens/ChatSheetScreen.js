@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import React, { useCallback, useImperativeHandle, useState, useEffect } from 'react';
+import React, { useCallback, useImperativeHandle, useState, useEffect, useRef } from 'react';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   Extrapolate,
@@ -18,7 +18,6 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import axios from 'axios';
 import { io } from 'socket.io-client';
 import { BASE_URL } from '@env';
 import { getClientId } from '../services/userService';
@@ -26,14 +25,15 @@ import { getClientId } from '../services/userService';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50;
 
-const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
+const socket = io(BASE_URL); // Initialize socket globally
+
+const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
   const translateY = useSharedValue(0);
   const active = useSharedValue(false);
   const [chatId, setChatId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
-  const [socket, setSocket] = useState(null);
-  const driverId = "66bac757e6e3c479f7b35d7e";
+  const flatListRef = useRef(null); // Reference to the FlatList
 
   const scrollTo = useCallback((destination) => {
     'worklet';
@@ -48,17 +48,11 @@ const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
   useImperativeHandle(ref, () => ({ scrollTo, isActive }), [scrollTo, isActive]);
 
   useEffect(() => {
-    // Initialize Socket.IO connection
-    const socketInstance = io(BASE_URL, {
-      transports: ['websocket'],
-    });
-    setSocket(socketInstance);
-
-    socketInstance.on('connect', () => {
+    socket.on('connect', () => {
       console.log('Socket connected');
     });
 
-    socketInstance.on('disconnect', () => {
+    socket.on('disconnect', () => {
       console.log('Socket disconnected');
     });
 
@@ -66,7 +60,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
       try {
         if (orderId && driverId) {
           const clientId = await getClientId();
-          socketInstance.emit('initiateChats', {
+          socket.emit('initiateChats', {
             orderId,
             clientId,
             driverId,
@@ -80,22 +74,30 @@ const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
     initiateChat();
 
     // Listen for chat details
-    socketInstance.on('chatDetailss', (data) => {
+    socket.on('chatDetailss', (data) => {
       setChatId(data.chatId);
       setMessages(data.messages);
+      scrollToBottom(); // Scroll to the bottom when chat details are loaded
     });
 
     // Real-time message listener
-    socketInstance.on('newMessages', (newMessage) => {
+    socket.on('newMessages', (newMessage) => {
       setMessages((prevMessages) => [...prevMessages, newMessage.message]);
+      scrollToBottom(); // Scroll to the bottom when a new message is added
     });
 
     return () => {
-      if (socketInstance) {
-        socketInstance.disconnect();
-      }
+      socket.off('chatDetailss'); // Clean up listeners
+      socket.off('newMessages');
     };
   }, [orderId, driverId]);
+
+  // Function to scroll to the bottom of the FlatList
+  const scrollToBottom = () => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  };
 
   const sendMessage = () => {
     if (message.trim() && chatId) {
@@ -145,8 +147,9 @@ const BottomSheet = React.forwardRef(({ orderId, clientId }, ref) => {
     <GestureDetector gesture={gesture}>
       <Animated.View style={[styles.bottomSheetContainer, rBottomSheetStyle]}>
         <View style={styles.line} />
-        
+
         <FlatList
+          ref={flatListRef} // Reference the FlatList to use scrollToEnd
           data={messages}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (

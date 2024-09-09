@@ -15,32 +15,32 @@ const ProductScreen = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
-    console.log('Attempting to connect to the socket server...');
+    console.log('Tentative de connexion au serveur socket...');
     const socket = io(BASE_URLIO);
 
     socket.emit('watchProducts');
-    console.log('watchProducts event emitted');
+    console.log('Événement watchProducts émis');
 
     socket.on('productsUpdated', ({ products }) => {
-      console.log('productsUpdated event received:', products);
+      console.log('Événement productsUpdated reçu :', products);
       setProducts(products);
       setLoading(false);
     });
 
     socket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
+      console.error('Erreur de connexion :', error);
     });
 
     socket.on('connect', () => {
-      console.log('Connected to the socket server');
+      console.log('Connecté au serveur socket');
     });
 
     socket.on('disconnect', () => {
-      console.log('Disconnected from the socket server');
+      console.log('Déconnecté du serveur socket');
     });
 
     return () => {
-      console.log('Disconnecting from socket server...');
+      console.log('Déconnexion du serveur socket...');
       socket.disconnect();
     };
   }, []);
@@ -74,16 +74,16 @@ const ProductScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Products</Text>
+        <Text style={styles.headerText}>Produits</Text>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by name or service type..."
+          placeholder="Rechercher par nom ou type de service..."
           placeholderTextColor="#9ca3af"
           value={searchText}
           onChangeText={setSearchText}
         />
         <TouchableOpacity style={styles.addButton} onPress={() => setAddModalVisible(true)}>
-          <Text style={styles.addButtonText}>Add</Text>
+          <Text style={styles.addButtonText}>Ajouter</Text>
         </TouchableOpacity>
       </View>
 
@@ -95,7 +95,7 @@ const ProductScreen = () => {
             <ProductCard key={index} product={product} onReadMore={() => handleOpenProductModal(product)} />
           ))
         ) : (
-          <Text style={styles.noResultsText}>No products found</Text>
+          <Text style={styles.noResultsText}>Aucun produit trouvé</Text>
         )}
       </ScrollView>
 

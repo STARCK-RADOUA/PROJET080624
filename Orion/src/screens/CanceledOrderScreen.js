@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BASE_URLIO } from '@env';
-
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { io } from 'socket.io-client';
@@ -9,13 +8,13 @@ import moment from 'moment';
 import DeliveredOrderModal from '../components/DeliverdOrderModal';
 
 const CanceledOrderScreen = () => {
-  const [orders, setOrders] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [filterDate, setFilterDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [commandes, setCommandes] = useState([]);
+  const [commandesFiltrees, setCommandesFiltrees] = useState([]);
+  const [dateFiltre, setDateFiltre] = useState(new Date());
+  const [afficherDatePicker, setAfficherDatePicker] = useState(false);
+  const [recherche, setRecherche] = useState('');
+  const [commandeSelectionnee, setCommandeSelectionnee] = useState(null);
+  const [chargement, setChargement] = useState(true);
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
@@ -23,14 +22,14 @@ const CanceledOrderScreen = () => {
     socket.emit('getCancelledOrders');
 
     socket.on('orderCanceledUpdated', (data) => {
-      setOrders(data.orders);
-      setFilteredOrders(data.orders); // Show all orders by default
-      setLoading(false); // Stop loading once data is fetched
+      setCommandes(data.orders);
+      setCommandesFiltrees(data.orders); // Afficher toutes les commandes par défaut
+      setChargement(false); // Arrêter le chargement une fois les données récupérées
     });
 
     socket.on('error', (err) => {
-      console.error('Socket error:', err.message);
-      setLoading(false); // Stop loading if there's an error
+      console.error('Erreur de socket:', err.message);
+      setChargement(false); // Arrêter le chargement en cas d'erreur
     });
 
     return () => {
@@ -38,44 +37,44 @@ const CanceledOrderScreen = () => {
     };
   }, []);
 
-  const filterOrdersByDate = (selectedDate) => {
-    const filtered = orders.filter(order =>
-      moment(order.delivery_time).isSame(selectedDate, 'day')
+  const filtrerCommandesParDate = (dateSelectionnee) => {
+    const filtrees = commandes.filter(commande =>
+      moment(commande.delivery_time).isSame(dateSelectionnee, 'day')
     );
-    setFilteredOrders(filtered);
+    setCommandesFiltrees(filtrees);
   };
 
-  const filterOrdersBySearch = (query) => {
-    setSearchQuery(query);
-    const filtered = orders.filter(order => {
-      const clientName = order.client_name ? order.client_name.toLowerCase() : '';
-      const driverName = order.driver_name ? order.driver_name.toLowerCase() : '';
-      const productNames = order.products
+  const filtrerCommandesParRecherche = (query) => {
+    setRecherche(query);
+    const filtrees = commandes.filter(commande => {
+      const nomClient = commande.client_name ? commande.client_name.toLowerCase() : '';
+      const nomChauffeur = commande.driver_name ? commande.driver_name.toLowerCase() : '';
+      const nomsProduits = commande.products
         .map(p => p.product?.name ? p.product.name.toLowerCase() : '')
         .join(' ');
-      const searchText = query.toLowerCase();
+      const texteRecherche = query.toLowerCase();
       return (
-        clientName.includes(searchText) ||
-        driverName.includes(searchText) ||
-        productNames.includes(searchText)
+        nomClient.includes(texteRecherche) ||
+        nomChauffeur.includes(texteRecherche) ||
+        nomsProduits.includes(texteRecherche)
       );
     });
-    setFilteredOrders(filtered);
+    setCommandesFiltrees(filtrees);
   };
 
-  const handleShowAll = () => {
-    setFilteredOrders(orders); // Show all orders when "Show All" is pressed
+  const afficherTout = () => {
+    setCommandesFiltrees(commandes); // Afficher toutes les commandes lorsque "Afficher tout" est pressé
   };
 
-  const handleCardPress = (order) => {
-    setSelectedOrder(order); // Set the selected order to display in the modal
+  const appuyerCarteCommande = (commande) => {
+    setCommandeSelectionnee(commande); // Afficher la commande sélectionnée dans le modal
   };
 
-  const handleCloseModal = () => {
-    setSelectedOrder(null); // Close the modal
+  const fermerModal = () => {
+    setCommandeSelectionnee(null); // Fermer le modal
   };
 
-  const renderSkeleton = () => (
+  const rendreSkeleton = () => (
     <>
       {[...Array(3)].map((_, index) => (
         <View key={index} style={styles.skeletonCard}>
@@ -88,56 +87,53 @@ const CanceledOrderScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Cancelled Orders</Text>
+      <Text style={styles.header}>Commandes Annulées</Text>
 
-      {/* Search Input */}
+      {/* Champ de recherche */}
       <TextInput
         style={styles.searchInput}
-        placeholder="Search by client, driver, or product name..."
-        value={searchQuery}
-        onChangeText={filterOrdersBySearch}
+        placeholder="Rechercher par client, chauffeur, ou nom de produit..."
+        value={recherche}
+        onChangeText={filtrerCommandesParRecherche}
       />
 
       <View style={styles.filterContainer}>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
-          <Ionicons name="calendar-outline" size={24} color="black" />
-          <Text style={styles.filterText}>{moment(filterDate).format('YYYY-MM-DD')}</Text>
+        <TouchableOpacity onPress={() => setAfficherDatePicker(true)} style={styles.datePicker}>
+          <Ionicons name="calendar-outline" size={24} color="white" />
+          <Text style={styles.filterText}>{moment(dateFiltre).format('YYYY-MM-DD')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.showAllButton} onPress={handleShowAll}>
-          <Text style={styles.showAllText}>Show All</Text>
+        <TouchableOpacity style={styles.showAllButton} onPress={afficherTout}>
+          <Text style={styles.showAllText}>Afficher tout</Text>
         </TouchableOpacity>
       </View>
 
-      {showDatePicker && (
+      {afficherDatePicker && (
         <DateTimePicker
-          value={filterDate}
+          value={dateFiltre}
           mode="date"
           display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              setFilterDate(selectedDate);
-              filterOrdersByDate(selectedDate); // Filter orders when a new date is selected
+          onChange={(event, dateSelectionnee) => {
+            setAfficherDatePicker(false);
+            if (dateSelectionnee) {
+              setDateFiltre(dateSelectionnee);
+              filtrerCommandesParDate(dateSelectionnee); // Filtrer les commandes selon la date sélectionnée
             }
           }}
         />
       )}
 
       <FlatList
-        data={loading ? Array.from({ length: 3 }) : filteredOrders}
+        data={chargement ? Array.from({ length: 3 }) : commandesFiltrees.sort((a, b) => moment(b.delivery_time) - moment(a.delivery_time))} // Trier par date d'annulation
         keyExtractor={(item, index) => item?._id || index.toString()}
         renderItem={({ item }) => (
-          loading ? (
-            renderSkeleton()
+          chargement ? (
+            rendreSkeleton()
           ) : (
-            <TouchableOpacity onPress={() => handleCardPress(item)}>
+            <TouchableOpacity onPress={() => appuyerCarteCommande(item)}>
               <View style={styles.card}>
-                <Image
-                  source={{ uri: 'https://img.icons8.com/ios-filled/50/000000/order-history.png' }}
-                  style={styles.orderIcon}
-                />
+                <Ionicons name="close-circle-outline" size={50} color="#FF6347" style={styles.orderIcon} />
                 <View style={styles.cardContent}>
-                  <Text style={styles.orderNumber}>Order #{item.order_number ?? 'N/A'}</Text>
+                  <Text style={styles.orderNumber}>Commande #{item.order_number ?? 'N/A'}</Text>
                   <Text style={styles.location}>{item.address_line}</Text>
                   <View style={styles.rightContainer}>
                     <Text style={styles.price}>€{item.total_price.toFixed(2)}</Text>
@@ -152,16 +148,16 @@ const CanceledOrderScreen = () => {
 
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>
-          Total in Euros: €
-          {filteredOrders.reduce((total, order) => total + order.total_price, 0).toFixed(2)}
+          Total en Euros: €
+          {commandesFiltrees.reduce((total, commande) => total + commande.total_price, 0).toFixed(2)}
         </Text>
       </View>
 
-      {selectedOrder && (
+      {commandeSelectionnee && (
         <DeliveredOrderModal
-          visible={!!selectedOrder}
-          onClose={handleCloseModal}
-          order={selectedOrder}
+          visible={!!commandeSelectionnee}
+          onClose={fermerModal}
+          order={commandeSelectionnee}
         />
       )}
     </View>
@@ -178,6 +174,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#FF6347',
   },
   searchInput: {
     height: 40,
@@ -198,16 +195,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    backgroundColor: '#FF6347',
+    borderRadius: 10,
+    padding: 10,
   },
   filterText: {
     marginLeft: 10,
     fontSize: 16,
-    color: '#333',
+    color: '#ffffff',
   },
   showAllButton: {
     paddingVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#FF7F50',
     borderRadius: 8,
     marginLeft: 10,
   },
@@ -219,8 +219,8 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    padding: 5,
+    backgroundColor: '#FFE4E1',
+    padding: 10,
     borderRadius: 10,
     marginBottom: 20,
     shadowColor: '#000',
@@ -230,9 +230,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   orderIcon: {
-    width: '15%',
-    height: '85%',
-    resizeMode: 'contain',
+    width: 50,
+    height: 50,
     marginRight: 15,
   },
   cardContent: {
@@ -242,7 +241,7 @@ const styles = StyleSheet.create({
   orderNumber: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FF6347',
     marginBottom: 5,
   },
   location: {
@@ -266,17 +265,18 @@ const styles = StyleSheet.create({
   totalContainer: {
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#FF6347',
     borderRadius: 10,
     alignItems: 'center',
   },
   totalText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#ffffff',
   },
   skeletonCard: {
     height: 100,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#FFCCCB',
     borderRadius: 8,
     marginBottom: 15,
     padding: 10,
@@ -284,14 +284,14 @@ const styles = StyleSheet.create({
   skeletonTitle: {
     width: '50%',
     height: 20,
-    backgroundColor: '#d4d4d4',
+    backgroundColor: '#FF7F7F',
     borderRadius: 4,
     marginBottom: 10,
   },
   skeletonDescription: {
     width: '80%',
     height: 15,
-    backgroundColor: '#d4d4d4',
+    backgroundColor: '#FF7F7F',
     borderRadius: 4,
   },
 });
