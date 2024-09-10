@@ -1,22 +1,17 @@
 import React, { useContext, useState } from 'react';
-import { TouchableOpacity, View, Text, Alert, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, View, Text, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BASE_URL } from '@env';
+import { AuthContext } from '../redux/AuthProvider';
 import * as Device from 'expo-device';
-import { AuthContext,AuthProvider } from '../redux/AuthProvider'; // Import AuthContext
-import LoginScreen from '../screens/LoginScreen';
-const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket,onLogin }) => {
+
+const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, onLogin }) => {
   const [loading, setLoading] = useState(false);
   const { logout } = useContext(AuthContext);
-  // Use the logout function from AuthContext
 
   const handleLogout = async () => {
     setLoading(true);
-    const deviceId =  Device.osBuildId;
-    console.log('------------------------------------');
-    console.log('Logging out...', deviceId);
-    console.log('------------------------------------');
-
+    const deviceId = Device.osBuildId;
+    
     try {
       const response = await fetch(`${BASE_URL}/api/clients/logout`, {
         method: 'POST',
@@ -25,16 +20,11 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket,onLogin 
         },
         body: JSON.stringify({ deviceId }),
       });
-   
-      const data = await response.json();
 
+      const data = await response.json();
       if (response.status === 200) {
-        if (socket && socket.connected) {
-          socket.disconnect();
-        }
-   await logout();
-   
-   onLogin()  // Clear authentication state
+        await logout();
+        onLogin();
         Alert.alert('Logout Successful', 'You have been logged out.');
       } else {
         Alert.alert('Logout Failed', data.errors ? data.errors.join(', ') : data.message);
@@ -50,7 +40,7 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket,onLogin 
   return (
     <TouchableOpacity onPress={() => {
       if (title === "LogOut") {
-        handleLogout(); // Call the logout function when LogOut is pressed
+        handleLogout();
       } else {
         setCurrentTab(title);
       }
@@ -63,6 +53,7 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket,onLogin 
         paddingLeft: 13,
         paddingRight: 35,
         borderRadius: 8,
+        position: 'relative', // Ensure the dot is positioned correctly
       }}>
         {loading ? (
           <ActivityIndicator size="small" color="black" />
@@ -81,9 +72,21 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, socket,onLogin 
             }}>{title}</Text>
           </>
         )}
+
+        {/* Show red dot for unread messages in Chat */}
+        {title === "Chat" && unreadMessages && (
+          <View style={{
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: 'red',
+            position: 'absolute',
+            top: 0,
+            right: 10,
+          }} />
+        )}
       </View>
     </TouchableOpacity>
-    
   );
 };
 

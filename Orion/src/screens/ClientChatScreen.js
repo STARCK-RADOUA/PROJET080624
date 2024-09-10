@@ -3,12 +3,14 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimens
 import { Ionicons } from '@expo/vector-icons';
 import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
-import UserSearchModal from './../components/AddChatModal';
+import ClientSearchModal from '../components/ClientSearchModal';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import RoomScreen from './RoomScreen';
+import ChatMainScreen from './ChatMainScreen';
+import DriverChatScreenComponent from './DriverChatScreen';
 
-const ChatScreenComponent = ({ navigation }) => {
+const ClientChatScreenComponent = ({ navigation }) => {
   const [chats, setChats] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -22,8 +24,9 @@ const ChatScreenComponent = ({ navigation }) => {
     const socket = io(BASE_URLIO);
 
     socket.on('chatMessagesUpdated', (data) => {
-      data.messages.forEach(chat => {
-        console.log("jkgkjgjk",JSON.stringify(data))
+      console.log(JSON.stringify(data))
+      const filteredMessages = data.messages.filter(chat => chat.role !== 'driver'); // Filter out drivers
+      filteredMessages.forEach(chat => {
         handleAddChat({
           _id: chat.clientId,
           firstName: chat.clientFullName.split(' ')[0],
@@ -113,12 +116,11 @@ const ChatScreenComponent = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Discussions</Text>
+        <Text style={styles.title}>Chat Client</Text>
         <View style={styles.headerIcons}>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Ionicons name="add-circle-outline" size={28} color="black" />
           </TouchableOpacity>
-       
         </View>
       </View>
 
@@ -130,33 +132,33 @@ const ChatScreenComponent = ({ navigation }) => {
         onChangeText={setSearchText}
       />
 
-<ScrollView contentContainerStyle={styles.chatList}>
-  {filteredChats.map((chat, index) => (
-    <TouchableOpacity key={index} style={styles.chatItem} onPress={() => handleChatPress(chat)}>
-      <View style={[styles.avatar, { backgroundColor: chat.avatarColor }]}>
-        <Text style={styles.avatarText}>
-          {chat.firstName ? chat.firstName.charAt(0) : ''}
-        </Text>
-      </View>
-      <View style={styles.chatDetails}>
-        <Text style={[styles.chatName, chat.unread ? styles.unreadChatName : null]}>
-          {`${chat.firstName || ''} ${chat.lastName || ''}`}
-        </Text>
-        <Text style={styles.chatMessage}>
-          {chat.lastMessage && chat.lastMessage.content ? chat.lastMessage.content : ''}
-        </Text>
-      </View>
-      <Text style={styles.chatTime}>
-        {chat.lastMessage && chat.lastMessage.timestamp ? formatTime(chat.lastMessage.timestamp) : ''}
-      </Text>
-      {chat.unread && chat.lastMessage.sender !== 'admin' && !chat.lastMessage.seen && (
-        <View style={styles.unreadDot} />
-      )}
-    </TouchableOpacity>
-  ))}
-</ScrollView>
+      <ScrollView contentContainerStyle={styles.chatList}>
+        {filteredChats.map((chat, index) => (
+          <TouchableOpacity key={index} style={styles.chatItem} onPress={() => handleChatPress(chat)}>
+            <View style={[styles.avatar, { backgroundColor: chat.avatarColor }]}>
+              <Text style={styles.avatarText}>
+                {chat.firstName ? chat.firstName.charAt(0) : ''}
+              </Text>
+            </View>
+            <View style={styles.chatDetails}>
+              <Text style={[styles.chatName, chat.unread ? styles.unreadChatName : null]}>
+                {`${chat.firstName || ''} ${chat.lastName || ''}`}
+              </Text>
+              <Text style={styles.chatMessage}>
+                {chat.lastMessage && chat.lastMessage.content ? chat.lastMessage.content : ''}
+              </Text>
+            </View>
+            <Text style={styles.chatTime}>
+              {chat.lastMessage && chat.lastMessage.timestamp ? formatTime(chat.lastMessage.timestamp) : ''}
+            </Text>
+            {chat.unread && chat.lastMessage.sender !== 'admin' && !chat.lastMessage.seen && (
+              <View style={styles.unreadDot} />
+            )}
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
-      <UserSearchModal
+      <ClientSearchModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onUserSelect={handleAddChat}
@@ -170,8 +172,10 @@ const Stack = createStackNavigator();
 const ChatScreen = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="ChatScreenComponent">
-        <Stack.Screen name="ChatScreenComponent" component={ChatScreenComponent} options={{ headerShown: false }} />
+      <Stack.Navigator initialRouteName="MainScreen">
+        <Stack.Screen name='MainScreen' component={ChatMainScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name='DriverChatScreenComponent' component={DriverChatScreenComponent} options={{ headerShown: false }}/>
+        <Stack.Screen name="ClientChatScreenComponent" component={ClientChatScreenComponent} options={{ headerShown: false }} />
         <Stack.Screen name="RoomScreen" component={RoomScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
@@ -199,9 +203,6 @@ const styles = StyleSheet.create({
   },
   headerIcons: {
     flexDirection: 'row',
-  },
-  editIcon: {
-    marginLeft: 15,
   },
   searchInput: {
     height: 40,

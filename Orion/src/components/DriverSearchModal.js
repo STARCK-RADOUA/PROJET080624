@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL } from '@env';
 
-const UserSearchModal = ({ visible, onClose, onUserSelect }) => {
+const DriverSearchModal = ({ visible, onClose, onUserSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState([]);
   const [searchedUsers, setSearchedUsers] = useState([]);
@@ -16,18 +16,21 @@ const UserSearchModal = ({ visible, onClose, onUserSelect }) => {
         setUsers(response.data);
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Erreur lors de la récupération des utilisateurs:', error);
     }
   };
 
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (query) {
-      setSearchedUsers(users.filter(user => 
-        `${user.firstName} ${user.lastName}`.toLowerCase().includes(query.toLowerCase())
-      ));
+      setSearchedUsers(
+        users.filter(user =>
+          `${user.firstName} ${user.lastName}`.toLowerCase().includes(query.toLowerCase()) &&
+          user.userType === 'Driver' // Only include drivers
+        )
+      );
     } else {
-      setSearchedUsers([]);
+      setSearchedUsers(users.filter(user => user.userType === 'Driver')); // Show all drivers if no search query
     }
   };
 
@@ -44,10 +47,10 @@ const UserSearchModal = ({ visible, onClose, onUserSelect }) => {
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Ionicons name="close-circle-outline" size={24} color="black" />
           </TouchableOpacity>
-          <Text style={styles.modalTitle}>Add New Chat</Text>
+          <Text style={styles.modalTitle}>Ajouter un nouveau chauffeur</Text>
           <TextInput
             style={styles.modalSearchInput}
-            placeholder="Search users..."
+            placeholder="Rechercher des chauffeurs..."
             placeholderTextColor="#9ca3af"
             value={searchQuery}
             onChangeText={handleSearch}
@@ -60,12 +63,12 @@ const UserSearchModal = ({ visible, onClose, onUserSelect }) => {
                     <Text style={styles.avatarText}>{user.firstName.charAt(0)}</Text>
                   </View>
                   <Text style={styles.modalUserName}>
-                    {user.firstName} {user.lastName}/{user.userType === 'Driver' ? 'D' : 'C'}
+                    {user.firstName} {user.lastName}/L
                   </Text>
                 </TouchableOpacity>
               ))
             ) : (
-              <Text style={styles.noUsersText}>No users found</Text>
+              <Text style={styles.noUsersText}>Aucun chauffeur trouvé</Text>
             )}
           </ScrollView>
         </View>
@@ -145,4 +148,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserSearchModal;
+export default DriverSearchModal;

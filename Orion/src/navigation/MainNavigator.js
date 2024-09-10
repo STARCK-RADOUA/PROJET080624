@@ -1,6 +1,4 @@
-import React, { useRef, useState } from 'react';
-import { Animated, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import NotificationScreen from '../screens/AdminNotificationScreen';
@@ -12,18 +10,52 @@ import ProductScreen from '../screens/ProductScreen';
 import SideMenu from '../components/SideMenu';
 import NotificationMenu from '../components/NotificationMenu';
 import ServiceScreen from '../screens/ServiceScreen'; 
-import ChatHomeScreen from '../screens/ChatHomeScreen';
+import ChatHomeScreen from '../screens/ClientChatScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import WarnScreen from '../screens/WarnScreen';
 import OrderChatHistoriqueScreen from '../screens/OrderChatHistoriqueScreen';
+import React, { useRef, useState, useEffect } from 'react';
+import { Animated, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import socketIOClient from "socket.io-client"; // Import socket.io client
+import { BASE_URL } from '@env';
 
-export default function MainNavigator({ onLogin }) {
+const MainNavigator = ({ onLogin }) => {
   const [currentTab, setCurrentTab] = useState("Accueil");
   const [showMenu, setShowMenu] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(false); // Track unread messages
 
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
   const closeButtonOffset = useRef(new Animated.Value(0)).current;
+
+  // Initialize socket
+  const socket = socketIOClient(BASE_URL); // Make sure to set BASE_URL correctly
+
+  useEffect(() => {
+    // Request initial chat messages on connect
+    socket.emit('watchChatMessages');
+
+    // Listen for the updated messages when they are received from the server
+    socket.on('chatMessagesUpdated', (data) => {
+      const hasUnread = data.messages.some(message => 
+        message.lastMessage.sender !== 'admin' && !message.lastMessage.seen
+      );
+      setUnreadMessages(hasUnread);
+    });
+
+    // Cleanup socket listener
+    return () => {
+      socket.off('chatMessagesUpdated');
+    };
+  }, [socket]);
+
+  const handleTabChange = (title) => {
+    if (title === "Chat") {
+      setUnreadMessages(false); // Remove red dot when Chat is clicked
+    }
+    setCurrentTab(title);
+  };
 
   const renderScreen = () => {
     switch (currentTab) {
@@ -63,7 +95,7 @@ export default function MainNavigator({ onLogin }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <SideMenu currentTab={currentTab} setCurrentTab={setCurrentTab} styles={styles} onLogin={onLogin} />
+      <SideMenu currentTab={currentTab} setCurrentTab={handleTabChange} styles={styles} onLogin={onLogin} unreadMessages={unreadMessages} />
 
       <Animated.View
         style={{
@@ -144,3 +176,5 @@ const styles = StyleSheet.create({
     // Dynamic marginTop is handled in-line where the Ionicons component is used
   },
 });
+
+export default MainNavigator;

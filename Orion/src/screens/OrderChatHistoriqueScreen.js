@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // Import from the new package
-import { Ionicons } from '@expo/vector-icons'; // Import icon library for modern icons
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; 
+import { Ionicons } from '@expo/vector-icons'; 
 import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,8 +10,9 @@ import OrderRoomScreen from './OrderChatRoom';
 
 const ChatScreenComponent = ({ navigation }) => {
   const [chats, setChats] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state for skeleton
   const [searchText, setSearchText] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all'); // Picker state for order status
+  const [selectedStatus, setSelectedStatus] = useState('all'); 
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -20,39 +21,54 @@ const ChatScreenComponent = ({ navigation }) => {
 
       // Listen for incoming chat messages from the socket
       socket.on('OrderchatMessagesUpdated', (data) => {
-        setChats(data.messages); // Directly set the chats from the received data
+        setChats(data.messages); // Set chats
+        setLoading(false); // Stop loading when data is received
       });
 
       // Emit an event to watch for chat messages
       socket.emit('watchOrderChatMessages');
 
       return () => {
-        socket.disconnect(); // Clean up socket connection when the component is unmounted
+        socket.disconnect();
       };
     } catch (err) {
       setError(err.message);
+      setLoading(false); // Stop loading in case of error
       Alert.alert("Erreur", "Échec de la connexion au serveur.");
     }
   }, []);
 
-  // Handle pressing a chat item
   const handleChatPress = (chat) => {
     try {
-      console.log('Clicked chat:', chat);
-
-      // Navigate to the OrderRoomScreen and pass chat details
       navigation.navigate('OrderRoomScreen', {
-        chatId: chat.chatId, // Pass the chat ID
-        orderId: chat.orderId, // Pass the chat ID
-        clientFullName: chat.clientFullName, // Pass the client's full name
-        driverFullName: chat.driverFullName, 
-        clientId : chat.clientId,
-        driverId : chat.driverId,
+        chatId: chat.chatId,
+        orderId: chat.orderId,
+        clientFullName: chat.clientFullName,
+        driverFullName: chat.driverFullName,
+        clientId: chat.clientId,
+        driverId: chat.driverId,
       });
     } catch (err) {
       setError(err.message);
       Alert.alert("Erreur", "Impossible de charger la discussion.");
     }
+  };
+
+  // Simulated skeleton loading placeholders
+  const renderSkeleton = () => {
+    return (
+      <View style={styles.skeletonContainer}>
+        {[...Array(5)].map((_, index) => (
+          <View key={index} style={styles.skeletonItem}>
+            <View style={styles.skeletonAvatar} />
+            <View style={styles.skeletonTextContainer}>
+              <View style={styles.skeletonText} />
+              <View style={styles.skeletonTextSmall} />
+            </View>
+          </View>
+        ))}
+      </View>
+    );
   };
 
   // Filter and sort chats based on search input and selected status
@@ -63,8 +79,7 @@ const ChatScreenComponent = ({ navigation }) => {
       const name = `${chat.orderId}`.toLowerCase();
       const clientName = chat.clientFullName.toLowerCase();
       const driverName = chat.driverFullName.toLowerCase();
-      
-      // Check if the search text matches any of orderId, clientFullName, or driverFullName
+
       return (name.includes(searchLower) || clientName.includes(searchLower) || driverName.includes(searchLower)) 
               && isOrderStatusMatch;
     })
@@ -72,7 +87,7 @@ const ChatScreenComponent = ({ navigation }) => {
       const aTimestamp = a.lastMessage ? new Date(a.lastMessage.timestamp) : 0;
       const bTimestamp = b.lastMessage ? new Date(b.lastMessage.timestamp) : 0;
       return bTimestamp - aTimestamp;
-    }); // Sort by last message timestamp
+    });
 
   return (
     <View style={styles.container}>
@@ -88,7 +103,6 @@ const ChatScreenComponent = ({ navigation }) => {
         onChangeText={setSearchText}
       />
 
-      {/* Picker for filtering by order status */}
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={selectedStatus}
@@ -103,29 +117,32 @@ const ChatScreenComponent = ({ navigation }) => {
 
       {error && <Text style={styles.errorText}>Erreur: {error}</Text>}
 
-      <ScrollView contentContainerStyle={styles.chatList}>
-        {filteredChats.map((chat, index) => (
-          <TouchableOpacity key={index} style={styles.chatItem} onPress={() => handleChatPress(chat)}>
-            <View style={styles.orderIconContainer}>
-              {/* Replace avatar with a modern order icon */}
-              <Ionicons name="cart-outline" size={32} color="#4682B4" />
-            </View>
-            <View style={styles.chatDetails}>
-              <Text style={[styles.chatName, chat.unread ? styles.unreadChatName : null]}>
-                {chat.orderId}
+      {loading ? (
+        renderSkeleton() // Show skeleton loader while loading
+      ) : (
+        <ScrollView contentContainerStyle={styles.chatList}>
+          {filteredChats.map((chat, index) => (
+            <TouchableOpacity key={index} style={styles.chatItem} onPress={() => handleChatPress(chat)}>
+              <View style={styles.orderIconContainer}>
+                <Ionicons name="cart-outline" size={32} color="#4682B4" />
+              </View>
+              <View style={styles.chatDetails}>
+                <Text style={[styles.chatName, chat.unread ? styles.unreadChatName : null]}>
+                  {chat.orderId}
+                </Text>
+                <Text style={styles.chatMessage}>
+                  {chat.lastMessage && chat.lastMessage.content ? chat.lastMessage.content : 'Aucun message'}
+                </Text>
+              </View>
+              <Text style={styles.chatTime}>
+                {chat.lastMessage && chat.lastMessage.timestamp 
+                  ? new Date(chat.lastMessage.timestamp).toLocaleTimeString() 
+                  : 'Pas de date'}
               </Text>
-              <Text style={styles.chatMessage}>
-                {chat.lastMessage && chat.lastMessage.content ? chat.lastMessage.content : 'Aucun message'}
-              </Text>
-            </View>
-            <Text style={styles.chatTime}>
-              {chat.lastMessage && chat.lastMessage.timestamp 
-                ? new Date(chat.lastMessage.timestamp).toLocaleTimeString() 
-                : 'Pas de date'}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -220,6 +237,38 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginVertical: 10,
+  },
+  // Skeleton loading styles
+  skeletonContainer: {
+    paddingHorizontal: 15,
+  },
+  skeletonItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f2f2f2',
+  },
+  skeletonAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#e0e0e0',
+    marginRight: 15,
+  },
+  skeletonTextContainer: {
+    flex: 1,
+  },
+  skeletonText: {
+    width: '50%',
+    height: 15,
+    backgroundColor: '#e0e0e0',
+    marginBottom: 5,
+  },
+  skeletonTextSmall: {
+    width: '30%',
+    height: 10,
+    backgroundColor: '#e0e0e0',
   },
 });
 
