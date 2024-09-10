@@ -38,7 +38,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Registration" component={RegistrationScreen} />  
         <Stack.Screen name="RegistrationLC" component={RegistrationWithLocationScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  
-        <Stack.Screen name="Services" component={ServicesScreen} />
+        <Stack.Screen name="Services" component={ServicesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="feedback" component={FeedBackScreen} />
 
