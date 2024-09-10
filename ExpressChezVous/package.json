@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
+    "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/drawer": "^6.7.2",
     "@react-navigation/native": "^6.1.18",
@@ -26,6 +27,7 @@
     "expo-permissions": "^14.4.0",
     "expo-screen-capture": "~6.0.1",
     "expo-system-ui": "^3.0.7",
+    "expo-updates": "~0.25.24",
     "firebase": "^10.13.0",
     "formik": "^2.4.6",
     "react": "18.2.0",
@@ -42,10 +44,9 @@
     "react-native-toast-message": "^2.2.0",
     "react-native-vector-icons": "^10.1.0",
     "socket.io-client": "^4.7.5",
+    "typescript": "~5.3.3",
     "uuid": "^10.0.0",
-    "yup": "^1.4.0",
-    "expo-updates": "~0.25.24",
-    "typescript": "~5.3.3"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

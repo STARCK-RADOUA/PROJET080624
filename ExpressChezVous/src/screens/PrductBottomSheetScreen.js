@@ -1,7 +1,5 @@
-import { BASE_URL, BASE_URLIO } from '@env';
-
 import React, { useCallback, useContext, useImperativeHandle, useState, useEffect } from 'react';
-import { Dimensions, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { Dimensions, StyleSheet, View, Text , TouchableOpacity, Image } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   Extrapolate,
@@ -10,10 +8,13 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { getClientId } from '../services/userService'; // Import the getClient function
+import { ScrollView } from 'react-native-gesture-handler'; // Import ScrollView from gesture-handler
+
 import axios from 'axios';
+import { getClientId } from '../services/userService'; // Import the getClient function
 import { DataContext } from '../navigation/DataContext';
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+import { BASE_URL } from '@env';
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT / 1.5;
 
 const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
@@ -29,7 +30,6 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
     extraFries: false,
   });
 
-  // Use item price if item is defined, otherwise default to 0
   const [totalPrice, setTotalPrice] = useState(item?.price || 0);
 
   const scrollTo = useCallback((destination) => {
@@ -63,28 +63,28 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
 
   const rBottomSheetStyle = useAnimatedStyle(() => {
     const borderRadius = interpolate(
-      translateY.value,
-      [MAX_TRANSLATE_Y + 50, MAX_TRANSLATE_Y],
-      [25, 25],
+      translateY.value+100,
+      [MAX_TRANSLATE_Y + 10, MAX_TRANSLATE_Y],
+      [400, 5],
       Extrapolate.CLAMP
     );
 
     return {
       borderRadius,
-      transform: [{ translateY: translateY.value }],
+      transform: [{ translateY: translateY.value -80}],
     };
   });
 
   const rImageStyle = useAnimatedStyle(() => {
-    const translateYImage = interpolate(
+    const scaleImage = interpolate(
       translateY.value,
       [MAX_TRANSLATE_Y, 0],
-      [-100, 0],
+      [1.5, 1],
       Extrapolate.CLAMP
     );
 
     return {
-      transform: [{ translateY: translateYImage }],
+      transform: [{ scale: scaleImage }],
     };
   });
 
@@ -94,9 +94,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
         const clientId = await getClientId();
         const url = `${BASE_URL}/api/order-items/${clientId}/${serviceName}/order-items`;
 
-
         const response = await axios.get(url);
-
         const addedItem = response.data.find(orderItem => orderItem.product_id._id === item?._id);
 
         if (addedItem) {
@@ -156,29 +154,21 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
 
       const clientId = await getClientId();
 
-
       await axios.post(`${BASE_URL}/api/order-items`, {
-
-        clientId: clientId,
+        clientId,
         productId: item?._id,
         quantity,
         selectedItems,
-        serviceName: serviceName
+        serviceName: serviceName,
       });
 
-      console.log('Item added to cart successfully');
-
       setIsAddedToCart(true);
-
-      // Reset quantity and extras to initial state
       setQuantity(1);
       setExtras({
         extraBeefPatty: false,
         extraCheeseSlice: false,
         extraFries: false,
       });
-
-      // Close the bottom sheet
       scrollTo(0);
     } catch (error) {
       console.error('Failed to add item to cart:', error);
@@ -186,32 +176,27 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
   };
 
   if (!item) {
-    return null; // If item is null or undefined, return nothing
+    return null;
   }
 
-  return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View style={[styles.bottomSheetContainer, rBottomSheetStyle]}>
-        {item.image_url ? (
-          <Animated.Image
-            source={{ uri: item.image_url }}
-            style={[styles.productImage, rImageStyle]}
-            resizeMode="cover"
-          />
-        ) : (
-          <Text style={styles.errorText}>Image not available</Text>
-        )}
-        <View style={styles.line} />
-        <View style={styles.contentContainer}>
+ return (
+  <GestureDetector gesture={gesture}>
+    <Animated.View style={[styles.bottomSheetContainer, rBottomSheetStyle]}>
+      {item.image_url ? (
+        <Animated.Image
+          source={{ uri: item.image_url }}
+          style={[styles.productImage, rImageStyle]}
+          resizeMode="contain"
+        />
+      ) : (
+        <Text style={styles.errorText}>Image not available</Text>
+      )}
+      <View style={styles.line} />
+      <View style={styles.contentContainer}>
           <View style={styles.container}>
             <View style={styles.header}>
-              <>
-                <Text style={styles.heading}>{item.name}</Text>
-                <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
-              </>
-              <TouchableOpacity>
-                <Text style={styles.heart}>❤️</Text>
-              </TouchableOpacity>
+              <Text style={styles.heading}>{item.name}</Text>
+              <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
             </View>
             <View style={styles.quantityAndLabelContainer}>
               <Text style={styles.extrasLabel}>Select Extras:</Text>
@@ -225,13 +210,16 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
                 </TouchableOpacity>
               </View>
             </View>
+            
+            <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
+
             <View style={styles.optionContainer}>
               {item.options?.map((option, index) => (
                 <TouchableOpacity
                   key={index}
                   style={[
                     styles.border,
-                    isAddedToCart && styles.borderDisabled
+                    isAddedToCart && styles.borderDisabled,
                   ]}
                   onPress={() => handleExtraChange(option.name)}
                   disabled={isAddedToCart}
@@ -252,65 +240,92 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
                 </TouchableOpacity>
               ))}
             </View>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                isAddedToCart && styles.buttonDisabled
-              ]}
-              onPress={handleAddToCart}
-              disabled={isAddedToCart}
-            >
-              <Text style={styles.buttonText}>
-                {isAddedToCart ? 'Added to Cart' : 'Add to Cart'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Animated.View>
-    </GestureDetector>
-  );
-});
+                    </ScrollView>
 
+          </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              isAddedToCart && styles.buttonDisabled,
+            ]}
+            onPress={handleAddToCart}
+            disabled={isAddedToCart}
+          >
+            <Text style={styles.buttonText}>
+              {isAddedToCart ? 'Added to Cart' : 'Add to Cart'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Animated.View>
+  </GestureDetector>
+);
+});
 const styles = StyleSheet.create({
   bottomSheetContainer: {
     height: SCREEN_HEIGHT,
     width: '100%',
-    backgroundColor: '#f9f3f1',
+    backgroundColor: '#f7c049ef',
     position: 'absolute',
     top: SCREEN_HEIGHT,
-    borderRadius: 25,
+    borderRadius: 35,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 10,
   },
   line: {
     width: 75,
     height: 4,
-    backgroundColor: 'grey',
+    backgroundColor: '#8f53531',
     alignSelf: 'center',
-    marginVertical: 15,
-    borderRadius: 2,
+    marginTop: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
   },
   contentContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingHorizontal: 40,
+    paddingTop: 30,
   },
   productImage: {
-    width: 100,
-    height: 100,
-    position: 'absolute',
-    top: -50,
+    width: SCREEN_WIDTH * 0.7,
+    height: SCREEN_WIDTH * 0.4,
     alignSelf: 'center',
-    borderRadius: 50,
-    borderWidth: 5,
-    borderColor: '#fff',
+    borderRadius: 15, // Rounded corners for the image
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    paddingBottom: 190,
+    elevation: 8,
+  },
+  scrollContainer: {
+    width: SCREEN_WIDTH * 0.7,
+    height: SCREEN_WIDTH * 0.4,
+    alignSelf: 'center',
   },
   price: {
-    fontSize: 18,
-    color: 'orange',
+    fontSize: 22,
+    color: '#575450',
     fontWeight: 'bold',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#333',
   },
   container: {},
   header: {
@@ -318,9 +333,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#FF8C00',
   },
@@ -335,7 +355,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   extrasLabel: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   quantityContainer: {
@@ -343,12 +363,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButton: {
-    fontSize: 20,
+    fontSize: 22,
     color: '#FF8C00',
     paddingHorizontal: 10,
   },
   quantityText: {
-    fontSize: 18,
+    fontSize: 20,
     marginHorizontal: 10,
   },
   optionContainer: {
@@ -360,7 +380,7 @@ const styles = StyleSheet.create({
   border: {
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    paddingVertical: 10,
+    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -373,12 +393,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#8B4513',
     marginRight: 10,
   },
   optionPrice: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#8B4513',
   },
   checkbox: {
@@ -403,18 +423,22 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
     backgroundColor: '#FF8C00',
-    paddingVertical: 11,
-    borderRadius: 25,
+    paddingVertical: 15,
+    borderRadius: 30,
     alignItems: 'center',
-    marginLeft: 40,
-    marginRight: 40,
+    marginHorizontal: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
   },
   buttonDisabled: {
     backgroundColor: '#cccccc',
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   errorText: {
@@ -422,6 +446,12 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginTop: 10,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'right',
+    marginTop: 5,
   },
 });
 

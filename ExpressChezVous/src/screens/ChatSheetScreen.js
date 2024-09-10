@@ -186,11 +186,11 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
 
 const styles = StyleSheet.create({
   bottomSheetContainer: {
-    height: SCREEN_HEIGHT,
+    height: SCREEN_HEIGHT * 0.7, // Set the max height to 70% of the screen
     width: '100%',
     backgroundColor: 'white',
     position: 'absolute',
-    top: SCREEN_HEIGHT,
+    top: SCREEN_HEIGHT*1.27,
     borderRadius: 25,
   },
   line: {
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   messageList: {
     flex: 1,
-    paddingHorizontal: 10,
+    paddingHorizontal: '5%',
     paddingVertical: 20,
   },
   messageContainer: {
@@ -221,17 +221,17 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   messageText: {
-    color: 'white',
+    color: 'black', // Changed color for readability
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 10,
+    marginBottom:  Platform.OS === 'ios' ? SCREEN_HEIGHT * 0.07: 5,
     backgroundColor: '#F2F2F2',
     borderTopWidth: 1,
     borderTopColor: '#E5E5EA',
-    bottom: '5%',
   },
   input: {
     flex: 1,
@@ -254,5 +254,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
 export default BottomSheet;

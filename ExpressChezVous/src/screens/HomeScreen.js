@@ -1,12 +1,12 @@
-import { BASE_URLIO } from '@env';
-import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions, Easing } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 import { DataContext } from '../navigation/DataContext';
 import Header from '../components/Header';
+import { BASE_URL, BASE_URLIO } from '@env';
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
@@ -14,24 +14,21 @@ const HomeScreen = ({ navigation }) => {
   const [isNotificationMenuVisible, setIsNotificationMenuVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const slideAnim = useRef(new Animated.Value(width)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
   const bottomSheetRef = useRef(null);
   const { sharedData } = useContext(DataContext);
   const serviceName = sharedData.serviceName;
-  
-  // Socket reference
+
   const socket = useRef(null);
 
   useEffect(() => {
-    // Establish socket connection
     socket.current = io(`${BASE_URLIO}`);
-
-    // Request and listen for active products from the server
     socket.current.emit('requestActiveProducts', serviceName);
-socket.current.on('newactiveProducts', () => {
-  socket.current.emit('requestActiveProducts', serviceName);
-  
-})
-    // Real-time product updates
+    socket.current.on('newactiveProducts', () => {
+      socket.current.emit('requestActiveProducts', serviceName);
+    });
+
     socket.current.on('activeProducts', (response) => {
       if (Array.isArray(response.products)) {
         setMenuItems((prevItems) => {
@@ -42,8 +39,7 @@ socket.current.on('newactiveProducts', () => {
         });
       }
     });
-    
-    // Cleanup on unmount
+
     return () => {
       socket.current.off('activeProducts');
       socket.current.disconnect();
@@ -69,33 +65,66 @@ socket.current.on('newactiveProducts', () => {
 
   const onPress = useCallback((item) => {
     setSelectedItem(item);
-    bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2); // Open bottom sheet
+    bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2);
   }, []);
+
+  const animateItem = (index) => {
+    Animated.sequence([
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 500,
+        delay: index * 200,
+        easing: Easing.bounce,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1.1,
+        friction: 2,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 2,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   return (
     <View style={styles.container}>
-       <Header navigation={navigation} />
+      <Header navigation={navigation} />
 
       <ScrollView style={styles.menuList}>
-      {menuItems && Array.isArray(menuItems) && menuItems.length === 0 ? (
-  <Text style={styles.noProductsText}>No products available</Text>
-) : (
-  menuItems.map((item, index) => (
-            <TouchableOpacity key={item.id || index} style={styles.menuItem} onPress={() => onPress(item)}>
-              <Image source={{ uri: item.image_url }} style={styles.menuItemImage} />
-              <View style={styles.menuItemText}>
-                <Text style={styles.menuItemName}>{item.name}</Text>
-                <Text style={styles.menuItemDescription}>{item.description}</Text>
-                <Text style={styles.menuItemPrice}>€{item.price.toFixed(2)}</Text>
-              </View>
-              <MaterialIcons name="keyboard-arrow-right" size={24} color="orange" />
-            </TouchableOpacity>
+        {menuItems && Array.isArray(menuItems) && menuItems.length === 0 ? (
+          <Text style={styles.noProductsText}>No products available</Text>
+        ) : (
+          menuItems.map((item, index) => (
+            <Animated.View
+              key={item.id || index}
+              style={[
+                styles.menuItem,
+                {
+                  transform: [{ scale: scaleAnim }],
+                  opacity: opacityAnim,
+                },
+              ]}
+              onLayout={() => animateItem(index)}
+            >
+              <TouchableOpacity onPress={() => onPress(item)} style={styles.touchableArea}>
+                <Image source={{ uri: item.image_url }} style={styles.menuItemImage} />
+                <View style={styles.menuItemText}>
+                  <Text style={styles.menuItemName}>{item.name}</Text>
+                  <Text style={styles.menuItemDescription}>{item.description}</Text>
+                  <Text style={styles.menuItemPrice}>€{item.price.toFixed(2)}</Text>
+                </View>
+                <MaterialIcons name="keyboard-arrow-right" size={24} color="#ffa726" />
+              </TouchableOpacity>
+            </Animated.View>
           ))
         )}
       </ScrollView>
 
       <PrductBottomSheetScreen ref={bottomSheetRef} item={selectedItem} />
-    
     </View>
   );
 };
@@ -103,18 +132,7 @@ socket.current.on('newactiveProducts', () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 20,
-    alignItems: 'center',
-  },
-  logo: {
-    width: 150,
-    height: 50,
-    resizeMode: 'contain',
+    backgroundColor: '#f7f7f7',
   },
   menuList: {
     paddingHorizontal: 20,
@@ -123,20 +141,22 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
+    backgroundColor: '#fff',
+    borderRadius: 15,
     padding: 15,
     marginVertical: 10,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 5,
   },
   menuItemImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#ffa726',
   },
   menuItemText: {
     flex: 1,
@@ -144,23 +164,29 @@ const styles = StyleSheet.create({
   },
   menuItemName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#333',
+    marginBottom: 5,
   },
   menuItemDescription: {
+    fontSize: 14,
     color: '#777',
-    marginTop: 5,
+    marginBottom: 10,
   },
   menuItemPrice: {
-    color: 'orange',
+    fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 5,
+    color: '#ffa726',
   },
   noProductsText: {
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
-    color: '#666',
+    color: '#999',
+  },
+  touchableArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

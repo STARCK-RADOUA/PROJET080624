@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Dimensions, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import io from 'socket.io-client';
-import { BASE_URLIO  , BASE_URL} from '@env';
+import { Ionicons } from '@expo/vector-icons';  // Import for futuristic send icon
+import { BASE_URLIO, BASE_URL } from '@env';
 import { getClientId } from '../services/userService';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
@@ -18,8 +19,6 @@ const ClientChatScreen = ({ navigation }) => {
   const socket = useRef(io(BASE_URLIO)).current;  // Initialize socket.io client
   const flatListRef = useRef(null);  // Reference for FlatList
 
-
-  // UseFocusEffect to mark messages as seen
   useFocusEffect(
     React.useCallback(() => {
       const markMessagesAsSeen = async () => {
@@ -43,33 +42,23 @@ const ClientChatScreen = ({ navigation }) => {
     }, [chatId])
   );
 
-
-
   useEffect(() => {
     const initiateChat = async () => {
       const userId = await getClientId();
       console.log("Client ID:", userId);
       console.log('Initiating chat between client and admin');
-      
+
       socket.emit('initiateChat', { adminId, userId, userType });
 
       socket.on('chatDetails', (data) => {
-        console.log("gjjgr", data)
         setChatId(data.chatId);
-
-       // Get the last message from the list of messages
-  const lastMessage = data.messages.length > 0 ? data.messages[data.messages.length - 1] : null;
-
-  // Check if the last message is from the admin and has already been seen
-  if (lastMessage && lastMessage.sender === 'admin' && !lastMessage.seen) {
-    console.log("Last message from admin has already been seen. Updating with only unseen messages.");
-
-    // Filter the unseen messages
-    const unseenMessages = data.messages.filter(message => !message.seen);
-
-    // Set the chatId and only unseen messages
-    setMessages(unseenMessages);
-  }
+        const lastMessage = data.messages.length > 0 ? data.messages[data.messages.length - 1] : null;
+        if (lastMessage && lastMessage.sender === 'admin' && !lastMessage.seen) {
+          const unseenMessages = data.messages.filter(message => !message.seen);
+          setMessages(unseenMessages);
+        } else {
+          setMessages(data.messages);
+        }
       });
 
       socket.on('newMessage', (messageData) => {
@@ -87,7 +76,6 @@ const ClientChatScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    // Scroll to the bottom of the FlatList when messages change
     flatListRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
@@ -98,7 +86,7 @@ const ClientChatScreen = ({ navigation }) => {
         sender: 'client',
         content: newMessage,
       });
-      setNewMessage('');  // Clear input after sending
+      setNewMessage('');
     }
   };
 
@@ -116,14 +104,15 @@ const ClientChatScreen = ({ navigation }) => {
       <Text style={styles.timestamp}>{formatTimestamp(item.timestamp)}</Text>
     </View>
   );
-  //8888888
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Text style={styles.chatTitle}>Chat {chatId ? 'Active' : 'Connecting...'}</Text>
+      <View style={styles.chatTitleContainer}>
+        <Text style={styles.chatTitleText}>Chat {chatId ? 'Active' : 'Connecting...'}</Text>
+      </View>
 
       <FlatList
         data={messages}
@@ -139,11 +128,11 @@ const ClientChatScreen = ({ navigation }) => {
           style={styles.textInput}
           value={newMessage}
           onChangeText={setNewMessage}
-          placeholder="Type a message"
-          placeholderTextColor="#888"
+          placeholder="Type a message..."
+          placeholderTextColor="#aaa"
         />
         <TouchableOpacity style={styles.sendButton} onPress={sendMessage} disabled={!chatId}>
-          <Text style={styles.sendButtonText}>Send</Text>
+          <Ionicons name="send" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -155,13 +144,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f7f7f7',
   },
-  chatTitle: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
+  chatTitleContainer: {
+
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingRight: 20,
     paddingBottom: 10,
   
@@ -169,17 +155,21 @@ const styles = StyleSheet.create({
     margin: 10,
     marginTop: 0,
     marginBottom: 0,
-    paddingTop: height * (Platform.OS === 'ios' ? 0.08 : 0.05),
+    paddingTop: height * (Platform.OS === 'ios' ? 0.05 : 0.05),
     alignItems: 'center',
 backgroundColor: '#e9ab25',
 borderRadius: 20,
-    padding: 2,
-    marginVertical: 5,
+
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 5,
     elevation: 3,
+  },
+  chatTitleText: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#333',
   },
   chatList: {
     flex: 1,
@@ -193,18 +183,26 @@ borderRadius: 20,
     backgroundColor: '#DCF8C6',
     borderRadius: 20,
     marginBottom: 10,
-    padding: 10,
+    padding: 15,
     maxWidth: '75%',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
   },
   messageContainerAdmin: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FFF',
+    backgroundColor: '#fff',
     borderRadius: 20,
     marginBottom: 10,
-    padding: 10,
+    padding: 15,
     maxWidth: '75%',
     borderColor: '#ddd',
     borderWidth: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
   },
   sender: {
     fontWeight: 'bold',
@@ -224,35 +222,41 @@ borderRadius: 20,
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderColor: '#ccc',
     backgroundColor: '#fff',
-    padding: 14,
-    justifyContent: 'space-between',
+    padding: 10,
+    paddingBottom: 30,
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
   },
   textInput: {
     flex: 1,
-    borderColor: '#ccc',
-    borderWidth: 1,
+    backgroundColor: '#f1f1f1',
     borderRadius: 25,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginRight: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     fontSize: 16,
+    marginRight: 10,
     color: '#333',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 2,
   },
   sendButton: {
     backgroundColor: '#e9ab25',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    padding: 12,
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  sendButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
   },
 });
 
