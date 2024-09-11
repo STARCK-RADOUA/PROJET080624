@@ -43,7 +43,7 @@ export async function registerForPushNotificationsAsync() {
     }
 
     try {
-      const projectId = '8a04b1f0-bf32-40a0-8ce1-354efa7c0cf0'; // Replace with your real Expo projectId
+      const projectId = '45d377ef-5a79-42d4-8c70-64c57e628942'; // Replace with your real Expo projectId
       token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
       console.log('Push token generated:', token);
     } catch (error) {
@@ -65,7 +65,7 @@ export async function saveDriverPushToken(expoPushToken) {
 
   try {
     const response = await axios.post(`${BASE_URL}/api/notification/save-push-token`, {
-      userType: 'Driver',
+      userType: 'Client',
       pushToken: expoPushToken,
       deviceId: Device.osBuildId,
     });

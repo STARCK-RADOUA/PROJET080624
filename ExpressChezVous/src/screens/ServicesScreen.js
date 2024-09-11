@@ -3,24 +3,58 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, ImageBackgro
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 import { DataContext } from '../navigation/DataContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { navigate } from '../utils/navigationRef'; // Import navigate function
 
 const ServicesScreen = ({ navigation }) => {
   const [services, setServices] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
-  const animations = useRef([]); // Store animation values
+  const [isLoading, setIsLoading] = useState(true); 
+  const [hasNavigated, setHasNavigated] = useState(false); // Track if we've already navigated
+  const animations = useRef([]); 
   const { setSharedData } = useContext(DataContext);
+
+  // Check the order status and navigate to PaymentSuccessScreen if needed
+  const checkOrderStatus = async () => {
+    try {
+      const storedOrder = await AsyncStorage.getItem('orderStatus');
+      console.log('Stored order value:', storedOrder); 
+  
+      if (storedOrder && !hasNavigated) { // Only proceed if we haven't navigated already
+        const parsedOrder = JSON.parse(storedOrder); 
+        const { orderId, orderStatus } = parsedOrder;
+  
+        console.log('Parsed Order ID:', orderId);
+        console.log('Parsed Order Status:', orderStatus);
+  
+        if (orderStatus === 'in_progress' || orderStatus === 'pending') {
+          console.log('Navigating to PaymentSuccessScreen');
+          setHasNavigated(true); // Prevent further navigation
+          navigate('PaymentSuccessScreen');
+        }
+      } else {
+        console.log('No stored order found or already navigated.');
+      }
+    } catch (error) {
+      console.error('Error parsing stored order:', error);  
+    }
+  };
+
+  useEffect(() => {
+        checkOrderStatus();
+
+  }, []); // Ensure this runs once when the component is mounted
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
 
     socket.on('servicesUpdated', ({ services }) => {
       setServices(services);
-      setIsLoading(false); // Hide loading animation once services are fetched
+      setIsLoading(false); 
 
       if (services.length > 0) {
         animations.current = services.map(() => new Animated.Value(0));
         InteractionManager.runAfterInteractions(() => {
-          triggerAnimations(); // Trigger animations when the screen is ready
+          triggerAnimations(); 
         });
       }
     });
@@ -36,8 +70,8 @@ const ServicesScreen = ({ navigation }) => {
         Animated.timing(anim, {
           toValue: 1,
           duration: 800,
-          delay: index * 200, // Stagger animations for each service
-          useNativeDriver: true, // Ensure animations run on the native thread
+          delay: index * 200, 
+          useNativeDriver: true, 
         }).start();
       }
     });
@@ -50,30 +84,28 @@ const ServicesScreen = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require('../assets/8498789sd.png')} // Replace with your actual background image URL
+      source={require('../assets/8498789sd.png')} 
       style={styles.backgroundImage}
     >
       <View style={styles.container}>
         <Text style={styles.headerText}>Our Services</Text>
 
         {isLoading ? (
-          // Show loading animation while data is being fetched
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#ffffff" />
             <Text style={styles.loadingText}>Loading services...</Text>
           </View>
         ) : (
-          // Show services once data is fetched
           <View style={styles.servicesContainer}>
             {services.map((service, index) => {
               const scale = animations.current[index]?.interpolate({
                 inputRange: [0, 1],
-                outputRange: [0.5, 1], // Start small and scale to normal size
+                outputRange: [0.5, 1], 
               });
 
               const opacity = animations.current[index]?.interpolate({
                 inputRange: [0, 1],
-                outputRange: [0, 1], // Fade in from 0 to 1
+                outputRange: [0, 1], 
               });
 
               const animatedStyles = scale && opacity
@@ -85,18 +117,16 @@ const ServicesScreen = ({ navigation }) => {
                   key={index}
                   style={[
                     styles.serviceItem,
-                    animatedStyles, // Apply animation styles here
+                    animatedStyles, 
                   ]}
                 >
                   <TouchableOpacity onPress={() => handleServicePress(service.name, service.test, service._id)}>
-                    {/* Shadow image for Android */}
                     {Platform.OS === 'android' && (
                       <View style={styles.shadowImageContainer}>
                         <Image source={{ uri: service.image }} style={styles.shadowImage} />
                       </View>
                     )}
 
-                    {/* Original image */}
                     <Image source={{ uri: service.image }} style={styles.serviceImage} />
                     <Text style={styles.serviceText}>{service.name}</Text>
                   </TouchableOpacity>
@@ -117,7 +147,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent overlay to make text and circles stand out
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', 
     alignItems: 'center',
     paddingTop: 50,
   },
@@ -148,36 +178,33 @@ const styles = StyleSheet.create({
   serviceItem: {
     width: 130,
     height: 130,
-    borderRadius: 90, // Circular shape
+    borderRadius: 90, 
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#27262618',
-    borderRadius: 100, // Circular shape
+    borderRadius: 100, 
     margin: 15,
     ...Platform.select({
       ios: {
-        shadowColor: '#000', // iOS shadow
-        shadowOffset: { width: 0, height: 4 }, // iOS shadow
-        shadowOpacity: 0.9, // iOS shadow
-        shadowRadius: 10, // iOS shadow
+        shadowColor: '#000', 
+        shadowOffset: { width: 0, height: 4 }, 
+        shadowOpacity: 0.9, 
+        shadowRadius: 10, 
       },
-    
     }),
   },
   shadowImageContainer: {
     position: 'absolute',
     top: 5,
     left: 5,
-
-
-    zIndex: 1, // Place shadow behind the original image
+    zIndex: 1, 
   },
   shadowImage: {
     width: 150,
     height: 110,
     resizeMode: 'contain',
-    tintColor: '#000', // Make the shadow image appear dark
-    opacity: 0.5, // Adjust opacity to simulate shadow
+    tintColor: '#000', 
+    opacity: 0.5, 
   },
   serviceImage: {
     width: 150,
@@ -186,7 +213,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 15,
     marginVertical: 10,
-    zIndex: 2, // Make sure the original image is in front
+    zIndex: 2, 
   },
   serviceText: {
     marginTop: 10,

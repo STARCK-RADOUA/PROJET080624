@@ -2,6 +2,7 @@ import axios from 'axios';
 import { BASE_URL } from '@env';
 import { getClient } from './userService'
 
+
 export const updateOrderItems = async (orders) => {
     try {
         // API endpoint using the base URL from .env
@@ -9,9 +10,11 @@ export const updateOrderItems = async (orders) => {
 
         // Prepare the request body
         const requestBody = {
-            
             items: orders
         };
+
+        // Log the payload for debugging
+        console.log('Request Payload:', requestBody);
 
         // Make the POST request
         const response = await axios.post(apiUrl, requestBody);
@@ -23,8 +26,18 @@ export const updateOrderItems = async (orders) => {
             console.log('Error', 'Failed to update order items');
         }
     } catch (error) {
-        console.error('Error updating order items:', error);
-        console.log('Error', 'Failed to update order items');
+        // Log detailed error information
+        if (error.response) {
+            // The server responded with a status code other than 2xx
+            console.error('Error updating order items:', error.response.data);
+            console.error('Status code:', error.response.status);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received:', error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Error setting up request:', error.message);
+        }
     }
 };
 

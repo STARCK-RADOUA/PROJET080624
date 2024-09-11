@@ -259,15 +259,16 @@ const ShoppingCartScreen = ({ navigation }) => {
   
 
   useFocusEffect(
+
+
+
+
+    
     useCallback(() => {
       // Reset states to their initial values when navigating back
-      setOrderItems([]);
       setExpandedItemId(null);
-      setTotalPrice(0);
       setUserPointsEarned(0);
       setMyFreeItem(0);
-      setItemsInTheCart(0);
-      setError('');
       setHasUsedPoints(false);
   
       const fetchData = async () => {

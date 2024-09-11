@@ -1,11 +1,10 @@
 import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity,ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import * as Location from 'expo-location';  // Import expo-location for location fetching
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { MaterialIcons } from '@expo/vector-icons';
 import { getClient } from '../services/userService'; // Add a function to get user ID
 
 // Validation schema using Yup
@@ -38,25 +37,32 @@ const AddressFormScreen = ({ navigation, route }) => {
     fetchUserId();
   }, []);
 
-  // Fetch the client's current location
-  const fetchCurrentLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission Denied', 'You need to allow location access to continue.');
-      return;
-    }
+  // Automatically fetch location when component mounts
+  useEffect(() => {
+    const fetchCurrentLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.error('Permission Denied', 'You need to allow location access to continue.');
+        return;
+      }
 
-    let location = await Location.getCurrentPositionAsync({});
-    console.log('Current Location:', location);
+      let location = await Location.getCurrentPositionAsync({});
+      console.log('Current Location:', location);
 
-    if (location) {
-      setLocation(location.coords); // Store the coordinates
-      setLocationFetched(true); // Enable form fields once location is fetched
-      Alert.alert('Location Fetched', 'Your current location has been successfully fetched.');
-    } else {
-      Alert.alert('Error', 'Failed to fetch location. Please try again.');
-    }
-  };
+      if (location) {
+        console.log('------------------------------------');
+        console.log('Current Location:', location);
+        console.log('------------------------------------');
+        setLocation(location.coords); // Store the coordinates
+        setLocationFetched(true); // Enable form fields once location is fetched
+      } else {
+        console.error('Error fetching location. Please try again.');
+      }
+    };
+
+    // Fetch the location once the component mounts
+    fetchCurrentLocation();
+  }, []);
 
   const handleFormSubmit = async (values) => {
     setIsSubmitting(true);
@@ -84,18 +90,6 @@ const AddressFormScreen = ({ navigation, route }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.title}>Add New Address</Text>
-
-        <View style={styles.iconRow}>
-          {/* Location Icon Button */}
-          <TouchableOpacity onPress={fetchCurrentLocation} style={styles.iconButton}>
-            <MaterialIcons name="my-location" size={28} color="#fff" />
-          </TouchableOpacity>
-
-          {/* Inform user to grant location access */}
-          <Text style={styles.locationInfo}>
-            Please allow location access to proceed.
-          </Text>
-        </View>
 
         <Formik
           initialValues={{
@@ -221,21 +215,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     color: '#e9ab25',
-  },
-  iconRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  iconButton: {
-    backgroundColor: '#e9ab25',
-    padding: 12,
-    borderRadius: 50,
-    marginRight: 15,
-  },
-  locationInfo: {
-    fontSize: 16,
-    color: '#333',
   },
   inputContainer: {
     marginBottom: 20,

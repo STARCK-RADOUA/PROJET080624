@@ -26,6 +26,7 @@ import FeedBackScreen from '../screens/FeedBackScreen';
 import QrcodeGeneratorScreenScreen from '../screens/QrcodeGeneratorScreen';
 import { DataProvider } from './DataContext'
 import { navigationRef } from '../utils/navigationRef'; 
+
 const Stack = createStackNavigator();
 const AppNavigator = () => {
   return (
@@ -50,6 +51,7 @@ const AppNavigator = () => {
           options={{ headerShown: false }}  
         /> 
           <Stack.Screen name="QrcodeGeneratorScreen" component={QrcodeGeneratorScreenScreen} />
+          <Stack.Screen name="ShoppingCartScreen" component={ShoppingCartScreen} />
 
         <Stack.Screen name="SupportChat" component={SupportChat}   options={{ headerShown: false }}  />
         <Stack.Screen name="AdressForm" component={AdressForm} />

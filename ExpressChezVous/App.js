@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {  StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import io from 'socket.io-client';
 import AppNavigator from './src/navigation/AppNavigator'; // Updated import path
@@ -13,32 +13,42 @@ export default function App() {
   const notificationListener = useRef();
   const responseListener = useRef();
   const socketRef = useRef(null);
-const deviceId =  Device.osBuildId;
+  const deviceId = Device.osBuildId;
+
   useEffect(() => {
     configureNotifications();
 
-console.log('------------------------------------');
-console.log('Client ID:', deviceId);
-console.log('------------------------------------');
+    console.log('------------------------------------');
+    console.log('Client ID:', deviceId);
+    console.log('------------------------------------');
+
     // Connect to Socket.IO
     const socket = io(BASE_URLIO, {
       query: {
-        deviceId:deviceId ,  // Pass the unique clientId
-      }
+        deviceId: deviceId,  // Pass the unique deviceId
+      },
     });
 
     // Listen for admin deactivation event
     socket.on('adminDeactivateClient', () => {
       console.log('You have been deactivated by the admin');
       // Navigate to Login screen when driver is deactivated
+      console.log('Navigating t777777777777777777o Login');
+
       navigate('Login');
     });
+
+    // Check and restore order status from AsyncStorage
+  
 
     // Handle push notifications
     registerForPushNotificationsAsync().then(token => {
       setExpoPushToken(token);
       if (token) {
         saveDriverPushToken(token);
+        console.log('------------------------------------');
+        console.log('Push token:', token);
+        console.log('------------------------------------');
       }
     });
 
@@ -50,7 +60,7 @@ console.log('------------------------------------');
       const targetScreen = response.notification.request.content.data.targetScreen;
       if (targetScreen) {
         console.log('Navigating to:', targetScreen);
-        //navigate(targetScreen);
+        // navigate(targetScreen); // Uncomment when navigation logic is set
       }
     });
 
@@ -65,8 +75,8 @@ console.log('------------------------------------');
 
   return (
     <>
-    <AppNavigator />
-  </>
+      <AppNavigator />
+    </>
   );
 }
 
