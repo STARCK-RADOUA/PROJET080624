@@ -46,7 +46,7 @@ return () => {
     const deviceId = Device.osBuildId;
 
     if (deviceId) {
-      socket.emit('autoLogin', { deviceId });
+      socket.emit('autoLoginDriver', { deviceId });
       startTracking(deviceId);
       socket.on('loginSuccess', () => {
         navigate('Test');

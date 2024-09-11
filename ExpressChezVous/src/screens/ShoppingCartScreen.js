@@ -34,20 +34,73 @@ const ShoppingCartScreen = ({ navigation }) => {
   const { setSharedData } = useContext(DataContext);
   const [isOrderButtonVisible, setIsOrderButtonVisible] = useState(true);
   const [userPoints, setUserPoints] = useState(0); // Track user's points
+  const [isDataFetched, setIsDataFetched] = useState(false); // New state to track if data fetching is done
 
   
+
   useEffect(() => {
     const fetchUserData = async () => {
       const user = await getUserDetails();
       setUserPointsEarned(user.points_earned);
       setUserPoints(user.points_earned);
     };
-    fetchUserData();
-
+  
+    const fetchOrderItems = async () => {
+      try {
+        const clientId = await getClientId();
+        const url = `${BASE_URL}/api/order-items/${clientId}/${serviceName}/order-items`;
+        const response = await axios.get(url);
+        const fetchedItems = response.data.map(item => ({ ...item, free: false })); // Add 'free' flag to each item
+        setOrderItems(fetchedItems);
+        calculateTotalPrice(fetchedItems);
+        calculateItemsInTheCart(fetchedItems);
+        setHasUsedPoints(fetchedItems.some(item => item.free)); // Check if any item is free (points used)
+      } catch (error) {
+        console.error('Failed to fetch order items:', error.message || error);
+        setError('Failed to fetch order items. Please check the console for details.');
+      }
+    };
+  
+    const fetchData = async () => {
+      await fetchUserData();
+      await fetchOrderItems();
+      setIsDataFetched(true); // Mark data fetching as completed
+    };
+  
+    fetchData();
+  
     const deviceId = Device.osBuildId;
     console.log('Device ID:', deviceId);
   }, []);
-
+  
+  useEffect(() => {
+    socket.on('servicesUpdated', async ({ services }) => {
+      const filteredServices = services.filter(service => service._id === sharedData.id);
+      console.log("Service data is", filteredServices);
+  
+      if (!filteredServices[0]?.isSystemPoint && isDataFetched) { // Ensure data fetching is done
+        setIsSystemPointModalVisible(true);
+      } else {
+        // Reset all values if system point is active
+        setOrderItems([]);
+        setExpandedItemId(null);
+        setTotalPrice(0);
+        setUserPointsEarned(0);
+        setMyFreeItem(0);
+        setItemsInTheCart(0);
+        setError('');
+        setHasUsedPoints(false);
+  
+        const user = await getUserDetails();
+        setUserPointsEarned(user.points_earned); // Reset points
+        await fetchOrderItems(); // Re-fetch order items if necessary
+      }
+    });
+  
+    return () => {
+      socket.off('servicesUpdated');
+    };
+  }, [isDataFetched]);
  
   const fetchOrderItems = async () => {
     try {
@@ -149,48 +202,6 @@ const ShoppingCartScreen = ({ navigation }) => {
     setHasUsedPoints(orderItems.some(item => item.free)); // Update hasUsedPoints when orderItems change
   }, [orderItems]);
 
-  useEffect(() => {
-
-    socket.on('servicesUpdated', ({ services })  => {
-      const filteredServices = services.filter(service => service._id === sharedData.id );
-
-      console.log("service data is ", filteredServices);
-      
-      // Check if the system point is active and show the modal
-      if (!filteredServices.isSystemPoint) {
-        setIsSystemPointModalVisible(true);
-        
-      }else{
-        setOrderItems([]);
-        setExpandedItemId(null);
-        setTotalPrice(0);
-        setUserPointsEarned(0);
-        setMyFreeItem(0);
-        setItemsInTheCart(0);
-        setError('');
-        setHasUsedPoints(false);
-    
-        const fetchData = async () => {
-          try {
-            const user = await getUserDetails();
-            setUserPointsEarned(user.points_earned); // Reset points to the user's initial value
-            await fetchOrderItems(); // Re-fetch the order items if necessary
-    
-            // Fetch service data to check isSystemPoint and reset values if needed
-          } catch (error) {
-            console.error('Error in useFocusEffect:', error);
-          }
-        };
-    
-        fetchData();
-      }
-    });
-
-    // Clean up socket on unmount
-    return () => {
-      socket.off('oserviceStatusUpdates');
-    };
-  }, []);
 
   const updateQuantity = (itemId, change) => {
     setOrderItems(prevItems => {
@@ -326,7 +337,6 @@ const ShoppingCartScreen = ({ navigation }) => {
   };
 
   const handleOkClick = () => {
-         setOrderItems([]); 
       setExpandedItemId(null);
       setTotalPrice(0);
       setUserPointsEarned(0);
@@ -599,7 +609,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'transparent',
   },
   modalContainer: {
     width: '80%',
