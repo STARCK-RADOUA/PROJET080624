@@ -7,6 +7,7 @@ import { registerForPushNotificationsAsync, saveDriverPushToken, configureNotifi
 import { BASE_URLIO } from '@env';
 import { navigate } from './src/utils/navigationRef'; // Import navigate function
 import * as Device from 'expo-device';
+import * as Location from 'expo-location';  // Import expo-location for location fetching
 
 export default function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
@@ -16,6 +17,14 @@ export default function App() {
   const deviceId = Device.osBuildId;
 
   useEffect(() => {
+    const fetchCurrentLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.error('Permission Denied', 'You need to allow location access to continue.');
+        return;
+      }}
+
+    fetchCurrentLocation();
     configureNotifications();
 
     console.log('------------------------------------');

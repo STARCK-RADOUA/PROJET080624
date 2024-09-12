@@ -26,9 +26,9 @@ const PaymentSuccessScreen = ({ route }) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const bottomSheetRef = useRef(null);
   const { sharedData } = useContext(DataContext);
-  const [nezPoint, setNezPoint] = useState(sharedData.dicrPoints);
-  const [firstpoints, setFirstPoints] = useState(sharedData.firstPoints);
-  const [orders, setOrders] = useState(sharedData.orders);
+  const [nezPoint, setNezPoint] = useState(sharedData?.dicrPoints);
+  const [firstpoints, setFirstPoints] = useState(sharedData?.firstPoints);
+  const [orders, setOrders] = useState(sharedData?.orders);
   const navigation = useNavigation();
 
   // Save screen state to AsyncStorage before closing the app
@@ -75,6 +75,9 @@ const PaymentSuccessScreen = ({ route }) => {
           setOrderID(orderId);
           setOrderStatus(orderStatus);
           setOrders(orders);
+          console.log('------------------------------------');
+          console.log('Retrieved state:', parsedStatus);
+          console.log('------------------------------------');
           setNezPoint(nezPoint);
           socket.emit('watchOrderStatuss', { order_id: orderId });
 
@@ -108,6 +111,7 @@ const PaymentSuccessScreen = ({ route }) => {
         setShowExitButton(true);
         if (nezPoint && orders.length > 0) {
           await updateUserPoints(nezPoint);
+          await updateOrderItems(orders);
         }
         
         navigation.replace('feedback', { orderId });

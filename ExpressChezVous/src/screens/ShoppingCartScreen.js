@@ -35,6 +35,7 @@ const ShoppingCartScreen = ({ navigation }) => {
   const [isOrderButtonVisible, setIsOrderButtonVisible] = useState(true);
   const [userPoints, setUserPoints] = useState(0); // Track user's points
   const [isDataFetched, setIsDataFetched] = useState(false); // New state to track if data fetching is done
+  const [isSystemPoint, setIsSystemPoint] = useState(false); // New state to track if data fetching is done
 
   
 
@@ -80,9 +81,10 @@ const ShoppingCartScreen = ({ navigation }) => {
   
       if (!filteredServices[0]?.isSystemPoint && isDataFetched) { // Ensure data fetching is done
         setIsSystemPointModalVisible(true);
+        setIsSystemPoint(true);
+
       } else {
         // Reset all values if system point is active
-        setOrderItems([]);
         setExpandedItemId(null);
         setTotalPrice(0);
         setUserPointsEarned(0);
@@ -313,14 +315,19 @@ const ShoppingCartScreen = ({ navigation }) => {
 
   const handleOrderNow = async () => {
     try {
-      const deviceId = Device.osBuildId;
-      const data = {
-        totalPrice: totalPrice,
-        orderItems: orderItems,
-        deviceId: deviceId,
-      };
-      setSharedData({ dicrPoints : userPointsEarned , firstPoints : userPoints , orders :orderItems ,  serviceName: serviceName, serviceTest: serviceTest, id: serviceId });
-      navigation.navigate('AdressForm', { newOrder: data });
+      if(myFreeItem > 0 && userPoints > 0){
+        const deviceId = Device.osBuildId;
+        const data = {
+          totalPrice: totalPrice,
+          orderItems: orderItems,
+          deviceId: deviceId,
+        };
+        setSharedData({ dicrPoints : userPointsEarned , firstPoints : userPoints , orders :orderItems ,  serviceName: serviceName, serviceTest: serviceTest, id: serviceId });
+        navigation.navigate('AdressForm', { newOrder: data });
+      }else{
+alert("vous devez avoir au moins un item gratuit")
+      }
+     
     } catch (error) {
       console.error('Failed to place the order:', error);
       setError('Failed to place the order. Please check the console for details.');

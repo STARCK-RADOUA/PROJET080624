@@ -7,7 +7,10 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
   const [showAllProducts, setShowAllProducts] = useState(false);
 
   if (!order) return null;
-
+  console.log('------------------------------------');
+  console.log(order);
+  console.log('------------------------------------');
+  
   const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
 
   // Animation for modal entry
@@ -39,6 +42,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
     >
       <View style={styles.modalContainer}>
         <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
+
           {/* Close Button */}
           <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
             <Ionicons name="close-circle" size={30} color="#ff5c5c" />
@@ -50,8 +54,10 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.label}>Order #{order.order_number ?? 'N/A'}</Text>
               <Text style={styles.label}>Client: {order.client_name}</Text>
               <Text style={styles.label}>Driver: {order.driver_name}</Text>
-              <Text style={styles.label}>Address: {order.address_line}</Text>
               <Text style={styles.label}>Payment: {order.payment_method}</Text>
+              <Text style={styles.label}>Total Price: €{order.total_price.toFixed(2)}</Text>
+              <Text style={styles.label}>Exchange: €{order.exchange.toFixed(2)} </Text>
+              <Text style={styles.label}>Address: {order.address_line}</Text>
               <Text style={styles.label}>
                 Delivery: {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}
               </Text>
@@ -73,7 +79,8 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                   <View style={styles.productDetails}>
                     <Text style={styles.productName}>{item.product?.name || 'Unavailable'}</Text>
                     <Text style={styles.productQuantity}>Qty: {item.quantity}</Text>
-                    <Text style={styles.productPrice}>€{item.price.toFixed(2)}</Text>
+                    <Text style={styles.productPrice}>€{!item.isFree? item.price.toFixed(2): 0}</Text>
+                    <Text style={styles.productServiceType}>Service Type: {item.service_type}</Text>
                   </View>
                 </View>
               ))}
@@ -87,11 +94,6 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                   <Text style={styles.showMoreText}>Show more products...</Text>
                 </TouchableOpacity>
               )}
-            </View>
-
-            {/* Total Price */}
-            <View style={styles.totalContainer}>
-              <Text style={styles.totalText}>Total: €{order.total_price.toFixed(2)}</Text>
             </View>
           </ScrollView>
         </Animated.View>
@@ -180,6 +182,10 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     color: '#ff5c5c',
+  },
+  productServiceType: {
+    fontSize: 14,
+    color: '#ccc',
   },
   showMoreButton: {
     marginTop: 10,

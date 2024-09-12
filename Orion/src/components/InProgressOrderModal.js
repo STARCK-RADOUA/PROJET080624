@@ -16,7 +16,9 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
   if (!order) return null;
 
   const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
-
+console.log('------------------------------------');
+console.log("displayedProducts",displayedProducts);
+console.log('------------------------------------');
   // Animation for modal entry
   const scaleAnim = new Animated.Value(0);
 
@@ -111,7 +113,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
                   <View style={styles.productDetails}>
                     <Text style={styles.productName}>{item.product?.name || 'Unavailable'}</Text>
                     <Text style={styles.productQuantity}>Qty: {item.quantity}</Text>
-                    <Text style={styles.productPrice}>€{item.price.toFixed(2)}</Text>
+                    <Text style={styles.productPrice}>€{!item.free? item.price.toFixed(2): 0}</Text>
                   </View>
                 </View>
               ))}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image, ActivityIndicator, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL } from '@env'; // Import the base URL from the .env file
@@ -41,58 +41,59 @@ const FeedbackScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Laissez vos commentaires</Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Laissez vos commentaires</Text>
 
-      {/* Illustration */}
-      <Image
-        source={{
-          uri: 'https://firebasestorage.googleapis.com/v0/b/deliver-90a33.appspot.com/o/undraw_Feedback_re_urmj.png?alt=media&token=840af0b1-cd25-4324-af7c-3010fb786a04',
-        }}
-        style={styles.image}
-      />
+        <Image
+          source={{
+            uri: 'https://firebasestorage.googleapis.com/v0/b/deliver-90a33.appspot.com/o/undraw_Feedback_re_urmj.png?alt=media&token=840af0b1-cd25-4324-af7c-3010fb786a04',
+          }}
+          style={styles.image}
+        />
 
-      {/* Rating Section */}
-      <View style={styles.starContainer}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <FontAwesome
-            key={star}
-            name={rating >= star ? 'star' : 'star-o'}
-            size={36}
-            color="#FFA500"
-            onPress={() => handleRating(star)}
-          />
-        ))}
-      </View>
-
-      {/* Feedback Input */}
-      <TextInput
-        style={styles.textInput}
-        multiline
-        placeholder="Merci Beaucoup. J'aime bien cette application"
-        value={feedback}
-        onChangeText={(text) => setFeedback(text)}
-      />
-
-      {/* Submit Button */}
-      {loading ? (
-        // Display an ActivityIndicator when loading
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Envoyer...</Text>
-          <ActivityIndicator size="small" color="#FFA500" />
+        <View style={styles.starContainer}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <FontAwesome
+              key={star}
+              name={rating >= star ? 'star' : 'star-o'}
+              size={36}
+              color="#FFA500"
+              onPress={() => handleRating(star)}
+            />
+          ))}
         </View>
-      ) : (
-        <Button title="Envoyer" onPress={handleSendFeedback} color="#FFA500" />
-      )}
-    </View>
+
+        <TextInput
+          style={styles.textInput}
+          multiline
+          placeholder="Merci Beaucoup. J'aime bien cette application"
+          value={feedback}
+          onChangeText={(text) => setFeedback(text)}
+        />
+
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Envoyer...</Text>
+            <ActivityIndicator size="small" color="#FFA500" />
+          </View>
+        ) : (
+          <Button  title="Envoyer" onPress={handleSendFeedback}  color="#FFA500" />
+        )}
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: '#e48c39c',
     justifyContent: 'center',
   },
   title: {

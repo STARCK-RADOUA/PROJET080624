@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity, FlatList, Modal, TextInput } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal, Platform, Animated } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import io from 'socket.io-client';
-import * as Device from 'expo-device';
 import { Ionicons } from '@expo/vector-icons';
-import AdminNotificationScreen from '../screens/AdminNotificationScreen'; // Importe ton composant
+import * as Device from 'expo-device';
 import { BASE_URLIO } from '@env';
+import NotificationItem from './NotificationItem';
+import NotificationModal from './NotificationModal';
+import AdminNotificationScreen from '../screens/AdminNotificationScreen'; // Import your admin component
 
 let socket;
 
@@ -13,13 +16,17 @@ const NotificationMenu = () => {
   const [filteredNotifications, setFilteredNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [addNotificationVisible, setAddNotificationVisible] = useState(false); // Pour le modal d'ajout de notification
+  const [addNotificationVisible, setAddNotificationVisible] = useState(false);
   const [deviceId, setDeviceId] = useState('');
   const [searchText, setSearchText] = useState('');
   const [isAscending, setIsAscending] = useState(true);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [menuVisible, setMenuVisible] = useState(false);
 
-  const slideAnim = useState(new Animated.Value(300))[0];
-  const fadeAnim = useState(new Animated.Value(0))[0];
+  const menuHeight = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const getDeviceId = async () => {
@@ -31,7 +38,6 @@ const NotificationMenu = () => {
       }
 
       socket.emit('requestNotifications', id);
-
       socket.on('allNotifications', (data) => {
         setNotifications(data);
         setFilteredNotifications(data);
@@ -44,32 +50,12 @@ const NotificationMenu = () => {
     };
 
     getDeviceId();
-
-    // Slide in animation
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-
-    // Fade-in animation
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
-
+    
     return () => {
       socket.off('allNotifications');
       socket.off('newNotification');
     };
   }, [deviceId]);
-
-  const openNotification = (notification) => {
-    setSelectedNotification(notification);
-    setModalVisible(true);
-    socket.emit('markAsRead', notification._id);
-  };
 
   const handleSearch = (text) => {
     setSearchText(text);
@@ -92,28 +78,40 @@ const NotificationMenu = () => {
     setIsAscending(!isAscending);
   };
 
-  const renderNotificationItem = ({ item }) => (
-    <Animated.View style={[styles.notificationItem, { opacity: fadeAnim }]}>
-      <TouchableOpacity
-        onPress={() => openNotification(item)}
-        style={styles.notificationInfo}
-      >
-        <View style={styles.notificationTextContainer}>
-          <Text style={styles.notificationTitle}>{item.title}</Text>
-          <Text style={styles.notificationMessage}>{item.message}</Text>
-       
-      
-          <Text style={styles.notificationTimestamp}>{new Date(item.created_at).toLocaleString()}</Text>
-        </View>
-      </TouchableOpacity>
-    </Animated.View>
-  );
+  const filterByDateRange = () => {
+    const endDateInclusive = new Date(endDate);
+    endDateInclusive.setDate(endDateInclusive.getDate() + 1); // Inclure le dernier jour
+  
+    const filtered = notifications.filter(notification => {
+      const notificationDate = new Date(notification.created_at);
+      return notificationDate >= startDate && notificationDate < endDateInclusive;
+    });
+    setFilteredNotifications(filtered);
+  };
+
+  const toggleFilterMenu = () => {
+    if (menuVisible) {
+      Animated.timing(menuHeight, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start(() => setMenuVisible(false));
+    } else {
+      setMenuVisible(true);
+      Animated.timing(menuHeight, {
+        toValue: 200, // Adjust height as needed
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
 
   return (
     <View style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>Total: {filteredNotifications.length}</Text>
+      <Text style={styles.headerText}>{filteredNotifications.length}</Text>
+
         <TextInput
           style={styles.searchInput}
           placeholder="Search by title or message"
@@ -122,71 +120,97 @@ const NotificationMenu = () => {
         />
         <TouchableOpacity onPress={handleSortByDate} style={styles.sortButton}>
           <Ionicons name="time-outline" size={24} color="#fff" />
-          <Text style={styles.sortButtonText}>Trier par Date</Text>
+          <Text style={styles.sortButtonText}>Trier</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleFilterMenu} style={styles.filterToggleButton}>
+          <Ionicons name={menuVisible ? "chevron-up" : "chevron-down"} size={24} color="#fff" />
+          <Text style={styles.filterToggleText}>{menuVisible ? "Hide" : "Filters"}</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Animated Filter Menu */}
+      {menuVisible && (
+        <Animated.View style={[styles.filterMenu, { height: menuHeight }]}>
+          <TouchableOpacity onPress={() => setShowStartDatePicker(true)} style={styles.dateButton}>
+            <Text style={styles.dateButtonText}>Start Date</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowEndDatePicker(true)} style={styles.dateButton}>
+            <Text style={styles.dateButtonText}>End Date</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={filterByDateRange} style={styles.filterButton}>
+            <Text style={styles.filterButtonText}>Appliquer</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+
       <FlatList
         data={filteredNotifications}
-        renderItem={renderNotificationItem}
+        renderItem={({ item }) => (
+          <NotificationItem
+            item={item}
+            openNotification={(notification) => {
+              setSelectedNotification(notification);
+              setModalVisible(true);
+            }}
+          />
+        )}
         keyExtractor={(item) => item._id}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
         showsVerticalScrollIndicator={false}
-        initialNumToRender={8}
-        maxToRenderPerBatch={8}
-        updateCellsBatchingPeriod={30}
-        windowSize={7}
       />
 
       {/* Add Notification Button */}
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => setAddNotificationVisible(true)} // Ouvre le modal pour ajouter une notification
+        onPress={() => setAddNotificationVisible(true)}
       >
         <Ionicons name="add" size={24} color="#fff" />
         <Text style={styles.addButtonText}>Add Notification</Text>
       </TouchableOpacity>
 
+      {/* Date Picker for Start Date */}
+      {showStartDatePicker && (
+        <DateTimePicker
+          value={startDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            const currentDate = selectedDate || startDate;
+            setShowStartDatePicker(Platform.OS === 'ios');
+            setStartDate(currentDate);
+          }}
+        />
+      )}
+
+      {/* Date Picker for End Date */}
+      {showEndDatePicker && (
+        <DateTimePicker
+          value={endDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            const currentDate = selectedDate || endDate;
+            setShowEndDatePicker(Platform.OS === 'ios');
+            setEndDate(currentDate);
+          }}
+        />
+      )}
+
+      {/* Admin Modal */}
       <Modal
         transparent={true}
         visible={addNotificationVisible}
         onRequestClose={() => setAddNotificationVisible(false)}
         animationType="slide"
       >
-        <View style={styles.modalOverlay}>
-          
-            <AdminNotificationScreen />
-            <TouchableOpacity 
-              onPress={() => setAddNotificationVisible(false)}
-              style={styles.closeButton}
-            >
-              <Text style={styles.closeButtonText}>×</Text>
-            </TouchableOpacity>
-        </View>
+        <AdminNotificationScreen />
       </Modal>
 
-      {selectedNotification && (
-        <Modal
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-          animationType="fade"
-        >
-          <TouchableOpacity style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{selectedNotification.title}</Text>
-              <Text style={styles.modalMessage}>{selectedNotification.message}</Text>
-              <Text style={styles.modalTime}>{new Date(selectedNotification.created_at).toLocaleString()}</Text>
-              {selectedNotification.read_at && (
-                <Text style={styles.modalReadTime}>Read at: {new Date(selectedNotification.read_at).toLocaleString()}</Text>
-              )}
-              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>×</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-      )}
+      {/* Notification Modal */}
+      <NotificationModal
+        visible={modalVisible}
+        notification={selectedNotification}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -206,11 +230,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
   },
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#030e0f',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    
   },
   searchInput: {
     flex: 1,
@@ -219,113 +248,55 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginHorizontal: 10,
     height: 40,
-    color: '#000',
   },
   sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#156974',
     padding: 10,
     borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 5,
   },
   sortButtonText: {
     color: '#fff',
     marginLeft: 5,
   },
-  notificationItem: {
+  filterToggleButton: {
+    backgroundColor: '#e27a3f',
+    padding: 10,
+    borderRadius: 5,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: '#b4b4b4',
-    borderRadius: 10,
-    marginHorizontal: 10,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  filterToggleText: {
+    color: '#fff',
+    marginLeft: 5,
+  },
+  filterMenu: {
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  dateButton: {
+    backgroundColor: '#1f695a',
+    padding: 10,
+    borderRadius: 5,
     marginVertical: 5,
-    shadowColor: '#b4b4b4',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.7,
-    shadowRadius: 5,
-    elevation: 3,
   },
-  notificationInfo: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  dateButtonText: {
+    color: '#fff',
+  },
+  filterButton: {
+    backgroundColor: '#e27a3f',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 5,
     alignItems: 'center',
   },
-  notificationTextContainer: {
-    flex: 1,
-  },
-  notificationTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1f695a',
-  },
-  notificationMessage: {
-    fontSize: 17,
-    color: '#272711',
-  },
-  notificationDateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  notificationTimestamp: {
-    fontSize: 15,
-    color: '#5c5b5b',
-    marginRight: 10,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#333',
-    marginHorizontal: 10,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: '#2d2d2d',
-    padding: 25,
-    borderRadius: 15,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 5 },
-    shadowRadius: 10,
-    elevation: 10,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#00ffcc',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  modalMessage: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#dddddd',
-  },
-  modalTime: {
-    fontSize: 12,
-    color: '#888',
-    marginBottom: 20,
-  },
-  modalReadTime: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 10,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: "5%",
-    right: "5%",
-    padding: 0,
-    
+  filterButtonText: {
+    color: '#fff',
   },
   addButton: {
     position: 'absolute',
@@ -341,10 +312,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 10,
     fontSize: 16,
-  },
-  closeButtonText: {
-    fontSize: 39,
-    color: '#105245',
   },
 });
 
