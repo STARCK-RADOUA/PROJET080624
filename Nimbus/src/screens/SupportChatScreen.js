@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import { BASE_URLIO, BASE_URL } from '@env';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
-
+import {getDriverId} from '../redux/driverSerice'
 const { width, height } = Dimensions.get('window');
 
 const SupportChatScreen = ({ navigation }) => {
@@ -13,7 +13,7 @@ const SupportChatScreen = ({ navigation }) => {
   const [newMessage, setNewMessage] = useState('');  // Input message
   const [chatId, setChatId] = useState(null);  // Chat ID obtained after initiation
 
-  const userType = 'Client';
+  const userType = 'Driver';
   const socket = useRef(io(BASE_URLIO)).current;  // Initialize socket.io client
   const flatListRef = useRef(null);  // Reference for FlatList
 
@@ -42,8 +42,8 @@ const SupportChatScreen = ({ navigation }) => {
 
   useEffect(() => {
     const initiateChat = async () => {
-      const userId = '66d1d4557dd4e7144171aacc';
-      console.log("Client ID:", userId);
+      const userId = await getDriverId();
+      console.log("Driver ID:", userId);
       console.log('Initiating chat between client and admin');
 
       socket.emit('initiateChat', { adminId, userId, userType });
