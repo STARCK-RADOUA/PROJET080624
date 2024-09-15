@@ -1,25 +1,25 @@
-import { BASE_URL ,BASE_URLIO} from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import axios from 'axios';
-import { Picker } from '@react-native-picker/picker'; // Correct Picker import
+import { Picker } from '@react-native-picker/picker';
 import { io } from 'socket.io-client';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const InProgressOrderModal = ({ visible, onClose, order }) => {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [drivers, setDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
+  const [expanded, setExpanded] = useState(null);
   const socket = io(BASE_URLIO);
 
   if (!order) return null;
 
   const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
-console.log('------------------------------------');
-console.log("displayedProducts",displayedProducts);
-console.log('------------------------------------');
-  // Animation for modal entry
+
+  // Animation pour l'entrée du modal
   const scaleAnim = new Animated.Value(0);
 
   const animateIn = () => {
@@ -38,16 +38,12 @@ console.log('------------------------------------');
     }).start(() => onClose());
   };
 
-  // Fetch available drivers when the modal is shown
+  // Récupérer les chauffeurs disponibles lorsque le modal est affiché
   useEffect(() => {
     if (visible) {
-      axios.get(`${BASE_URL}/api/driver/diponible`) // Replace with your actual API endpoint
-        .then(response => {
-          setDrivers(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching drivers:', error.message);
-        });
+      axios.get(`${BASE_URL}/api/driver/diponible`)
+        .then(response => setDrivers(response.data))
+        .catch(error => console.error('Erreur de récupération des chauffeurs :', error.message));
     }
   }, [visible]);
 
@@ -58,15 +54,16 @@ console.log('------------------------------------');
         driverId: selectedDriver 
       })
       .then(response => {
-        console.log('Order affected successfully:', response.data);
+        console.log('Commande affectée avec succès :', response.data);
         socket.emit('watchOrderStatuss', { order_id: order.order_number });
-
-        onClose(); // Close the modal after affecting the order
+        onClose(); // Fermer le modal après l'affectation
       })
-      .catch(error => {
-        console.error('Error affecting order:', error.message);
-      });
+      .catch(error => console.error('Erreur lors de l\'affectation de la commande :', error.message));
     }
+  };
+
+  const toggleExpand = (index) => {
+    setExpanded(expanded === index ? null : index);
   };
 
   return (
@@ -79,29 +76,29 @@ console.log('------------------------------------');
     >
       <View style={styles.modalContainer}>
         <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
-          {/* Close Button */}
+          {/* Bouton de fermeture */}
           <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
-            <Ionicons name="close-circle" size={30} color="#ff5c5c" />
+            <Ionicons name="close-circle" size={37} color="#ff5c5c" />
           </TouchableOpacity>
 
           <ScrollView>
-            {/* Order Info */}
+            {/* Infos sur la commande */}
             <View style={styles.orderInfo}>
-              <Text style={styles.label}>Order #{order.order_number ?? 'N/A'}</Text>
-              <Text style={styles.label}>Client: {order.client_name}</Text>
-              <Text style={styles.label}>Driver: {order.driver_name}</Text>
-              <Text style={styles.label}>Address: {order.address_line}</Text>
-              <Text style={styles.label}>Payment: {order.payment_method}</Text>
-              <Text style={styles.label}>
-                Delivery: {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}
-              </Text>
+              <Text style={styles.label}><MaterialIcons name="receipt" size={16} color="#ffbf00" /> Commande #{order.order_number ?? 'N/A'}</Text>
+              <Text style={styles.label}><Ionicons name="person" size={16} color="#ffbf00" /> Client : {order.client_name}</Text>
+              <Text style={styles.label}><Ionicons name="car" size={16} color="#ffbf00" /> Chauffeur : {order.driver_name}</Text>
+              <Text style={styles.label}><Ionicons name="card" size={16} color="#ffbf00" /> Paiement : {order.payment_method}</Text>
+              <Text style={styles.label}><Ionicons name="cash" size={16} color="#ffbf00" /> Prix Total : €{order.total_price.toFixed(2)}</Text>
+              <Text style={styles.label}><Ionicons name="swap-horizontal" size={16} color="#ffbf00" /> Échange : €{order.exchange.toFixed(2)}</Text>
+              <Text style={styles.label}><Ionicons name="home" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
+              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Livraison : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
-            {/* Products */}
-            <Text style={styles.sectionHeader}>Products:</Text>
+            {/* Produits */}
+            <Text style={styles.sectionHeader}>Produits :</Text>
             <View style={styles.productsContainer}>
               {displayedProducts.map((item, index) => (
-                <View key={index} style={styles.productContainer}>
+                <TouchableOpacity key={index} onPress={() => toggleExpand(index)} style={styles.productContainer}>
                   <View style={styles.imageContainer}>
                     <Image
                       source={{
@@ -111,26 +108,31 @@ console.log('------------------------------------');
                     />
                   </View>
                   <View style={styles.productDetails}>
-                    <Text style={styles.productName}>{item.product?.name || 'Unavailable'}</Text>
-                    <Text style={styles.productQuantity}>Qty: {item.quantity}</Text>
-                    <Text style={styles.productPrice}>€{!item.free? item.price.toFixed(2): 0}</Text>
+                    <Text style={styles.productName}>{item.product?.name || 'Indisponible'}</Text>
+                    {expanded === index && (
+                      <View>
+                        <Text style={styles.productQuantity}>Quantité : {item.quantity}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit"}</Text>
+                      </View>
+                    )}
                   </View>
-                </View>
+                  <Ionicons name={expanded === index ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
+                </TouchableOpacity>
               ))}
 
-              {/* Show more products button */}
+              {/* Bouton pour afficher plus de produits */}
               {order.products.length > 3 && !showAllProducts && (
                 <TouchableOpacity
                   style={styles.showMoreButton}
                   onPress={() => setShowAllProducts(true)}
                 >
-                  <Text style={styles.showMoreText}>Show more products...</Text>
+                  <Text style={styles.showMoreText}>Afficher plus de produits...</Text>
                 </TouchableOpacity>
               )}
             </View>
 
-            {/* Driver Selection */}
-            <Text style={styles.sectionHeader}>Assign Driver:</Text>
+            {/* Sélection du chauffeur */}
+            <Text style={styles.sectionHeader}>Affecter un chauffeur :</Text>
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={selectedDriver}
@@ -147,16 +149,16 @@ console.log('------------------------------------');
               </Picker>
             </View>
 
-            {/* Affect Order Button */}
+            {/* Bouton Affecter */}
             {selectedDriver && (
               <TouchableOpacity style={styles.affectButton} onPress={handleAffectOrder}>
-                <Text style={styles.affectButtonText}>Affect the Order to {drivers.find(driver => driver.driver_id === selectedDriver)?.firstName}</Text>
+                <Text style={styles.affectButtonText}>Affecter la commande à {drivers.find(driver => driver.driver_id === selectedDriver)?.firstName}</Text>
               </TouchableOpacity>
             )}
 
-            {/* Total Price */}
+            {/* Prix Total */}
             <View style={styles.totalContainer}>
-              <Text style={styles.totalText}>Total: €{order.total_price.toFixed(2)}</Text>
+              <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
             </View>
           </ScrollView>
         </Animated.View>
@@ -185,10 +187,11 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 10,
+    top: 30,
     right: 10,
   },
   orderInfo: {
+    paddingTop: 20,
     marginBottom: 20,
   },
   label: {

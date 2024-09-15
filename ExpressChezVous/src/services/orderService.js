@@ -3,14 +3,14 @@ import { BASE_URL } from '@env';
 import { getClient } from './userService'
 
 
-export const updateOrderItems = async (orders) => {
+export const updateOrderItems = async (items) => {
     try {
         // API endpoint using the base URL from .env
         const apiUrl = `${BASE_URL}/api/order-items/update-order-items`;
 
         // Prepare the request body
         const requestBody = {
-            items: orders
+            items: items
         };
 
         // Log the payload for debugging

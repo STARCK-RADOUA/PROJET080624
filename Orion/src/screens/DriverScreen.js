@@ -1,11 +1,10 @@
-import { BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import io from 'socket.io-client';
-import AddUserModal from './../components/AddDriverModal';
 import DriverCard from './../components/DriverCard';
 import DriverModal from './../components/DriverModal';
+import AddUserModal from './../components/AddDriverModal';
+import { BASE_URLIO } from '@env';
 
 export default function DriverScreen() {
   const [drivers, setDrivers] = useState([]);
@@ -14,29 +13,32 @@ export default function DriverScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filterActivated, setFilterActivated] = useState('all'); 
-  const [filterIsLogin, setFilterIsLogin] = useState('all');    
+  const [filterActivated, setFilterActivated] = useState('all');
+  const [filterIsLogin, setFilterIsLogin] = useState('all');
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+  const [isLoginDropdownVisible, setIsLoginDropdownVisible] = useState(false);
+
+  const filters = [
+    { label: "Filtrer par activation", value: "all" },
+    { label: "Activé", value: "activated" },
+    { label: "Désactivé", value: "deactivated" }
+  ];
+
+  const loginFilters = [
+    { label: "Filtrer par connexion", value: "all" },
+    { label: "Connecté", value: "loggedIn" },
+    { label: "Déconnecté", value: "loggedOut" }
+  ];
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
-
     socket.emit('watchDrivers');
     socket.on('driversUpdated', ({ drivers }) => {
-      console.log('driversUpdated event received:', drivers);
       setDrivers(drivers);
-      applyFilters(drivers); 
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('Erreur de connexion:', error);
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Déconnecté du serveur socket');
+      applyFilters(drivers);
     });
 
     return () => {
-      console.log('Déconnexion du serveur socket...');
       socket.disconnect();
     };
   }, []);
@@ -44,16 +46,6 @@ export default function DriverScreen() {
   const handleSearch = (query) => {
     setSearchText(query);
     applyFilters(drivers, query, filterActivated, filterIsLogin);
-  };
-
-  const handleFilterActivated = (value) => {
-    setFilterActivated(value);
-    applyFilters(drivers, searchText, value, filterIsLogin);
-  };
-
-  const handleFilterIsLogin = (value) => {
-    setFilterIsLogin(value);
-    applyFilters(drivers, searchText, filterActivated, value);
   };
 
   const applyFilters = (drivers, searchQuery = searchText, activatedFilter = filterActivated, isLoginFilter = filterIsLogin) => {
@@ -82,6 +74,18 @@ export default function DriverScreen() {
     setFilteredDrivers(filtered);
   };
 
+  const handleDropdownSelect = (value) => {
+    setFilterActivated(value);
+    setDropdownVisible(false);
+    applyFilters(drivers, searchText, value, filterIsLogin);
+  };
+
+  const handleLoginDropdownSelect = (value) => {
+    setFilterIsLogin(value);
+    setIsLoginDropdownVisible(false);
+    applyFilters(drivers, searchText, filterActivated, value);
+  };
+
   const handleCardPress = (driver) => {
     setSelectedDriver(driver);
     setIsModalVisible(true);
@@ -93,56 +97,61 @@ export default function DriverScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Liste des livreurs</Text>
 
-      {/* Search Input and Filter Dropdowns */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
           placeholder="Rechercher par nom ou téléphone..."
           placeholderTextColor="#9ca3af"
           value={searchText}
-          onChangeText={(text) => handleSearch(text)}
+          onChangeText={handleSearch}
         />
         <TouchableOpacity style={styles.addButton} onPress={() => setAddModalVisible(true)}>
           <Text style={styles.addButtonText}>Ajouter</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Filter Dropdowns */}
       <View style={styles.filterContainer}>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={filterActivated}
-            style={styles.filterPicker}
-            onValueChange={(itemValue) => handleFilterActivated(itemValue)}
-          >
-            <Picker.Item label="Tous" value="all" />
-            <Picker.Item label="Activé" value="activated" />
-            <Picker.Item label="Désactivé" value="deactivated" />
-          </Picker>
-        </View>
-
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={filterIsLogin}
-            style={styles.filterPicker}
-            onValueChange={(itemValue) => handleFilterIsLogin(itemValue)}
-          >
-            <Picker.Item label="Tous" value="all" />
-            <Picker.Item label="Connecté" value="loggedIn" />
-            <Picker.Item label="Déconnecté" value="loggedOut" />
-          </Picker>
-        </View>
+        <TouchableOpacity onPress={() => setDropdownVisible(!isDropdownVisible)} style={styles.dropdownButton}>
+          <Text>{filters.find(f => f.value === filterActivated)?.label || 'Filtrer'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setIsLoginDropdownVisible(!isLoginDropdownVisible)} style={styles.dropdownButton}>
+          <Text>{loginFilters.find(f => f.value === filterIsLogin)?.label || 'Filtrer par login'}</Text>
+        </TouchableOpacity>
       </View>
+
+      {/* Dropdown Modal for Activation Filter */}
+      {isDropdownVisible && (
+        <View style={styles.dropdown}>
+          {filters.map((filter) => (
+            <TouchableOpacity key={filter.value} onPress={() => handleDropdownSelect(filter.value)}>
+              <Text style={styles.dropdownItem}>{filter.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {/* Dropdown Modal for Login Filter */}
+      {isLoginDropdownVisible && (
+        <View style={styles.dropdown}>
+          {loginFilters.map((filter) => (
+            <TouchableOpacity key={filter.value} onPress={() => handleLoginDropdownSelect(filter.value)}>
+              <Text style={styles.dropdownItem}>{filter.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
 
       <ScrollView contentContainerStyle={styles.cardContainer}>
         {filteredDrivers.length > 0 ? (
           filteredDrivers.map(driver => (
-            <DriverCard key={driver._id} driver={driver} onPress={handleCardPress} />
+            <DriverCard key={driver._id} driver={driver} onPress={() => handleCardPress(driver)} />
           ))
         ) : (
-          <Text style={styles.noDriversText}>Aucun livreur disponible</Text>
+          <Text>Aucun livreur disponible</Text>
         )}
       </ScrollView>
 
@@ -153,11 +162,9 @@ export default function DriverScreen() {
       />
 
       <AddUserModal modalVisible={addModalVisible} setModalVisible={setAddModalVisible} />
-    </View>
+    </SafeAreaView>
   );
 }
-
-const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
   container: {
@@ -208,53 +215,31 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 20,
   },
-  pickerContainer: {
-    flex: 1,
-    marginHorizontal: 5,
+  dropdownButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#ddd',
+    borderRadius: 8,
   },
-  filterPicker: {
-    height: 50,
-    width: '100%',
+  dropdown: {
+    position: 'absolute',
+    top: 150,
+    left: 10,
+    right: 10,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    zIndex: 9999,
+  },
+  dropdownItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   cardContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  driverItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: '#b4b4b4',
-    borderRadius: 10,
-    marginHorizontal: 10,
-    marginVertical: 5,
-    shadowColor: '#b4b4b4',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.7,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  driverInfo: {
-    width: '100%',
-    flexDirection: 'column',
-  },
-  driverName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1f695a',
-  },
-  driverPhone: {
-    fontSize: 17,
-    color: '#272711',
-  },
-  driverStatus: {
-    fontSize: 15,
-    color: '#5c5b5b',
-  },
-  noDriversText: {
-    fontSize: 16,
-    color: '#5c5b5b',
   },
 });

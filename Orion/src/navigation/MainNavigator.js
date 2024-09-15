@@ -12,6 +12,7 @@ import NotificationMenu from '../components/NotificationMenu';
 import ServiceScreen from '../screens/ServiceScreen'; 
 import ChatHomeScreen from '../screens/ClientChatScreen';
 import OrdersScreen from '../screens/OrdersScreen';
+import DriverRevenueScreen from '../screens/DriverRevenueScreen';
 import WarnScreen from '../screens/WarnScreen';
 import OrderChatHistoriqueScreen from '../screens/OrderChatHistoriqueScreen';
 import React, { useRef, useState, useEffect } from 'react';
@@ -82,6 +83,8 @@ const MainNavigator = ({ onLogin }) => {
       case 'Chat':
         return <ChatHomeScreen />;
       case 'Analyse':
+        return <DriverRevenueScreen />;
+      case 'invité':
         return <WarnScreen />;
       default:
         return <HomeScreen />;

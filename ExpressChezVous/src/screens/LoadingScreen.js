@@ -9,29 +9,50 @@ const socket = io(`${BASE_URLIO}`); // Replace with your server's URL
 
 const LoadingScreen = ({ navigation }) => {
   const [isActivated, setIsActivated] = useState(false);
+  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
+
+
 
   useEffect(() => {
     const deviceId = Device.osBuildId;
 
-    const intervalId = setInterval(() => {
-      console.log('Emitting checkActivation event...');
+  
       socket.emit('checkActivation', { deviceId });
-    }, 3000); // Check every 3 seconds
 
     socket.on('activationStatus', (status) => {
       console.log('Activation status received:', status);
       if (status.activated) {
         setIsActivated(true);
-        clearInterval(intervalId);
         navigation.replace('Services');
       }
     });
 
     return () => {
-      clearInterval(intervalId);
       socket.off('activationStatus');
     };
   }, [navigation]);
+  useEffect(() => {
+
+    const deviceId = Device.osBuildId;
+
+    const socket1 = io(BASE_URLIO, {
+      query: {
+        deviceId: deviceId,  // Passer l'identifiant unique
+      }
+    });
+
+    // Écouter l'événement d'activation de l'administrateur
+    socket1.on('adminActivateClient', () => {
+      console.log('Admin activated Client');
+      navigation.replace('Login');
+      setIsActivated(true);
+      setIsLoginSuccess(true);
+    });
+
+    return () => {
+      socket1.off('adminActivateClient');
+    };
+  }, [isLoginSuccess]);
 
   return (
     <View style={styles.container}>

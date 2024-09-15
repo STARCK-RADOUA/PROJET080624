@@ -29,6 +29,8 @@ export const clearAllData = async () => {
   }
 };
 
+
+
 export const retrieveStateFromStorage = async () => {
   try {
     const savedOrderStatus = await AsyncStorage.getItem('orderStatus');

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import io from 'socket.io-client';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons'; // Icon library
 import { BASE_URLIO } from '@env';
 
 // Connexion au serveur via Socket.IO
 const socket = io(BASE_URLIO);
 
-export default function AdminNotificationScreen() {
+export default function AdminNotificationScreen({ navigation,onRequestClose}) { // Accepting navigation as prop
   const [clients, setClients] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -74,6 +74,10 @@ export default function AdminNotificationScreen() {
     setMessage('');
   };
 
+  const handleClose = () => {
+    navigation.goBack(); // Go back to the previous screen
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -81,6 +85,11 @@ export default function AdminNotificationScreen() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.inner}>
+          {/* Close Button */}
+          <TouchableOpacity style={styles.closeButton} onPress={onRequestClose}>
+            <Ionicons name="close-circle" size={35} color="#e21818" />
+          </TouchableOpacity>
+
           <Text style={styles.title}>Envoyer une Notification</Text>
 
           <TextInput
@@ -158,33 +167,40 @@ export default function AdminNotificationScreen() {
     </KeyboardAvoidingView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212', // Couleur de fond sombre
+    backgroundColor: '#121212',
   },
   inner: {
     flex: 1,
     justifyContent: 'space-between',
-    padding: '10%', // Padding réactif
+    padding: '10%',
   },
   title: {
     fontSize: 26,
     paddingTop: 20,
     fontWeight: 'bold',
-    color: '#f5f5f5', // Texte clair pour le mode sombre
+    color: '#f5f5f5',
     marginBottom: 30,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 1,
   },
   input: {
     height: 50,
-    borderColor: '#333', // Bordure plus sombre
+    borderColor: '#333',
     borderWidth: 1,
     paddingHorizontal: 15,
     marginBottom: 20,
     borderRadius: 10,
-    backgroundColor: '#1f1f1f', // Fond d'entrée sombre
+    backgroundColor: '#1f1f1f',
     fontSize: 16,
-    color: '#fff', // Texte clair pour les inputs
+    color: '#fff',
   },
   filterContainer: {
     marginBottom: 20,
@@ -192,7 +208,7 @@ const styles = StyleSheet.create({
   subLabel: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#f5f5f5', // Texte clair pour le mode sombre
+    color: '#f5f5f5',
     marginBottom: 10,
   },
   filterButtons: {
@@ -203,12 +219,11 @@ const styles = StyleSheet.create({
   filterButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#333', // Bouton plus sombre en mode non sélectionné
+    backgroundColor: '#333',
     borderRadius: 5,
-  // Largeur réactive
   },
   filterButtonSelected: {
-    backgroundColor: '#1f695a', // Couleur accentuée pour le bouton sélectionné
+    backgroundColor: '#1f695a',
   },
   filterButtonText: {
     color: '#fff',
@@ -216,7 +231,7 @@ const styles = StyleSheet.create({
   },
   userList: {
     marginBottom: 20,
-    height: '70%', // Hauteur réactive
+    height: '70%',
   },
   userItem: {
     flexDirection: 'row',
@@ -224,18 +239,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 15,
     borderWidth: 1,
-    borderColor: '#333', // Bordure plus sombre
+    borderColor: '#333',
     marginBottom: 10,
     borderRadius: 10,
-    backgroundColor: '#1f1f1f', // Fond plus sombre pour les éléments utilisateurs
+    backgroundColor: '#1f1f1f',
   },
   selectedUserItem: {
     borderColor: '#1f695a',
-    backgroundColor: '#2e7d6b', // Couleur plus claire pour les éléments sélectionnés
+    backgroundColor: '#2e7d6b',
   },
   userText: {
     fontSize: 18,
-    color: '#fff', // Texte clair pour le mode sombre
+    color: '#fff',
   },
   noUserText: {
     textAlign: 'center',
@@ -248,7 +263,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    width: '80%', // Largeur réactive
+    width: '80%',
     alignSelf: 'center',
   },
   buttonText: {
