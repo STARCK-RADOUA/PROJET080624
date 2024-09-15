@@ -315,7 +315,7 @@ const ShoppingCartScreen = ({ navigation }) => {
 
   const handleOrderNow = async () => {
     try {
-      if(myFreeItem > 0 && userPoints > 0 ){
+      if((myFreeItem > 0 && userPoints > 0) || userPoints === 0){
         const deviceId = Device.osBuildId;
         const data = {
           totalPrice: totalPrice,
