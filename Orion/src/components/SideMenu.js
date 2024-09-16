@@ -24,6 +24,7 @@ const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages, unreadAd
           {TabButton({ currentTab, setCurrentTab, title: "Services", iconName: "briefcase-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Historique Chat", iconName: "time-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Analyse", iconName: "stats-chart-outline" })}
+          {TabButton({ currentTab, setCurrentTab, title: "invité", iconName: "stats-chart-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Chat Client", iconName: "send-outline", unreadMessages })}
           {TabButton({ currentTab, setCurrentTab, title: "Chat Livreur", iconName: "chatbubble-ellipses-outline", unreadMessages: unreadAdminMessages })}
           {TabButton({ currentTab, setCurrentTab, title: "Recherche", iconName: "search-outline" })}

@@ -1,8 +1,10 @@
 import React, { useContext, useState } from 'react';
-import { TouchableOpacity, View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, ActivityIndicator, StyleSheet , Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../redux/AuthProvider';
 import * as Device from 'expo-device';
+import { BASE_URL } from '@env';
+
 
 const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, onLogin }) => {
   const [loading, setLoading] = useState(false);

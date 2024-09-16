@@ -3,7 +3,7 @@ import { Animated, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from '
 import { Ionicons } from '@expo/vector-icons';
 import socketIOClient from "socket.io-client"; // Import socket.io client
 import { BASE_URL } from '@env';
-
+import DriverRevenueScreen from '../screens/DriverRevenueScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import NotificationMenu from '../components/NotificationMenu';
