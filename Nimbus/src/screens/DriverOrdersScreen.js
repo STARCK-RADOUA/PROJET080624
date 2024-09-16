@@ -1,20 +1,20 @@
-import React, { useState,useContext, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch, Image, Alert, Dimensions } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Switch, Image, Alert, Linking } from 'react-native';
 import { io } from 'socket.io-client';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Importer l'icône QR
-
-import moment from 'moment';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; 
 import OrderDetailModal from '../components/OrderDetailModal';
-import { BASE_URLIO ,BASE_URL} from '@env';
+import { BASE_URLIO, BASE_URL } from '@env';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import * as Device from 'expo-device';
-import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
+import { LocationContext } from '../utils/LocationContext';
 import { navigate } from '../utils/navigationRef';
+import moment from 'moment';
+import { fetchDriverId, updateDriverAvailability, openGoogleMaps, openWaze, getDeviceId } from '../utils/driverOrderUtils';
+import styles from './styles/styles'; 
+import Shimmer from 'react-native-shimmer'; // Import Shimmer
 
-const { width, height } = Dimensions.get('window');
-
-const DriverOrdersScreen = () => {
+const DriverOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
@@ -24,186 +24,99 @@ const DriverOrdersScreen = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
   const [activeStatusMessage, setActiveStatusMessage] = useState('Fetching status...');
-  const { startTracking } = useContext(LocationContext); 
-  useEffect(() => {
-    const fetchAndSetDeviceId = async () => {
-setDeviceId(Device.osBuildId);    };
-    fetchAndSetDeviceId();
-    startTracking(Device.osBuildId);
+  const { startTracking, stopTracking, isTracking } = useContext(LocationContext);
 
+  useEffect(() => {
+    getDeviceId(setDeviceId);
+    startTracking(deviceId);
   }, []);
 
   useEffect(() => {
-    getDeviceId()
     if (deviceId) {
-      fetchDriverId();
+      fetchDriverId(deviceId, setDriverId, setDriverInfo, setActiveStatusMessage);
       startTracking(deviceId);
-
     }
   }, [deviceId]);
 
-  
   useEffect(() => {
     if (driverId) {
-      const deviceId = Device.osBuildId;
       const socket = io(BASE_URLIO, {
-        query: {
-          deviceId:deviceId ,  // Pass the unique clientId
-        }
+        query: { deviceId },
       });
-     
+
       socket.emit('driverConnected', deviceId);
 
-      socket.on('connect', () => {
-
-        startTracking(deviceId);
-
-        console.log('Connected to Socket.IO server');
-      });
-      socket.on('connection', () => {
-
-        startTracking(deviceId);
-
-        console.log('Connected to Socket.IO server');
-      });
-
+      socket.on('connect', () => startTracking(deviceId));
       socket.on('orderInprogressUpdatedForDriver', (data) => {
-        if (data.active) {
-          setIsSwitchDisabled(true);
-          setIsEnabled(true);
-          setActiveStatusMessage('Order is active');
-        } else {
-          setIsSwitchDisabled(false);
-          setIsEnabled(false);
-          setActiveStatusMessage('Order is inactive');
-        }
+        setOrders(data.orders || []);
+        setLoading(false);
+        setIsEnabled(data.active);
       });
 
-      return () => {
-        socket.disconnect();
-      };
+      return () => socket.disconnect();
     }
   }, [driverId]);
 
-  const updateDriverAvailability = async (newIsEnabled) => {
+
+  const logout = async () => {
+    const deviceId = Device.osBuildId;
+    console.log('------------------------------------');
+    console.log('Logging out...', deviceId);
+    console.log('------------------------------------');
+
     try {
-      if (driverId) {
+      const response = await fetch(`${BASE_URL}/api/clients/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ deviceId }),
+      });
 
-        await axios.post(`${BASE_URL}/api/driver/updateAvailability`, {
-          driverId,
-          isDisponible: newIsEnabled,
-        });
-console.log('------------------------------------');
-console.log(deviceId);
-console.log('------------------------------------');
+      const data = await response.json();
 
+      if (response.ok) {
+        if (socket.connected) {
+          socket.disconnect();
+        }
+        navigation.replace('Login');
+      } else {
+        Alert.alert('Logout Failed', data.errors ? data.errors.join(', ') : data.message);
       }
     } catch (error) {
-      console.error('Error updating driver availability:', error);
+      Alert.alert('Error', 'Something went wrong during logout.');
+    } finally {
+      setLoading(false);
     }
   };
+
+
+
+
+
 
   const toggleSwitch = () => {
     const newIsEnabled = !isEnabled;
     setIsEnabled(newIsEnabled);
-    updateDriverAvailability(newIsEnabled);
+    updateDriverAvailability(driverId, newIsEnabled);
   };
 
-  const fetchDriverId = async () => {
-    try {
-      if (deviceId) {
-        const response = await axios.post(`${BASE_URL}/api/driver/device`, { deviceId });
-
-        if (response.status === 200 && response.data.driverId) {
-          setDriverId(response.data.driverId);
-          setDriverInfo(response.data.user || { firstName: 'Unknown', lastName: '' });
-          setIsEnabled(response.data.driverInfo?.isDisponible || false);
-          setActiveStatusMessage(response.data.driverInfo?.isDisponible ? 'True' : 'False');
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching driver ID:', error);
-    }
-  };
-
-  const getDeviceId = async () => {
-   
-      setDeviceId(Device.osBuildId);
-    
-  };
-
-  
-  useEffect(() => {
-    const fetchDriverOrders = () => {
-      const deviceId = Device.osBuildId;
-      console.log('------------------------------------');
-      console.log(deviceId,"order inprogress");
-      console.log('------------------------------------');
-      const socket = io(BASE_URLIO, {
-        query: {
-          deviceId:deviceId ,  // Pass the unique clientId
-        }
-      });
-           socket.on('orderInprogressUpdatedForDriver', (data) => {
-        setOrders(data.orders || []);
-        setLoading(false);
-        console.log('data', data);
-        console.log('------------------------------------');
-        console.log('orders', orders);
-        console.log('------------------------------------');
-      });
-
-      socket.on('error', (err) => {
-        console.error('Socket error:', err.message);
-        setLoading(false);
-      });
-
-      return () => {
-        socket.disconnect();
-      };
-    };
-
-    fetchDriverOrders();
-  }, [driverId]);
-
-  const handleCardPress = (order) => {
-    setSelectedOrder(order);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedOrder(null);
-  };
-  const handleQRCodePress = () => {
-    navigate('QrcodeGeneratorDriverScreen'); // Navigue vers l'écran de génération de QR code
-  };
-  const renderSkeleton = () => (
-    <>
-      {[...Array(3)].map((_, index) => (
-        <View key={index} style={styles.skeletonCard}>
-          <View style={styles.skeletonTitle} />
-          <View style={styles.skeletonDescription} />
-        </View>
-      ))}
-    </>
-  );
-
-
-  const handleNavigate = () => {
-    navigate('SupportChat'); // Replace 'YourTargetScreen' with the actual screen name
-  };
+  const handleCardPress = (order) => setSelectedOrder(order);
+  const handleCloseModal = () => setSelectedOrder(null);
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerh}>
+<View style={[styles.headerh, {
+  shadowColor: !isEnabled ? '#7a2424' : '#28919b', // Rouge si désactivé, vert sinon
+}]}>
         <View style={styles.headerv}>
-        <TouchableOpacity  style={styles.qr} onPress={handleQRCodePress}>
-          <Icon name="qrcode-scan" style={styles.qr1} size={45} color="#fff" />
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.qr} onPress={() => navigate('QrcodeGeneratorDriverScreen')}>
+            <Icon name="qrcode-scan" size={45} color="#fff" />
+          </TouchableOpacity>
           <Text style={styles.headerText}>Driver Availability</Text>
           <Switch
             trackColor={{ false: '#7a2424', true: '#1c7745' }}
             thumbColor={isEnabled ? '#36d815' : '#ca6411'}
-            ios_backgroundColor="#3e3e3e"
             onValueChange={toggleSwitch}
             value={isEnabled}
             disabled={isSwitchDisabled}
@@ -213,13 +126,16 @@ console.log('------------------------------------');
       </View>
 
       {isEnabled ? (
+        <>
         <View style={styles.container2}>
           <FlatList
             data={loading ? Array.from({ length: 3 }) : orders}
             keyExtractor={(item, index) => item?._id || index.toString()}
-            renderItem={({ item }) => (
+            renderItem={({ item }) =>
               loading ? (
-                renderSkeleton()
+                <Shimmer>
+                  <View style={styles.shimmerContainer} />
+                </Shimmer>
               ) : (
                 <TouchableOpacity onPress={() => handleCardPress(item)}>
                   <View style={styles.card}>
@@ -229,162 +145,58 @@ console.log('------------------------------------');
                     />
                     <View style={styles.cardContent}>
                       <Text style={styles.orderNumber}>Order #{item.order_number || 'N/A'}</Text>
-                      <Text style={styles.location}>{item.address_line || 'No Address Provided'}</Text>
-                      <View style={styles.rightContainer}>
-                        <Text style={styles.date}>
-                          {moment(item.delivery_time).format('YYYY-MM-DD HH:mm') || 'No Delivery Time'}
-                        </Text>
+                      <Text style={styles.address_line}>{item.address_line || 'No Address Provided'}</Text>
+                      <View style={styles.fieldRow}>
+                        <TouchableOpacity style={styles.navigateButtonGoogle} onPress={() => openGoogleMaps(item.location)}>
+                          <Ionicons name="navigate-outline" size={24} color="white" />
+                          <Text style={styles.navigateText}>Google</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.navigateButtonWaze} onPress={() => openWaze(item.location)}>
+                          <Ionicons name="navigate-outline" size={24} color="white" />
+                          <Text style={styles.navigateText}>Waze</Text>
+                        </TouchableOpacity>
+                         <TouchableOpacity style={styles.navigateButtonChat} onPress={() => openWaze(item.location)}>
+                          <Ionicons name="send-outline" size={24} color="white" />
+                        </TouchableOpacity>
                       </View>
+                      <Text style={styles.date}>
+                        {moment(item.delivery_time).format('YYYY-MM-DD HH:mm') || 'No Delivery Time'}
+                      </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
               )
-            )}
-          />
+            }
+          /> 
+         
         </View>
+        <View style={styles.footer }>
+          <TouchableOpacity style={styles.navigateButtonSupportChat} onPress={() => logout()}>
+                          <Ionicons name="log-out-outline" size={24} color="white" />
+                          <Text style={styles.navigateText}>Quiter   </Text>
+                          <Ionicons name="log-out-outline" size={24} color="white" />
+
+                        </TouchableOpacity>
+                         <TouchableOpacity style={styles.navigateButtonStop} onPress={() => navigate('SupportChat')}>
+                          <Ionicons name="send-outline" size={30} color="white" />
+                        </TouchableOpacity>
+        </View>
+        </>
+
+       
+
       ) : (
         <View style={styles.disabledView}>
           <Text style={styles.disabledText}>Please enable availability to view orders.</Text>
-          <TouchableOpacity style={styles.navigateButton} onPress={handleNavigate}>
+          <TouchableOpacity style={styles.navigateButton} onPress={() => navigate('SupportChat')}>
             <Text style={styles.navigateButtonText}>Go to CHAT</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {selectedOrder && (
-        <OrderDetailModal
-          visible={!!selectedOrder}
-          onClose={handleCloseModal}
-          order={selectedOrder}
-        />
-      )}
+      {selectedOrder && <OrderDetailModal visible={!!selectedOrder} onClose={handleCloseModal} order={selectedOrder} />}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 10,
-    paddingTop: 20,
-    backgroundColor: '#ffffff',
-  },
-  container2: {
-    paddingTop: 10,
-    height: '70%',
-    paddingHorizontal: 10,
-    backgroundColor: '#ffffff',
-  },
-  headerv: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-   qr: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-   qr1: {
-    alignItems: 'center',
-    justifyContent: 'start',
-  },
-  headerh: {
-    marginTop: 28,
-
-    backgroundColor: '#2C4231',
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomLeftRadius: 95,
-    borderTopLeftRadius: 95,
-    borderBottomRightRadius: 95,
-    borderTopRightRadius: 95,
-  },
-  headerText: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  statusText: {
-    color: '#A5A5A5',
-    fontSize: 19,
-  },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  orderIcon: {
-    width: '15%',
-    height: width * 0.15,
-    resizeMode: 'contain',
-    marginRight: 15,
-  },
-  cardContent: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  orderNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  location: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 5,
-  },
-  rightContainer: {
-    alignItems: 'flex-end',
-  },
-  date: {
-    fontSize: 14,
-    color: '#999',
-  },
-  disabledView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  disabledText: {
-    color: '#A5A5A5',
-    fontSize: 18,
-  },
-  skeletonCard: {
-    height: 100,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 8,
-    marginBottom: 15,
-    padding: 10,
-  },
-  skeletonTitle: {
-    width: '50%',
-    height: 20,
-    backgroundColor: '#d4d4d4',
-    borderRadius: 4,
-    marginBottom: 10,
-  },
-  skeletonDescription: {
-    width: '80%',
-    height: 15,
-    backgroundColor: '#d4d4d4',
-    borderRadius: 4,
-  },
-});
 
 export default DriverOrdersScreen;

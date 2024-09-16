@@ -20,7 +20,6 @@ const LoginScreen = ({ navigation }) => {
  
 
   useEffect(() => {
-    startTracking(deviceId);
     autoLogin();
 
     
@@ -47,7 +46,6 @@ return () => {
 
     if (deviceId) {
       socket.emit('autoLoginDriver', { deviceId });
-      startTracking(deviceId);
       socket.on('loginSuccess', () => {
         navigate('Test');
        return socket.off('loginSuccess');
@@ -68,7 +66,6 @@ return () => {
         Alert.alert('Login Successful', 'hi ,Welcome!');
         
         // Start tracking after successful login
-        startTracking(deviceId);
         
         navigate('Test'); // Navigate to the main screen after login
       }
