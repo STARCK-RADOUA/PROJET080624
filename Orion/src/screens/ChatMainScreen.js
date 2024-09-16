@@ -62,7 +62,7 @@ const ChatMainScreen = ({ navigation }) => {
         )}
       </TouchableOpacity>
 
-      {/* Driver Chat Button */}
+      {/* Chat Livreur Button */}
       <TouchableOpacity
         style={styles.chatOption}
         onPress={() => navigation.navigate('DriverChatScreenComponent')}

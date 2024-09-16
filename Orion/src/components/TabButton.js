@@ -1,8 +1,10 @@
 import React, { useContext, useState } from 'react';
-import { TouchableOpacity, View, Text, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, View, Text, ActivityIndicator, StyleSheet , Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../redux/AuthProvider';
 import * as Device from 'expo-device';
+import { BASE_URL } from '@env';
+
 
 const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, onLogin }) => {
   const [loading, setLoading] = useState(false);
@@ -45,16 +47,7 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages,
         setCurrentTab(title);
       }
     }}>
-      <View style={{
-        flexDirection: "row",
-        alignItems: 'center',
-        paddingVertical: 8,
-        backgroundColor: currentTab === title ? 'beige' : 'transparent',
-        paddingLeft: 13,
-        paddingRight: 35,
-        borderRadius: 8,
-        position: 'relative', // Ensure the dot is positioned correctly
-      }}>
+      <View style={[styles.buttonContainer, { backgroundColor: currentTab === title ? 'beige' : 'transparent' }]}>
         {loading ? (
           <ActivityIndicator size="small" color="black" />
         ) : (
@@ -64,30 +57,46 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages,
               size={25}
               color={currentTab === title ? "black" : "white"}
             />
-            <Text style={{
-              fontSize: 15,
-              fontWeight: 'bold',
-              paddingLeft: 15,
-              color: currentTab === title ? "#0a5f6e" : "white"
-            }}>{title}</Text>
+            <Text style={[styles.buttonText, { color: currentTab === title ? "#0a5f6e" : "white" }]}>
+              {title}
+            </Text>
           </>
         )}
 
-        {/* Show red dot for unread messages in Chat */}
-        {title === "Chat" && unreadMessages && (
-          <View style={{
-            width: 10,
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: 'red',
-            position: 'absolute',
-            top: 0,
-            right: 10,
-          }} />
+        {/* Show notification icon for unread messages */}
+        {(title === "Chat Client" || title === "Chat Livreur") && unreadMessages && (
+          <Ionicons
+            name="notifications-outline"  // Or choose another notification icon
+            size={20}
+            color="red"
+            style={styles.notificationIcon}
+          />
         )}
       </View>
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: "row",
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingLeft: 13,
+    paddingRight: 35,
+    borderRadius: 8,
+    position: 'relative',
+  },
+  buttonText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    paddingLeft: 15,
+  },
+  notificationIcon: {
+    position: 'absolute',
+    top: 5,
+    right: 10,
+  },
+});
 
 export default TabButton;
