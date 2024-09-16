@@ -45,7 +45,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
                   <View style={styles.productDetails}>
                     <Text style={styles.productName}>{item.product?.name || 'Unavailable'}</Text>
                     <Text style={styles.productQuantity}>Qty: {item.quantity}</Text>
-                    <Text style={styles.productPrice}>€{item.price.toFixed(2)}</Text>
+                    <Text style={styles.productPrice}>€{!item.isFree? item.price.toFixed(2): "gratuit"}</Text>
                   </View>
                 </View>
               ))}

@@ -45,8 +45,14 @@ setDeviceId(Device.osBuildId);    };
   
   useEffect(() => {
     if (driverId) {
-      const socket = io(BASE_URLIO);
-      socket.emit('driverConnected', driverId);
+      const deviceId = Device.osBuildId;
+      const socket = io(BASE_URLIO, {
+        query: {
+          deviceId:deviceId ,  // Pass the unique clientId
+        }
+      });
+     
+      socket.emit('driverConnected', deviceId);
 
       socket.on('connect', () => {
 
@@ -54,8 +60,14 @@ setDeviceId(Device.osBuildId);    };
 
         console.log('Connected to Socket.IO server');
       });
+      socket.on('connection', () => {
 
-      socket.on('orderActiveChanged', (data) => {
+        startTracking(deviceId);
+
+        console.log('Connected to Socket.IO server');
+      });
+
+      socket.on('orderInprogressUpdatedForDriver', (data) => {
         if (data.active) {
           setIsSwitchDisabled(true);
           setIsEnabled(true);
@@ -123,11 +135,22 @@ console.log('------------------------------------');
   
   useEffect(() => {
     const fetchDriverOrders = () => {
-      const socket = io(BASE_URLIO);
-
-      socket.on('driverOrderUpdate', (data) => {
+      const deviceId = Device.osBuildId;
+      console.log('------------------------------------');
+      console.log(deviceId,"order inprogress");
+      console.log('------------------------------------');
+      const socket = io(BASE_URLIO, {
+        query: {
+          deviceId:deviceId ,  // Pass the unique clientId
+        }
+      });
+           socket.on('orderInprogressUpdatedForDriver', (data) => {
         setOrders(data.orders || []);
         setLoading(false);
+        console.log('data', data);
+        console.log('------------------------------------');
+        console.log('orders', orders);
+        console.log('------------------------------------');
       });
 
       socket.on('error', (err) => {
