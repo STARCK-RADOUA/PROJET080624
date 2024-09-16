@@ -12,7 +12,6 @@ import { navigate } from '../utils/navigationRef';
 import moment from 'moment';
 import { fetchDriverId, updateDriverAvailability, openGoogleMaps, openWaze, getDeviceId } from '../utils/driverOrderUtils';
 import styles from './styles/styles'; 
-import Shimmer from 'react-native-shimmer'; // Import Shimmer
 
 const DriverOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
@@ -133,9 +132,9 @@ const DriverOrdersScreen = ({ navigation }) => {
             keyExtractor={(item, index) => item?._id || index.toString()}
             renderItem={({ item }) =>
               loading ? (
-                <Shimmer>
+                <>
                   <View style={styles.shimmerContainer} />
-                </Shimmer>
+                </>
               ) : (
                 <TouchableOpacity onPress={() => handleCardPress(item)}>
                   <View style={styles.card}>
