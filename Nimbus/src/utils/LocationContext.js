@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import * as Location from 'expo-location';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
-
+import Platform from 'react-native/Libraries/Utilities/Platform';
 export const LocationContext = createContext();
 
 export const LocationProvider = ({ children }) => {
