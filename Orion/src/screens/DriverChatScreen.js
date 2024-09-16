@@ -4,6 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
 import DriverSearchModal from '../components/DriverSearchModal';
+import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
+import RoomScreen from './RoomScreen';
+
 
 
 const DriverChatScreenComponent = ({ navigation }) => {
@@ -162,6 +166,22 @@ const DriverChatScreenComponent = ({ navigation }) => {
 };
 
 
+const Stack = createStackNavigator();
+
+const ChatScreen = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="DriverChatScreenComponent">
+        <Stack.Screen name="DriverChatScreenComponent" component={DriverChatScreenComponent} options={{ headerShown: false }} />
+        <Stack.Screen name="RoomScreen" component={RoomScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+const screenWidth = Dimensions.get('window').width;
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -242,4 +262,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DriverChatScreenComponent;
+export default ChatScreen;

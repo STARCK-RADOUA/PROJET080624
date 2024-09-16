@@ -7,8 +7,7 @@ import ClientSearchModal from '../components/ClientSearchModal';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import RoomScreen from './RoomScreen';
-import ChatMainScreen from './ChatMainScreen';
-import DriverChatScreenComponent from './DriverChatScreen';
+
 
 const ClientChatScreenComponent = ({ navigation }) => {
   const [chats, setChats] = useState([]);
@@ -172,9 +171,7 @@ const Stack = createStackNavigator();
 const ChatScreen = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainScreen">
-        <Stack.Screen name='MainScreen' component={ChatMainScreen} options={{ headerShown: false }}/>
-        <Stack.Screen name='DriverChatScreenComponent' component={DriverChatScreenComponent} options={{ headerShown: false }}/>
+      <Stack.Navigator initialRouteName="ClientChatScreenComponent">
         <Stack.Screen name="ClientChatScreenComponent" component={ClientChatScreenComponent} options={{ headerShown: false }} />
         <Stack.Screen name="RoomScreen" component={RoomScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
