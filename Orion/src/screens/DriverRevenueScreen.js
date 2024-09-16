@@ -4,15 +4,15 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
-import WarnItem from './WarnItem';
-import WarnDetailModal from './WarnDetailModal';
+import DriverItem from './DriverRevenueItem'; // Update import
 
 const socket = io(BASE_URLIO);
 
-const WarnList = () => {
-  const [warns, setWarns] = useState([]);
-  const [filteredWarns, setFilteredWarns] = useState([]);
-  const [selectedWarn, setSelectedWarn] = useState(null);
+const DriverRevenueScreen = () => {
+  const [drivers, setDrivers] = useState([]);
+  const [filteredDrivers, setFilteredDrivers] = useState([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [selectedDriver, setSelectedDriver] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [isAscending, setIsAscending] = useState(true);
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -25,32 +25,43 @@ const WarnList = () => {
   const fadeAnim = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
-    socket.emit('requestAllWarns');
 
-    socket.on('warnsData', (data) => {
-      setWarns(data);
-      setFilteredWarns(data);
+        socket.emit('fetchDriverOrdersForCountUpdated', startDate.toISOString(), endDate.toISOString());
+      
+        socket.on('fetchDriverOrdersForCountUpdated', (data) => {
+          const { totalBusiness, driverRevenues, orders } = data;
+          setDrivers(Object.values(driverRevenues)); // Convert driverRevenues object to array
+          setFilteredDrivers(Object.values(driverRevenues)); // Same here for filtering
+          setTotalRevenue(totalBusiness);
+          console.log('------------------------------------');
+          console.log(totalBusiness,"totalBusiness");
+          console.log(driverRevenues,"driverRevenues");
+
+          console.log('------------------------------------');
+        });
+      
+        // Other socket listeners and cleanup...
+      
+     
+      
+    socket.on('driverAdded', (newDriver) => {
+      setDrivers((prevDrivers) => [...prevDrivers, newDriver]);
+      setFilteredDrivers((prevDrivers) => [...prevDrivers, newDriver]);
     });
 
-    socket.on('warnAdded', (newWarn) => {
-      setWarns((prevWarns) => [...prevWarns, newWarn]);
-      setFilteredWarns((prevWarns) => [...prevWarns, newWarn]);
-    });
-
-    socket.on('warnUpdated', (updatedWarn) => {
-      setWarns((prevWarns) =>
-        prevWarns.map((warn) => (warn._id === updatedWarn._id ? updatedWarn : warn))
+    socket.on('driverUpdated', (updatedDriver) => {
+      setDrivers((prevDrivers) =>
+        prevDrivers.map((driver) => (driver._id === updatedDriver._id ? updatedDriver : driver))
       );
-      setFilteredWarns((prevWarns) =>
-        prevWarns.map((warn) => (warn._id === updatedWarn._id ? updatedWarn : warn))
+      setFilteredDrivers((prevDrivers) =>
+        prevDrivers.map((driver) => (driver._id === updatedDriver._id ? updatedDriver : driver))
       );
     });
 
-    socket.on('warnDeleted', (deletedWarn) => {
-      setWarns((prevWarns) => prevWarns.filter((warn) => warn._id !== deletedWarn._id));
-      setFilteredWarns((prevWarns) => prevWarns.filter((warn) => warn._id !== deletedWarn._id));
+    socket.on('driverDeleted', (deletedDriver) => {
+      setDrivers((prevDrivers) => prevDrivers.filter((driver) => driver._id !== deletedDriver._id));
+      setFilteredDrivers((prevDrivers) => prevDrivers.filter((driver) => driver._id !== deletedDriver._id));
     });
-
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
@@ -58,47 +69,46 @@ const WarnList = () => {
     }).start();
 
     return () => {
-      socket.off('warnsData');
-      socket.off('warnAdded');
-      socket.off('warnUpdated');
-      socket.off('warnDeleted');
+      socket.off('fetchDriverOrdersForCountUpdated');
+      socket.off('driverAdded');
+      socket.off('driverUpdated');
+      socket.off('driverDeleted');
     };
-  }, []);
+}, [startDate, endDate]);
 
   const handleSearch = (text) => {
     setSearchText(text);
-    filterWarnings(text, startDate, endDate);
+    filterDrivers(text, startDate, endDate);
   };
 
-  const filterWarnings = (searchText, startDate, endDate) => {
-    // Ajouter un jour à la date de fin pour inclure le dernier jour complet
+  const filterDrivers = (searchText, startDate, endDate) => {
     const endDateInclusive = new Date(endDate);
     endDateInclusive.setDate(endDateInclusive.getDate() + 1);
-     const startDateInclusive = new Date(startDate);
-     startDateInclusive.setDate(startDateInclusive.getDate()-1 );
+    const startDateInclusive = new Date(startDate);
+    startDateInclusive.setDate(startDateInclusive.getDate() - 1);
   
-    const filtered = warns
-      .filter(warn =>
-        (warn.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
-         warn.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
-         warn.phone.toString().includes(searchText))
+    const filtered = drivers
+      .filter(driver =>
+        (driver.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
+         driver.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
+         driver.phone.toString().includes(searchText))
       )
-      .filter(warn => {
-        const warnDate = new Date(warn.created_at);
-        return warnDate >= startDateInclusive && warnDate < endDateInclusive;
+      .filter(driver => {
+        const driverDate = new Date(driver.created_at);
+        // Check if driverDate is valid
+        return !isNaN(driverDate) && driverDate >= startDateInclusive && driverDate < endDateInclusive;
       });
   
-    setFilteredWarns(filtered);
+    setFilteredDrivers(filtered);
   };
-  
 
   const handleSortByDate = () => {
-    const sorted = [...filteredWarns].sort((a, b) => {
+    const sorted = [...filteredDrivers].sort((a, b) => {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
       return isAscending ? dateA - dateB : dateB - dateA;
     });
-    setFilteredWarns(sorted);
+    setFilteredDrivers(sorted);
     setIsAscending(!isAscending);
   };
 
@@ -107,14 +117,21 @@ const WarnList = () => {
   };
 
   const applyFilters = () => {
-    filterWarnings(searchText, startDate, endDate);
+    // Convert dates to ISO strings for backend
+    const startISO = startDate.toISOString();
+    const endISO = endDate.toISOString();
+  console.log('------------------------------------');
+  console.log("start et and avant envoyer vers server ",startISO, endISO);
+  console.log('------------------------------------');
+    socket.emit('fetchDriverOrdersForCountUpdated', startISO, endISO);
     setShowFilterMenu(false);
   };
+  
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>{filteredWarns.length}</Text>
+        <Text style={styles.headerText}>Total Business Revenue: €{totalRevenue.toFixed(2)}</Text>
         <TextInput
           style={styles.searchInput}
           placeholder="Search by name or phone"
@@ -132,9 +149,9 @@ const WarnList = () => {
       </View>
 
       <FlatList
-        data={filteredWarns}
+        data={filteredDrivers}
         renderItem={({ item }) => (
-          <WarnItem
+          <DriverItem
             item={item}
             scaleAnim={scaleAnim}
             fadeAnim={fadeAnim}
@@ -152,7 +169,7 @@ const WarnList = () => {
                 useNativeDriver: true,
               }).start();
             }}
-            onPress={() => setSelectedWarn(item)}
+            onPress={() => setSelectedDriver(item)}
           />
         )}
         keyExtractor={item => item._id}
@@ -164,10 +181,10 @@ const WarnList = () => {
         windowSize={7}
       />
 
-      {selectedWarn && (
-        <WarnDetailModal
-          warn={selectedWarn}
-          onClose={() => setSelectedWarn(null)}
+      {selectedDriver && (
+        <DriverDetailModal
+          driver={selectedDriver}
+          onClose={() => setSelectedDriver(null)}
         />
       )}
 
@@ -186,49 +203,30 @@ const WarnList = () => {
         </View>
       )}
 
-      {showStartDatePicker && Platform.OS === 'ios' && (
-  <Modal transparent={true} animationType="slide" visible={showStartDatePicker}>
-    <View style={styles.iosPickerContainer}>
-      <View style={styles.pickerWrapper}>
+      {showStartDatePicker && (
         <DateTimePicker
           value={startDate}
           mode="date"
-          display="spinner" // or "inline" for different styles
+          display="default"
           onChange={(event, selectedDate) => {
-            const currentDate = selectedDate || startDate;
+            const currentDate = selectedDate ;
+            setShowStartDatePicker(Platform.OS === 'ios');
             setStartDate(currentDate);
           }}
-          style={styles.dateTimePicker} // Apply custom styles
         />
-        <TouchableOpacity onPress={() => setShowStartDatePicker(false)} style={styles.closeButton}>
-          <Text style={styles.closeButtonText}>Done</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </Modal>
-)}
-  
-      {showEndDatePicker && Platform.OS === 'ios' && (
-  <Modal transparent={true} animationType="slide" visible={showEndDatePicker}>
-    <View style={styles.iosPickerContainer}>
-      <View style={styles.pickerWrapper}>
+      )}
+      {showEndDatePicker && (
         <DateTimePicker
           value={endDate}
           mode="date"
-          display="spinner" // or "inline" for different styles
+          display="default"
           onChange={(event, selectedDate) => {
-            const currentDate = selectedDate || endDate;
+            const currentDate = selectedDate ;
+            setShowEndDatePicker(Platform.OS === 'ios');
             setEndDate(currentDate);
           }}
-          style={styles.dateTimePicker} // Apply custom styles
         />
-        <TouchableOpacity onPress={() => setShowEndDatePicker(false)} style={styles.closeButton}>
-          <Text style={styles.closeButtonText}>Done</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </Modal>
-)}
+      )}
     </View>
   );
 };
@@ -288,32 +286,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 5,
   },
-  iosPickerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim background
-  },
-  pickerWrapper: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    width: '80%',
-    alignItems: 'center',
-  },
-  dateTimePicker: {
-    width: '100%',
-  },
-  closeButton: {
-    marginTop: 10,
-    backgroundColor: '#1f695a',
-    padding: 10,
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: '#fff',
-    textAlign: 'center',
-  },
   filterMenu: {
     position: 'absolute',
     top: 50,
@@ -355,4 +327,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WarnList;
+export default DriverRevenueScreen;

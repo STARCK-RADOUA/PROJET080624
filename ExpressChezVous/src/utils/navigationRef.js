@@ -10,7 +10,13 @@ export function navigate(name, params) {
         index: 0,  // Index of the route you want to display (0 for Login)
         routes: [{ name: 'Login', params }],  // New route array
       });
-    }else if (name === 'PaymentSuccessScreen') {
+    }else if (name === 'Registration') {
+      // Use reset to clear navigation stack and navigate to Login
+      navigationRef.current.reset({
+        index: 0,  // Index of the route you want to display (0 for Login)
+        routes: [{ name: 'Registration', params }],  // New route array
+      });
+    }  else if (name === 'PaymentSuccessScreen') {
       // Use reset to clear navigation stack and navigate to Login
       navigationRef.current.reset({
         index: 0,  // Index of the route you want to display (0 for Login)

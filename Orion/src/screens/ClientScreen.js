@@ -1,41 +1,44 @@
-import { BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Modal, FlatList, Platform } from 'react-native';
 import io from 'socket.io-client';
-import ClientCard from './../components/ClientCard';  // Create a separate ClientCard component similar to DriverCard.
-import ClientModal from './../components/ClientModal';  // Create a separate ClientModal component similar to DriverModal.
-
+import ClientCard from './../components/ClientCard';
+import ClientModal from './../components/ClientModal';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { KeyboardAvoidingView } from 'react-native';
+import { BASE_URLIO } from '@env';
 export default function ClientScreen() {
   const [clients, setClients] = useState([]);
   const [filteredClients, setFilteredClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [addModalVisible, setAddModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filterActivated, setFilterActivated] = useState('all'); // New state for activated filter
-  const [filterIsLogin, setFilterIsLogin] = useState('all');     // New state for isLogin filter
+  const [filterActivated, setFilterActivated] = useState('all'); // Filter for activated
+  const [filterIsLogin, setFilterIsLogin] = useState('all');     // Filter for login
+  const [isDropdownVisible, setDropdownVisible] = useState(false); // Dropdown state
+  const [isLoginDropdownVisible, setIsLoginDropdownVisible] = useState(false); // Login dropdown
+
+  const filters = [
+    { label: "Filtrer par activation", value: "all" },
+    { label: "Activé", value: "activated" },
+    { label: "Désactivé", value: "deactivated" }
+  ];
+
+  const loginFilters = [
+    { label: "Filtrer par connexion", value: "all" },
+    { label: "Connecté", value: "loggedIn" },
+    { label: "Déconnecté", value: "loggedOut" }
+  ];
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
 
     socket.emit('watchClients');
     socket.on('clientsUpdated', ({ clients }) => {
-      console.log('clientsUpdated event received:', clients);
       setClients(clients);
-      applyFilters(clients); // Apply filters to the initial data
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Disconnected from the socket server');
+      applyFilters(clients);
     });
 
     return () => {
-      console.log('Disconnecting from socket server...');
       socket.disconnect();
     };
   }, []);
@@ -43,16 +46,6 @@ export default function ClientScreen() {
   const handleSearch = (query) => {
     setSearchText(query);
     applyFilters(clients, query, filterActivated, filterIsLogin);
-  };
-
-  const handleFilterActivated = (value) => {
-    setFilterActivated(value);
-    applyFilters(clients, searchText, value, filterIsLogin);
-  };
-
-  const handleFilterIsLogin = (value) => {
-    setFilterIsLogin(value);
-    applyFilters(clients, searchText, filterActivated, value);
   };
 
   const applyFilters = (clients, searchQuery = searchText, activatedFilter = filterActivated, isLoginFilter = filterIsLogin) => {
@@ -81,6 +74,18 @@ export default function ClientScreen() {
     setFilteredClients(filtered);
   };
 
+  const handleDropdownSelect = (value) => {
+    setFilterActivated(value);
+    setDropdownVisible(false);
+    applyFilters(clients, searchText, value, filterIsLogin);
+  };
+
+  const handleLoginDropdownSelect = (value) => {
+    setFilterIsLogin(value);
+    setIsLoginDropdownVisible(false);
+    applyFilters(clients, searchText, filterActivated, value);
+  };
+  
   const handleCardPress = (client) => {
     setSelectedClient(client);
     setIsModalVisible(true);
@@ -91,11 +96,11 @@ export default function ClientScreen() {
     setSelectedClient(null);
   };
 
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Liste des clients</Text>
 
-      {/* Search Input and Filter Dropdowns */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -104,39 +109,44 @@ export default function ClientScreen() {
           value={searchText}
           onChangeText={(text) => handleSearch(text)}
         />
-       
       </View>
 
+      {/* Filter Dropdowns */}
       <View style={styles.filterContainer}>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={filterActivated}
-            style={styles.filterPicker}
-            onValueChange={(itemValue) => handleFilterActivated(itemValue)}
-          >
-            <Picker.Item label="Tous" value="all" />
-            <Picker.Item label="Activé" value="activated" />
-            <Picker.Item label="Désactivé" value="deactivated" />
-          </Picker>
-        </View>
-
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={filterIsLogin}
-            style={styles.filterPicker}
-            onValueChange={(itemValue) => handleFilterIsLogin(itemValue)}
-          >
-            <Picker.Item label="Tous" value="all" />
-            <Picker.Item label="Connecté" value="loggedIn" />
-            <Picker.Item label="Déconnecté" value="loggedOut" />
-          </Picker>
-        </View>
+        <TouchableOpacity onPress={() => setDropdownVisible(!isDropdownVisible)} style={styles.dropdownButton}>
+          <Text>{filters.find(f => f.value === filterActivated)?.label || 'Filtrer'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setIsLoginDropdownVisible(!isLoginDropdownVisible)} style={styles.dropdownButton}>
+          <Text>{loginFilters.find(f => f.value === filterIsLogin)?.label || 'Filtrer par login'}</Text>
+        </TouchableOpacity>
       </View>
+
+      {/* Dropdown Modal for Activation Filter */}
+      {isDropdownVisible && (
+        <View style={styles.dropdown}>
+          {filters.map((filter) => (
+            <TouchableOpacity key={filter.value} onPress={() => handleDropdownSelect(filter.value)}>
+              <Text style={styles.dropdownItem}>{filter.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {/* Dropdown Modal for Login Filter */}
+      {isLoginDropdownVisible && (
+        <View style={styles.dropdown}>
+          {loginFilters.map((filter) => (
+            <TouchableOpacity key={filter.value} onPress={() => handleLoginDropdownSelect(filter.value)}>
+              <Text style={styles.dropdownItem}>{filter.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
 
       <ScrollView contentContainerStyle={styles.cardContainer}>
         {filteredClients.length > 0 ? (
           filteredClients.map(client => (
-            <ClientCard key={client._id} client={client} onPress={handleCardPress} />
+            <ClientCard key={client._id} client={client} onPress={() => handleCardPress(client)} />
           ))
         ) : (
           <Text>Aucun client disponible</Text>
@@ -145,15 +155,12 @@ export default function ClientScreen() {
 
       <ClientModal
         visible={isModalVisible}
-        onClose={closeModal}
+        onClose={() => closeModal()}
         client={selectedClient}
       />
-
-    </View>
+    </SafeAreaView>
   );
 }
-
-const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
   container: {
@@ -186,31 +193,32 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginRight: 10,
   },
-  addButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    backgroundColor: '#f3b13e',
-    borderColor: '#f3b13e',
-    borderWidth: 1,
-    borderRadius: 8,
-  },
-  addButtonText: {
-    color: '#1f2937',
-    fontSize: 14,
-    fontWeight: '500',
-  },
   filterContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
   },
-  pickerContainer: {
-    flex: 1,
-    marginHorizontal: 5,
+  dropdownButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#ddd',
+    borderRadius: 8,
   },
-  filterPicker: {
-    height: 50,
-    width: '100%',
+  dropdown: {
+    position: 'absolute',
+    top: 150,
+    left: 10,
+    right: 10,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    zIndex: 9999,
+  },
+  dropdownItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   cardContainer: {
     flexDirection: 'column',

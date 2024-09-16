@@ -93,11 +93,20 @@ const UserProfileScreen = ({ navigation }) => {
       if (!isPasswordMatch) {
         throw new Error("Passwords do not match.");
       }
-
+console.log('------------------------------------');
+console.log('Password:', newPassword);
+console.log('------------------------------------');
+console.log('------------------------------------');
+console.log('--------------', id);
+console.log('------------------------------------');
+console.log('------------------------------------');
+console.log('------------------------------------');
+console.log('------------------------------------');
       const response = await axios.post(`${BASE_URL}/api/users/change-password`, {
         id,
         newPassword,
       });
+      
       Alert.alert('Success', 'Password changed successfully!');
       setPasswordModalVisible(false);
     } catch (error) {

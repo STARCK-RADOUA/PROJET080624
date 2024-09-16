@@ -168,33 +168,51 @@ const NotificationMenu = () => {
       </TouchableOpacity>
 
       {/* Date Picker for Start Date */}
-      {showStartDatePicker && (
+      {showStartDatePicker && Platform.OS === 'ios' && (
+  <Modal transparent={true} animationType="slide" visible={showStartDatePicker}>
+    <View style={styles.iosPickerContainer}>
+      <View style={styles.pickerWrapper}>
         <DateTimePicker
           value={startDate}
           mode="date"
-          display="default"
+          display="spinner" // or "inline" for different styles
           onChange={(event, selectedDate) => {
             const currentDate = selectedDate || startDate;
-            setShowStartDatePicker(Platform.OS === 'ios');
             setStartDate(currentDate);
           }}
+          style={styles.dateTimePicker} // Apply custom styles
         />
-      )}
+        <TouchableOpacity onPress={() => setShowStartDatePicker(false)} style={styles.closeButton}>
+          <Text style={styles.closeButtonText}>Done</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </Modal>
+)}
 
       {/* Date Picker for End Date */}
-      {showEndDatePicker && (
+    
+      {showEndDatePicker && Platform.OS === 'ios' && (
+  <Modal transparent={true} animationType="slide" visible={showEndDatePicker}>
+    <View style={styles.iosPickerContainer}>
+      <View style={styles.pickerWrapper}>
         <DateTimePicker
           value={endDate}
           mode="date"
-          display="default"
+          display="spinner" // or "inline" for different styles
           onChange={(event, selectedDate) => {
             const currentDate = selectedDate || endDate;
-            setShowEndDatePicker(Platform.OS === 'ios');
             setEndDate(currentDate);
           }}
+          style={styles.dateTimePicker} // Apply custom styles
         />
-      )}
-
+        <TouchableOpacity onPress={() => setShowEndDatePicker(false)} style={styles.closeButton}>
+          <Text style={styles.closeButtonText}>Done</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </Modal>
+)}
       {/* Admin Modal */}
       <Modal
         transparent={true}
@@ -202,7 +220,10 @@ const NotificationMenu = () => {
         onRequestClose={() => setAddNotificationVisible(false)}
         animationType="slide"
       >
-        <AdminNotificationScreen />
+        <AdminNotificationScreen
+                onRequestClose={() => setAddNotificationVisible(false)}
+
+             />
       </Modal>
 
       {/* Notification Modal */}
@@ -312,6 +333,32 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 10,
     fontSize: 16,
+  },
+  iosPickerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim background
+  },
+  pickerWrapper: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  dateTimePicker: {
+    width: '100%',
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: '#1f695a',
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: '#fff',
+    textAlign: 'center',
   },
 });
 

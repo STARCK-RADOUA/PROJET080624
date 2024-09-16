@@ -92,6 +92,8 @@ const MainNavigator = ({ onLogin }) => {
       case 'Chat Livreur':
           return <DriverChatScreenComponent />;
       case 'Analyse':
+        return <DriverRevenueScreen />;
+      case 'invité':
         return <WarnScreen />;
       default:
         return <HomeScreen />;

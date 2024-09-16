@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import moment from 'moment';
 
 const DeliveredOrderModal = ({ visible, onClose, order }) => {
-  const [showAllProducts, setShowAllProducts] = useState(false);
+  const [afficherTousProduits, setAfficherTousProduits] = useState(false);
+  const [developpe, setDeveloppe] = useState(null);
 
   if (!order) return null;
-  console.log('------------------------------------');
-  console.log(order);
-  console.log('------------------------------------');
-  
-  const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
 
-  // Animation for modal entry
+  const produitsAffiches = afficherTousProduits ? order.products : order.products.slice(0, 3);
+
+  // Animation pour l'entrée du modal
   const scaleAnim = new Animated.Value(0);
 
-  const animateIn = () => {
+  const animerEntree = () => {
     Animated.spring(scaleAnim, {
       toValue: 1,
       friction: 7,
@@ -24,7 +22,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
     }).start();
   };
 
-  const animateOut = () => {
+  const animerSortie = () => {
     Animated.spring(scaleAnim, {
       toValue: 0,
       friction: 7,
@@ -32,66 +30,71 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
     }).start(() => onClose());
   };
 
+  const basculerDeveloppe = (index) => {
+    setDeveloppe(developpe === index ? null : index);
+  };
+
   return (
     <Modal
       animationType="none"
       transparent={true}
       visible={visible}
-      onShow={animateIn}
-      onRequestClose={animateOut}
+      onShow={animerEntree}
+      onRequestClose={animerSortie}
     >
       <View style={styles.modalContainer}>
         <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
-
-          {/* Close Button */}
-          <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
-            <Ionicons name="close-circle" size={30} color="#ff5c5c" />
+          <TouchableOpacity style={styles.closeButton} onPress={animerSortie}>
+            <Ionicons name="close-circle" size={38} color="#ff5c5c" />
           </TouchableOpacity>
 
           <ScrollView>
-            {/* Order Info */}
+            {/* Informations sur la commande */}
             <View style={styles.orderInfo}>
-              <Text style={styles.label}>Order #{order.order_number ?? 'N/A'}</Text>
-              <Text style={styles.label}>Client: {order.client_name}</Text>
-              <Text style={styles.label}>Driver: {order.driver_name}</Text>
-              <Text style={styles.label}>Payment: {order.payment_method}</Text>
-              <Text style={styles.label}>Total Price: €{order.total_price.toFixed(2)}</Text>
-              <Text style={styles.label}>Exchange: €{order.exchange.toFixed(2)} </Text>
-              <Text style={styles.label}>Address: {order.address_line}</Text>
-              <Text style={styles.label}>
-                Delivery: {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}
-              </Text>
+              <Text style={styles.label}><MaterialIcons name="receipt" size={16} color="#ffbf00" /> Commande #{order.order_number ?? 'N/A'}</Text>
+              <Text style={styles.label}><Ionicons name="person" size={16} color="#ffbf00" /> Client : {order.client_name}</Text>
+              <Text style={styles.label}><Ionicons name="car" size={16} color="#ffbf00" /> Chauffeur : {order.driver_name}</Text>
+              <Text style={styles.label}><Ionicons name="card" size={16} color="#ffbf00" /> Paiement : {order.payment_method}</Text>
+              <Text style={styles.label}><Ionicons name="cash" size={16} color="#ffbf00" /> Prix Total : €{order.total_price.toFixed(2)}</Text>
+              <Text style={styles.label}><Ionicons name="swap-horizontal" size={16} color="#ffbf00" /> Échange : €{order.exchange.toFixed(2)}</Text>
+              <Text style={styles.label}><Ionicons name="home" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
+              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Livraison : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
-            {/* Products */}
-            <Text style={styles.sectionHeader}>Products:</Text>
+            {/* Produits */}
+            <Text style={styles.sectionHeader}>Produits :</Text>
             <View style={styles.productsContainer}>
-              {displayedProducts.map((item, index) => (
-                <View key={index} style={styles.productContainer}>
+              {produitsAffiches.map((item, index) => (
+                <TouchableOpacity key={index} onPress={() => basculerDeveloppe(index)} style={styles.productContainer}>
                   <View style={styles.imageContainer}>
                     <Image
-                      source={{
-                        uri: item.product?.image_url || 'https://via.placeholder.com/150',
-                      }}
+                      source={{ uri: item.product?.image_url || 'https://via.placeholder.com/150' }}
                       style={styles.productImage}
                     />
                   </View>
                   <View style={styles.productDetails}>
-                    <Text style={styles.productName}>{item.product?.name || 'Unavailable'}</Text>
-                    <Text style={styles.productQuantity}>Qty: {item.quantity}</Text>
-                    <Text style={styles.productPrice}>€{!item.isFree? item.price.toFixed(2): 0}</Text>
-                    <Text style={styles.productServiceType}>Service Type: {item.service_type}</Text>
+                    <Text style={styles.productName}>{item.product?.name || 'Indisponible'}</Text>
+                    {developpe === index && (
+                      <View>
+                        <Text style={styles.productQuantity}>Qté : {item.quantity}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit"}</Text>
+                        <Text style={styles.productServiceType}>Type de service : {item.service_type}</Text>
+                      </View>
+                    )}
                   </View>
-                </View>
+                  <Ionicons name={developpe === index ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
+                </TouchableOpacity>
               ))}
 
-              {/* Show more products button */}
-              {order.products.length > 3 && !showAllProducts && (
+              {/* Bouton pour afficher plus de produits */}
+              {order.products.length > 3 && (
                 <TouchableOpacity
                   style={styles.showMoreButton}
-                  onPress={() => setShowAllProducts(true)}
+                  onPress={() => setAfficherTousProduits(!afficherTousProduits)}
                 >
-                  <Text style={styles.showMoreText}>Show more products...</Text>
+                  <Text style={styles.showMoreText}>
+                    {afficherTousProduits ? 'Afficher moins' : 'Afficher plus de produits...'}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -122,11 +125,12 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 10,
+    top: 30,
     right: 10,
   },
   orderInfo: {
-    marginBottom: 20,
+    paddingTop: 20,
+   marginBottom: 20,
   },
   label: {
     fontSize: 16,
@@ -194,18 +198,6 @@ const styles = StyleSheet.create({
   showMoreText: {
     color: '#007bff',
     fontSize: 16,
-  },
-  totalContainer: {
-    marginTop: 20,
-    padding: 15,
-    backgroundColor: '#333',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  totalText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffbf00',
   },
 });
 

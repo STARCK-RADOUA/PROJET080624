@@ -2,9 +2,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, ImageBackground, Dimensions, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import * as Device from 'expo-device';
 import io from 'socket.io-client';
+import * as Location from 'expo-location';
 import { styles } from './styles/loginstyle';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { BASE_URL, BASE_URLIO } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { navigate } from '../utils/navigationRef'; // Import navigate function
+
 const { width } = Dimensions.get('window');
 const socket = io(`${BASE_URLIO}`);
 
@@ -12,60 +16,183 @@ const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const socketRef = useRef(null);
-  const deviceId =  Device.osBuildId;
-
-  // Animation for logo
+  const [isLocationObtained, setIsLocationObtained] = useState(false);
+  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
+  const [location, setLocation] = useState(null);
+  const deviceId = Device.osBuildId;
   const logoAnim = useRef(new Animated.Value(0)).current;
+  const [hasNavigated, setHasNavigated] = useState(false); // Track if we've already navigated
+  useEffect(() => {
+    const deviceId = Device.osBuildId;
+
+    const socket1 = io(BASE_URLIO, )
+
+    socket1.emit('checkActivation', { deviceId });
+
+    socket1.on('activationStatus', (status) => {
+      console.log('Activation status received:', status);
+      if (!status.activated) {
+        navigation.replace('Loading');
+      }
+    });
+
+    return () => {
+      socket1.off('activationStatus');
+    };
+  }, [navigation]);
 
   useEffect(() => {
-    autoLogin();
+    // Récupérer la localisation en premier
+  
+if(isLocationObtained == false){
+ fetchCurrentLocation();
+}
+    // Fetch the location once the component mounts
+    
+
     Animated.spring(logoAnim, {
       toValue: 1,
       friction: 2,
       tension: 40,
       useNativeDriver: true,
     }).start();
+
+    // Connexion au socket
     const socket = io(BASE_URLIO, {
       query: {
-        deviceId:deviceId ,  // Pass the unique clientId
+        deviceId: deviceId,  // Passer l'identifiant unique
       }
     });
 
-    // Socket event listener for admin activation
+    // Écouter l'événement d'activation de l'administrateur
     socket.on('adminActivateClient', () => {
       console.log('Admin activated Client');
-      autoLogin();
+      fetchCurrentLocation();
     });
 
     return () => {
       socket.off('adminActivateClient');
     };
-  }, []);
+  }, [isLoginSuccess]);
 
-  // Auto-login function
-  const autoLogin = async () => {
-    const deviceId = Device.osBuildId;
-    console.log(deviceId);
-    if (deviceId) {
-      socket.emit('autoLogin', { deviceId });
+  // Fonction pour obtenir la localisation
+  const handleGetLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission refusée', 'La permission de localisation est requise pour continuer.');
+      return;
+    }
+
+    let currentLocation = await Location.getCurrentPositionAsync({});
+    setLocation(currentLocation.coords);
+    setIsLocationObtained(true);
+
+    // Tenter l'auto-login une fois la localisation obtenue
+    autoLogin(currentLocation.coords);
+  };
+  const fetchCurrentLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.error('Permission Denied', 'You need to allow location access to continue.');
+      return;
+    }
+    setLoading(true);
+    let location = await Location.getCurrentPositionAsync({});
+    console.log('Current Location:', location);
+
+    if (location) {
+      console.log('------------------------------------');
+      console.log('Current Location:', location);
+      console.log('------------------------------------');
+      setLocation(location.coords); // Store the coordinates
+      setIsLocationObtained(true);
+      setLoading(false);
+      autoLogin(location.coords);
+      console.log('Location Obtained:', location.coords); // Enable form fields once location is fetched
+    } else {
+      console.error('Error fetching location. Please try again.');
+    }
+  };
+
+
+
+
+  const checkIsScanSuccess = async () => {
+    try {
+      const registrationData = await AsyncStorage.getItem('registrationTimestamp');
+  
+      if (registrationData) {
+        const parsedData = JSON.parse(registrationData); // Parse l'objet JSON
+        const { timestamp, uniqueId } = parsedData;
+        console.log('Stored registration  from login value:', timestamp , uniqueId); 
+
+        const now = new Date().getTime();
+        const elapsed = now - parseInt(timestamp, 10);
+        if (timestamp) {
+          const elapsed = now - parseInt(timestamp, 10);
+   if (elapsed > 15 * 60 * 1000) { // 15 minutes
+            await AsyncStorage.removeItem('registrationTimestamp');
+            console.log('Registration timestamp  no more registration removed.');
+          
+          }
+
+          if (elapsed < 15 * 60 * 1000) { // 15 minutes
+           
+          console.log('Navigating  from login to registration');
+          setHasNavigated(true); // Prevent further navigation
+          navigate('Registration');
+          console.log('------------------------------------');
+          console.log('Elapsed time since from login last registration:', elapsed);
+          console.log('------------------------------------');
+       
+          }
+
+        }
+  
+     
+      } else {
+        console.log('No stored order found or already navigated.');
+      }
+    } catch (error) {
+      console.error('Error parsing stored order:', error);  
+    }
+  };
+
+  useEffect(() => {
+    checkIsScanSuccess();
+
+  }, []); // Ensure this runs once when the component is mounted
+
+  // Fonction d'auto-login
+  const autoLogin = async (currentLocation) => {
+    console.log('Tentative d\'auto-login...');
+    
+    if (deviceId ) {
+      socket.emit('autoLogin', { deviceId, location: currentLocation });
 
       socket.on('loginSuccess', () => {
-        // Reset navigation stack and navigate to Services
+        // Rediriger vers la page des services
         navigation.reset({
           index: 0,
           routes: [{ name: 'Services' }],
         });
+        setIsLoginSuccess(true);
+      });
+
+      socket.on('loginFailure', () => {
       });
     }
   };
 
-  // Manual login function
+  // Fonction de login manuel
   const manualLogin = async () => {
-    const deviceId = Device.osBuildId;
     if (!phone || !password) {
       Alert.alert('Erreur', 'Veuillez remplir les champs requis.');
       return;
+    }
+
+    if (!isLocationObtained) {
+      await fetchCurrentLocation();
     }
 
     try {
@@ -75,6 +202,7 @@ const LoginScreen = ({ navigation }) => {
         phone: phone.trim(),
         password: password.trim(),
         deviceId,
+        location,
       };
 
       const response = await fetch(`${BASE_URL}/api/clients/login`, {
@@ -88,16 +216,15 @@ const LoginScreen = ({ navigation }) => {
       const data = await response.json();
 
       if (response.ok) {
-        // Reset navigation stack and navigate to Services
         navigation.reset({
           index: 0,
           routes: [{ name: 'Services' }],
         });
       } else {
-        Alert.alert('Login Failed', data.errors ? data.errors.join(', ') : data.message);
+        Alert.alert('Échec de la connexion', data.errors ? data.errors.join(', ') : data.message);
       }
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      Alert.alert('Erreur', 'Une erreur s\'est produite. Veuillez réessayer plus tard.');
     } finally {
       setLoading(false);
     }
@@ -107,10 +234,9 @@ const LoginScreen = ({ navigation }) => {
     <ImageBackground source={require('../assets/8498789sd.png')} style={styles.backgroundImage}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}  // Handle keyboard behavior on iOS
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}  // Adjust offset based on platform
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       >
-        {/* Animated Logo */}
         <Animated.View style={[styles.imageContainer, { transform: [{ scale: logoAnim }] }]}>
           <Image
             source={require('../assets/images/8498789.png')}
@@ -119,7 +245,6 @@ const LoginScreen = ({ navigation }) => {
         </Animated.View>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
           <View style={styles.container1}>
-            {/* Input fields for manual login */}
             <View style={styles.container}>
               <TextInput
                 style={styles.input}
@@ -136,12 +261,10 @@ const LoginScreen = ({ navigation }) => {
                 onChangeText={setPassword}
               />
 
-              {/* Manual login button */}
               <TouchableOpacity style={styles.button} onPress={manualLogin}>
                 <Text style={styles.buttonText}>Se connecter</Text>
               </TouchableOpacity>
 
-              {/* QR Icon and Create Account */}
               <View style={styles.horizontalLayout}>
                 <TouchableOpacity onPress={() => navigation.navigate('RegistrationLC')}>
                   <Text style={styles.linkText}>Créer un compte</Text>
@@ -151,8 +274,7 @@ const LoginScreen = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
 
-              {/* Loading indicator during login */}
-              {loading && <ActivityIndicator size="large" color="#fff" />}
+              {loading && <ActivityIndicator size="large" color="orange" />}
             </View>
           </View>
         </ScrollView>

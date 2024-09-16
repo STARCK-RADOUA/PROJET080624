@@ -79,7 +79,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
         <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
           {/* Close Button */}
           <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
-            <Ionicons name="close-circle" size={30} color="#ff5c5c" />
+            <Ionicons name="close-circle" size={37} color="#ff5c5c" />
           </TouchableOpacity>
 
           <ScrollView>
@@ -89,6 +89,8 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.label}>Client: {order.client_name}</Text>
               <Text style={styles.label}>Address: {order.address_line}</Text>
               <Text style={styles.label}>Payment: {order.payment_method}</Text>
+              <Text style={styles.label}>Total Price: €{order.total_price.toFixed(2)}</Text>
+              <Text style={styles.label}>Exchange: €{order.exchange.toFixed(2)} </Text>
               <Text style={styles.label}>
                 Delivery: {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}
               </Text>
@@ -110,7 +112,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                   <View style={styles.productDetails}>
                     <Text style={styles.productName}>{item.product?.name || 'Unavailable'}</Text>
                     <Text style={styles.productQuantity}>Qty: {item.quantity}</Text>
-                    <Text style={styles.productPrice}>€{item.price.toFixed(2)}</Text>
+                    <Text style={styles.productPrice}>€{!item.isFree? item.price.toFixed(2): "Free"}</Text>
                   </View>
                 </View>
               ))}
@@ -182,11 +184,12 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 10,
+    top: 40,
     right: 10,
   },
   orderInfo: {
     marginBottom: 20,
+    paddingTop: 20,
   },
   label: {
     fontSize: 16,

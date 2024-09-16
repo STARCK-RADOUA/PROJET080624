@@ -27,8 +27,8 @@ const WarnDetailModal = ({ warn, onClose }) => {
         'Choose Navigation App',
         'Select the app to navigate to this location',
         [
-          { text: 'Google Maps', onPress: () => openGoogleMaps(latitudeFloat, longitudeFloat) },
-          { text: 'Waze', onPress: () => openWaze(latitudeFloat, longitudeFloat) },
+          { text: 'Google Maps', onPress: () => openGoogleMaps(  longitudeFloat, latitudeFloat) },
+          { text: 'Waze', onPress: () => openWaze( longitudeFloat, latitudeFloat) },
           { text: 'Cancel', style: 'cancel' }
         ],
         { cancelable: true }

@@ -34,6 +34,9 @@ const PaymentSuccessScreen = ({ route }) => {
   // Save screen state to AsyncStorage before closing the app
   const saveStateToStorage = async (orderId, orderStatus, orders, nezPoint) => {
     try {
+      console.log('------------------------------------');
+      console.log('Saving order status in paay:', { orders, nezPoint });
+      console.log('------------------------------------');
       const orderData = JSON.stringify({ orderId, orderStatus, orders, nezPoint });
       await AsyncStorage.setItem('orderStatus', orderData);
       console.log('Stored order status in paay:', orderData);
@@ -109,7 +112,7 @@ const PaymentSuccessScreen = ({ route }) => {
         setIsChatDisabled(true);
         setRedirectMessage('Votre commande a été livrée. Chat pendant 2 minutes.');
         setShowExitButton(true);
-        if (nezPoint && orders.length > 0) {
+        if ((nezPoint || nezPoint === 0) && orders.length > 0) {
           await updateUserPoints(nezPoint);
           await updateOrderItems(orders);
         }
@@ -126,12 +129,22 @@ const PaymentSuccessScreen = ({ route }) => {
 
       if (status === 'in_progress') {
         setIsChatDisabled(false);
-          await updateUserPoints(nezPoint);
+        if (Array.isArray(orders)) {
+          const items = orders.map(order => ({
+            _id: order._id,
+            free: order.free,
+            quantity: order.quantity
+          }));
+        await updateOrderItems(items);
+          console.log('Items:', items);
+        } else {
+          console.error('Orders is not defined or not an array');
+        }
       }
     });
 
     return () => socket.off('orderStatusUpdates');
-  }, [orderId]);
+  }, [nezPoint]);
 
   // Handle back button press logic
   useEffect(() => {

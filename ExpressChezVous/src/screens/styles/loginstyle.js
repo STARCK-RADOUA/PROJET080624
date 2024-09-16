@@ -26,7 +26,8 @@ export const styles = StyleSheet.create({
   image: {
     width: width * 0.5,  // Set image width to 50% of screen width
     height: width * 0.5,  // Set image height proportional to width
-    resizeMode: 'contain',  // Ensure the image is fully visible
+    resizeMode: 'contain',
+      // Ensure the image is fully visible
   },
   container: {
     width: '85%',  // Set container width to 85% of screen width for responsiveness
