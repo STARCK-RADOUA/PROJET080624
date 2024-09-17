@@ -12,7 +12,6 @@ const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages, unreadAd
         <Text style={styles.profileName}>Mehdi Saadi</Text>
       </View>
 
-      {/* Scrollable Menu Buttons */}
       <ScrollView style={styles.menuScroll}>
         <View style={styles.menuButtons}>
           {TabButton({ currentTab, setCurrentTab, title: "Accueil", iconName: "home-outline" })}
@@ -24,6 +23,7 @@ const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages, unreadAd
           {TabButton({ currentTab, setCurrentTab, title: "Services", iconName: "briefcase-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Historique Chat", iconName: "time-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Analyse", iconName: "stats-chart-outline" })}
+          {TabButton({ currentTab, setCurrentTab, title: "Chiffre d'affaire", iconName: "cash-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "invité", iconName: "stats-chart-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Chat Client", iconName: "send-outline", unreadMessages })}
           {TabButton({ currentTab, setCurrentTab, title: "Chat Livreur", iconName: "chatbubble-ellipses-outline", unreadMessages: unreadAdminMessages })}
