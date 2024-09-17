@@ -20,7 +20,8 @@
         "NSLocationAlwaysUsageDescription": "We need your location to provide continuous tracking even when the app is in the background.",
         "UIBackgroundModes": [
           "fetch",
-          "remote-notification"
+          "remote-notification",
+          "location"
         ],
         "NSUserTrackingUsageDescription": "This identifier will be used to send you notifications for important updates."
       },
