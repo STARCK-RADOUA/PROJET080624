@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
       },
       container2: {
         paddingTop: 10,
+        padding: 10,
         marginTop: 10,
         height: '70%',
         backgroundColor: '#ffffff',
