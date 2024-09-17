@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
+import { Modal, View, Text,Alert, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
-
+import { BASE_URLIO, BASE_URL } from '@env';
+import * as Device from 'expo-device';
 import { MaterialIcons } from '@expo/vector-icons';
+import io from 'socket.io-client';
 
 const OrderDetailModal = ({ visible, onClose, order }) => {
   const [showAllProducts, setShowAllProducts] = useState(false);
@@ -37,6 +39,70 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
   // Récupérer les chauffeurs disponibles lorsque le modal est affiché
 
 
+  const confirmLivraison = () => {
+    // Affiche une alerte de confirmation avant la déconnexion
+    Alert.alert(
+      'Confirmation',
+      'Êtes-vous sûr de vouloir vous comfirmer la livraison de cette commande ?',
+      [
+        {
+          text: 'Annuler',
+          onPress: () => console.log('livraison annulée'),
+          style: 'cancel',
+        },
+        {
+          text: 'Livrer',
+          onPress: () => commandeLivree(), // Appelle la fonction logout si l'utilisateur confirme
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+  
+  const commandeLivree = async () => {
+    
+    const order_number = order.order_number ;
+    console.log('------------------------------------');
+    console.log(' trying livred...', order_number);
+    console.log('------------------------------------');
+  
+    try {
+      const response = await fetch(`${BASE_URL}/api/driver/commandeLivree`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ order_number }),
+      });
+  
+      const l = await response.json();
+  
+      if (response.ok) {
+        console.log('------------------------------------');
+        console.log('livred successful');
+        console.log('------------------------------------');
+const deviceId = Device.osBuildId;
+        const socket = io(BASE_URLIO, {
+          query: { deviceId },
+        });
+        animateOut();
+        socket.emit('driverConnected', deviceId);
+  
+     
+      } else {
+        Alert.alert('Confirmation échouée', data.errors ? data.errors.join(', ') : data.message);
+      }
+    } catch (error) {
+      Alert.alert('Erreur', 'Une erreur est survenue pendant la déconnexion.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+
+
 
   const toggleExpand = (index) => {
     setExpanded(expanded === index ? null : index);
@@ -57,7 +123,6 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
             <Ionicons name="close-circle" size={37} color="#ff5c5c" />
           </TouchableOpacity>
 
-          <ScrollView>
             {/* Infos sur la commande */}
             <View style={styles.orderInfo}>
               <Text style={styles.label}><MaterialIcons name="receipt" size={16} color="#ffbf00" /> Commande #{order.order_number ?? 'N/A'}</Text>
@@ -72,6 +137,8 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
 
             {/* Produits */}
             <Text style={styles.sectionHeader}>Produits :</Text>
+            <ScrollView>
+
             <View style={styles.productsContainer}>
               {displayedProducts.map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => toggleExpand(index)} style={styles.productContainer}>
@@ -113,10 +180,14 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
 
 
             {/* Prix Total */}
-            <View style={styles.totalContainer}>
+            
+          </ScrollView>
+          <View style={styles.totalContainer}>
               <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
             </View>
-          </ScrollView>
+          <TouchableOpacity style={styles.affectButton} onPress={() => confirmLivraison()} >
+                <Text style={styles.affectButtonText}>Commande Livrée</Text>
+              </TouchableOpacity>
         </Animated.View>
       </View>
     </Modal>
@@ -132,6 +203,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: '90%',
+    maxHeight: '98%',
     backgroundColor: '#1f1f1f',
     borderRadius: 20,
     padding: 20,
@@ -226,7 +298,7 @@ const styles = StyleSheet.create({
   affectButton: {
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#ff5c5c',
+    backgroundColor: '#248b2a',
     borderRadius: 10,
     alignItems: 'center',
   },

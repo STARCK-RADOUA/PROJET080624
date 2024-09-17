@@ -18,12 +18,8 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We need your location to provide real-time tracking.",
         "NSLocationAlwaysUsageDescription": "We need your location to provide continuous tracking even when the app is in the background.",
-        "UIBackgroundModes": [
-          "fetch",
-          "remote-notification",
-          "location"
-        ],
-        "NSUserTrackingUsageDescription": "This identifier will be used to send you notifications for important updates."
+        "UIBackgroundModes": ["location", "fetch", "remote-notification"],
+
       },
       "runtimeVersion": "1.0.0"
     },

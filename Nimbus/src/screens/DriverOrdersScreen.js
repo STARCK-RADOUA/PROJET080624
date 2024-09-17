@@ -57,12 +57,33 @@ const DriverOrdersScreen = ({ navigation }) => {
   }, [driverId]);
 
 
+  const confirmLogout = () => {
+    // Affiche une alerte de confirmation avant la déconnexion
+    Alert.alert(
+      'Confirmation',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      [
+        {
+          text: 'Annuler',
+          onPress: () => console.log('Déconnexion annulée'),
+          style: 'cancel',
+        },
+        {
+          text: 'Déconnecter',
+          onPress: () => logout(), // Appelle la fonction logout si l'utilisateur confirme
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+  
   const logout = async () => {
     const deviceId = Device.osBuildId;
     console.log('------------------------------------');
     console.log('Logging out...', deviceId);
     console.log('------------------------------------');
-
+  
     try {
       const response = await fetch(`${BASE_URL}/api/clients/logout`, {
         method: 'POST',
@@ -71,26 +92,24 @@ const DriverOrdersScreen = ({ navigation }) => {
         },
         body: JSON.stringify({ deviceId }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
-        if (socket.connected) {
-          socket.disconnect();
-        }
+        console.log('------------------------------------');
+        console.log('Logout successful');
+        console.log('------------------------------------');
         navigation.replace('Login');
       } else {
-        Alert.alert('Logout Failed', data.errors ? data.errors.join(', ') : data.message);
+        Alert.alert('Déconnexion échouée', data.errors ? data.errors.join(', ') : data.message);
       }
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong during logout.');
+      Alert.alert('Erreur', 'Une erreur est survenue pendant la déconnexion.');
     } finally {
       setLoading(false);
     }
   };
-
-
-
+  
 
 
 
@@ -170,7 +189,7 @@ const DriverOrdersScreen = ({ navigation }) => {
          
         </View>
         <View style={styles.footer }>
-          <TouchableOpacity style={styles.navigateButtonSupportChat} onPress={() => logout()}>
+          <TouchableOpacity style={styles.navigateButtonSupportChat} onPress={() => confirmLogout()}>
                           <Ionicons name="log-out-outline" size={24} color="white" />
                           <Text style={styles.navigateText}>Quiter   </Text>
                           <Ionicons name="log-out-outline" size={24} color="white" />
