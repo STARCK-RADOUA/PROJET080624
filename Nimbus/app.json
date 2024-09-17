@@ -24,9 +24,7 @@
         ],
         "NSUserTrackingUsageDescription": "This identifier will be used to send you notifications for important updates."
       },
-      "runtimeVersion": {
-        "policy": "appVersion"
-      }
+      "runtimeVersion": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
