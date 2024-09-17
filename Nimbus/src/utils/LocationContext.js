@@ -1,32 +1,14 @@
 import React, { createContext, useState, useEffect } from 'react';
 import * as Location from 'expo-location';
-import * as TaskManager from 'expo-task-manager';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
-import { Platform } from 'react-native';
-
+import Platform from 'react-native/Libraries/Utilities/Platform';
 export const LocationContext = createContext();
 
 export const LocationProvider = ({ children }) => {
   const [isTracking, setIsTracking] = useState(false);
   const [locationSubscription, setLocationSubscription] = useState(null);
   const [socket, setSocket] = useState(null);
-
-  // Define background task for location updates
-  TaskManager.defineTask('BACKGROUND_LOCATION_TASK', async ({ data, error }) => {
-    if (error) {
-      console.error('Background location task error:', error);
-      return;
-    }
-    if (data) {
-      const { locations } = data;
-      const { latitude, longitude } = locations[0].coords;
-      console.log(`Background Latitude: ${latitude}, Longitude: ${longitude}`);
-      if (socket) {
-        socket.emit('driverLocationUpdate', { deviceId: 'your-device-id', latitude, longitude });
-      }
-    }
-  });
 
   // Function to start tracking location
   const startTracking = async (deviceId) => {
@@ -36,6 +18,7 @@ export const LocationProvider = ({ children }) => {
       return;
     }
 
+    // Request background location permission if necessary
     if (Platform.OS === 'android') {
       const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
       if (backgroundStatus !== 'granted') {
@@ -48,29 +31,19 @@ export const LocationProvider = ({ children }) => {
     const newSocket = io(BASE_URLIO);
     setSocket(newSocket);
 
-    // Start foreground location tracking
+    // Start location tracking
     const subscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 5000,
-        distanceInterval: 5,
+        timeInterval: 5000, // Update every 5 seconds
+        distanceInterval: 5, // Update every 5 meters
       },
       (location) => {
         const { latitude, longitude } = location.coords;
-        console.log(`Foreground Latitude: ${latitude}, Longitude: ${longitude}`);
+        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
         newSocket.emit('driverLocationUpdate', { deviceId, latitude, longitude });
-      },
-      (error) => {
-        console.error('Foreground location error:', error);
       }
     );
-
-    // Start background location tracking
-    await Location.startLocationUpdatesAsync('BACKGROUND_LOCATION_TASK', {
-      accuracy: Location.Accuracy.High,
-      timeInterval: 5000,
-      distanceInterval: 5,
-    });
 
     setIsTracking(true);
     setLocationSubscription(subscription);

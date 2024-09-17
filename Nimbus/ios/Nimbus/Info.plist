@@ -2,47 +2,26 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
-    <!-- This disables minimum frame duration on iPhone for smoother animations. -->
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
-    
-    <!-- Language and regional settings. -->
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
-    
-    <!-- App name displayed on the home screen. -->
     <key>CFBundleDisplayName</key>
     <string>Nimbus</string>
-    
-    <!-- Executable name for the app. -->
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
-    
-    <!-- Unique identifier for the app. -->
     <key>CFBundleIdentifier</key>
     <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-    
-    <!-- Version of the Info.plist format. -->
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
-    
-    <!-- Name of the app. -->
     <key>CFBundleName</key>
     <string>$(PRODUCT_NAME)</string>
-    
-    <!-- Bundle type identifier. -->
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
-    
-    <!-- Short version of the app. -->
     <key>CFBundleShortVersionString</key>
     <string>1.0.0</string>
-    
-    <!-- Optional: Leave as is unless you have a specific signature. -->
     <key>CFBundleSignature</key>
     <string>????</string>
-    
-    <!-- URL schemes for deep linking. -->
     <key>CFBundleURLTypes</key>
     <array>
       <dict>
@@ -58,16 +37,10 @@
         </array>
       </dict>
     </array>
-    
-    <!-- Build version number. -->
     <key>CFBundleVersion</key>
     <string>1</string>
-    
-    <!-- Indicates the app requires iOS. -->
     <key>LSRequiresIPhoneOS</key>
     <true/>
-    
-    <!-- App Transport Security settings for network communication. -->
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
@@ -75,46 +48,30 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
-    
-    <!-- Location usage descriptions. -->
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location for tracking purposes.</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>We need your location to provide continuous tracking even when the app is in the background.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>We need your location to provide real-time tracking.</string>
-    
-    <!-- User tracking usage description for notifications. -->
     <key>NSUserTrackingUsageDescription</key>
     <string>This identifier will be used to send you notifications for important updates.</string>
-    
-    <!-- Background modes for the app. -->
     <key>UIBackgroundModes</key>
     <array>
       <string>fetch</string>
       <string>remote-notification</string>
       <string>location</string>
     </array>
-    
-    <!-- Name of the launch storyboard. -->
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
-    
-    <!-- Required device capabilities. -->
     <key>UIRequiredDeviceCapabilities</key>
     <array>
       <string>arm64</string>
     </array>
-    
-    <!-- Fullscreen requirement for the app. -->
     <key>UIRequiresFullScreen</key>
     <false/>
-    
-    <!-- Status bar style. -->
     <key>UIStatusBarStyle</key>
     <string>UIStatusBarStyleDefault</string>
-    
-    <!-- Supported interface orientations. -->
     <key>UISupportedInterfaceOrientations</key>
     <array>
       <string>UIInterfaceOrientationPortrait</string>
@@ -127,12 +84,8 @@
       <string>UIInterfaceOrientationLandscapeLeft</string>
       <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
-    
-    <!-- User interface style (Light or Dark mode). -->
     <key>UIUserInterfaceStyle</key>
     <string>Light</string>
-    
-    <!-- Status bar appearance configuration. -->
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
   </dict>
