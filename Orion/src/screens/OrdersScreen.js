@@ -7,6 +7,7 @@ import DeliveredOrdersScreen from './DeliveredOrdersScreen';
 import CanceledOrderScreen from './CanceledOrderScreen';
 import OngoingOrdersScreen from './PendingOrdersScreen';
 import InProgreesgOrdersScreen from './InProgressOrderScreen';
+import TestOrdersScreen from './TestOrdersScreen'; // Import the new screen
 
 const OrdersScreen = ({ navigation }) => {
   return (
@@ -48,6 +49,15 @@ const OrdersScreen = ({ navigation }) => {
           <Text style={styles.cardDescription}>Voir l'historique des commandes non livrées</Text>
         </View>
       </TouchableOpacity>
+
+      {/* New section for Commandes de test */}
+      <TouchableOpacity style={[styles.card, styles.purpleCard]} onPress={() => navigation.navigate('TestOrders')}>
+        <Ionicons name="flask-outline" size={32} color="white" style={styles.cardIcon} />
+        <View style={styles.cardTextContainer}>
+          <Text style={styles.cardTitle}>Commandes de test</Text>
+          <Text style={styles.cardDescription}>Voir et gérer les commandes de test</Text>
+        </View>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -81,6 +91,11 @@ const App = () => {
         <Stack.Screen 
           name="InProgressOrders" 
           component={InProgreesgOrdersScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="TestOrders" 
+          component={TestOrdersScreen} // New screen for Commandes de test
           options={{ headerShown: false }} 
         />
       </Stack.Navigator>
@@ -127,6 +142,9 @@ const styles = StyleSheet.create({
   },
   redCard: {
     backgroundColor: '#F44336',
+  },
+  purpleCard: {
+    backgroundColor: '#9C27B0', // Purple color for "Commandes de test"
   },
   cardIcon: {
     marginRight: 20,

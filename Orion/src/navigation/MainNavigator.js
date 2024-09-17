@@ -18,6 +18,7 @@ import OrderChatHistoriqueScreen from '../screens/OrderChatHistoriqueScreen';
 import WarnScreen from '../screens/WarnScreen';
 import SideMenu from '../components/SideMenu';
 import DriverChatScreenComponent from '../screens/DriverChatScreen';
+import RevenueScreen from '../screens/RevenueScreen';
 
 const MainNavigator = ({ onLogin }) => {
   const [currentTab, setCurrentTab] = useState("Accueil");
@@ -95,6 +96,8 @@ const MainNavigator = ({ onLogin }) => {
         return <DriverRevenueScreen />;
       case 'invité':
         return <WarnScreen />;
+      case "Chiffre d'affaire": // Using double quotes
+        return < RevenueScreen/>;
       default:
         return <HomeScreen />;
     }
