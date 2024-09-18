@@ -21,6 +21,10 @@ const UserProfileScreen = ({ navigation }) => {
   const [isPasswordModalVisible, setPasswordModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [editedFirstName, setEditedFirstName] = useState('');
+  const [editedLastName, setEditedLastName] = useState('');
+  const [isNameModalVisible, setNameModalVisible] = useState(false);
+
   // Password modal inputs
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -29,6 +33,28 @@ const UserProfileScreen = ({ navigation }) => {
   const [isCurrentPasswordValid, setIsCurrentPasswordValid] = useState(false); 
   const [showValidateSection, setShowValidateSection] = useState(true);
 
+  const handleNameChange = async () => {
+    const id = await getClient(); 
+  
+    setLoading(true);
+    console.log("dgdg",id)
+    try {
+      await axios.post(`${BASE_URL}/api/users/change-name`, {
+        id,
+        firstName: editedFirstName,
+        lastName: editedLastName,
+      });
+      setFirstName(editedFirstName);
+      setLastName(editedLastName);
+      Alert.alert('Success', 'Name changed successfully!');
+      setNameModalVisible(false);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to change name.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   useEffect(() => {
     const fetchUserData = async () => {
       const user = await getUserDetails();
@@ -143,6 +169,12 @@ console.log('------------------------------------');
 
        
           <Text style={styles.userName}>{`${firstName} ${lastName}`}</Text>
+          <TouchableOpacity 
+  style={styles.iconButton} 
+  onPress={() => setNameModalVisible(true)}>
+  <MaterialIcons name="edit" size={24} color="#e9ab25" />
+</TouchableOpacity>
+
           </View>
 
 <View style={styles.row}>
@@ -218,6 +250,8 @@ console.log('------------------------------------');
               </View>
             )}
 
+
+
             <TextInput
               placeholder="New Password"
               value={newPassword}
@@ -264,6 +298,42 @@ console.log('------------------------------------');
           </View>
         </View>
       </Modal>
+
+
+      {/* Modal for Changing Name */}
+<Modal visible={isNameModalVisible} transparent animationType="slide">
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>Change Name</Text>
+      <TextInput
+        placeholder="First Name"
+        value={editedFirstName}
+        onChangeText={setEditedFirstName}
+        style={styles.modalInput}
+      />
+      <TextInput
+        placeholder="Last Name"
+        value={editedLastName}
+        onChangeText={setEditedLastName}
+        style={styles.modalInput}
+      />
+      <TouchableOpacity
+        style={styles.modalButton}
+        onPress={handleNameChange}
+        disabled={loading}
+      >
+        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalButtonText}>OK</Text>}
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.modalCloseButton}
+        onPress={() => setNameModalVisible(false)}
+      >
+        <Text style={styles.modalCloseText}>Cancel</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
     </View>
   );
 };
