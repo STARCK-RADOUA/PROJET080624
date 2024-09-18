@@ -86,7 +86,6 @@ const deviceId = Device.osBuildId;
         const socket = io(BASE_URLIO, {
           query: { deviceId },
         });
-        animateOut();
         socket.emit('driverConnected', deviceId);
   
      
@@ -95,8 +94,9 @@ const deviceId = Device.osBuildId;
       }
     } catch (error) {
       Alert.alert('Erreur', 'Une erreur est survenue pendant la déconnexion.');
-    } finally {
-      setLoading(false);
+    } finally {  
+            animateOut();
+
     }
   };
   

@@ -208,6 +208,9 @@ const DriverOrdersScreen = ({ navigation }) => {
           <Text style={styles.disabledText}>Please enable availability to view orders.</Text>
           <TouchableOpacity style={styles.navigateButton} onPress={() => navigate('SupportChat')}>
             <Text style={styles.navigateButtonText}>Go to CHAT</Text>
+          </TouchableOpacity> 
+           <TouchableOpacity style={styles.navigateButton} onPress={() => navigate('call')}>
+            <Text style={styles.navigateButtonText}>Call</Text>
           </TouchableOpacity>
         </View>
       )}
