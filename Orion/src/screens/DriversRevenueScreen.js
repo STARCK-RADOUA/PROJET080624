@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Button, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import io from 'socket.io-client';
+import DriverCard from './../components/DriverRevenuCard';
+import DriverRevenueModal from './../components/DriverRevenueModal'; // Import the modal
 import { BASE_URLIO } from '@env';
-import { Calendar } from 'react-native-calendars'; // Asksuming you use react-native-calendars
 
-const socket = io(BASE_URLIO);
-
-export default function DriverRevenue() {
+export default function DriversRevenueScreen() {
   const [drivers, setDrivers] = useState([]);
-  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [filteredDrivers, setFilteredDrivers] = useState([]);
+  const [searchText, setSearchText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [driverData, setDriverData] = useState(null);
+  const [selectedDriver, setSelectedDriver] = useState(null);
 
   useEffect(() => {
-    socket.emit('watchDrivers');
-    socket.on('driversUpdated', ({ drivers }) => {
-        console.log('fucking' , drivers)
-      setDrivers(drivers);
+    const socket = io(BASE_URLIO);
+    socket.emit('getDriverStats');
+    socket.on('driverStats', (data) => {
+      console.log(data)
+      setDrivers(data);
+      setFilteredDrivers(data);
     });
 
     return () => {
@@ -26,84 +26,64 @@ export default function DriverRevenue() {
     };
   }, []);
 
-  const fetchDriverData = async (userId) => {
-    try {
-      socket.emit('getDriverRevenue', userId, startDate, endDate);
-      socket.on('driverData', (data) => {
-        console.log('Received driverData:', data);  // Add this line
-        setDriverData(data);
-      });
-    } catch (error) {
-      console.error('Error fetching driver data:', error);
-    }
+  const handleSearch = (query) => {
+    setSearchText(query);
+    const filtered = drivers.filter(driver =>
+      driver.firstName.toLowerCase().includes(query.toLowerCase()) ||
+      driver.lastName.toLowerCase().includes(query.toLowerCase()) ||
+      driver.driverId.toString().includes(query) ||
+      driver.userId.toString().includes(query)
+    );
+    setFilteredDrivers(filtered);
   };
 
-  const handleCardPress = (driver) => {
+  const openModal = (driver) => {
     setSelectedDriver(driver);
     setModalVisible(true);
   };
 
-  const handleFetchData = () => {
-    if (startDate && endDate) { 
-      fetchDriverData(selectedDriver._id);
-    } else {
-      alert('Please select both start and end dates.');
-    }
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedDriver(null);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Driver Revenue</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Liste des livreurs</Text>
+
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Rechercher par nom, téléphone, ID..."
+          placeholderTextColor="#9ca3af"
+          value={searchText}
+          onChangeText={handleSearch}
+        />
+      </View>
+
       <ScrollView contentContainerStyle={styles.cardContainer}>
-        {drivers.map(driver => (
-          <TouchableOpacity key={driver._id} style={styles.driverCard} onPress={() => handleCardPress(driver)}>
-            <Text style={styles.driverName}>{driver.firstName} {driver.lastName}</Text>
-            <Text>Total Revenue: {driver.totalRevenue}</Text>
-            <Text>Total Orders: {driver.totalOrders}</Text>
-          </TouchableOpacity>
-        ))}
+        {filteredDrivers.length > 0 ? (
+          filteredDrivers.map(driver => (
+            <DriverCard
+              key={driver.driverId}
+              driver={driver}
+              onPress={() => openModal(driver)}
+            />
+          ))
+        ) : (
+          <Text>Aucun livreur disponible</Text>
+        )}
       </ScrollView>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Driver Details</Text>
-            {selectedDriver && (
-              <>
-                <Text>Name: {selectedDriver.firstName} {selectedDriver.lastName}</Text>
-                <Text>Total Revenue All Time: {driverData?.driver.totalRevenue}</Text>
-                <Text>Total Orders All Time: {driverData?.driver.totalOrders}</Text>
-
-                <Calendar
-                  onDayPress={(day) => {
-                    if (!startDate) {
-                      setStartDate(day.dateString);
-                    } else {
-                      setEndDate(day.dateString);
-                    }
-                  }}
-                />
-
-                <Button title="Fetch Data" onPress={handleFetchData} />
-
-                {driverData && (
-                  <>
-                    <Text>Revenue Between Dates: {driverData.revenueBetweenDates}</Text>
-                    <Text>Orders Between Dates: {driverData.ordersBetweenDates}</Text>
-                  </>
-                )}
-              </>
-            )}
-            <Button title="Close" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
-    </View>
+      {/* Render the modal */}
+      {selectedDriver && (
+        <DriverRevenueModal
+          visible={modalVisible}
+          onClose={closeModal}
+          driver={selectedDriver}
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
@@ -121,44 +101,26 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'left',
   },
+  searchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  searchInput: {
+    flex: 1,
+    height: 50,
+    paddingLeft: 40,
+    borderColor: '#d1d5db',
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: '#f9fafb',
+    color: '#111827',
+    marginRight: 10,
+  },
   cardContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  driverCard: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 10,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  driverName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
   },
 });
