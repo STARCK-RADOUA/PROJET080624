@@ -38,7 +38,6 @@ const DriverOrdersScreen = ({ navigation }) => {
   }, [deviceId]);
 
   useEffect(() => {
-    if (driverId) {
       const socket = io(BASE_URLIO, {
         query: { deviceId },
       });
@@ -47,14 +46,17 @@ const DriverOrdersScreen = ({ navigation }) => {
 
       socket.on('connect', () => startTracking(deviceId));
       socket.on('orderInprogressUpdatedForDriver', (data) => {
+        console.log('------------------------------------');
+        console.log(data);
+        console.log('------------------------------------');
         setOrders(data.orders || []);
         setLoading(false);
         setIsEnabled(data.active);
       });
 
-      return () => socket.disconnect();
-    }
-  }, [driverId]);
+   
+    
+  }, [deviceId]);
 
 
   const confirmLogout = () => {
@@ -209,9 +211,7 @@ const DriverOrdersScreen = ({ navigation }) => {
           <TouchableOpacity style={styles.navigateButton} onPress={() => navigate('SupportChat')}>
             <Text style={styles.navigateButtonText}>Go to CHAT</Text>
           </TouchableOpacity> 
-           <TouchableOpacity style={styles.navigateButton} onPress={() => navigate('call')}>
-            <Text style={styles.navigateButtonText}>Call</Text>
-          </TouchableOpacity>
+         
         </View>
       )}
 

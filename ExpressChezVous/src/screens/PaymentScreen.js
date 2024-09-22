@@ -26,7 +26,26 @@ const PaymentScreen = ({ navigation, route }) => {
       }
     };
   }, []);
-
+  const confirmLogout = () => {
+    // Affiche une alerte de confirmation avant la déconnexion
+    Alert.alert(
+      'Confirmation',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      [
+        {
+          text: 'Annuler',
+          onPress: () => console.log('Déconnexion annulée'),
+          style: 'cancel',
+        },
+        {
+          text: 'Comander',
+          onPress: () => handlePayment(), // Appelle la fonction logout si l'utilisateur confirme
+          style: 'active',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
   const handlePayment = async () => {
     if (!selectedPayment) {
       return;
@@ -106,7 +125,7 @@ const PaymentScreen = ({ navigation, route }) => {
       <TouchableOpacity
         style={[styles.okButton, !selectedPayment && styles.disabledButton]}
         disabled={!selectedPayment}
-        onPress={handlePayment}
+        onPress={confirmLogout}
       >
         <Text style={styles.okText}>{loading ? 'Processing...' : 'Confirm Payment'}</Text>
       </TouchableOpacity>

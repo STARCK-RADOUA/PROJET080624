@@ -117,7 +117,7 @@ const PaymentSuccessScreen = ({ route }) => {
           await updateOrderItems(orders);
         }
         
-        navigation.replace('feedback', { orderId });
+        navigation.navigate('feedback', { orderId });
         await clearAllData(); // Clear all data once delivered
       }
 
