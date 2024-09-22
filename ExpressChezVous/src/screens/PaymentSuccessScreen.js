@@ -73,6 +73,7 @@ const PaymentSuccessScreen = ({ route }) => {
       if (savedOrderStatus) {
         const parsedStatus = JSON.parse(savedOrderStatus);
         console.log('Retrieved state:', parsedStatus);
+
         const { orderId, orderStatus, orders, nezPoint } = parsedStatus;
         if (orderId && (orderStatus === 'in_progress' || orderStatus === 'pending')) {
           setOrderID(orderId);
@@ -109,7 +110,6 @@ const PaymentSuccessScreen = ({ route }) => {
       // Save current state
 
       if (status === 'delivered') {
-        setIsChatDisabled(true);
         setRedirectMessage('Votre commande a été livrée. Chat pendant 2 minutes.');
         setShowExitButton(true);
         if ((nezPoint || nezPoint === 0) && orders.length > 0) {
@@ -118,13 +118,15 @@ const PaymentSuccessScreen = ({ route }) => {
         }
         
         navigation.navigate('feedback', { orderId });
-        await clearAllData(); // Clear all data once delivered
       }
 
       if (status === 'cancelled') {
-        Alert.alert('Order cancelled', 'Order has been cancelled.');
-        navigation.replace('Services');
-        await clearAllData(); // Clear all data once cancelled
+        setIsChatDisabled(true);
+        setRedirectMessage('Order cancelled', 'Order has been cancelled.');
+        setShowExitButton(true);
+    // Clear all data once cancelled  
+             await clearAllData(); // Clear all data once cancelled  
+             navigation.navigate('Services', );
       }
 
       if (status === 'in_progress') {
@@ -222,7 +224,8 @@ const PaymentSuccessScreen = ({ route }) => {
     outputRange: [-Dimensions.get('window').width, Dimensions.get('window').width],
   });
 
-  const handleExitPress = () => {
+  const handleExitPress = async() => {
+    await clearAllData(); // Clear all data once cancelled  
     navigation.replace('feedback', { orderId });
   };
 

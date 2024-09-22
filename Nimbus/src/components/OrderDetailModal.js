@@ -58,6 +58,26 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
       ],
       { cancelable: true }
     );
+  }; 
+   const cancelLivraison = () => {
+    // Affiche une alerte de confirmation avant la déconnexion
+    Alert.alert(
+      'Confirmation',
+      'Êtes-vous sûr de vouloir vous comfirmer la livraison de cette commande ?',
+      [
+        {
+          text: 'Annuler',
+          onPress: () => console.log('livraison annulée'),
+          style: 'cancel',
+        },
+        {
+          text: 'annuler la commande',
+          onPress: () => commandeCancled(), // Appelle la fonction logout si l'utilisateur confirme
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
   };
   
   const commandeLivree = async () => {
@@ -81,6 +101,46 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
       if (response.ok) {
         console.log('------------------------------------');
         console.log('livred successful');
+        console.log('------------------------------------');
+const deviceId = Device.osBuildId;
+        const socket = io(BASE_URLIO, {
+          query: { deviceId },
+        });
+        socket.emit('driverConnected', deviceId);
+  
+     
+      } else {
+        Alert.alert('Confirmation échouée', data.errors ? data.errors.join(', ') : data.message);
+      }
+    } catch (error) {
+      Alert.alert('Erreur', 'Une erreur est survenue pendant la déconnexion.');
+    } finally {  
+            animateOut();
+
+    }
+  };
+  
+  const commandeCancled = async () => {
+    
+    const order_number = order.order_number ;
+    console.log('------------------------------------');
+    console.log(' trying livred...', order_number);
+    console.log('------------------------------------');
+  
+    try {
+      const response = await fetch(`${BASE_URL}/api/driver/commandeCanceled`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ order_number }),
+      });
+  
+      const l = await response.json();
+  
+      if (response.ok) {
+        console.log('------------------------------------');
+        console.log('comande canceled successful');
         console.log('------------------------------------');
 const deviceId = Device.osBuildId;
         const socket = io(BASE_URLIO, {
@@ -185,9 +245,16 @@ const deviceId = Device.osBuildId;
           <View style={styles.totalContainer}>
               <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
             </View>
+            <View style={styles.totalContainer11}>
+
           <TouchableOpacity style={styles.affectButton} onPress={() => confirmLivraison()} >
                 <Text style={styles.affectButtonText}>Commande Livrée</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.affectButton33} onPress={() => cancelLivraison()} >
+                <Text style={styles.affectButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              </View>
+
         </Animated.View>
       </View>
     </Modal>
@@ -301,6 +368,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#248b2a',
     borderRadius: 10,
     alignItems: 'center',
+  },  affectButton33: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#ac3838',
+    borderRadius: 10,
+    alignItems: 'center',
   },
   affectButtonText: {
     color: '#fff',
@@ -313,6 +386,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
     borderRadius: 10,
     alignItems: 'center',
+  }, 
+   totalContainer11: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+
+    justifyContent: 'space-between',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.9,
+    shadowRadius: 5,
+    elevation: 5,
+    flexDirection: 'row',
   },
   totalText: {
     fontSize: 18,
