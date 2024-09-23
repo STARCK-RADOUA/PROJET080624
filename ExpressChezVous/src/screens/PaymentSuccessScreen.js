@@ -9,6 +9,7 @@ import { DataContext } from '../navigation/DataContext';
 import { BASE_URLIO } from '@env'; 
 import { updateOrderItems, updateUserPoints } from '../services/orderService';
 import styles from './styles/paymentSuccessStyles';
+import { Platform } from 'react-native';
 
 const socket = io(BASE_URLIO);
 
@@ -45,6 +46,21 @@ const PaymentSuccessScreen = ({ route }) => {
     }
   };
 
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      const backAction = () => {
+        if (orderStatus === 'pending' || orderStatus === 'in_progress') {
+          Alert.alert('Attendez !', 'Vous ne pouvez pas quitter tant que la commande n\'est pas livrée.');
+          return true;
+        }
+        return false;
+      };
+  
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+      return () => backHandler.remove();
+    }
+  }, [orderStatus]);
+  
   // Clear data from AsyncStorage except for `orderId`
   const clearDataExceptOrderId = async (orderId) => {
     try {
@@ -283,7 +299,7 @@ const PaymentSuccessScreen = ({ route }) => {
       )}
 
       <View style={styles.bottomFixed}>
-        {orderStatus !== 'pending' && (
+        {orderStatus == 'in_progress' && (
           <>
             <Text style={styles.deliveryText}>ATTENTION ! LA COMMANDE EST SUR LE POINT D’ARRIVER.</Text>
 

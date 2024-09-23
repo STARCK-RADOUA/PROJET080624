@@ -200,6 +200,8 @@ console.log('------------------------------------');
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Change Phone Number</Text>
+            <Text style={styles.modalTitle2}>Numerro de telephone</Text>
+
             <TextInput
              
                 keyboardType="phone-pad"
@@ -232,7 +234,11 @@ console.log('------------------------------------');
             <Text style={styles.modalTitle}>Change Password</Text>
 
             {showValidateSection && (
+              <View >
+              <Text style={styles.modalTitle2}>Votre Mot de pass </Text>
+
               <View style={styles.row}>
+
                 <TextInput
                   placeholder="Current Password"
                   value={currentPassword}
@@ -248,8 +254,10 @@ console.log('------------------------------------');
                   {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.validateButtonText}>Validate</Text>}
                 </TouchableOpacity>
               </View>
+              </View>
             )}
 
+            <Text style={styles.modalTitle2}>New mot de pass</Text>
 
 
             <TextInput
@@ -263,6 +271,8 @@ console.log('------------------------------------');
               style={styles.modalInput}
               editable={isCurrentPasswordValid}
             />
+                  <Text style={styles.modalTitle2}>Confirmee le mot de pass</Text>
+
             <TextInput
               placeholder="Confirm New Password"
               value={confirmNewPassword}
@@ -276,10 +286,10 @@ console.log('------------------------------------');
             />
 
             {!isPasswordMatch && confirmNewPassword.length > 0 && (
-              <Text style={styles.errorText}>Passwords do not match</Text>
+              <Text style={styles.errorText}>Mot de pass incorect</Text>
             )}
             {isPasswordMatch && confirmNewPassword.length > 0 && (
-              <Text style={styles.successText}>Passwords match</Text>
+              <Text style={styles.successText}>Mot de pass incorect</Text>
             )}
 
             <TouchableOpacity
@@ -305,12 +315,16 @@ console.log('------------------------------------');
   <View style={styles.modalOverlay}>
     <View style={styles.modalContainer}>
       <Text style={styles.modalTitle}>Change Name</Text>
+      <Text style={styles.modalTitle2}>Prenom</Text>
+
       <TextInput
         placeholder="First Name"
         value={editedFirstName}
         onChangeText={setEditedFirstName}
         style={styles.modalInput}
       />
+            <Text style={styles.modalTitle2}>Nom</Text>
+
       <TextInput
         placeholder="Last Name"
         value={editedLastName}
@@ -322,6 +336,7 @@ console.log('------------------------------------');
         onPress={handleNameChange}
         disabled={loading}
       >
+
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalButtonText}>OK</Text>}
       </TouchableOpacity>
       <TouchableOpacity
@@ -456,8 +471,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
+   modalTitle2: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    alignContent: "flex-start"
+  },
   modalInput: {
     width: '100%',
+    color: '#161313',
     height: 40,
     backgroundColor: '#F0F0F0',
     borderRadius: 20,

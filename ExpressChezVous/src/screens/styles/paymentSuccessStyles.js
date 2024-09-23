@@ -39,6 +39,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     bottom: 9,
+  },  exitButton: {
+   
+    alignItems: 'center',
+    backgroundColor: '#26a115a7',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.9,
+    shadowRadius: 5,
+    elevation: 5,
+    marginTop: 20,
+    padding: 30,
+    borderRadius: "30%",
+    justifyContent: 'center',
   },
   deliveryText: {
     fontSize: 16,
