@@ -6,15 +6,37 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { io } from 'socket.io-client';
 import moment from 'moment';
 import OngoingOrderModal from '../components/OngoingOrderModal';
+import { format } from 'date-fns';
 
 const OngoingOrdersScreen = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [filterDate, setFilterDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(true); // Loading state
+
+   // Date filter states
+   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+   const [startDate, setStartDate] = useState(new Date());
+   const [endDate, setEndDate] = useState(new Date());
+   const [showFilterMenu, setShowFilterMenu] = useState(false);
+
+   // Filter chats by date range
+   const applyFilters = () => {
+    const filteredOrders = orders.filter((commande) => {
+      const chatDate = new Date(commande.created_at); // Filtering by chatCreatedAt
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+      return chatDate >= new Date(formattedStartDate) && chatDate <= new Date(formattedEndDate);
+    });
+    setFilteredOrders(filteredOrders);
+    setShowFilterMenu(false);
+  };
+
+  const toggleFilterMenu = () => {
+    setShowFilterMenu(!showFilterMenu);
+  };
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
@@ -37,12 +59,6 @@ const OngoingOrdersScreen = () => {
     };
   }, []);
 
-  const filterOrdersByDate = (selectedDate) => {
-    const filtered = orders.filter(order =>
-      moment(order.delivery_time).isSame(selectedDate, 'day')
-    );
-    setFilteredOrders(filtered);
-  };
 
   const filterOrdersBySearch = (query) => {
     setSearchQuery(query);
@@ -97,26 +113,51 @@ const OngoingOrdersScreen = () => {
       />
 
       <View style={styles.filterContainer}>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
+        <TouchableOpacity onPress={toggleFilterMenu} style={styles.datePicker}>
           <Ionicons name="calendar-outline" size={24} color="black" />
-          <Text style={styles.filterText}>{moment(filterDate).format('YYYY-MM-DD')}</Text>
+          <Text style={styles.filterText}>Filtrer</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.showAllButton} onPress={handleShowAll}>
           <Text style={styles.showAllText}>Afficher tout</Text>
         </TouchableOpacity>
       </View>
 
-      {showDatePicker && (
+     
+      {showFilterMenu && (
+        <View style={styles.filterMenu}>
+          <TouchableOpacity onPress={() => setShowStartDatePicker(true)} style={styles.dateButton}>
+            <Text style={styles.dateButtonText}>Start Date: {startDate.toDateString()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowEndDatePicker(true)} style={styles.dateButton}>
+            <Text style={styles.dateButtonText}>End Date: {endDate.toDateString()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={applyFilters} style={styles.applyFilterButton}>
+            <Text style={styles.applyFilterButtonText}>Apply Filters</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {showStartDatePicker && (
         <DateTimePicker
-          value={filterDate}
+          value={startDate}
           mode="date"
           display="default"
           onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              setFilterDate(selectedDate);
-              filterOrdersByDate(selectedDate);
-            }
+            const currentDate = selectedDate || startDate;
+            setShowStartDatePicker(false);
+            setStartDate(currentDate);
+          }}
+        />
+      )}
+      {showEndDatePicker && (
+        <DateTimePicker
+          value={endDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            const currentDate = selectedDate || endDate;
+            setShowEndDatePicker(false);
+            setEndDate(currentDate);
           }}
         />
       )}
@@ -175,7 +216,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2d3436',
+    color: '#f3b13e', // Slightly darker yellow for buttons
     marginBottom: 20,
   },
   searchInput: {
@@ -186,7 +227,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
     fontSize: 16,
-    backgroundColor: '#f9f2c3', // Soft yellow background
   },
   filterContainer: {
     flexDirection: 'row',
@@ -196,7 +236,10 @@ const styles = StyleSheet.create({
   datePicker: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#f3b13e', 
     flex: 1,
+    borderRadius: 10,
+    padding: 10,
   },
   filterText: {
     marginLeft: 10,
@@ -305,6 +348,44 @@ const styles = StyleSheet.create({
     backgroundColor: '#f3d8a5',
     borderRadius: 4,
     marginBottom: 10,
+  },
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e27a3f',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  filterButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+  },
+  filterMenu: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    elevation: 5,
+  },
+  dateButton: {
+    backgroundColor: '#f3b13e',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 5,
+  },
+  dateButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+  applyFilterButton: {
+    backgroundColor: '#D8A25E',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  applyFilterButtonText: {
+    color: '#fff',
+    textAlign: 'center',
   },
 });
 

@@ -6,6 +6,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { io } from 'socket.io-client';
 import moment from 'moment';
 import TestOrderModal from '../components/TestOrderModal';
+import { format } from 'date-fns';
+
 
 const TestOrdersScreen = () => {
   const [commandes, setCommandes] = useState([]);
@@ -15,6 +17,30 @@ const TestOrdersScreen = () => {
   const [recherche, setRecherche] = useState('');
   const [commandeSelectionnee, setCommandeSelectionnee] = useState(null);
   const [chargement, setChargement] = useState(true);
+
+   // Date filter states
+   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+   const [startDate, setStartDate] = useState(new Date());
+   const [endDate, setEndDate] = useState(new Date());
+   const [showFilterMenu, setShowFilterMenu] = useState(false);
+
+
+
+  const toggleFilterMenu = () => {
+    setShowFilterMenu(!showFilterMenu);
+  };
+  const applyFilters = () => {
+    const filteredOrders = commandes.filter((commande) => {
+      const chatDate = new Date(commande.created_at); // Filtering by chatCreatedAt
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+      return chatDate >= new Date(formattedStartDate) && chatDate <= new Date(formattedEndDate);
+    });
+    setCommandesFiltrees(filteredOrders);
+    setShowFilterMenu(false);
+  };
+
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
@@ -36,12 +62,6 @@ const TestOrdersScreen = () => {
     };
   }, []);
 
-  const filtrerCommandesParDate = (dateSelectionnee) => {
-    const filtrees = commandes.filter(commande =>
-      moment(commande.delivery_time).isSame(dateSelectionnee, 'day')
-    );
-    setCommandesFiltrees(filtrees);
-  };
 
   const filtrerCommandesParRecherche = (query) => {
     setRecherche(query);
@@ -97,26 +117,51 @@ const TestOrdersScreen = () => {
       />
 
       <View style={styles.filterContainer}>
-        <TouchableOpacity onPress={() => setAfficherDatePicker(true)} style={styles.datePicker}>
+        <TouchableOpacity onPress={toggleFilterMenu} style={styles.datePicker}>
           <Ionicons name="calendar-outline" size={24} color="white" />
-          <Text style={styles.filterText}>{moment(dateFiltre).format('YYYY-MM-DD')}</Text>
+          <Text style={styles.filterText}>Filtrer</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.showAllButton} onPress={afficherTout}>
           <Text style={styles.showAllText}>Afficher tout</Text>
         </TouchableOpacity>
       </View>
 
-      {afficherDatePicker && (
+     
+      {showFilterMenu && (
+        <View style={styles.filterMenu}>
+          <TouchableOpacity onPress={() => setShowStartDatePicker(true)} style={styles.dateButton}>
+            <Text style={styles.dateButtonText}>Start Date: {startDate.toDateString()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowEndDatePicker(true)} style={styles.dateButton}>
+            <Text style={styles.dateButtonText}>End Date: {endDate.toDateString()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={applyFilters} style={styles.applyFilterButton}>
+            <Text style={styles.applyFilterButtonText}>Apply Filters</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {showStartDatePicker && (
         <DateTimePicker
-          value={dateFiltre}
+          value={startDate}
           mode="date"
           display="default"
-          onChange={(event, dateSelectionnee) => {
-            setAfficherDatePicker(false);
-            if (dateSelectionnee) {
-              setDateFiltre(dateSelectionnee);
-              filtrerCommandesParDate(dateSelectionnee); // Filtrer les commandes selon la date sélectionnée
-            }
+          onChange={(event, selectedDate) => {
+            const currentDate = selectedDate || startDate;
+            setShowStartDatePicker(false);
+            setStartDate(currentDate);
+          }}
+        />
+      )}
+      {showEndDatePicker && (
+        <DateTimePicker
+          value={endDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            const currentDate = selectedDate || endDate;
+            setShowEndDatePicker(false);
+            setEndDate(currentDate);
           }}
         />
       )}
@@ -289,6 +334,44 @@ const styles = StyleSheet.create({
     height: 15,
     backgroundColor: '#B39DDB',
     borderRadius: 5,
+  },
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e27a3f',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  filterButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+  },
+  filterMenu: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    elevation: 5,
+  },
+  dateButton: {
+    backgroundColor: '#9C27B0',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 5,
+  },
+  dateButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+  applyFilterButton: {
+    backgroundColor: '#7B1FA2',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  applyFilterButtonText: {
+    color: '#fff',
+    textAlign: 'center',
   },
 });
 
