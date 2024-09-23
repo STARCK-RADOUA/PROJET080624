@@ -31,7 +31,8 @@ const PaymentSuccessScreen = ({ route }) => {
   const [firstpoints, setFirstPoints] = useState(sharedData?.firstPoints);
   const [orders, setOrders] = useState(sharedData?.orders);
   const navigation = useNavigation();
-
+  const [duration, setDuration] = useState(null);
+  const [distance, setDistance] = useState(null);
   // Save screen state to AsyncStorage before closing the app
   const saveStateToStorage = async (orderId, orderStatus, orders, nezPoint) => {
     try {
@@ -46,6 +47,8 @@ const PaymentSuccessScreen = ({ route }) => {
     }
   };
 
+
+ 
   useEffect(() => {
     if (Platform.OS === 'android') {
       const backAction = () => {
@@ -126,6 +129,8 @@ const PaymentSuccessScreen = ({ route }) => {
       // Save current state
 
       if (status === 'delivered') {
+        socket.emit('disconnectRoute');
+
         setRedirectMessage('Votre commande a été livrée. Chat pendant 2 minutes.');
         setShowExitButton(true);
         if ((nezPoint || nezPoint === 0) && orders.length > 0) {
@@ -137,6 +142,8 @@ const PaymentSuccessScreen = ({ route }) => {
       }
 
       if (status === 'cancelled') {
+        socket.emit('disconnectRoute');
+
         setIsChatDisabled(true);
         setRedirectMessage('Order cancelled', 'Order has been cancelled.');
         setShowExitButton(true);
@@ -154,6 +161,21 @@ const PaymentSuccessScreen = ({ route }) => {
             quantity: order.quantity
           }));
         await updateOrderItems(items);
+
+
+           // Joindre le suivi de l'itinéraire
+      socket.emit('joinRouteTracking', orderId);
+console.log('------------------------------------');
+console.log(orderId,"eeeee");
+console.log('------------------------------------');
+      // Écouter les mises à jour en temps réel
+      socket.on('routeUpdate', (data) => {
+        console.log('----------daaataaa--------------------------');
+        console.log(data);
+        console.log('------------------------------------');
+          setDuration(data.duration);
+          setDistance(data.distance);
+      });
           console.log('Items:', items);
         } else {
           console.error('Orders is not defined or not an array');
@@ -208,25 +230,29 @@ const PaymentSuccessScreen = ({ route }) => {
       };
 
       animateDeliveryImage();
-      let totalTimeRemaining = totalTimeInSeconds;
+      let totalTimeRemaining = duration;
 
       const interval = setInterval(() => {
         totalTimeRemaining -= 1;
-        const newProgress = ((totalTimeInSeconds - totalTimeRemaining) / totalTimeInSeconds) * 100;
-        setProgress(newProgress);
-
-        if (totalTimeRemaining % 60 === 0) {
-          setRemainingTime(totalTimeRemaining / 60);
+  
+        // Ensure totalTimeRemaining never becomes negative
+        if (totalTimeRemaining < 0) {
+          totalTimeRemaining = 0;
         }
-
+  
+        // Update the progress
+        const newProgress = ((duration - totalTimeRemaining) / duration) * 100;
+        setProgress(newProgress);
+  
+        // Clear interval when time runs out
         if (totalTimeRemaining <= 0) {
           clearInterval(interval);
         }
       }, 1000);
-
+  
       return () => clearInterval(interval);
     }
-  }, [orderStatus]);
+  }, [orderStatus, duration]);
 
   const openBottomSheet = () => {
     if (!isChatDisabled && bottomSheetRef.current) {
@@ -273,9 +299,23 @@ const PaymentSuccessScreen = ({ route }) => {
       </View>
 
       <View style={styles.successContainer}>
+      <View style={styles.bottomFixed2}>
+
         <Text style={styles.successText}>
-          {orderStatus === 'pending' ? 'VOTRE COMMANDE EN COURS DE TRAITEMENT' : 'Votre Comande est comfirmée'}
+          {orderStatus === 'pending' ? 'VOTRE COMMANDE EN COURS DE TRAITEMENT' : `Votre Comande est comfirmée ` }
+
         </Text>
+        <Text style={styles.redirectMessage2}> 
+  {orderStatus === 'in_progress' 
+    ? (duration !== null 
+        ? `${Math.floor(duration / 60)}m et ${((283 - (progress * 283) / 100) % 60).toFixed(0)}s` 
+        : 'Calcul en cours...') 
+    : " "}
+</Text>
+
+        </View>
+
+
         {orderStatus !== 'pending' && (
           <Image
             style={[styles.checkIcon, { width: Dimensions.get('window').width * 0.1, height: Dimensions.get('window').height * 0.05 }]}
@@ -297,35 +337,33 @@ const PaymentSuccessScreen = ({ route }) => {
           />
         </Animated.View>
       )}
-
+   
       <View style={styles.bottomFixed}>
         {orderStatus == 'in_progress' && (
           <>
-            <Text style={styles.deliveryText}>ATTENTION ! LA COMMANDE EST SUR LE POINT D’ARRIVER.</Text>
 
             <View style={styles.circularContainer}>
-              <Svg height="60" width="60" viewBox="0 0 100 100">
-                <Circle cx="50" cy="50" r="45" stroke="rgba(255, 255, 255, 0.5)" strokeWidth="5" fill="none" />
-                <Circle
-                  cx="50"
-                  cy="50"
-                  r="45"
-                  stroke="#fff"
-                  strokeWidth="5"
-                  fill="none"
-                  strokeDasharray="283"
-                  strokeDashoffset={283 - (progress * 283) / 100}
-                />
-              </Svg>
-              <Text style={styles.deliveryTime}>{`Il reste ${remainingTime} minutes`}</Text>
-            </View>
+             
+              <Text style={styles.deliveryTimetext}>{duration !== null ? `Il reste ${Math.floor(duration / 60)}m et ${((283 - (progress * 283) / 100)%60).toFixed(0) }s` : 'Calcul en cours...'}</Text>
+
+              
+               </View>
+        {2 > (Math.floor(duration / 60)) && (
+          <>
+            <Text style={styles.deliveryText}>ATTENTION ! LA COMMANDE EST SUR LE POINT D’ARRIVER.</Text>
+
+            
+          </>
+        )}
           </>
         )}
       </View>
+  
 
       {redirectMessage ? (
         <View style={styles.redirectMessageContainer}>
-          <Text style={styles.redirectMessage}>{redirectMessage}</Text>
+          <Text style={styles.redirectMessage2}>{redirectMessage}</Text>
+
         </View>
       ) : null}
 
@@ -341,6 +379,7 @@ const PaymentSuccessScreen = ({ route }) => {
         <BottomSheet ref={bottomSheetRef} orderId={orderId} clientId={clientId} driverId={driverId} >
           <View>
             <Text style={{ padding: 20, fontSize: 16 }}>Chat with us</Text>
+            
           </View>
         </BottomSheet>
       )}

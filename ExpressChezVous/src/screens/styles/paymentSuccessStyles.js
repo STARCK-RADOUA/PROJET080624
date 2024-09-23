@@ -25,7 +25,11 @@ const styles = StyleSheet.create({
   successContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
+  }, successContainer2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    
   },
   deliveryImageContainer: {
     position: 'absolute',
@@ -39,6 +43,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     bottom: 9,
+  },
+   bottomFixed2: {
+    backgroundColor: '#ffab0e4e',
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  
+
+    borderRadius: 45,
+   
+    padding: 20,
+    justifyContent: 'center',
   },  exitButton: {
    
     alignItems: 'center',
@@ -51,7 +67,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginTop: 20,
     padding: 30,
-    borderRadius: "30%",
     justifyContent: 'center',
   },
   deliveryText: {
@@ -61,9 +76,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   deliveryTime: {
-    fontSize: 14,
-    color: '#fff',
+    color: '#249715',
+    fontWeight: 'bold',
+
     marginTop: 5,
+  }, redirectMessage2: {
+    color: '#179407',
+    fontWeight: 'bold',
+    alignContent:"flex-start",
+    fontSize: 19,
+
+
+  }, successText: {
+    color: '#2c3b2a',
+    fontWeight: 'bold',
+    alignContent:"flex-start",
+    fontSize: 18,
+
+
+  },
+    deliveryTimetext: {
+    fontSize: 19,
+    color: '#249715',
+    fontWeight: 'bold',
+
+    marginTop: 5,
+    alignContent:"center"
+  },
+  circularContainer: {
+    fontSize: 19,
+    color: '#249715',
+    fontWeight: 'bold',
+
   },
 });
 
