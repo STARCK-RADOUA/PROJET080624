@@ -7,6 +7,9 @@ import io from 'socket.io-client';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import OrderRoomScreen from './OrderChatRoom';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
+
 
 const ChatScreenComponent = ({ navigation }) => {
   const [chats, setChats] = useState([]);
@@ -14,6 +17,12 @@ const ChatScreenComponent = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all'); 
   const [error, setError] = useState(null);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+
 
   useEffect(() => {
     try {
@@ -54,6 +63,21 @@ const ChatScreenComponent = ({ navigation }) => {
     }
   };
 
+  const applyFilters = () => {
+    const filteredChats = chats.filter((chat) => {
+      const chatDate = new Date(chat.chatCreatedAt); 
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      console.log(formattedStartDate)
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+      return chatDate >= new Date(formattedStartDate) && chatDate <= new Date(formattedEndDate);
+    });
+    setChats(filteredChats);
+    setShowFilterMenu(false);
+  };
+
+  const toggleFilterMenu = () => {
+    setShowFilterMenu(!showFilterMenu);
+  };
   // Simulated skeleton loading placeholders
   const renderSkeleton = () => {
     return (
@@ -113,7 +137,51 @@ const ChatScreenComponent = ({ navigation }) => {
           <Picker.Item label="En cours" value="in_progress" />
           <Picker.Item label="Livré" value="delivered" />
         </Picker>
+          {/* Filter Button */}
+          <TouchableOpacity onPress={toggleFilterMenu} style={styles.filterButton}>
+          <Ionicons name="filter-outline" size={24} color="#fff" />
+          <Text style={styles.filterButtonText}>Filter</Text>
+        </TouchableOpacity>
       </View>
+
+      {showFilterMenu && (
+        <View style={styles.filterMenu}>
+          <TouchableOpacity onPress={() => setShowStartDatePicker(true)} style={styles.dateButton}>
+            <Text style={styles.dateButtonText}>Start Date: {startDate.toDateString()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowEndDatePicker(true)} style={styles.dateButton}>
+            <Text style={styles.dateButtonText}>End Date: {endDate.toDateString()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={applyFilters} style={styles.applyFilterButton}>
+            <Text style={styles.applyFilterButtonText}>Apply Filters</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {showStartDatePicker && (
+        <DateTimePicker
+          value={startDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            const currentDate = selectedDate || startDate;
+            setShowStartDatePicker(false);
+            setStartDate(currentDate);
+          }}
+        />
+      )}
+      {showEndDatePicker && (
+        <DateTimePicker
+          value={endDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            const currentDate = selectedDate || endDate;
+            setShowEndDatePicker(false);
+            setEndDate(currentDate);
+          }}
+        />
+      )}
 
       {error && <Text style={styles.errorText}>Erreur: {error}</Text>}
 
@@ -189,14 +257,54 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginHorizontal: 15,
     marginBottom: 10,
     backgroundColor: '#f2f2f2',
     borderRadius: 20,
   },
   picker: {
-    height: 40,
+    flex: 1,
     color: '#000',
+  },
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e27a3f',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  filterButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+  },
+  filterMenu: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    elevation: 5,
+  },
+  dateButton: {
+    backgroundColor: '#1f695a',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 5,
+  },
+  dateButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+  applyFilterButton: {
+    backgroundColor: '#2e8b57',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  applyFilterButtonText: {
+    color: '#fff',
+    textAlign: 'center',
   },
   chatList: {
     paddingHorizontal: 15,
