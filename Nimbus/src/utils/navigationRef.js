@@ -16,8 +16,16 @@ export function navigate(name, params) {
         index: 0,  // Index of the route you want to display (0 for Login)
         routes: [{ name: 'Test', params }],  // New route array
       });
+    }
+    else if (name === 'RoomScreen') {
+      // Use reset to clear navigation stack and navigate to Login
+      navigationRef.current.reset({
+        index: 0,  // Index of the route you want to display (0 for Login)
+        routes: [{ name: 'RoomScreen', params }],  // New route array
+      });
     } else {
       navigationRef.current.navigate(name, params);  // Default navigate for other screens
     }
+    
   }
 }

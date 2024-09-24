@@ -7,6 +7,7 @@ import OrderScreen from '../screens/DriverOrdersScreen';
 import QrcodeGeneratorDriverScreen from '../screens/QrcodeGeneratorDriverScreen';
 import SupportChat from '../screens/SupportChatScreen';
 import { navigationRef } from '../utils/navigationRef'; // Import navigationRef
+import OrderRoomScreen from '../screens/OrderRoomScreen';
 
 const Stack = createStackNavigator();
 
@@ -33,6 +34,12 @@ export default function AppNavigator() {
           name="SupportChat"
           component={SupportChat}
           options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="RoomScreen"
+          component={OrderRoomScreen}
+          options={{ title: 'Room', headerShown: true ,     gestureEnabled: true, // This enables the swipe back gesture
+          }} // This will show the header with a back button
         />
       </Stack.Navigator>
     </NavigationContainer>

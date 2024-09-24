@@ -113,8 +113,7 @@ const DriverOrdersScreen = ({ navigation }) => {
   };
   
 
-
-
+ 
   const toggleSwitch = () => {
     const newIsEnabled = !isEnabled;
     setIsEnabled(newIsEnabled);
@@ -175,8 +174,17 @@ const DriverOrdersScreen = ({ navigation }) => {
                           <Ionicons name="navigate-outline" size={24} color="white" />
                           <Text style={styles.navigateText}>Waze</Text>
                         </TouchableOpacity>
-                         <TouchableOpacity style={styles.navigateButtonChat} onPress={() => openWaze(item.location)}>
-                          <Ionicons name="send-outline" size={24} color="white" />
+                        <TouchableOpacity 
+  style={styles.navigateButtonChat} 
+  onPress={() => navigate('RoomScreen', { 
+    clientName: item.client_name, 
+    orderId: item.order_number, 
+    clientId: item.client_id, 
+    driverId: item.driver_id 
+  })}>
+                        <Ionicons name="send-outline" size={24} color="white" />
+                          <Text style={styles.navigateText}>Chat</Text>
+
                         </TouchableOpacity>
                       </View>
                       <Text style={styles.date}>

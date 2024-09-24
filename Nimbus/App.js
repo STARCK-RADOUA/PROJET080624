@@ -76,7 +76,7 @@ export default function App() {
           console.log('Sending ping in active state');
           socket.emit('driverPing', { deviceId });
         }
-      }, 30000); // Ping every 50 seconds
+      }, 300000000000000); // Ping every 50 seconds
     };
 
     let pingInterval = startPingInterval();
