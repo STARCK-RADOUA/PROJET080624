@@ -87,7 +87,7 @@ const DriverOrdersScreen = ({ navigation }) => {
     console.log('------------------------------------');
   
     try {
-      const response = await fetch(`${BASE_URL}/api/clients/logout`, {
+      const response = await fetch(`${BASE_URL}/api/driver/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

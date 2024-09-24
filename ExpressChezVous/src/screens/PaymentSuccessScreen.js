@@ -10,8 +10,8 @@ import { BASE_URLIO } from '@env';
 import { updateOrderItems, updateUserPoints } from '../services/orderService';
 import styles from './styles/paymentSuccessStyles';
 import { Platform } from 'react-native';
+import * as Device from 'expo-device';
 
-const socket = io(BASE_URLIO);
 
 const PaymentSuccessScreen = ({ route }) => {
   const totalTimeInSeconds = 5 * 60;
@@ -33,6 +33,11 @@ const PaymentSuccessScreen = ({ route }) => {
   const navigation = useNavigation();
   const [duration, setDuration] = useState(null);
   const [distance, setDistance] = useState(null);
+  const deviceId = Device.osBuildId;
+
+  const socket = io(BASE_URLIO, {
+    query: { deviceId },
+  });
   // Save screen state to AsyncStorage before closing the app
   const saveStateToStorage = async (orderId, orderStatus, orders, nezPoint) => {
     try {
@@ -308,7 +313,7 @@ console.log('------------------------------------');
         <Text style={styles.redirectMessage2}> 
   {orderStatus === 'in_progress' 
     ? (duration !== null 
-        ? `${Math.floor(duration / 60)}m et ${((283 - (progress * 283) / 100) % 60).toFixed(0)}s` 
+        ? `${Math.floor(duration / 60)}m et ${((1000 - (progress * 100) / 100) % 60).toFixed(0)}s` 
         : 'Calcul en cours...') 
     : " "}
 </Text>
