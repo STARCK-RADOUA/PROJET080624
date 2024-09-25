@@ -11,6 +11,7 @@ export const LocationProvider = ({ children }) => {
   const [isTracking, setIsTracking] = useState(false);
   const [locationSubscription, setLocationSubscription] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState(null); // Ajout d'un état pour la localisation actuelle
 
   // Define background task for location updates
   TaskManager.defineTask('BACKGROUND_LOCATION_TASK', async ({ data, error }) => {
@@ -21,6 +22,8 @@ export const LocationProvider = ({ children }) => {
     if (data) {
       const { locations } = data;
       const { latitude, longitude } = locations[0].coords;
+      setCurrentLocation({ latitude, longitude }); // Mise à jour de la localisation actuelle dans le contexte
+
       console.log(`Background Latitude: ${latitude}, Longitude: ${longitude}`);
       if (socket) {
         socket.emit('driverLocationUpdate', { deviceId: 'your-device-id', latitude, longitude });
@@ -57,6 +60,8 @@ export const LocationProvider = ({ children }) => {
       },
       (location) => {
         const { latitude, longitude } = location.coords;
+        setCurrentLocation({ latitude, longitude }); // Mise à jour de la localisation actuelle dans le contexte
+
         console.log(`Foreground Latitude: ${latitude}, Longitude: ${longitude}`);
         newSocket.emit('driverLocationUpdate', { deviceId, latitude, longitude });
       },
@@ -97,7 +102,7 @@ export const LocationProvider = ({ children }) => {
   }, []);
 
   return (
-    <LocationContext.Provider value={{ startTracking, stopTracking, isTracking }}>
+    <LocationContext.Provider value={{ startTracking, stopTracking, isTracking,currentLocation }}>
       {children}
     </LocationContext.Provider>
   );

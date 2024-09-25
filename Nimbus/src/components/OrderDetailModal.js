@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text,Alert, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
+import { Modal, View, Text,Alert,TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import { BASE_URLIO, BASE_URL } from '@env';
@@ -12,6 +12,9 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
   const [drivers, setDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [expanded, setExpanded] = useState(null);
+  const [reportReason, setReportReason] = useState('');
+  const [comment, setComment] = useState('');
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   if (!order) return null;
 
@@ -67,12 +70,12 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
       [
         {
           text: 'Annuler',
-          onPress: () => console.log('livraison annulée'),
+          onPress: () => console.log('Commande non annulée'),
           style: 'cancel',
         },
         {
           text: 'annuler la commande',
-          onPress: () => commandeCancled(), // Appelle la fonction logout si l'utilisateur confirme
+          onPress: () =>       setShowCancelModal(true),          // Appelle la fonction logout si l'utilisateur confirme
           style: 'destructive',
         },
       ],
@@ -133,7 +136,7 @@ const deviceId = Device.osBuildId;
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ order_number }),
+        body: JSON.stringify({ order_number, reportReason, comment }),
       });
   
       const l = await response.json();
@@ -155,6 +158,7 @@ const deviceId = Device.osBuildId;
     } catch (error) {
       Alert.alert('Erreur', 'Une erreur est survenue pendant la déconnexion.');
     } finally {  
+      setShowCancelModal(false);
             animateOut();
 
     }
@@ -254,6 +258,48 @@ const deviceId = Device.osBuildId;
                 <Text style={styles.affectButtonText}>Cancel</Text>
               </TouchableOpacity>
               </View>
+              <Modal
+  animationType="slide"
+  transparent={true}
+  visible={showCancelModal}
+  onRequestClose={() => setShowCancelModal(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalView}>
+      <Text style={styles.sectionHeader}>Annuler la commande</Text>
+
+      <Text style={styles.label}>Motif d'annulation :</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Motif"
+        value={reportReason}
+        onChangeText={setReportReason}
+      />
+
+      <Text style={styles.label}>Commentaire :</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Commentaire"
+        value={comment}
+        onChangeText={setComment}
+      />
+
+      <TouchableOpacity
+        style={styles.affectButton}
+        onPress={commandeCancled}
+      >
+        <Text style={styles.affectButtonText}>Envoyer</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.affectButton33}
+        onPress={() => setShowCancelModal(false)}
+      >
+        <Text style={styles.affectButtonText}>Annuler</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
         </Animated.View>
       </View>
@@ -352,6 +398,16 @@ const styles = StyleSheet.create({
     color: '#007bff',
     fontSize: 16,
   },
+  input: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    backgroundColor: '#fff',
+    color: '#000',
+  },
+  
   pickerContainer: {
     marginTop: 20,
     backgroundColor: '#333',

@@ -47,7 +47,7 @@ return () => {
     if (deviceId) {
       socket.emit('autoLoginDriver', { deviceId });
       socket.on('loginSuccess', () => {
-        navigate('Test');
+        navigate('Home');
        return socket.off('loginSuccess');
 
       });

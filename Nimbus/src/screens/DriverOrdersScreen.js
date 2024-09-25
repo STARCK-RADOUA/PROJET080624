@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Switch, Image, Alert, Linking } from 'react-native';
+import { View,AppState, Text, FlatList, TouchableOpacity, Switch, Image, Alert, Linking } from 'react-native';
 import { io } from 'socket.io-client';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; 
 import OrderDetailModal from '../components/OrderDetailModal';
@@ -12,6 +12,7 @@ import { navigate } from '../utils/navigationRef';
 import moment from 'moment';
 import { fetchDriverId, updateDriverAvailability, openGoogleMaps, openWaze, getDeviceId } from '../utils/driverOrderUtils';
 import styles from './styles/styles'; 
+import * as Location from 'expo-location';
 
 const DriverOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
@@ -24,6 +25,9 @@ const DriverOrdersScreen = ({ navigation }) => {
   const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
   const [activeStatusMessage, setActiveStatusMessage] = useState('Fetching status...');
   const { startTracking, stopTracking, isTracking } = useContext(LocationContext);
+  const [currentLocation, setCurrentLocation] = useState(null); // Ajout d'un état pour la localisation actuelle
+  const [locationSubscription, setLocationSubscription] = useState(null);
+  const [appState, setAppState] = useState(AppState.currentState);
 
   useEffect(() => {
     getDeviceId(setDeviceId);
@@ -32,6 +36,7 @@ const DriverOrdersScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (deviceId) {
+
       fetchDriverId(deviceId, setDriverId, setDriverInfo, setActiveStatusMessage);
       startTracking(deviceId);
     }
@@ -41,7 +46,7 @@ const DriverOrdersScreen = ({ navigation }) => {
       const socket = io(BASE_URLIO, {
         query: { deviceId },
       });
-
+      
       socket.emit('driverConnected', deviceId);
 
       socket.on('connect', () => startTracking(deviceId));
@@ -52,12 +57,102 @@ const DriverOrdersScreen = ({ navigation }) => {
         setOrders(data.orders || []);
         setLoading(false);
         setIsEnabled(data.active);
+   
       });
 
-   
-    
-  }, [deviceId]);
 
+
+
+
+   return () => {
+        socket.disconnect();
+      };
+    
+  }, [deviceId]); 
+  useEffect(() => {
+    const socket = io(BASE_URLIO, {
+      query: { deviceId },
+    });
+    
+    socket.emit('driverConnected', deviceId);
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (appState.match(/inactive|background/) && nextAppState === 'active') {
+        // Rafraîchir les commandes ou d'autres données ici
+        console.log('App is back to foreground - refreshing data');
+        refreshDistances(); // Rafraîchir les distances ou autres données
+      }
+      setAppState(nextAppState);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [appState]);
+  const subscribeToLocation = async () => {
+      const subscription = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 5000, // 10 secondes
+          distanceInterval: 100, // Met à jour toutes les 10 mètres
+        },
+        async(location) => {
+          const { latitude, longitude } = location.coords;
+          const updatedOrders = await Promise.all(
+            orders.map(async (order) => {
+              if (latitude&&longitude && order.location) {
+                const [lat, lng] = order.location.split(',').map(coord => parseFloat(coord.trim()));
+      
+      
+                console.log('------------------------------------');
+                console.log("####################################");
+                console.log('------------------------------------');
+                console.log("currentLocation.latitude, currentLocation.longitude",latitude, longitude)
+                console.log("order.location",lat, lng)
+                const distanceData = await getDistance(latitude, longitude, lat, lng);
+                return { ...order, distance: distanceData.distance };
+              }
+              return order;
+            })
+          );
+          setOrders(updatedOrders);
+          console.log(`Updated location: Latitude: ${latitude}, Longitude: ${longitude}`);
+          console.log('------------sub------------------------');
+          console.log(locationSubscription);
+          console.log('------------------------------------');
+        },
+        (error) => {
+          console.error('Location error:', error);
+        }
+      );
+      setLocationSubscription(subscription);
+    };
+
+
+  const refreshDistances = async () => {
+
+  await subscribeToLocation();
+  
+   
+  };
+
+  const getDistance = async (startLat, startLng, endLat, endLng) => {
+    const osrmUrl = `http://192.168.8.159:5000/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=false`;
+
+    try {
+        const response = await axios.get(osrmUrl,{ timeout: 10000 });
+        const data = response.data;
+        
+      if (data.code === 'Ok' && data.routes.length > 0) {
+        const route = data.routes[0];
+        return { distance: (route.distance / 1000).toFixed(2) }; // Convertir en km
+      } else {
+        throw new Error('Error retrieving route data.');
+      }
+    } catch (error) {
+      console.error(error);
+      return { distance: 'N/A' };
+    }
+  };
 
   const confirmLogout = () => {
     // Affiche une alerte de confirmation avant la déconnexion
@@ -111,13 +206,34 @@ const DriverOrdersScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const intervalId = setInterval(async()  => {
+      console.log("yooo")
+    
+  
+          refreshDistances();
+        console.log("ymmmmmmooo")
+  
+  
+    }, 5000);
+  
+  
+   
+    return () => clearInterval(intervalId); // Nettoie l'intervalle lors du démontage
+  }, [orders, currentLocation]); // Dépend des commandes et de la localisation actuelle
   
 
  
   const toggleSwitch = () => {
-    const newIsEnabled = !isEnabled;
+
+    if (orders.length === 0) {
+       const newIsEnabled = !isEnabled;
     setIsEnabled(newIsEnabled);
     updateDriverAvailability(driverId, newIsEnabled);
+      return ;
+    }
+         Alert.alert('Attendez !', 'Vous ne pouvez pas quitter tant que les commandes n\'est pas livrée.');
+
   };
 
   const handleCardPress = (order) => setSelectedOrder(order);
@@ -165,14 +281,17 @@ const DriverOrdersScreen = ({ navigation }) => {
                     <View style={styles.cardContent}>
                       <Text style={styles.orderNumber}>Order #{item.order_number || 'N/A'}</Text>
                       <Text style={styles.address_line}>{item.address_line || 'No Address Provided'}</Text>
+                      <Text style={styles.distance}>
+                    Distance: {item.distance ? `${item.distance} km` : 'Calculating...'}
+                  </Text>
                       <View style={styles.fieldRow}>
                         <TouchableOpacity style={styles.navigateButtonGoogle} onPress={() => openGoogleMaps(item.location)}>
                           <Ionicons name="navigate-outline" size={24} color="white" />
-                          <Text style={styles.navigateText}>Google</Text>
+                          <Text style={styles.navigateText}>Google </Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.navigateButtonWaze} onPress={() => openWaze(item.location)}>
                           <Ionicons name="navigate-outline" size={24} color="white" />
-                          <Text style={styles.navigateText}>Waze</Text>
+                          <Text style={styles.navigateText}>Waze </Text>
                         </TouchableOpacity>
                         <TouchableOpacity 
   style={styles.navigateButtonChat} 
@@ -183,7 +302,7 @@ const DriverOrdersScreen = ({ navigation }) => {
     driverId: item.driver_id 
   })}>
                         <Ionicons name="send-outline" size={24} color="white" />
-                          <Text style={styles.navigateText}>Chat</Text>
+                          <Text style={styles.navigateText}></Text>
 
                         </TouchableOpacity>
                       </View>
