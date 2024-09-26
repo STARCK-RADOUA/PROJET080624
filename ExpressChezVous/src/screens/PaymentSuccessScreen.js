@@ -135,6 +135,7 @@ const PaymentSuccessScreen = ({ route }) => {
 
       if (status === 'delivered') {
         socket.emit('disconnectRoute');
+        setIsChatDisabled(false);
 
         setRedirectMessage('Votre commande a été livrée. Chat pendant 2 minutes.');
         setShowExitButton(true);
@@ -142,7 +143,8 @@ const PaymentSuccessScreen = ({ route }) => {
           await updateUserPoints(nezPoint);
           await updateOrderItems(orders);
         }
-        
+        await clearAllData(); // Clear all data once cancelled  
+
         navigation.navigate('feedback', { orderId });
       }
 

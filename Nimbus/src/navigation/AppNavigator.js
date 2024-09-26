@@ -21,7 +21,7 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Test"
+          name="Home"
           component={OrderScreen}
           options={{ headerShown: false }}
         />
@@ -38,7 +38,7 @@ export default function AppNavigator() {
          <Stack.Screen
           name="RoomScreen"
           component={OrderRoomScreen}
-          options={{ title: 'Room', headerShown: true ,     gestureEnabled: true, // This enables the swipe back gesture
+          options={{ title: 'Room', headerShown: true ,    // This enables the swipe back gesture
           }} // This will show the header with a back button
         />
       </Stack.Navigator>
