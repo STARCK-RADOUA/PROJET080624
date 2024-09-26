@@ -21,6 +21,7 @@ const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages, unreadAd
           {TabButton({ currentTab, setCurrentTab, title: "Produits", iconName: "pricetag-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Commandes", iconName: "clipboard-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Services", iconName: "briefcase-outline" })}
+          {TabButton({ currentTab, setCurrentTab, title: "Qr", iconName: "qr-code-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Historique Chat", iconName: "time-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Analyse", iconName: "stats-chart-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Chiffre d'affaire", iconName: "cash-outline" })}

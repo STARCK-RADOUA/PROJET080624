@@ -4,7 +4,6 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Ani
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import axios from 'axios';
-import { Picker } from '@react-native-picker/picker';
 import { io } from 'socket.io-client';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -13,13 +12,14 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
   const [drivers, setDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [expanded, setExpanded] = useState(null);
+  const [driverModalVisible, setDriverModalVisible] = useState(false); // Modal visibility state for driver selection
   const socket = io(BASE_URLIO);
 
   if (!order) return null;
 
   const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
 
-  // Animation pour l'entrée du modal
+  // Animation for modal entry
   const scaleAnim = new Animated.Value(0);
 
   const animateIn = () => {
@@ -38,7 +38,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
     }).start(() => onClose());
   };
 
-  // Récupérer les chauffeurs disponibles lorsque le modal est affiché
+  // Fetch available drivers when the modal is displayed
   useEffect(() => {
     if (visible) {
       axios.get(`${BASE_URL}/api/driver/diponible`)
@@ -56,7 +56,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
       .then(response => {
         console.log('Commande affectée avec succès :', response.data);
         socket.emit('watchOrderStatuss', { order_id: order.order_number });
-        onClose(); // Fermer le modal après l'affectation
+        onClose(); // Close the modal after assignment
       })
       .catch(error => console.error('Erreur lors de l\'affectation de la commande :', error.message));
     }
@@ -65,6 +65,35 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
   const toggleExpand = (index) => {
     setExpanded(expanded === index ? null : index);
   };
+
+  // Render a custom dropdown for driver selection
+  const renderDriverDropdown = () => (
+    <Modal
+      transparent={true}
+      visible={driverModalVisible}
+      animationType="fade"
+      onRequestClose={() => setDriverModalVisible(false)}
+    >
+      <View style={styles.driverModalContainer}>
+        <View style={styles.driverModalContent}>
+          <ScrollView>
+            {drivers.map(driver => (
+              <TouchableOpacity
+                key={driver.driver_id}
+                style={styles.driverItem}
+                onPress={() => {
+                  setSelectedDriver(driver.driver_id);
+                  setDriverModalVisible(false);
+                }}
+              >
+                <Text style={styles.driverName}>{`${driver.firstName} ${driver.lastName}`}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
 
   return (
     <Modal
@@ -76,13 +105,13 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
     >
       <View style={styles.modalContainer}>
         <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
-          {/* Bouton de fermeture */}
+          {/* Close button */}
           <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
             <Ionicons name="close-circle" size={37} color="#ff5c5c" />
           </TouchableOpacity>
 
           <ScrollView>
-            {/* Infos sur la commande */}
+            {/* Order Info */}
             <View style={styles.orderInfo}>
               <Text style={styles.label}><MaterialIcons name="receipt" size={16} color="#ffbf00" /> Commande #{order.order_number ?? 'N/A'}</Text>
               <Text style={styles.label}><Ionicons name="person" size={16} color="#ffbf00" /> Client : {order.client_name}</Text>
@@ -94,7 +123,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Livraison : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
-            {/* Produits */}
+            {/* Products */}
             <Text style={styles.sectionHeader}>Produits :</Text>
             <View style={styles.productsContainer}>
               {displayedProducts.map((item, index) => (
@@ -120,7 +149,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
                 </TouchableOpacity>
               ))}
 
-              {/* Bouton pour afficher plus de produits */}
+              {/* Button to show more products */}
               {order.products.length > 3 && !showAllProducts && (
                 <TouchableOpacity
                   style={styles.showMoreButton}
@@ -131,37 +160,34 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
               )}
             </View>
 
-            {/* Sélection du chauffeur */}
+            {/* Custom Dropdown for Driver Selection */}
             <Text style={styles.sectionHeader}>Affecter un chauffeur :</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedDriver}
-                onValueChange={(itemValue) => setSelectedDriver(itemValue)}
-                style={styles.picker}
-              >
-                {drivers.map(driver => (
-                  <Picker.Item 
-                    key={driver.driver_id} 
-                    label={`${driver.firstName} ${driver.lastName}`} 
-                    value={driver.driver_id} 
-                  />
-                ))}
-              </Picker>
-            </View>
+            <TouchableOpacity 
+              style={styles.driverSelectButton} 
+              onPress={() => setDriverModalVisible(true)}
+            >
+              <Text style={styles.driverSelectText}>
+                {selectedDriver ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName : 'Sélectionner un chauffeur'}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#ffbf00" />
+            </TouchableOpacity>
 
-            {/* Bouton Affecter */}
+            {/* Button to assign the order */}
             {selectedDriver && (
               <TouchableOpacity style={styles.affectButton} onPress={handleAffectOrder}>
                 <Text style={styles.affectButtonText}>Affecter la commande à {drivers.find(driver => driver.driver_id === selectedDriver)?.firstName}</Text>
               </TouchableOpacity>
             )}
 
-            {/* Prix Total */}
+            {/* Total Price */}
             <View style={styles.totalContainer}>
               <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
             </View>
           </ScrollView>
         </Animated.View>
+
+        {/* Render Driver Dropdown */}
+        {renderDriverDropdown()}
       </View>
     </Modal>
   );
@@ -257,15 +283,18 @@ const styles = StyleSheet.create({
     color: '#007bff',
     fontSize: 16,
   },
-  pickerContainer: {
-    marginTop: 20,
+  driverSelectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#333',
-    borderRadius: 10,
     padding: 10,
+    borderRadius: 10,
+    marginTop: 20,
+    justifyContent: 'space-between',
   },
-  picker: {
-    height: 50,
+  driverSelectText: {
     color: '#fff',
+    fontSize: 16,
   },
   affectButton: {
     marginTop: 20,
@@ -290,6 +319,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#ffbf00',
+  },
+  driverModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  driverModalContent: {
+    width: '80%',
+    backgroundColor: '#1f1f1f',
+    borderRadius: 10,
+    padding: 20,
+    maxHeight: '50%',
+  },
+  driverItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  driverName: {
+    color: '#ffbf00',
+    fontSize: 16,
   },
 });
 

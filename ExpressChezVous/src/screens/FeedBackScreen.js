@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image, ActivityIndicator, ScrollView } from 'react-native';
+import { Alert ,View, Text, TextInput, Button, StyleSheet, Image, ActivityIndicator, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL } from '@env'; // Import the base URL from the .env file
@@ -17,6 +17,16 @@ const FeedbackScreen = ({ route, navigation }) => {
   };
 
   const handleSendFeedback = async () => {
+    // Input validation
+    if (!feedback || rating === 0) {
+      Alert.alert(
+        'Validation Error',
+        'Please provide both feedback and a rating before submitting.',
+        [{ text: 'OK' }]
+      );
+      return; // Stop execution if validation fails
+    }
+  
     setLoading(true); // Start loading (Envoyer...)
     
     try {
@@ -25,21 +35,34 @@ const FeedbackScreen = ({ route, navigation }) => {
         comment: feedback,
         stars: rating,
       });
-
+  
       console.log('Feedback sent successfully:', response.data);
-
+  
+      // Show success alert
+      Alert.alert(
+        'Success',
+        'Thank you! Your feedback has been submitted successfully.',
+        [{ text: 'OK' }]
+      );
+  
       // Simulate 3-second delay before navigating to HomeScreen
       setTimeout(() => {
         setLoading(false); // Stop loading after 3 seconds
-        navigation.replace('Services'); // Navigate to HomeScreen
+        navigation.replace('Home'); // Navigate to HomeScreen
       }, 3000);
-
+  
     } catch (error) {
       setLoading(false); // Stop loading in case of error
       console.error('Error sending feedback:', error);
+  
+      // Show error alert
+      Alert.alert(
+        'Error',
+        'An error occurred while sending your feedback. Please try again later.',
+        [{ text: 'OK' }]
+      );
     }
   };
-
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>

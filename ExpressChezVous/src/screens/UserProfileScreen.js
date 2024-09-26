@@ -34,22 +34,32 @@ const UserProfileScreen = ({ navigation }) => {
   const [showValidateSection, setShowValidateSection] = useState(true);
 
   const handleNameChange = async () => {
-    const id = await getClient(); 
+    if (!editedFirstName || !editedLastName) {
+      Alert.alert('Validation Error', 'Both first and last names are required.');
+      return; // Stop the function if validation fails
+    }
   
+    if (editedFirstName.length < 2 || editedLastName.length < 2) {
+      Alert.alert('Validation Error', 'Names must be at least 2 characters long.');
+      return;
+    }
+  
+    const id = await getClient(); 
     setLoading(true);
-    console.log("dgdg",id)
+    console.log("Client ID:", id);
+  
     try {
       await axios.post(`${BASE_URL}/api/users/change-name`, {
         id,
-        firstName: editedFirstName,
-        lastName: editedLastName,
+        firstName: editedFirstName.trim(),
+        lastName: editedLastName.trim(),
       });
       setFirstName(editedFirstName);
       setLastName(editedLastName);
       Alert.alert('Success', 'Name changed successfully!');
       setNameModalVisible(false);
     } catch (error) {
-      Alert.alert('Error', 'Failed to change name.');
+      Alert.alert('Error', 'Failed to change name. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -69,17 +79,63 @@ const UserProfileScreen = ({ navigation }) => {
    
   }, []);
 
-  // Function to send userId and currentPassword to the backend for validation
-  const handleCurrentPasswordValidation = async () => {
-    setLoading(true); 
+  const handlePasswordChange = async () => {
+    if (!newPassword || newPassword.length < 8) {
+      Alert.alert('Validation Error', 'Password must be at least 8 characters long.');
+      return;
+    }
+  
+    if (!isPasswordMatch) {
+      Alert.alert('Validation Error', 'Passwords do not match.');
+      return;
+    }
+  
+    const id = await getClient(); 
+    setLoading(true);
+  
+    try {
+      console.log('Password:', newPassword);
+      console.log('Client ID:', id);
+  
+      const response = await axios.post(`${BASE_URL}/api/users/change-password`, {
+        id,
+        newPassword,
+      });
+  
+      Alert.alert('Success', 'Password changed successfully!');
+      setPasswordModalVisible(false);
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Failed to change password.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const validatePasswords = (newPass, confirmPass) => {
+    if (newPass && confirmPass && newPass === confirmPass) {
+      setIsPasswordMatch(true);
+    } else {
+      setIsPasswordMatch(false);
+    }
+  };
+  
 
+  
+  const handleCurrentPasswordValidation = async () => {
+    if (!currentPassword) {
+      Alert.alert('Validation Error', 'Please enter your current password.');
+      return;
+    }
+  
+    setLoading(true); 
+  
     try {
       const id = await getClient(); 
       const response = await axios.post(`${BASE_URL}/api/users/validate-password`, {
         id,
         currentPassword
       });
-
+  
       if (response.data.isValid) {
         setIsCurrentPasswordValid(true); 
         setShowValidateSection(false); 
@@ -94,61 +150,38 @@ const UserProfileScreen = ({ navigation }) => {
       setLoading(false); 
     }
   };
-
+  
   const handlePhoneChange = async () => {
-    const id = await getClient(); 
-    console.log(id)
-
+    if (!phoneNumber) {
+      Alert.alert('Validation Error', 'Phone number is required.');
+      return; // Stop the function if validation fails
+    }
+  
+    const phoneNumberPattern = /^[0-9]{10}$/; // Example pattern for a 10-digit phone number
+    if (!phoneNumberPattern.test(phoneNumber)) {
+      Alert.alert('Validation Error', 'Please enter a valid 10-digit phone number.');
+      return; // Stop the function if validation fails
+    }
+  
+    const id = await getClient();
+    console.log("Client ID:", id);
+  
     setLoading(true);
     try {
-      const response = await axios.post(`${BASE_URL}/api/users/change-phone`, { phoneNumber , id });
+      const response = await axios.post(`${BASE_URL}/api/users/change-phone`, {
+        phoneNumber: phoneNumber.trim(), // Trim any spaces
+        id
+      });
       Alert.alert('Success', 'Phone number changed successfully!');
       setPhoneModalVisible(false);
     } catch (error) {
-      Alert.alert('Error', 'Failed to change phone number.');
+      Alert.alert('Error', 'Failed to change phone number. Please try again.');
     } finally {
       setLoading(false);
     }
   };
-
-  const handlePasswordChange = async () => {
-    const id = await getClient(); 
-
-    setLoading(true);
-    try {
-      if (!isPasswordMatch) {
-        throw new Error("Passwords do not match.");
-      }
-console.log('------------------------------------');
-console.log('Password:', newPassword);
-console.log('------------------------------------');
-console.log('------------------------------------');
-console.log('--------------', id);
-console.log('------------------------------------');
-console.log('------------------------------------');
-console.log('------------------------------------');
-console.log('------------------------------------');
-      const response = await axios.post(`${BASE_URL}/api/users/change-password`, {
-        id,
-        newPassword,
-      });
-      
-      Alert.alert('Success', 'Password changed successfully!');
-      setPasswordModalVisible(false);
-    } catch (error) {
-      Alert.alert('Error', error.message || 'Failed to change password.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const validatePasswords = (newPass, confirmPass) => {
-    if (newPass && confirmPass && newPass === confirmPass) {
-      setIsPasswordMatch(true);
-    } else {
-      setIsPasswordMatch(false);
-    }
-  };
+  
+ 
 
   return (
     <View style={styles.container}>

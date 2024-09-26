@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   },
   deliveryImageContainer: {
     position: 'absolute',
-    top: Dimensions.get('window').height * 0.55,
+    top: Dimensions.get('window').height * 0.667,
   },
   bottomFixed: {
     width: '100%',
