@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef  ,} from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import io from 'socket.io-client';
 import { BASE_URLIO  , BASE_URL} from '@env';
+import { useFocusEffect } from '@react-navigation/native';
+import axios from 'axios';
 
 const RoomScreen = ({ route }) => {
   const { clientName, orderId , clientId  , driverId} = route.params;
@@ -11,7 +13,28 @@ const RoomScreen = ({ route }) => {
   const [chatId, setChatId] = useState(null);
   const socket = io(BASE_URL); // Initialize socket globally
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const markMessagesAsSeen = async () => {
+        try {
+          if (chatId) {
+            await axios.post(`${BASE_URL}/api/chat/mark-seenFD`, {
+              chatId,
+            });
+            console.log("Messages marked as seen");
+          }
+        } catch (error) {
+          console.error("Error marking messages as seen:", error);
+        }
+      };
 
+      markMessagesAsSeen();
+
+      return () => {
+        console.log("Cleanup on screen exit");
+      };
+    }, [chatId])
+  );
  
   useEffect(() => {
     socket.on('connect', () => {
