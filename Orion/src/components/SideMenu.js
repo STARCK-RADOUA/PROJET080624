@@ -9,7 +9,7 @@ const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages, unreadAd
       {/* Profile Section */}
       <View style={styles.profileSection}>
         <Ionicons name="person-circle" size={60} color="white" style={styles.profileIcon} />
-        <Text style={styles.profileName}>Mehdi Saadi</Text>
+        <Text style={styles.profileName}>Dr.Abderrahman   </Text>
       </View>
 
       <ScrollView style={styles.menuScroll}>

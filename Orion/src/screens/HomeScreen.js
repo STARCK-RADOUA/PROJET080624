@@ -10,8 +10,7 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Bienvenu, Mehdi et TariQ! , developpers d tep 3atinha ghi nguir</Text>
-        <Ionicons name="person-circle-outline" size={50} color="white" />
+      <Text style={styles.headerText}>Bienvenu, Mehdi et TariQ! </Text>        <Ionicons name="person-circle-outline" size={50} color="white" />
       </View>
     </ScrollView>
   );

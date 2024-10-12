@@ -195,7 +195,7 @@ const deviceId = Device.osBuildId;
               <Text style={styles.label}><Ionicons name="card" size={16} color="#ffbf00" /> Paiement : {order.payment_method}</Text>
               <Text style={styles.label}><Ionicons name="cash" size={16} color="#ffbf00" /> Prix Total : €{order.total_price.toFixed(2)}</Text>
               <Text style={styles.label}><Ionicons name="swap-horizontal" size={16} color="#ffbf00" /> Échange : €{order.exchange.toFixed(2)}</Text>
-              <Text style={styles.label}><Ionicons name="home" size={16} color="#ffbf00" /> Adresse : {order.location}</Text>
+              <Text style={styles.label}><Ionicons name="home" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
               <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date de creation : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 30,
+    top: 10,
     right: 10,
   },
   orderInfo: {
