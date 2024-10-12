@@ -265,6 +265,21 @@ const styles = StyleSheet.create({
         backgroundColor: '#d4d4d4',
         borderRadius: 4,
       },
+      navigateButtonChat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  redButton: {
+    width: 10,  // size of the red dot
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'red',
+  },
+  navigateText: {
+    color: 'white',
+    marginLeft: 10,
+  }
 });
 
 export default styles;
