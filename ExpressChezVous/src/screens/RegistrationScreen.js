@@ -179,23 +179,23 @@ const [uniqueId, setUniqueId] = useState('');
 
   return (
     <LinearGradient colors={['#0f2027', '#203a43', '#e9ab25']} style={styles.container}>
-      <Text style={styles.title}>Complete your registration</Text>
+      <Text style={styles.title}> Complétez votre inscription</Text>
 
       <View style={styles.inputContainer}>
         <Ionicons name="person-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="First Name" placeholderTextColor="#ccc" value={firstName} onChangeText={setFirstName} />
+        <TextInput style={styles.input} placeholder="Prénom" placeholderTextColor="#ccc" value={firstName} onChangeText={setFirstName} />
       </View>
 
       <View style={styles.inputContainer}>
         <Ionicons name="person-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Last Name" placeholderTextColor="#ccc" value={lastName} onChangeText={setLastName} />
+        <TextInput style={styles.input} placeholder="Nom de famille" placeholderTextColor="#ccc" value={lastName} onChangeText={setLastName} />
       </View>
 
       <View style={styles.inputContainer}>
         <Ionicons name="call-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
         <TextInput
           style={styles.input}
-          placeholder="Phone Number"
+          placeholder="06 *** *** **"
           keyboardType="phone-pad"
           placeholderTextColor="#ccc"
           value={phone}
@@ -207,12 +207,12 @@ const [uniqueId, setUniqueId] = useState('');
 
       <View style={styles.inputContainer}>
         <Ionicons name="lock-closed-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} placeholderTextColor="#ccc" value={password} onChangeText={setPassword} />
+        <TextInput style={styles.input} placeholder="Mot de passe" secureTextEntry={true} placeholderTextColor="#ccc" value={password} onChangeText={setPassword} />
       </View>
 
       <View style={styles.inputContainer}>
         <Ionicons name="lock-closed-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={true} placeholderTextColor="#ccc" value={cmpassword} onChangeText={setcmPassword} />
+        <TextInput style={styles.input} placeholder="Confirmer le mot de passe" secureTextEntry={true} placeholderTextColor="#ccc" value={cmpassword} onChangeText={setcmPassword} />
       </View>
 
       <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
@@ -226,72 +226,80 @@ const [uniqueId, setUniqueId] = useState('');
           }}
           disabled={!isFormValid}
         >
-          <Text style={styles.buttonText}>Confirm</Text>
+          <Text style={styles.buttonText}>Confirmer</Text>
         </TouchableOpacity>
       </Animated.View>
     </LinearGradient>
   );
-};
-const styles = StyleSheet.create({
+};const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#101010', // Dark background for contrast
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#e9ab25',
+    fontSize: 32, // Larger font size for a stronger presence
+    fontWeight: '700', // Bold font weight
+    marginBottom: 30, // More space for cleaner layout
+    color: '#f5f5f5', // White for high contrast
     textAlign: 'center',
-    letterSpacing: 1.5,
+    letterSpacing: 1.8, // Slightly spaced letters for modern feel
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '80%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 10,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    width: '90%', // Full-width input fields
+    backgroundColor: '#1c1c1c', // Darker background for input
+    borderRadius: 15, // Softer, modern rounded corners
+    marginBottom: 20, // More space between inputs for a clean layout
+    paddingHorizontal: 15, // Extra padding for a more spacious feel
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#e9ab25',
+    borderColor: '#e9ab25', // Gold border to match the theme
+    shadowColor: '#e9ab25', // Subtle gold shadow
+    shadowOpacity: 0.4,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
   },
   inputIcon: {
-    marginRight: 10,
+    marginRight: 12, // Add some spacing between the icon and input
+    color: '#e9ab25', // Gold icon color for consistency
   },
   input: {
     flex: 1,
-    color: '#fff',
-    fontSize: 16,
+    color: '#fff', // White text for inputs
+    fontSize: 18, // Slightly larger for readability
+    fontWeight: '400', // Lighter weight for modern aesthetic
   },
   button: {
-    width: '80%',
-    padding: 15,
-    backgroundColor: '#e9ab25',
-    borderRadius: 50,
+    width: '90%', // Full-width button for a balanced design
+    padding: 16, // More padding for a premium feel
+    backgroundColor: '#1c1c1c', // Gold color for the button
+    borderRadius: 50, // Fully rounded button for modern design
     alignItems: 'center',
-    shadowColor: '#e9ab25',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.8,
-    shadowRadius: 25,
-    elevation: 5,
+    shadowColor: '#1c1c1c',
+    shadowOffset: { width: 0, height: 8 }, // Subtle elevated shadow for depth
+    shadowOpacity: 0.7,
+    shadowRadius: 15,
+    elevation: 8,
+    marginTop: 20, // Extra space at the top for button prominence
   },
   buttonText: {
-    color: '#191818',
-    fontWeight: 'bold',
-    fontSize: 16,
+    color: '#e9ab25', // Dark text for contrast with the gold button
+    fontWeight: '700', // Bold text for emphasis
+    fontSize: 18, // Larger button text for modern look
     letterSpacing: 1.2,
   },
   disabledButton: {
-    opacity: 0.5,
+    opacity: 0.5, // Make the disabled button semi-transparent
   },
   errorText: {
-    color: 'red',
-    marginBottom: 10,
+    color: '#ff4d4d', // Red for error messages to make them clear
+    marginBottom: 15,
     textAlign: 'center',
+    fontSize: 14, // More readable error text size
   },
 });
 

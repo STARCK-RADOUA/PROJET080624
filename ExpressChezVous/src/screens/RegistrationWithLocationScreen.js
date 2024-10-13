@@ -29,7 +29,7 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
       const id = Device.osBuildId;
       setDeviceId(id);
     };
-
+    handleGetLocation();
     getDeviceId();
 
     const validatePhoneNumber = (phone) => {
@@ -38,7 +38,7 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
     };
 
     if (phone !== '' && !validatePhoneNumber(phone)) {
-      setPhoneError('Invalid phone number format.');
+      setPhoneError('Format de numéro de téléphone invalide.');
     } else {
       setPhoneError('');
     }
@@ -99,7 +99,7 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
   const handleGetLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission denied', 'Location permission is required to proceed.');
+      Alert.alert('Permission refusée', 'L autorisation de localisation est requise pour continuer.');
       return;
     }
 
@@ -117,23 +117,23 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
       {/* Futuristic theme based on orange `#e9ab25` */}
       <LinearGradient colors={['#0f2027', '#203a43', '#e9ab25']} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <Text style={styles.title}>Complete Your Registration</Text>
+          <Text style={styles.title}>Complétez votre inscription</Text>
 
           <View style={styles.inputContainer}>
             <Ionicons name="person-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="First Name" placeholderTextColor="#ccc" value={firstName} onChangeText={setFirstName} />
+            <TextInput style={styles.input} placeholder="Prénom" placeholderTextColor="#ccc" value={firstName} onChangeText={setFirstName} />
           </View>
 
           <View style={styles.inputContainer}>
             <Ionicons name="person-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="Last Name" placeholderTextColor="#ccc" value={lastName} onChangeText={setLastName} />
+            <TextInput style={styles.input} placeholder="Nom de famille" placeholderTextColor="#ccc" value={lastName} onChangeText={setLastName} />
           </View>
 
           <View style={styles.inputContainer}>
             <Ionicons name="call-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="Phone Number"
+              placeholder="06 ********"
               keyboardType="phone-pad"
               placeholderTextColor="#ccc"
               value={phone}
@@ -145,20 +145,17 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
 
           <View style={styles.inputContainer}>
             <Ionicons name="lock-closed-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} placeholderTextColor="#ccc" value={password} onChangeText={setPassword} />
+            <TextInput style={styles.input} placeholder="Mot de passe" secureTextEntry={true} placeholderTextColor="#ccc" value={password} onChangeText={setPassword} />
           </View>
 
           <View style={styles.inputContainer}>
             <Ionicons name="lock-closed-outline" size={20} color="#e9ab25" style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={true} placeholderTextColor="#ccc" value={cmpassword} onChangeText={setcmPassword} />
+            <TextInput style={styles.input} placeholder="Confirmer le mot de passe" secureTextEntry={true} placeholderTextColor="#ccc" value={cmpassword} onChangeText={setcmPassword} />
           </View>
 
           {/* Horizontal location icon and confirm button */}
           <View style={styles.horizontalContainer}>
-            <TouchableOpacity onPress={handleGetLocation} style={styles.locationButton}>
-              <Ionicons name="location-outline" size={40} color="white" />
-              <Text style={styles.locationButtonText}>Get Location</Text>
-            </TouchableOpacity>
+          
 
             <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
               <TouchableOpacity
@@ -171,117 +168,108 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
                 }}
                 disabled={!isFormValid}
               >
-                <Text style={styles.buttonText}>Confirm</Text>
+                <Text style={styles.buttonText}>Confirmer</Text>
               </TouchableOpacity>
             </Animated.View>
           </View>
 
-          {/* Information about location requirement */}
-          <Text style={styles.infoText}>
-            To verify you're not a robot or spam, please provide your location to proceed.
-          </Text>
         </ScrollView>
       </LinearGradient>
     </KeyboardAvoidingView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: '9%',
+    backgroundColor: '#101010', // Darker background for modern contrast
   },
   scrollViewContent: {
     justifyContent: 'center',
-    paddingTop: width * 0.2,
+    paddingTop: width * 0.15, // Less padding for a sleeker look
     alignItems: 'center',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#e9ab25',
+    fontSize: 32, // Larger and modern font size
+    fontWeight: '700', // Bold font weight for a strong presence
+    marginBottom: 30, // More space for a cleaner layout
+    color: '#f5f5f5', // White for modern contrast
     textAlign: 'center',
-    letterSpacing: 1.5,
+    letterSpacing: 1.8, // Modern spaced letters
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 10,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    backgroundColor: '#1c1c1c', // Darker input background
+    borderRadius: 15, // More rounded corners for modern look
+    marginBottom: 20, // More space between inputs
+    paddingHorizontal: 15,
+    paddingVertical: 12, // Slightly thicker padding
     borderWidth: 1,
-    borderColor: '#e9ab25',
+    borderColor: '#e9ab25', // Gold border
+    shadowColor: '#e9ab25',
+    shadowOpacity: 0.4, // Softer shadow for subtle depth
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
   },
   inputIcon: {
-    marginRight: 10,
+    marginRight: 12, // Slightly more space between icon and input
+    color: '#e9ab25', // Gold icon color
   },
   input: {
     flex: 1,
-    color: '#fff',
-    fontSize: 16,
+    color: '#fff', // Clean white text for input fields
+    fontSize: 18, // Larger text for better readability
+    fontWeight: '400', // Lighter font weight for a modern feel
   },
   button: {
     width: '100%',
-    padding: 15,
-    backgroundColor: '#e9ab25',
+    padding: 16, // Slightly larger padding
+    backgroundColor: '#1c1c1c', // Gold background for modern accent
     borderRadius: 50,
     alignItems: 'center',
-    shadowColor: '#e9ab25',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.8,
-    shadowRadius: 25,
-    elevation: 5,
+    shadowColor: '#1c1c1c',
+    shadowOffset: { width: 0, height: 8 }, // Subtle elevated shadow for depth
+    shadowOpacity: 0.7,
+    shadowRadius: 15,
+    elevation: 8,
+    flexDirection: 'row', // Horizontal layout for possible icons in the future
+    justifyContent: 'center', // Center text
+    marginTop: 20,
   },
   buttonText: {
-    color: '#191818',
-    fontWeight: 'bold',
-    fontSize: 16,
+    color: '#e9ab25', // Dark text for contrast
+    fontWeight: '700', // Stronger font weight
+    fontSize: 18, // Larger button text for modern emphasis
     letterSpacing: 1.2,
   },
   disabledButton: {
-    opacity: 0.5,
+    opacity: 0.5, // Disabled button is semi-transparent
   },
   errorText: {
-    color: 'red',
-    marginBottom: 10,
+    color: '#ff4d4d', // Bright red for error messages
+    marginBottom: 15,
     textAlign: 'center',
+    fontSize: 14, // More readable error text size
   },
   horizontalContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    marginTop: 20,
+    justifyContent: 'space-between', // Ensure space between the location and confirm buttons
+    marginTop: 30, // More space for a cleaner layout
     width: '100%',
   },
-  locationButton: {
-    backgroundColor: '#e9ab25',
-    borderRadius: 50,
-    paddingVertical: 15,
-    paddingHorizontal: 25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#e9ab25',
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-  },
-  locationButtonText: {
-    color: '#fff',
-    marginLeft: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+ 
+ 
   infoText: {
-    color: '#e9ab25',
+    color: '#e9ab25', // Gold text for modern feel
     textAlign: 'center',
     fontSize: 14,
     marginTop: 30,
     lineHeight: 20,
+    fontStyle: 'italic', // Italicized for emphasis
   },
 });
 

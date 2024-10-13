@@ -36772,7 +36772,7 @@ PROJET080624
 │     │  ├─ PrductBottomSheetScreen.js
 │     │  ├─ ProductDetailScreen.js
 │     │  ├─ ProductListScreen.js
-│     │  ├─ QrcodeGeneratorScreen.js
+│     │  ├─ Parrainage.js
 │     │  ├─ QRScannerScreen.js
 │     │  ├─ ReceiptScreen.js
 │     │  ├─ RegistrationScreen.js

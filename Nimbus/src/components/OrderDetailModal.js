@@ -317,14 +317,14 @@ const styles = StyleSheet.create({
   modalView: {
     width: '90%',
     maxHeight: '98%',
-    backgroundColor: '#1f1f1f',
-    borderRadius: 20,
+    backgroundColor: '#f2f4f5', // Light background
+    borderRadius: 30, // Rounded corners
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 4 }, // Deeper shadow for floating effect
+    shadowOpacity: 0.3,
     shadowRadius: 10,
-    elevation: 15,
+    elevation: 10,
   },
   closeButton: {
     position: 'absolute',
@@ -338,13 +338,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
-    color: '#ccc',
+    color: '#1f2f16', // Dark green text
   },
   sectionHeader: {
     fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 10,
-    color: '#ffbf00',
+    color: '#21b64a', // Light green for headers
   },
   productsContainer: {
     marginTop: 10,
@@ -352,13 +352,13 @@ const styles = StyleSheet.create({
   productContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333',
-    borderRadius: 10,
+    backgroundColor: '#eaf7eb', // Soft green background for items
+    borderRadius: 15,
     padding: 10,
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
   },
   imageContainer: {
@@ -380,32 +380,32 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#ffbf00',
+    color: '#21b64a',
   },
   productQuantity: {
     fontSize: 14,
-    color: '#ccc',
+    color: '#1f2f16',
   },
   productPrice: {
     fontSize: 14,
-    color: '#ff5c5c',
+    color: '#21b64a',
   },
   showMoreButton: {
     marginTop: 10,
     alignItems: 'center',
   },
   showMoreText: {
-    color: '#007bff',
+    color: '#21b64a', // Green for "show more" text
     fontSize: 16,
   },
   input: {
-    borderColor: '#ccc',
+    borderColor: '#21b64a',
     borderWidth: 1,
     padding: 10,
     marginBottom: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     backgroundColor: '#fff',
-    color: '#000',
+    color: '#1f2f16',
   },
   
   pickerContainer: {
@@ -418,18 +418,23 @@ const styles = StyleSheet.create({
     height: 50,
     color: '#fff',
   },
-  affectButton: {
-    marginTop: 20,
-    padding: 15,
-    backgroundColor: '#248b2a',
-    borderRadius: 10,
-    alignItems: 'center',
-  },  affectButton33: {
+ affectButton33: {
     marginTop: 20,
     padding: 15,
     backgroundColor: '#ac3838',
     borderRadius: 10,
     alignItems: 'center',
+  },
+  affectButton: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#21b64a', // Green button background
+    borderRadius: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
   },
   affectButtonText: {
     color: '#fff',
@@ -439,7 +444,7 @@ const styles = StyleSheet.create({
   totalContainer: {
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#333',
+    backgroundColor: '#5a4f4fae',
     borderRadius: 10,
     alignItems: 'center',
   }, 

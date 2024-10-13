@@ -98,7 +98,18 @@ const ChatScreenComponent = ({ navigation }) => {
   // Filter and sort chats based on search input and selected status
   const filteredChats = chats
     .filter(chat => {
-      const isOrderStatusMatch = selectedStatus === 'all' || chat.orderStatus === selectedStatus;
+      let selectesdoned = selectedStatus;
+      if(selectedStatus === 'tous') {
+        selectesdoned='all';
+        
+      }if(selectedStatus === 'livré') {
+        selectesdoned='delivered';
+        
+      }if(selectedStatus === 'en cours') {
+        selectesdoned = 'in_progress'
+        
+      }
+      const isOrderStatusMatch = selectesdoned === 'all' || chat.orderStatus === selectesdoned;
       const searchLower = searchText.toLowerCase();
       const name = `${chat.orderId}`.toLowerCase();
       const clientName = chat.clientFullName.toLowerCase();
@@ -127,16 +138,20 @@ const ChatScreenComponent = ({ navigation }) => {
         onChangeText={setSearchText}
       />
 
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedStatus}
-          style={styles.picker}
-          onValueChange={(itemValue) => setSelectedStatus(itemValue)}
-        >
-          <Picker.Item label="Tous" value="all" />
-          <Picker.Item label="En cours" value="in_progress" />
-          <Picker.Item label="Livré" value="delivered" />
-        </Picker>
+<View style={styles.listContainer}>
+        {['Tous', 'En cours', 'Livré'].map((status, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.listItem,
+              selectedStatus === status.toLowerCase() && styles.selectedListItem,
+            ]}
+            onPress={() => setSelectedStatus(status.toLowerCase())}
+          >
+            <Text style={styles.listItemText}>{status}</Text>
+          </TouchableOpacity>
+        ))}
+
           {/* Filter Button */}
           <TouchableOpacity onPress={toggleFilterMenu} style={styles.filterButton}>
           <Ionicons name="filter-outline" size={24} color="#fff" />
@@ -243,6 +258,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingBottom: 10,
   },
+  listContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 15,
+    marginBottom: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -263,6 +286,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: '#f2f2f2',
     borderRadius: 20,
+  },
+  selectedListItem: {
+    backgroundColor: '#e27a3f',
+    borderRadius: 5,
   },
   picker: {
     flex: 1,
@@ -330,6 +357,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 3,
+  },
+  listItem: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  listItemText: {
+    color: '#000',
   },
   unreadChatName: {
     fontWeight: 'bold',

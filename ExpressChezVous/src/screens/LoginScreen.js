@@ -31,9 +31,10 @@ const LoginScreen = ({ navigation }) => {
 
     socket1.on('activationStatus', (status) => {
       console.log('Activation status received:', status);
-      if (!status.activated) {
+      if (status.activated === false && status.none === true) {
         navigation.replace('Loading');
-      }
+      } 
+        
     });
 
     return () => {

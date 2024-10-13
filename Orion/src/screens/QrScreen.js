@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Modal, ActivityIndicator } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; 
 import axios from 'axios';
 import { BASE_URL } from '@env'; 
 import { Ionicons } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; 
 
 const QrScreen = () => {
   const [qrData, setQrData] = useState([]);
@@ -11,8 +11,8 @@ const QrScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedQr, setSelectedQr] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedType, setSelectedType] = useState('all');
-  const [loading, setLoading] = useState(true); // Loading state
+  const [selectedType, setSelectedType] = useState('tous');
+  const [loading, setLoading] = useState(true);
 
   // Fetch the QR data using Axios
   useEffect(() => {
@@ -24,37 +24,49 @@ const QrScreen = () => {
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false); // Set loading to false once data is fetched
+        setLoading(false);
       }
     };
-
     fetchQrData(); 
   }, []);
 
-  // Search filter logic
-  const handleSearch = (query) => {
-    setSearchText(query);
+  // Unified filter logic: it filters based on both search text and selected type
+  const applyFilter = (query, type) => {
     const filtered = qrData.filter(item => {
-      const matchesType = selectedType === 'all' || item.type === selectedType; 
+      const matchesType = 
+        type === 'tous' || 
+        (type === 'driver' && item.type === 'Driver') || 
+        (type === 'client' && item.type === 'Client');
+      
       const matchesQuery = 
         item.userInfo.firstName.toLowerCase().includes(query.toLowerCase()) ||
         item.userInfo.lastName.toLowerCase().includes(query.toLowerCase()) ||
         item.userInfo.phone.toString().includes(query) ||
         item.deviceId.includes(query) ||
         item.id.includes(query);
-        
-      return matchesType && matchesQuery; 
+
+      return matchesType && matchesQuery;
     });
     setFilteredData(filtered);
   };
 
-  // Handle card click to show modal
+  // This handles typing in the search box
+  const handleSearch = (query) => {
+    setSearchText(query);
+    applyFilter(query, selectedType);
+  };
+
+  // Handle the filter buttons click
+  const handleTypeChange = (type) => {
+    setSelectedType(type.toLowerCase());
+    applyFilter(searchText, type.toLowerCase());
+  };
+
   const handleCardPress = (qr) => {
     setSelectedQr(qr);
     setIsModalVisible(true);
   };
 
-  // Close modal
   const closeModal = () => {
     setIsModalVisible(false);
     setSelectedQr(null);
@@ -77,18 +89,20 @@ const QrScreen = () => {
         onChangeText={handleSearch}
       />
 
-      <Picker
-        selectedValue={selectedType}
-        style={styles.picker}
-        onValueChange={(itemValue) => {
-          setSelectedType(itemValue);
-          handleSearch(searchText); 
-        }}
-      >
-        <Picker.Item label="All" value="all" />
-        <Picker.Item label="Driver" value="driver" />
-        <Picker.Item label="Client" value="client" />
-      </Picker>
+      <View style={styles.listContainer}>
+        {['Tous', 'Driver', 'Client'].map((type, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.listItem,
+              selectedType === type.toLowerCase() && styles.selectedListItem,
+            ]}
+            onPress={() => handleTypeChange(type)}
+          >
+            <Text style={styles.listItemText}>{type}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <ScrollView contentContainerStyle={styles.cardContainer}>
         {loading ? (
@@ -100,7 +114,7 @@ const QrScreen = () => {
             <TouchableOpacity key={qr.id} style={styles.card} onPress={() => handleCardPress(qr)}>
               <View style={styles.cardContent}>
                 <View style={styles.qrPlaceholder}>
-                  <Text style={styles.qrText}>QR Code: {qr.qr}</Text>
+                <Icon name="qrcode-scan" size={45} color="#fff" />
                 </View>
                 <View style={styles.textContainer}>
                   <Text style={styles.cardTitle}>QR: {qr.qr}</Text>
@@ -177,14 +191,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
   },
-  picker: {
-    height: 50,
-    width: '100%',
+  listContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    backgroundColor: '#FFFF',
+    backgroundColor: '#f2f2f2',
+    borderRadius: 20,
+    padding: 10,
+  },
+  listItem: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectedListItem: {
+    backgroundColor: '#e27a3f',
+    borderRadius: 5,
+  },
+  listItemText: {
+    color: '#000',
   },
   cardContainer: {
     flexDirection: 'column',
@@ -192,7 +218,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: Dimensions.get('window').width - 40,
-    backgroundColor: '#EAD8B1',
+    backgroundColor: '#c0bbaf',
     borderRadius: 20,
     padding: 20,
     marginVertical: 20,
@@ -209,7 +235,7 @@ const styles = StyleSheet.create({
   qrPlaceholder: {
     width: 50,
     height: 50,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#110a0a',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',

@@ -23,7 +23,7 @@ import Logout from '../screens/logout';
 import PaymentScreen from '../screens/PaymentScreen';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 import FeedBackScreen from '../screens/FeedBackScreen';
-import QrcodeGeneratorScreenScreen from '../screens/QrcodeGeneratorScreen';
+import ParrainageScreen from '../screens/Parrainage';
 import { DataProvider } from './DataContext'
 import { navigationRef } from '../utils/navigationRef'; 
 
@@ -36,7 +36,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="QRScanner" component={QRScannerScreen} options={{ headerShown: false }}/>
-        <Stack.Screen name="Registration" component={RegistrationScreen} />  
+        <Stack.Screen name="Registration" component={RegistrationScreen} options={{ headerShown: false }}/>  
         <Stack.Screen name="RegistrationLC" component={RegistrationWithLocationScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Services" component={ServicesScreen} options={{ headerShown: false }} />
@@ -50,7 +50,7 @@ const AppNavigator = () => {
           component={DrawerNavigator} 
           options={{ headerShown: false }}  
         /> 
-          <Stack.Screen name="QrcodeGeneratorScreen" component={QrcodeGeneratorScreenScreen} />
+          <Stack.Screen name="Parrainage" component={ParrainageScreen} />
           <Stack.Screen name="ShoppingCartScreen" component={ShoppingCartScreen} />
 
         <Stack.Screen name="SupportChat" component={SupportChat}   options={{ headerShown: false }}  />

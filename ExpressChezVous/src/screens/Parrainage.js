@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ScreenCapture from 'expo-screen-capture'; // Import ScreenCapture
 import { BASE_URL, BASE_URLIO } from '@env';
 
-const QrcodeGeneratorScreen = () => {
+const Parrainage = () => {
   const [qrData, setQrData] = useState(null);
   const [expiration, setExpiration] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -194,4 +194,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QrcodeGeneratorScreen;
+export default Parrainage;

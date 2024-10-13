@@ -147,16 +147,19 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', 
+    backgroundColor: 'rgba(15, 15, 15, 0.85)', // Darker background with slight transparency
     alignItems: 'center',
     paddingTop: 50,
   },
   headerText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 30,
-    letterSpacing: 1.5,
+    fontSize: 32, // Larger modern text
+    fontWeight: '700', // Bolder text
+    color: '#e9ab25', // Gold color for the title
+    marginBottom: 40, // More spacing for a cleaner layout
+    letterSpacing: 2, // Modern spacing for the header text
+    textShadowColor: '#000', // Subtle shadow for depth
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 10,
   },
   loadingContainer: {
     flex: 1,
@@ -167,13 +170,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: '#ffffff',
     fontSize: 16,
+    fontWeight: '500',
+
   },
   servicesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
     width: '100%',
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
   },
   serviceItem: {
     width: 130,
@@ -184,6 +189,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#27262618',
     borderRadius: 100, 
     margin: 15,
+    borderWidth: 2,
+    borderColor: '#e9ab25', 
     ...Platform.select({
       ios: {
         shadowColor: '#000', 
@@ -216,10 +223,10 @@ const styles = StyleSheet.create({
     zIndex: 2, 
   },
   serviceText: {
-    marginTop: 10,
+    marginTop: 15,
     textAlign: 'center',
     fontSize: 17,
-    color: '#f3ebebb0',
+    color: '#f3ebebfd',
     fontWeight: '600',
   },
 });

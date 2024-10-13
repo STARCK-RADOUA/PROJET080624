@@ -248,7 +248,7 @@ const DriverOrdersScreen = ({ navigation }) => {
           <TouchableOpacity style={styles.qr} onPress={() => navigate('QrcodeGeneratorDriverScreen')}>
             <Icon name="qrcode-scan" size={45} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerText}>Driver Availability</Text>
+          <Text style={styles.headerText}>     Driver Availability     </Text>
           <Switch
             trackColor={{ false: '#7a2424', true: '#1c7745' }}
             thumbColor={isEnabled ? '#36d815' : '#ca6411'}
@@ -266,6 +266,8 @@ const DriverOrdersScreen = ({ navigation }) => {
           <FlatList
             data={loading ? Array.from({ length: 3 }) : orders}
             keyExtractor={(item, index) => item?._id || index.toString()}
+            initialNumToRender={10}
+  windowSize={5}
             renderItem={({ item }) =>
               loading ? (
                 <>
@@ -279,11 +281,27 @@ const DriverOrdersScreen = ({ navigation }) => {
                       style={styles.orderIcon}
                     />
                     <View style={styles.cardContent}>
-                      <Text style={styles.orderNumber}>Order #{item.order_number || 'N/A'}</Text>
-                      <Text style={styles.address_line}>{item.address_line || 'No Address Provided'}</Text>
-                      <Text style={styles.distance}>
-                    Distance: {item.distance ? `${item.distance} km` : 'Calculating...'}
-                  </Text>
+                    <Text style={styles.orderNumber}>
+  Commande de{'\n'}
+  <Text style={{ color: item.client_name ? '#28a745' : '#dc3545', fontWeight: 'bold' }}>
+    {item.client_name ?? 'N/A'}
+  </Text>
+</Text>
+<Text style={styles.address_line}>
+  Adresse: 
+  <Text style={{ color: item.address_line ? '#20c997' : '#dc3545', fontWeight: 'bold' }}>
+    {item.address_line ?? 'Aucune adresse fournie'}
+  </Text>
+</Text>
+<Text style={styles.distance}>
+  Distance: 
+  <Text style={{ color: item.distance ? '#28a745' : '#dc3545', fontWeight: 'bold' }}>
+    {item.distance ? `${item.distance} km` : 'Calcul en cours...'}
+  </Text>
+</Text>
+
+
+
                       <View style={styles.fieldRow}>
                         <TouchableOpacity style={styles.navigateButtonGoogle} onPress={() => openGoogleMaps(item.location)}>
                           <Ionicons name="navigate-outline" size={24} color="white" />
