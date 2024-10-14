@@ -18,6 +18,7 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We need your location to provide real-time tracking.",
         "NSLocationAlwaysUsageDescription": "We need your location to provide continuous tracking even when the app is in the background.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs to track your location at all times.",
         "UIBackgroundModes": ["location", "fetch", "remote-notification"]
 
 
@@ -35,7 +36,9 @@
         "ACCESS_COARSE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
         "INTERNET",
-        "ACCESS_NETWORK_STATE"
+        "ACCESS_NETWORK_STATE",
+        "FOREGROUND_SERVICE"
+
       ],
       "package": "com.riderhard.nimbus",
       "runtimeVersion": "1.0.0"
