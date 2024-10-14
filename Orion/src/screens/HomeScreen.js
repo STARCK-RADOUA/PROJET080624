@@ -20,8 +20,8 @@ const HomeScreen = () => {
       {/* Header Section */}
       <View style={styles.header}>
         <Text style={styles.title}>Home</Text>
-        <Icon name="moon-outline" type="ionicon" color="#000" />
-        <Icon name="person" type="ionicon" color="#000" />
+        <Icon name="moon-outline" type="ionicon" color="#81b0ff" />
+        <Icon name="person" type="ionicon" color="#81b0ff" />
       </View>
 
       {/* Stats Cards Section */}
@@ -118,7 +118,7 @@ const HomeScreen = () => {
             propsForDots: {
               r: '6',
               strokeWidth: '2',
-              stroke: '#ffa726',
+              stroke: '#81b0ff',
             },
           }}
           bezier
@@ -131,12 +131,11 @@ const HomeScreen = () => {
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',  // Light background for a modern look
   },
   header: {
     flexDirection: 'row',
@@ -145,70 +144,80 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,  // Slightly larger for modern headings
+    fontWeight: '700',  // Bolder font for emphasis
+    color: '#333',  // Dark gray text for modern contrast
   },
   statsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: 'flex-row',
+    flexWrap: 'flex-row',
     justifyContent: 'space-between',
   },
   card: {
     width: '45%',
-    padding: 15,
-    borderRadius: 10,
-    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 15,  // Increased rounding for a softer, modern feel
+    backgroundColor: '#ffffff',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 20,
+    shadowColor: '#000',  // Subtle shadow for depth
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,  // Elevation for Android shadow
   },
   statNumber: {
-    fontSize: 20,
+    fontSize: 24,  // Bigger font for better emphasis
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 12,
+    color: '#81b0ff',  // Theme color accent for consistency
   },
   filterContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 15,
+    marginBottom: 20,
   },
   filterButton: {
     flex: 1,
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: '#e0e0e0',
-    marginHorizontal: 5,
+    padding: 12,
+    borderRadius: 12,  // Consistent rounding across components
+    backgroundColor: '#f0f0f0',  // Flat, minimal background for inactive buttons
+    marginHorizontal: 6,
     alignItems: 'center',
   },
   activeFilter: {
-    backgroundColor: '#1976d2',
+    backgroundColor: '#81b0ff',  // Active filter color matches the theme
   },
   filterText: {
-    color: '#fff',
+    color: '#333',  // Modern, dark gray text for better contrast
+    fontWeight: '500',  // Medium weight for modern buttons
   },
   chartContainer: {
-    marginTop: 20,
+    marginTop: 30,  // Increased spacing for better structure
   },
   chartHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   chartTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,  // Slightly larger title for clarity
+    fontWeight: '700',
+    color: '#333',  // Dark gray for modern look
   },
   periodContainer: {
     flexDirection: 'row',
   },
   periodText: {
     fontSize: 16,
-    marginHorizontal: 10,
-    color: '#1976d2',
+    marginHorizontal: 12,
+    color: '#81b0ff',  // Period color consistent with theme
+    fontWeight: '500',
   },
   activePeriod: {
     fontWeight: 'bold',
-    color: '#000',
+    color: '#333',  // Active period has dark gray for readability
   },
 });
 
