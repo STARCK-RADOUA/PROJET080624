@@ -15,6 +15,28 @@ export default function App() {
   const responseListener = useRef();
   const socketRef = useRef(null);
   const deviceId = Device.osBuildId;
+  useEffect(() => {
+    // Initialize socket connection
+    const socket = io(BASE_URLIO);
+    // Listen to the socket for the system status
+    socket.on('statusSiteDriver', (systemActive) => {
+      // Check the system status from the server
+      console.log('System status received:', { systemActive });
+      console.log('System status received:', { systemActive });
+      console.log('System status received:', { systemActive });
+       // Stop loading after receiving the status 
+       if (!systemActive) {
+navigate('SystemDownScreen') 
+ } 
+ if (systemActive) {
+navigate('Login') 
+ }
+    });
+
+    return () => {
+      socket.off('statusSiteDriver');
+    };
+  }, []);
 
   useEffect(() => {
     const fetchCurrentLocation = async () => {
@@ -37,6 +59,7 @@ export default function App() {
         deviceId: deviceId,  // Pass the unique deviceId
       },
     });
+    socket.emit('toggleSystemDriver'); // For example, emit an event to check system status
 
     // Listen for admin deactivation event
     socket.on('adminDeactivateClient', () => {

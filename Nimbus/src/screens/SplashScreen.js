@@ -12,7 +12,7 @@ const SplashScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/8498789-23.png')} style={styles.logo} />
+      <Image source={require('../assets/sffff.webp')} style={styles.logo} />
     </View>
   );
 };
@@ -20,7 +20,7 @@ const SplashScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundImage: require('../assets/8498789sd.png'),
+    backgroundColor: '#1b3b1fb3',
     justifyContent: 'center',
     alignItems: 'center',
   },

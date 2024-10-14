@@ -1,133 +1,148 @@
-import { BASE_URL, BASE_URLIO } from '@env';
-
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Switch, StyleSheet, ScrollView } from 'react-native';
+import { Icon } from 'react-native-elements';
 import io from 'socket.io-client';
+import { BASE_URLIO } from '@env';
 
-const ClientChatScreen = () => {
-  const clientId = '66c10e4d4eac0352b3aec084';  // Static clientId
-  const adminId = '66bac40871e4a7ed9e6fc705';  // Static adminId
-  const [messages, setMessages] = useState([]);  // Chat messages
-  const [newMessage, setNewMessage] = useState('');  // Input message
-  const [chatId, setChatId] = useState(null);  // Chat ID obtained after initiation
+// Connect to the socket server
+const socket = io(BASE_URLIO);
 
-  const socket = io(BASE_URLIO);  // Adjust to your server IP
+const SettingsScreen = () => {
+  const [isClientsActive, setIsClientsActive] = useState(true);
+  const [isDriversActive, setIsDriversActive] = useState(true);
+  const [isSystemActive, setIsSystemActive] = useState(true);
 
   useEffect(() => {
-    // Initiate chat when the component mounts
-    console.log('Initiating chat between client and admin');
-    socket.emit('initiateChat', { adminId, clientId });
-
-    // Listen for chat details from the server (only unseen messages)
-    socket.on('chatDetails', (data) => {
-      console.log('Chat details received:', data);
-      setChatId(data.chatId);  // Set the chatId obtained from the server
-      setMessages(data.messages);  // Load only unseen messages from admin
+    socket.emit('statusS');
+    // Listen to the initial status from the server
+    socket.on('statusSite', (data) => {
+      setIsSystemActive(data.systemActive);
+      setIsClientsActive(data.clientsActive);
+      setIsDriversActive(data.driversActive);
     });
 
-    // Listen for new messages in real-time
-    socket.on('newMessage', (messageData) => {
-      console.log('New message received:', messageData);
-      setMessages((prevMessages) => [...prevMessages, messageData.message]);  // Append new message
-    });
-
-    // Cleanup on component unmount
+    // Cleanup on unmount
     return () => {
-      socket.off('chatDetails');
-      socket.off('newMessage');
-      socket.disconnect();
-      console.log('Socket disconnected');
+      socket.off('status');
     };
   }, []);
 
-  // Handle sending a message
-  const sendMessage = () => {
-    if (newMessage.trim() && chatId) {
-      socket.emit('sendMessage', {
-        chatId,
-        sender: 'client',  // Client is sending the message
-        content: newMessage
-      });
-      setNewMessage('');  // Clear input after sending
-
-      // Do NOT clear messages after sending
-    }
+  // Toggle System status
+  const toggleSystem = () => {
+    const newStatus = !isSystemActive;
+    setIsSystemActive(newStatus);
+    socket.emit('toggleSystem', newStatus); // Emit change to the server
   };
 
-  // Render each message
-  const renderMessage = ({ item }) => (
-    <View style={styles.messageContainer}>
-      <Text style={styles.sender}>{item.sender}</Text>
-      <Text style={styles.content}>{item.content}</Text>
-    </View>
-  );
+  // Toggle Clients status
+  const toggleClients = () => {
+    const newStatus = !isClientsActive;
+    setIsClientsActive(newStatus);
+    socket.emit('toggleClients', newStatus); // Emit change to the server
+  };
+
+  // Toggle Drivers status
+  const toggleDrivers = () => {
+    const newStatus = !isDriversActive;
+    setIsDriversActive(newStatus);
+    socket.emit('toggleDrivers', newStatus); // Emit change to the server
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.chatTitle}>Chat {chatId ? 'Active' : 'Connecting...'}</Text>
-
-      <FlatList
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={(item, index) => index.toString()}
-        style={styles.chatList}
-      />
-
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.textInput}
-          value={newMessage}
-          onChangeText={setNewMessage}
-          placeholder="Type a message"
-        />
-        <Button title="Send" onPress={sendMessage} disabled={!chatId} />
+    <ScrollView style={styles.container}>
+      {/* Header Section */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Settings</Text>
+        <Icon name="settings-outline" type="ionicon" color="#000" />
       </View>
-    </View>
+
+      {/* System Activation Section */}
+      <View style={styles.settingContainer}>
+        <View style={styles.settingRow}>
+          <Icon name="power-outline" type="ionicon" color={isSystemActive ? "#1976d2" : "#ff5252"} />
+          <Text style={styles.settingText}>Activate Entire System</Text>
+        </View>
+        <Switch
+          trackColor={{ false: '#767577', true: '#1976d2' }}
+          thumbColor={isSystemActive ? '#ffffff' : '#f4f3f4'}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={toggleSystem}
+          value={isSystemActive}
+        />
+      </View>
+
+      {/* Clients Activation Section */}
+      <View style={styles.settingContainer}>
+        <View style={styles.settingRow}>
+          <Icon name="people-outline" type="ionicon" color={isClientsActive ? "#1976d2" : "#ff5252"} />
+          <Text style={styles.settingText}>Activate All Clients</Text>
+        </View>
+        <Switch
+          trackColor={{ false: '#767577', true: '#1976d2' }}
+          thumbColor={isClientsActive ? '#ffffff' : '#f4f3f4'}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={toggleClients}
+          value={isClientsActive}
+        />
+      </View>
+
+      {/* Drivers Activation Section */}
+      <View style={styles.settingContainer}>
+        <View style={styles.settingRow}>
+          <Icon name="car-outline" type="ionicon" color={isDriversActive ? "#1976d2" : "#ff5252"} />
+          <Text style={styles.settingText}>Activate All Drivers</Text>
+        </View>
+        <Switch
+          trackColor={{ false: '#767577', true: '#1976d2' }}
+          thumbColor={isDriversActive ? '#ffffff' : '#f4f3f4'}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={toggleDrivers}
+          value={isDriversActive}
+        />
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-    backgroundColor: '#fff',
+    padding: 20,
+    backgroundColor: '#f5f5f5',
   },
-  chatTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  chatList: {
-    flex: 1,
-    marginBottom: 10,
-  },
-  messageContainer: {
-    padding: 10,
-    marginVertical: 5,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-  },
-  sender: {
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
   },
-  content: {
-    marginTop: 5,
+  settingContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    marginVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 5,
   },
-  inputContainer: {
+  settingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderColor: '#ccc',
-    paddingTop: 10,
   },
-  textInput: {
-    flex: 1,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
+  settingText: {
+    fontSize: 18,
+    marginLeft: 10,
+    color: '#000',
   },
 });
 
-export default ClientChatScreen;
+export default SettingsScreen;

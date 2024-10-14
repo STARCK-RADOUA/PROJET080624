@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, AppState } from 'react-native';
+import { View, ActivityIndicator ,StyleSheet, AppState } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import * as Location from 'expo-location';
@@ -14,6 +14,8 @@ import * as Device from 'expo-device';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
 
+
+
 export default function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [isConnected, setIsConnected] = useState(true);
@@ -22,7 +24,8 @@ export default function App() {
   const responseListener = useRef();
   const socketRef = useRef(null);
   const BACKGROUND_PING_TASK = 'background-fetch';
-
+  const [isSystemDown, setIsSystemDown] = useState(false);
+  const [loading, setLoading] = useState(false);
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
@@ -36,6 +39,34 @@ export default function App() {
     }
   });
 
+  useEffect(() => {
+    // Initialize socket connection
+    const socket = io(BASE_URLIO);
+    // Listen to the socket for the system status
+    socket.on('statusSiteDriver', (systemActive) => {
+      // Check the system status from the server
+      setIsSystemDown(!systemActive); // Set system down if status is false
+      console.log('System status received:', { systemActive });
+      console.log('System status received:', { systemActive });
+      console.log('System status received:', { systemActive });
+      setLoading(false);
+       // Stop loading after receiving the status 
+       if (!systemActive) {
+navigate('SystemDownScreen') 
+ } 
+ if (systemActive) {
+navigate('Login') 
+ }
+    });
+
+    return () => {
+      socket.off('statusSiteDriver');
+    };
+  }, []);
+
+
+
+ 
   // Register background fetch task
   async function registerBackgroundTask() {
     try {
@@ -58,6 +89,8 @@ export default function App() {
     // Initialize socket connection
     const socket = io(BASE_URLIO, { query: { deviceId } });
     socketRef.current = socket;
+    socket.emit('toggleSystemDriver'); // For example, emit an event to check system status
+
     socket.on('connect', () => {
       console.log('Socket reconnected');
     });

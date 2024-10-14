@@ -8,13 +8,17 @@ import QrcodeGeneratorDriverScreen from '../screens/QrcodeGeneratorDriverScreen'
 import SupportChat from '../screens/SupportChatScreen';
 import { navigationRef } from '../utils/navigationRef'; // Import navigationRef
 import OrderRoomScreen from '../screens/OrderRoomScreen';
+import SystemDownScreen from '../screens/SystemDownScreen';
+import SplashScreen from '../screens/SplashScreen';
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
   return (
     <NavigationContainer ref={navigationRef}> 
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Splash">
+      <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -33,6 +37,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="SupportChat"
           component={SupportChat}
+          options={{ headerShown: false }}
+        />  
+         <Stack.Screen
+          name="SystemDownScreen"
+          component={SystemDownScreen}
           options={{ headerShown: false }}
         />
          <Stack.Screen

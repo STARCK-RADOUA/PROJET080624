@@ -26,6 +26,7 @@ import FeedBackScreen from '../screens/FeedBackScreen';
 import ParrainageScreen from '../screens/Parrainage';
 import { DataProvider } from './DataContext'
 import { navigationRef } from '../utils/navigationRef'; 
+import SystemDownScreen from '../screens/SystemDownScreen';
 
 const Stack = createStackNavigator();
 const AppNavigator = () => {
@@ -43,7 +44,10 @@ const AppNavigator = () => {
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="feedback" component={FeedBackScreen} />
 
-
+        <Stack.Screen  name="SystemDownScreen"
+          component={SystemDownScreen}
+          options={{ headerShown: false }}
+        />
         {/* Renommer "Home" en "MainDrawerNavigator" pour éviter la redondance */}
         <Stack.Screen 
           name="Home" 
