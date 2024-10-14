@@ -109,79 +109,93 @@ const ProductScreen = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f4f4c3',
+    backgroundColor: '#F9F9F9', // Light, neutral background
     paddingTop: 10,
   },
   header: {
-    padding: 10,
-    backgroundColor: '#6472743e',
-    borderRadius: 10,
-    marginHorizontal: 10,
-    marginBottom: 10,
+    padding: 15,
+    backgroundColor: '#E5E7EB', // Light grey for header background
+    borderRadius: 12, // Rounded corners for a modern look
+    marginHorizontal: 20,
+    marginBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   headerText: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#030e0f',
+    color: '#2D3748', // Dark grey for header text
   },
   searchInput: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-    paddingHorizontal: 10,
+    height: 45,
+    backgroundColor: '#FFFFFF', // White background for the input
+    borderRadius: 10,
+    paddingHorizontal: 15,
     marginHorizontal: 10,
-    height: 40,
-    color: '#000',
+    fontSize: 16,
+    borderColor: '#E2E8F0', // Subtle grey border
+    borderWidth: 1,
+    color: '#1A202C', // Darker grey for text input
+    shadowColor: '#000', // Subtle shadow for elevation
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   addButton: {
     paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: '#f3b13e',
-    borderColor: '#f3b13e',
-    borderWidth: 1,
-    borderRadius: 8,
+    backgroundColor: '#5A67D8', // Indigo color for action button
+    borderRadius: 10,
+    elevation: 2, // Slight elevation for a raised button look
   },
   addButtonText: {
-    color: '#dfe1e6',
-    fontSize: 14,
-    fontWeight: '500',
+    color: '#FFFFFF', // White text for contrast
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   cardList: {
     justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   noResultsText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#6b7280',
+    color: '#6B7280', // Grey color for "no results" text
     textAlign: 'center',
+    marginTop: 20,
   },
   skeletonCard: {
     height: 100,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 8,
-    marginBottom: 15,
-    padding: 10,
+    backgroundColor: '#E5E7EB', // Light grey for skeleton loader background
+    borderRadius: 12, // Rounded corners to match modern card style
+    marginBottom: 20,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   skeletonTitle: {
-    width: '50%',
+    width: '60%',
     height: 20,
-    backgroundColor: '#d4d4d4',
+    backgroundColor: '#D1D5DB', // Lighter grey for skeleton title
     borderRadius: 4,
     marginBottom: 10,
   },
   skeletonDescription: {
     width: '80%',
     height: 15,
-    backgroundColor: '#d4d4d4',
+    backgroundColor: '#D1D5DB', // Grey for skeleton description
     borderRadius: 4,
   },
 });
+
 
 export default ProductScreen;

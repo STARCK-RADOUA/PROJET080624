@@ -28,30 +28,29 @@ const ProductCard = ({ product, onReadMore }) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     width: '100%',
-    marginBottom: 10,
-    padding: 10,
+    marginBottom: 15,
+    padding: 15,
     borderWidth: 1,
-    borderRadius: 10,
-    shadowColor: '#b4b4b4',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.7,
+    borderRadius: 12,
+    borderColor: '#E2E8F0', // Light grey border
+    backgroundColor: '#FFF', // White background for the card
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    backgroundColor: '#b4b4b4',
-    borderColor: '#FFF6E9',
   },
   imageContainer: {
-    width: 120,
-    height: 120,
-    marginRight: 10,
+    width: 100,
+    height: 100,
+    marginRight: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FEFAF6',
+    backgroundColor: '#F7FAFC', // Light background for image container
     borderRadius: 10,
   },
   productImage: {
@@ -65,19 +64,19 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 8,
-    fontSize: width * 0.05,
-    fontWeight: '700',
-    color: '#1f695a',
+    fontSize: width * 0.05, // Responsive font size for title
+    fontWeight: 'bold',
+    color: '#2D3748', // Dark grey text for the title
   },
   description: {
-    marginBottom: 12,
-    fontSize: width * 0.033,
-    color: '#2d2e30',
+    marginBottom: 10,
+    fontSize: width * 0.038, // Slightly smaller font for description
+    color: '#4A5568', // Grey for description text
   },
   price: {
-    fontSize: width * 0.046,
-    fontWeight: '700',
-    color: '#554c3c',
+    fontSize: width * 0.045, // Medium font for price
+    fontWeight: 'bold',
+    color: '#1A202C', // Dark grey text for the price
     marginBottom: 10,
   },
   optionsContainer: {
@@ -85,21 +84,23 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   option: {
-    fontSize: width * 0.03,
-    color: '#66748d',
+    fontSize: width * 0.034, // Smaller font for options
+    color: '#718096', // Lighter grey for options
   },
   iconButton: {
     position: 'absolute',
     right: 10,
     bottom: 10,
-    padding: 10,
-    backgroundColor: '#da9820',
-    borderRadius: 50,
+    padding: 12,
+    backgroundColor: '#5A67D8', // Indigo for the action button
+    borderRadius: 30,
+    elevation: 2,
   },
   icon: {
-    fontSize: width * 0.06,
-    color: 'white',
+    fontSize: width * 0.06, // Responsive icon size
+    color: '#FFF', // White icon for contrast
   },
 });
+
 
 export default ProductCard;

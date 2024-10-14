@@ -174,7 +174,7 @@ const handleToggleLoginStatus = () => {
             <Switch
               value={editableDriver.activated}
               onValueChange={handleActivateDeactivate}
-              thumbColor={editableDriver.activated ? "#34C759" : "#f4f3f4"}
+              thumbColor={editableDriver.activated ? "#5A67D8" : "#f4f3f4"}
               trackColor={{ false: "#767577", true: "#81b0ff" }}
             />
           </View>
@@ -184,7 +184,7 @@ const handleToggleLoginStatus = () => {
             <Switch
               value={editableDriver.isLogin}
               onValueChange={handleToggleLoginStatus}
-              thumbColor={editableDriver.isLogin ? "#34C759" : "#f4f3f4"}
+              thumbColor={editableDriver.isLogin ? "#5A67D8" : "#f4f3f4"}
               trackColor={{ false: "#767577", true: "#81b0ff" }}
             />
           </View>
@@ -194,25 +194,24 @@ const handleToggleLoginStatus = () => {
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Dark background for modal
+    paddingVertical: "20%",
   },
   modalView: {
-    width: '85%',
-    backgroundColor: '#333', 
-    borderRadius: 15,
-    padding: 25,
-    alignItems: 'stretch',
+    width: '90%',
+    backgroundColor: '#38435a88', // Dark background for modal view
+    borderRadius: 12,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.6,
     shadowRadius: 7,
-    elevation: 10, 
+    elevation: 10, // For Android shadow
   },
   closeButton: {
     position: 'absolute',
@@ -221,9 +220,9 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   name: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#1f695a', 
+    color: '#5A67D8', // Primary theme color for title
     textAlign: 'center',
     marginVertical: 15,
   },
@@ -231,18 +230,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
-    flexWrap: 'wrap',
+    marginVertical: 10,
   },
   label: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#ddd', 
-    marginBottom: 5,
+    color: '#E2E8F0', // Light grey for labels
   },
   textValue: {
     fontSize: 16,
-    color: '#fff', 
+    color: '#FFFFFF', // White for text
     fontWeight: '500',
     flex: 2,
     textAlign: 'right',
@@ -250,23 +247,30 @@ const styles = StyleSheet.create({
   navigateButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#afb997',
-    padding: 10,
+    backgroundColor: '#5A67D8', // Primary theme color for navigation buttons
+    padding: 12,
     borderRadius: 8,
     marginVertical: 5,
     flex: 1,
     justifyContent: 'center',
   },
   navigateText: {
-    color: '#fff',
+    color: '#FFFFFF', // White text for navigation button
     marginLeft: 10,
     fontWeight: 'bold',
   },
   separator: {
     height: 1,
-    backgroundColor: '#555',
+    backgroundColor: '#CBD5E0', // Light grey separator
     marginVertical: 15,
   },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 10,
+  },
 });
+
 
 export default DriverModal;

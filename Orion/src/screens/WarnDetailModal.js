@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginHorizontal: 20,
     borderRadius: 10,
-    shadowColor: '#10515a',
+    shadowColor: '#5A67D8',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.8,
     shadowRadius: 10,
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '800',
     marginBottom: 20,
-    color: '#10515a',
+    color: '#5A67D8',
     textAlign: 'center',
   },
   modalText: {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#10515a',
+    backgroundColor: '#5A67D8',
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 8,

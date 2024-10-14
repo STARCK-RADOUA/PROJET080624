@@ -92,21 +92,21 @@ const ServiceScreen = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
-    padding: 10,
-    backgroundColor: 'white',
+    padding: 20,
+    backgroundColor: '#F9F9F9', // Light background for modern look
   },
   headerContainer: {
     marginBottom: 20,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#1f2937',
+    color: '#111827', // Dark grey for bold title
     marginBottom: 10,
+    textAlign: 'center', // Centered title for balance
   },
   searchContainer: {
     flexDirection: 'row',
@@ -116,26 +116,30 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 50,
-    paddingLeft: 40,
-    borderColor: '#d1d5db',
+    paddingLeft: 15,
+    borderColor: '#E5E7EB', // Light grey border for clean look
     borderWidth: 1,
-    borderRadius: 8,
-    backgroundColor: '#f9fafb',
-    color: '#111827',
+    borderRadius: 12, // Rounded corners for modern feel
+    backgroundColor: '#F3F4F6', // Light background for input
+    color: '#1F2937', // Dark text color for readability
     marginRight: 10,
+    shadowColor: '#000', // Subtle shadow for elevation
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   addButton: {
     paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: '#f3b13e',
-    borderColor: '#f3b13e',
-    borderWidth: 1,
-    borderRadius: 8,
+    backgroundColor: '#5A67D8', // Vibrant green for call-to-action
+    borderRadius: 12,
+    elevation: 2,
   },
   addButtonText: {
-    color: '#1f2937',
-    fontSize: 14,
-    fontWeight: '500',
+    color: '#FFF', // White text for contrast
+    fontSize: 16,
+    fontWeight: '600',
   },
   cardList: {
     justifyContent: 'center',
@@ -143,27 +147,33 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#6b7280',
+    color: '#6B7280', // Medium grey for "no results" text
     textAlign: 'center',
+    marginTop: 20,
   },
   skeletonCard: {
     height: 100,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 8,
+    backgroundColor: '#E5E7EB', // Light grey for skeleton loading
+    borderRadius: 12,
     marginBottom: 15,
-    padding: 10,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   skeletonTitle: {
     width: '50%',
     height: 20,
-    backgroundColor: '#d4d4d4',
+    backgroundColor: '#D1D5DB', // Grey for skeleton title
     borderRadius: 4,
     marginBottom: 10,
   },
   skeletonDescription: {
     width: '80%',
     height: 15,
-    backgroundColor: '#d4d4d4',
+    backgroundColor: '#D1D5DB', // Grey for skeleton description
     borderRadius: 4,
   },
 });

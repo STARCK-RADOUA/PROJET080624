@@ -224,7 +224,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
             {/* Produit actif */}
             <View style={styles.switchContainer}>
               <Text style={styles.label}>Est actif</Text>
-              <Switch thumbColor={"#f3b13e"} value={isActive} onValueChange={setIsActive} />
+              <Switch thumbColor={"#5A67D8"} value={isActive} onValueChange={setIsActive} />
             </View>
 
             {/* Section des options */}
@@ -258,7 +258,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity onPress={() => removeOption(index)} style={styles.removeOptionButton}>
-                    <Ionicons name="remove-circle" size={30} color="#f3b13e" />
+                    <Ionicons name="remove-circle" size={30} color="#5A67D8" />
                   </TouchableOpacity>
                 )}
               </View>
@@ -277,7 +277,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
                       setImageUrl(''); // Réinitialiser l'URL de l'image pour faire réapparaître le bouton de téléchargement
                     }}
                   >
-                    <Ionicons name="close-circle" size={24} color="#f3b13e" />
+                    <Ionicons name="close-circle" size={24} color="#5A67D8" />
                   </TouchableOpacity>
                 </View>
                 {!uploading && !imageUrl && (
@@ -309,31 +309,31 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#8a8a8a50',
+    backgroundColor: 'rgba(56, 67, 90, 0.85)', // Semi-transparent dark background
     paddingVertical: '20%',
   },
   modalView: {
-    backgroundColor: '#333',
-    borderRadius: 15,
+    backgroundColor: '#38435a88', // Darker modal background
+    borderRadius: 12,
     paddingTop: 20,
     paddingBottom: 20,
     paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.7,
     shadowRadius: 5,
+    elevation: 5,
   },
   modalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
+    color: '#5A67D8', // Primary color for the title
     marginBottom: 15,
-    color: '#1f695a',
     textAlign: 'center',
   },
   closeButton: {
@@ -346,29 +346,29 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#f0f0f0',
+    color: '#E2E8F0', // Light grey for labels
     textAlign: 'left',
   },
   input: {
     width: '100%',
-    padding: 10,
-    borderRadius: 8,
+    padding: 12,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#333',
-    marginBottom: 10,
-    backgroundColor: '#424242',
-    color: '#fff',
+    borderColor: '#5A67D8', // Primary border color
+    marginBottom: 12,
+    backgroundColor: '#38435A', // Dark input background
+    color: '#FFFFFF', // White text
   },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   optionsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#5A67D8', // Primary theme color for the title
     marginBottom: 10,
-    color: '#f0f0f0',
   },
   optionContainer: {
     flexDirection: 'row',
@@ -378,9 +378,9 @@ const styles = StyleSheet.create({
   },
   optionInput: {
     width: '40%',
-    backgroundColor: '#424242',
+    backgroundColor: '#38435A', // Matching input style
     color: '#fff',
-    borderColor: '#333',
+    borderColor: '#5A67D8', // Border matching the theme
   },
   addOptionButton: {
     marginLeft: 10,
@@ -394,15 +394,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 15,
-    backgroundColor: '#444343',
+    backgroundColor: '#444', // Dark background for image picker
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   pickImageText: {
     marginTop: 10,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#FFFFFF', // White text for image picker
   },
   imageWrapper: {
     flexDirection: 'row',
@@ -425,33 +425,37 @@ const styles = StyleSheet.create({
     right: -10,
   },
   uploadButton: {
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#5A67D8', // Primary color for upload button
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginLeft: 20,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
     shadowColor: '#000',
   },
   uploadingButton: {
     backgroundColor: 'yellow',
   },
   uploadButtonText: {
-    color: '#1e1e1e',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '500',
   },
   submitButton: {
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#5A67D8', // Primary theme color for submit button
     padding: 15,
     borderRadius: 10,
     marginTop: 10,
     alignSelf: 'center',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    shadowColor: '#000',
   },
   submitButtonText: {
-    color: '#1e1e1e',
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -460,5 +464,6 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
 });
+
 
 export default AddProductModal;

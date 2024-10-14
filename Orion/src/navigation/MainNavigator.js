@@ -183,7 +183,7 @@ const MainNavigator = ({ onLogin }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#10515a',
+    backgroundColor: '#333b81',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },

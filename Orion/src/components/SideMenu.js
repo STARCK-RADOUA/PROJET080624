@@ -44,7 +44,7 @@ const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages, unreadAd
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#10515a',
+    backgroundColor: '#333b81',
     padding: 15,
     flexDirection: 'column',
   },

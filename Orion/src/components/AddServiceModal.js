@@ -149,13 +149,13 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
             {/* Point système */}
             <View style={styles.switchContainer}>
               <Text style={styles.label}>Système du points</Text>
-              <Switch thumbColor={"#f3b13e"} value={isSystemPoint} onValueChange={setIsSystemPoint} />
+              <Switch thumbColor={"#5A67D8"} value={isSystemPoint} onValueChange={setIsSystemPoint} />
             </View>
 
             {/* Service de test */}
             <View style={styles.switchContainer}>
               <Text style={styles.label}>Système du test</Text>
-              <Switch thumbColor={"#f3b13e"} value={testService} onValueChange={setTestService} />
+              <Switch thumbColor={"#5A67D8"} value={testService} onValueChange={setTestService} />
             </View>
 
             {/* Sélection d'image */}
@@ -181,7 +181,7 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
                       setUploadButtonVisible(false); // Rendre le bouton de téléchargement visible à nouveau
                     }}
                   >
-                    <Ionicons name="close-circle" size={24} color="#f3b13e" />
+                    <Ionicons name="close-circle" size={24} color="#5A67D8" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -203,30 +203,30 @@ const AddServiceModal = ({ modalVisible, setModalVisible }) => {
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    paddingVertical: "20%",
+    backgroundColor: 'rgba(56, 67, 90, 0.85)', // Updated background with transparency
+    paddingVertical: '20%',
   },
   modalView: {
-    backgroundColor: '#2c2c2c',
-    borderRadius: 10,
+    backgroundColor: '#2c2c2c63', // Darker modal background for contrast
+    borderRadius: 12,
     paddingTop: 20,
     paddingBottom: 20,
     paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.7,
-    shadowRadius: 3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#1f695a',
+    color: '#5A67D8', // Primary theme color for title
     marginBottom: 15,
     textAlign: 'center',
   },
@@ -238,25 +238,25 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: 5,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#dddddd',
+    color: '#E2E8F0', // Light grey for labels
     textAlign: 'left',
   },
   input: {
     width: '100%',
-    padding: 10,
-    borderRadius: 8,
+    padding: 12,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#444',
-    marginBottom: 10,
-    backgroundColor: '#3a3a3a',
-    color: '#ffffff',
+    borderColor: '#5A67D8', // Primary border color
+    marginBottom: 12,
+    backgroundColor: '#38435A', // Dark background for input field
+    color: '#FFFFFF', // White text for inputs
   },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   pickImageButton: {
     alignItems: 'center',
@@ -264,13 +264,13 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: '#444',
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   pickImageText: {
     marginTop: 10,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#FFFFFF',
   },
   imageWrapper: {
     flexDirection: 'row',
@@ -293,10 +293,10 @@ const styles = StyleSheet.create({
     right: -10,
   },
   uploadButton: {
-    backgroundColor: '#444',
+    backgroundColor: '#5A67D8', // Primary theme color for upload button
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#555',
+    borderColor: '#5A67D8',
     paddingVertical: 10,
     paddingHorizontal: 20,
     shadowOffset: { width: 0, height: 2 },
@@ -305,16 +305,20 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
   },
   uploadButtonText: {
-    color: '#ffffff',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '500',
   },
   submitButton: {
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#5A67D8', // Primary theme color for submit button
     padding: 15,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 15,
     alignSelf: 'center',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    shadowColor: '#000',
   },
   submitButtonText: {
     color: 'white',
@@ -326,5 +330,6 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
 });
+
 
 export default AddServiceModal;

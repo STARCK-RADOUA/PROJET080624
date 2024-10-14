@@ -338,7 +338,7 @@ const ProductModal = ({ visible, onClose, product }) => {
 
             {isEditing && (
               <TouchableOpacity style={styles.addOptionButton} onPress={addOption}>
-                <Ionicons name="add-circle" size={30} color="#ffbf00" />
+                <Ionicons name="add-circle" size={30} color="#5A67D8" />
               </TouchableOpacity>
             )}
           </View>
@@ -364,24 +364,24 @@ const ProductModal = ({ visible, onClose, product }) => {
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Dark overlay for modal background
   },
   modalView: {
     width: '90%',
-    backgroundColor: '#333',
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: '#38435a88', // Dark grey background for the modal
+    borderRadius: 15,
+    padding: 25,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
+    elevation: 5, // Elevation to make the modal appear raised
   },
   closeButton: {
     position: 'absolute',
@@ -391,13 +391,13 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: 'relative',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   productImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#444',
+    width: 120,
+    height: 120,
+    borderRadius: 60, // Circular image for the product
+    backgroundColor: '#2D3748', // Dark grey background for placeholder
   },
   imagePlaceholder: {
     justifyContent: 'center',
@@ -407,68 +407,65 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -10,
     right: -10,
-    backgroundColor: '#ffbf00',
-    padding: 5,
+    backgroundColor: '#5A67D8', // Bright yellow for camera icon background
+    padding: 8,
     borderRadius: 20,
   },
   uploadButton: {
-    backgroundColor: '#555',
+    backgroundColor: '#4a55689e', // Medium grey for upload button
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#666',
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginTop: 10,
   },
   uploadButtonText: {
-    color: '#ffbf00',
+    color: '#5A67D8', // Bright yellow text for upload button
     fontSize: 14,
     fontWeight: '500',
   },
   fieldRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     width: '100%',
     marginVertical: 10,
   },
   editInput: {
     borderBottomWidth: 1,
-    borderBottomColor: '#777',
+    borderBottomColor: '#777', // Light grey border for editable inputs
     width: '85%',
     fontSize: 16,
     paddingVertical: 5,
-    color: '#fff',
+    color: '#FFF', // White text color
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginTop: 10,
-    color: '#ffbf00',
+    color: '#5A67D8', // Bright yellow for the product name
+    marginBottom: 10,
   },
   description: {
     fontSize: 16,
-    marginTop: 5,
-    color: '#bbb',
+    color: '#A0AEC0', // Light grey for the description text
+    marginBottom: 10,
   },
   price: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#ffbf00',
-    marginTop: 10,
+    color: '#5A67D8', // Bright yellow for price
   },
   serviceType: {
     fontSize: 16,
-    color: '#bbb',
-    marginTop: 5,
+    color: '#A0AEC0', // Light grey for service type text
   },
   optionsContainer: {
-    marginTop: 20,
     width: '100%',
+    marginTop: 20,
   },
   optionsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#ffbf00',
+    color: '#5A67D8', // Bright yellow for options title
     marginBottom: 10,
   },
   optionRow: {
@@ -479,12 +476,12 @@ const styles = StyleSheet.create({
   },
   optionName: {
     fontSize: 16,
-    color: '#fff',
+    color: '#FFF', // White text for option name
     width: '40%',
   },
   optionPrice: {
     fontSize: 16,
-    color: '#ffbf00',
+    color: '#5A67D8', // Bright yellow for option price
     width: '30%',
   },
   addOptionButton: {
@@ -492,25 +489,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   noOptionsText: {
-    color: '#888',
+    color: '#A0AEC0', // Light grey for no options text
     fontSize: 14,
   },
   updateButton: {
-    backgroundColor: '#ffbf00',
+    backgroundColor: '#5A67D8', // Bright yellow for the update button
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 8,
-    marginTop: 10,
+    marginTop: 20,
     alignItems: 'center',
     alignSelf: 'stretch',
   },
   updateButtonText: {
-    color: '#333',
+    color: '#1A202C', // Dark text for the button
     fontWeight: '600',
     fontSize: 16,
   },
   deleteButton: {
-    backgroundColor: '#C7253E',
+    backgroundColor: '#C7253E', // Bright red for delete button
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -519,15 +516,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   deleteButtonText: {
-    color: 'white',
+    color: '#FFF', // White text for delete button
     fontWeight: '600',
     fontSize: 16,
   },
   errorMessage: {
-    color: '#C7253E',
+    color: '#C7253E', // Bright red for error messages
     marginTop: 10,
     fontSize: 14,
   },
 });
+
 
 export default ProductModal;

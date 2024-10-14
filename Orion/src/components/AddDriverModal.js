@@ -172,12 +172,12 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
 
             <View style={styles.switchContainer}>
               <Text style={styles.label}>Activé</Text>
-              <Switch thumbColor="#f3b13e" value={activated} onValueChange={setActivated} />
+              <Switch thumbColor="#5A67D8" value={activated} onValueChange={setActivated} />
             </View>
 
             <View style={styles.switchContainer}>
               <Text style={styles.label}>Connecté</Text>
-              <Switch thumbColor="#f3b13e" value={isLogin} onValueChange={setIsLogin} />
+              <Switch thumbColor="#5A67D8" value={isLogin} onValueChange={setIsLogin} />
             </View>
           </ScrollView>
 
@@ -192,33 +192,32 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
       </View>
     </Modal>
   );
-};
-
-const styles = StyleSheet.create({
+};const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Darker background for modal container
-    paddingVertical: "20%",
+    backgroundColor: 'rgba(56, 67, 90, 0.85)', // Transparent dark background
+    paddingVertical: '20%',
   },
   modalView: {
-    backgroundColor: '#333', // Dark background for modal view
-    borderRadius: 10,
+    backgroundColor: '#38435a88', // Dark background for modal
+    borderRadius: 12,
     paddingTop: 20,
     paddingBottom: 20,
     paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7, // Increase shadow opacity for a more pronounced effect
-    shadowRadius: 3,
+    shadowOpacity: 0.7,
+    shadowRadius: 5,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
+    color: '#5A67D8', // Primary color for title
     marginBottom: 15,
     textAlign: 'center',
-    color: '#1f695a', // White text for modal title
   },
   closeButton: {
     position: 'absolute',
@@ -228,34 +227,39 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: 5,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#ddd', // Light gray color for labels
+    color: '#E2E8F0', // Light grey for labels
+    textAlign: 'left',
   },
   input: {
     width: '100%',
-    padding: 10,
-    borderRadius: 8,
+    padding: 12,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#555', // Darker border color for inputs
-    marginBottom: 10,
-    backgroundColor: '#444', // Darker background color for inputs
-    color: '#fff', // White text for inputs
+    borderColor: '#5A67D8', // Primary border color
+    marginBottom: 12,
+    backgroundColor: '#38435A', // Dark background for input field
+    color: '#FFFFFF', // White text for inputs
   },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   submitButton: {
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#5A67D8', // Primary theme color for submit button
     padding: 15,
     borderRadius: 10,
     marginTop: 10,
     alignSelf: 'center',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    shadowColor: '#000',
   },
   submitButtonText: {
-    color: '#000', // Dark text for contrast with the submit button color
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',

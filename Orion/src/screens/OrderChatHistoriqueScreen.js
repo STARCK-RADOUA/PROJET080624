@@ -207,7 +207,7 @@ const ChatScreenComponent = ({ navigation }) => {
           {filteredChats.map((chat, index) => (
             <TouchableOpacity key={index} style={styles.chatItem} onPress={() => handleChatPress(chat)}>
               <View style={styles.orderIconContainer}>
-                <Ionicons name="cart-outline" size={32} color="#4682B4" />
+                <Ionicons name="cart-outline" size={32} color="#5A67D8" />
               </View>
               <View style={styles.chatDetails}>
                 <Text style={[styles.chatName, chat.unread ? styles.unreadChatName : null]}>
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   selectedListItem: {
-    backgroundColor: '#e27a3f',
+    backgroundColor: '#5A67D8',
     borderRadius: 5,
   },
   picker: {
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e27a3f',
+    backgroundColor: '#5A67D8',
     padding: 10,
     borderRadius: 5,
     marginLeft: 10,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   applyFilterButton: {
-    backgroundColor: '#2e8b57',
+    backgroundColor: '#5A67D8',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,

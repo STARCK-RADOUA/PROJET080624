@@ -15,27 +15,27 @@ const ServiceCard = ({ service, onReadMore }) => {
     </TouchableOpacity>
   );
 };
-
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: '#b4b4b4',
-    borderRadius: 10,
+    backgroundColor: '#FFF', // White background for the card
+    borderRadius: 12, // Rounded corners for a modern feel
     overflow: 'hidden',
     marginBottom: 15,
-    padding: 10,
+    padding: 15,
     shadowColor: '#000',
-    shadowOpacity: 0.5,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
     shadowRadius: 5,
     elevation: 5,
     flexDirection: 'row',
+    alignItems: 'center', // Ensure content aligns centrally
   },
   cardImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60, // Slightly larger image for better visual impact
+    height: 60,
+    borderRadius: 30, // Rounded image for a modern profile picture look
     marginRight: 15,
-    backgroundColor: '#eeebeb',
+    backgroundColor: '#E5E7EB', // Subtle grey background for image placeholder
   },
   cardContent: {
     flexDirection: 'row',
@@ -48,17 +48,17 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1f695a',
+    color: '#2D3748', // Dark grey for the title
     marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 14,
-    color: '#dddddd',
+    color: '#718096', // Light grey for subtitle (inactive points system)
     marginBottom: 4,
   },
   cardTest: {
     fontSize: 12,
-    color: '#888888',
+    color: '#4A5568', // Mid-grey for test system status
   },
 });
 

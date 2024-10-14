@@ -169,7 +169,7 @@ const ServiceModal = ({ visible, onClose, service }) => {
           {uploadButtonVisible && (
             <TouchableOpacity style={styles.uploadButton} onPress={uploadMedia}>
               {uploading ? (
-                <ActivityIndicator size="small" color="yellow" />
+                <ActivityIndicator size="small" color="5A67D8" />
               ) : (
                 <Text style={styles.uploadButtonText}>Télécharger</Text>
               )}
@@ -197,7 +197,7 @@ const ServiceModal = ({ visible, onClose, service }) => {
               <Switch
                 value={editableService.isSystemPoint}
                 onValueChange={(value) => handleInputChange('isSystemPoint', value)}
-                thumbColor={"#f3b13e"}
+                thumbColor={"#5A67D8"}
               />
             ) : (
               <Text style={styles.textValue}>{editableService.isSystemPoint ? 'Oui' : 'Non'}</Text>
@@ -210,7 +210,7 @@ const ServiceModal = ({ visible, onClose, service }) => {
               <Switch
                 value={editableService.test}
                 onValueChange={(value) => handleInputChange('test', value)}
-                thumbColor={"#f3b13e"}
+                thumbColor={"#5A67D8"}
               />
             ) : (
               <Text style={styles.textValue}>{editableService.test ? 'Oui' : 'Non'}</Text>
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: '90%',
-    backgroundColor: 'white',
+    backgroundColor: '#38435a88',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -10,
     right: -10,
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#5A67D8',
     padding: 5,
     borderRadius: 20,
   },
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   uploadButtonText: {
-    color: '#333',
+    color: '#5A67D8',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -307,24 +307,25 @@ const styles = StyleSheet.create({
     width: '85%',
     fontSize: 16,
     paddingVertical: 5,
+    
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 10,
-    color: '#333',
+    color: '#dacfcf',
   },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#555',
+    color: '#dad4d4',
   },
   textValue: {
     fontSize: 16,
-    color: '#555',
+    color: '#b8adad',
   },
   updateButton: {
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#5A67D8',
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 8,
