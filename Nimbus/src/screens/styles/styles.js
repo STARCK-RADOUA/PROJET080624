@@ -266,6 +266,9 @@ const styles = StyleSheet.create({
         borderRadius: 4,
       },
       navigateButtonChat: {
+        backgroundColor: '#08C2FF',
+borderRadius : 30 ,
+padding : 10 ,
     flexDirection: 'row',
     alignItems: 'center',
   },

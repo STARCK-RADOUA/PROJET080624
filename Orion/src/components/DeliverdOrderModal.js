@@ -124,9 +124,11 @@ const styles = StyleSheet.create({
     elevation: 15,
   },
   closeButton: {
-    position: 'absolute',
-    top: 30,
-    right: 10,
+    color: '#ff5c5c',  // Customize the color as needed
+    marginTop: 20,
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
   orderInfo: {
     paddingTop: 20,

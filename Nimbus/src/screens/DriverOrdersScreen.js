@@ -13,6 +13,8 @@ import moment from 'moment';
 import { fetchDriverId, updateDriverAvailability, openGoogleMaps, openWaze, getDeviceId } from '../utils/driverOrderUtils';
 import styles from './styles/styles'; 
 import * as Location from 'expo-location';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const DriverOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
@@ -28,6 +30,35 @@ const DriverOrdersScreen = ({ navigation }) => {
   const [currentLocation, setCurrentLocation] = useState(null); // Ajout d'un état pour la localisation actuelle
   const [locationSubscription, setLocationSubscription] = useState(null);
   const [appState, setAppState] = useState(AppState.currentState);
+  const [messages, setMessages] = useState([]); // State for messages
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (deviceId) {
+        const socket = io(BASE_URLIO);
+  
+        socket.emit('watchChatMessagesDriver', deviceId);
+  
+        socket.on('OrderchatMessagesDriverUpdated', (data) => {
+          console.log(data, "plz data");
+
+          const filteredMessages = data.messages.filter(message => message.lastMessage); // Filtrer les messages avec lastMessage
+          if (filteredMessages.length > 0) {
+            setMessages(filteredMessages); // Stocker uniquement les messages avec lastMessage dans l'état
+          }
+          console.log(filteredMessages, "plz");
+        });
+
+     
+
+  
+        return () => {
+          socket.disconnect(); // Déconnecter le socket quand on quitte l'écran
+        };
+      }
+    }, [deviceId])
+  );
 
   useEffect(() => {
     getDeviceId(setDeviceId);
@@ -136,7 +167,7 @@ const DriverOrdersScreen = ({ navigation }) => {
   };
 
   const getDistance = async (startLat, startLng, endLat, endLng) => {
-    const osrmUrl = `http://192.168.8.159:5000/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=false`;
+    const osrmUrl = `http://192.168.1.11:5000/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=false`;
 
     try {
         const response = await axios.get(osrmUrl,{ timeout: 10000 });
@@ -311,18 +342,32 @@ const DriverOrdersScreen = ({ navigation }) => {
                           <Ionicons name="navigate-outline" size={24} color="white" />
                           <Text style={styles.navigateText}>Waze </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity 
-  style={styles.navigateButtonChat} 
-  onPress={() => navigate('RoomScreen', { 
-    clientName: item.client_name, 
-    orderId: item.order_number, 
-    clientId: item.client_id, 
-    driverId: item.driver_id 
-  })}>
-                        <Ionicons name="send-outline" size={24} color="white" />
-                          <Text style={styles.navigateText}></Text>
+                        <TouchableOpacity
+                            style={styles.navigateButtonChat}
+                            onPress={() => navigate('RoomScreen', {
+                              clientName: item.client_name,
+                              orderId: item.order_number,
+                              clientId: item.client_id,
+                              driverId: item.driver_id
+                            })}
+                          >
+                            <Ionicons name="send-outline" size={24} color="white" />
+                            <Text style={styles.navigateText}>Chat</Text>
 
-                        </TouchableOpacity>
+                            {/* Check each message for unread status */}
+                            {messages.map((message, index) => {
+                              const hasUnread = message.orderId === item.order_number && !message.lastMessage.seen && message.lastMessage.sender !== "driver";
+                              console.log(message.sender , "hgfg")
+                              return (
+                                hasUnread && (
+                                  <View key={index} style={styles.unreadIndicator}>
+                                    <View style={styles.redButton} />
+                                  </View>
+                                )
+                              );
+                            })}
+                          </TouchableOpacity>
+
                       </View>
                       <Text style={styles.date}>
                         {moment(item.delivery_time).format('YYYY-MM-DD HH:mm') || 'No Delivery Time'}

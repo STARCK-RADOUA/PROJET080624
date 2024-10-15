@@ -1,11 +1,108 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { LineChart } from 'react-native-chart-kit';
+import { BASE_URLIO } from '@env';
+import io from 'socket.io-client';
 
 const HomeScreen = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Weekly');
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [totalSum, setTotalSum] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [error, setError] = useState('');
+  const [totalClients, setTotalClients] = useState(0);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [dailyRevenue, setDailyRevenue] = useState([]);
+
+  useEffect(() => {
+    const socket = io(BASE_URLIO);
+
+    // Emit the event to get daily revenue
+    socket.emit('getDailyRevenue');
+
+    // Listen for daily revenue response
+    socket.on('dailyRevenue', (data) => {
+      setDailyRevenue(data.dailyRevenue);
+      console.log(data)
+    });
+
+    // Listen for errors
+    socket.on('error', (message) => {
+      setError(message);
+    });
+
+    // Cleanup on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+  useEffect(() => {
+    const socket = io(BASE_URLIO);
+
+    // Emit the event to get total products
+    socket.emit('getTotalProducts');
+
+    // Listen for total products response
+    socket.on('totalProducts', (data) => {
+      setTotalProducts(data.totalProducts);
+    });
+
+    // Listen for errors
+    socket.on('error', (message) => {
+      setError(message);
+    });
+
+    // Cleanup on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+  useEffect(() => {
+    const socket = io(BASE_URLIO);
+
+    // Emit the event to get total clients
+    socket.emit('getTotalClients');
+
+    // Listen for total clients response
+    socket.on('totalClients', (data) => {
+      setTotalClients(data.totalClients);
+    });
+
+    // Listen for errors
+    socket.on('error', (message) => {
+      setError(message);
+    });
+
+    // Cleanup on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const socket = io(BASE_URLIO);
+
+    // Fetch delivered orders summary when the component mounts
+    socket.emit('getDeliveredOrdersSummary');
+
+    // Listen for delivered orders summary
+    socket.on('deliveredOrdersSummary', (data) => {
+      console.log('data' , data)
+      setTotalSum(data.totalSum);
+      setTotalCount(data.totalCount);
+    });
+
+    // Listen for errors
+    socket.on('error', (message) => {
+      setError(message);
+    });
+
+    // Cleanup on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []); // Empty depend
 
   const handlePeriodChange = (period) => {
     setSelectedPeriod(period);
@@ -19,29 +116,30 @@ const HomeScreen = () => {
     <ScrollView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={styles.title}>Home</Text>
-        <Icon name="moon-outline" type="ionicon" color="#81b0ff" />
-        <Icon name="person" type="ionicon" color="#81b0ff" />
+        <Text style={styles.title}>tableau de bord</Text>
+        
       </View>
 
       {/* Stats Cards Section */}
       <View style={styles.statsContainer}>
-        <Card containerStyle={styles.card}>
-          <Text>Total Menus</Text>
-          <Text style={styles.statNumber}>140</Text>
-        </Card>
-        <Card containerStyle={styles.card}>
-          <Text>Total Orders</Text>
-          <Text style={styles.statNumber}>175</Text>
-        </Card>
-        <Card containerStyle={styles.card}>
-          <Text>Total Clients</Text>
-          <Text style={styles.statNumber}>263</Text>
-        </Card>
-        <Card containerStyle={styles.card}>
-          <Text>Total Revenue</Text>
-          <Text style={styles.statNumber}>$13,755</Text>
-        </Card>
+        <View style={styles.cardWrapper}>
+          <Card containerStyle={[styles.card, styles.card1]}>
+            <Text>Total Menus</Text>
+            <Text style={styles.statNumber}>{totalProducts}</Text>
+          </Card>
+          <Card containerStyle={[styles.card, styles.card2]}>
+            <Text>Total Orders</Text>
+            <Text style={styles.statNumber}>{totalCount}</Text>
+          </Card>
+          <Card containerStyle={[styles.card, styles.card3]}>
+            <Text>Total Clients</Text>
+            <Text style={styles.statNumber}>{totalClients}</Text>
+          </Card>
+          <Card containerStyle={[styles.card, styles.card4]}>
+            <Text>Total Revenue</Text>
+            <Text style={styles.statNumber}>{totalSum} €</Text>
+          </Card>
+        </View>
       </View>
 
       {/* Filter Section */}
@@ -131,6 +229,7 @@ const HomeScreen = () => {
     </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -149,15 +248,17 @@ const styles = StyleSheet.create({
     color: '#333',  // Dark gray text for modern contrast
   },
   statsContainer: {
-    flexDirection: 'flex-row',
-    flexWrap: 'flex-row',
-    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  cardWrapper: {
+    flexDirection: 'row',
+    flexWrap: 'wrap', // Allows the cards to wrap into multiple lines
+    justifyContent: 'space-between', // Aligns cards with space between them
   },
   card: {
-    width: '45%',
+    width: '43%',  // Each card takes up 48% of the width
     padding: 20,
     borderRadius: 15,  // Increased rounding for a softer, modern feel
-    backgroundColor: '#ffffff',
     alignItems: 'center',
     marginBottom: 20,
     shadowColor: '#000',  // Subtle shadow for depth
@@ -165,6 +266,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,  // Elevation for Android shadow
+  },
+  card1: {
+    backgroundColor: '#ffe4e1', // Soft red/pink tone
+  },
+  card2: {
+    backgroundColor: '#e0f7fa', // Soft cyan/blue tone
+  },
+  card3: {
+    backgroundColor: '#fff9c4', // Soft yellow tone
+  },
+  card4: {
+    backgroundColor: '#d1c4e9', // Soft lavender tone
   },
   statNumber: {
     fontSize: 24,  // Bigger font for better emphasis
