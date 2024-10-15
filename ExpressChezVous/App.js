@@ -15,22 +15,26 @@ export default function App() {
   const responseListener = useRef();
   const socketRef = useRef(null);
   const deviceId = Device.osBuildId;
+  const [isSystemActive, setIsSystemActive] = useState(true);
+
   useEffect(() => {
     // Initialize socket connection
-    const socket = io(BASE_URLIO);
-    // Listen to the socket for the system status
+    const socket = io(BASE_URLIO, {
+      query: {
+        deviceId: deviceId,  // Pass the unique deviceId
+      },
+    });    // Listen to the socket for the system status
     socket.on('statusSiteDriver', (systemActive) => {
       // Check the system status from the server
       console.log('System status received:', { systemActive });
       console.log('System status received:', { systemActive });
       console.log('System status received:', { systemActive });
+      setIsSystemActive(systemActive);
        // Stop loading after receiving the status 
        if (!systemActive) {
 navigate('SystemDownScreen') 
  } 
- if (systemActive) {
-navigate('Login') 
- }
+
     });
 
     return () => {

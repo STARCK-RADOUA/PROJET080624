@@ -54,9 +54,7 @@ export default function App() {
        if (!systemActive) {
 navigate('SystemDownScreen') 
  } 
- if (systemActive) {
-navigate('Login') 
- }
+
     });
 
     return () => {

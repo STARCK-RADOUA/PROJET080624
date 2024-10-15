@@ -10,8 +10,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { navigate } from '../utils/navigationRef'; // Import navigate function
 
 const { width } = Dimensions.get('window');
-const socket = io(`${BASE_URLIO}`);
+const deviceId = Device.osBuildId;
 
+const socket = io(BASE_URLIO, {
+  query: {
+    deviceId: deviceId,  // Pass the unique deviceId
+  },
+});
 const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [phone, setPhone] = useState('');
@@ -167,8 +172,11 @@ if(isLocationObtained == false){
   // Fonction d'auto-login
   const autoLogin = async (currentLocation) => {
     console.log('Tentative d\'auto-login...');
-    
+   
     if (deviceId ) {
+
+
+
       socket.emit('autoLogin', { deviceId, location: currentLocation });
 
       socket.on('loginSuccess', () => {

@@ -1,14 +1,62 @@
-import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
-import { navigate } from '../utils/navigationRef'; // Importer la fonction de navigation
 
+import React, { useEffect, useState } from 'react';
+
+import { navigate } from '../utils/navigationRef'; // Import navigate function
+import * as Device from 'expo-device';
 const SystemDownScreen = ({navigation}) => {
-  
+  const deviceId = Device.osBuildId;
 
- 
+  const [isSystemActive, setIsSystemActive] = useState(true);
+  const fetchData = async () => {
+
+    const socket = io(BASE_URLIO, {
+      query: {
+        deviceId: deviceId,  // Pass the unique deviceId
+      },
+    }); 
+    socket.emit('toggleSystemDriver'); // For example, emit an event to check system status
+
+  };
+  useEffect(() => {
+    // Initialize socket connection
+    const socket = io(BASE_URLIO, {
+      query: {
+        deviceId: deviceId,  // Pass the unique deviceId
+      },
+    });    // Listen to the socket for the system status
+    socket.on('statusSiteDriver', (systemActive) => {
+      // Check the system status from the server
+      console.log('System status received:', { systemActive });
+      console.log('System status received:', { systemActive });
+      console.log('System status received:', { systemActive });
+      setIsSystemActive(systemActive);
+       // Stop loading after receiving the status 
+       if (!systemActive) {
+navigate('SystemDownScreen') 
+ } 
+ if (systemActive) {
+navigate('Login') 
+ }
+    });
+
+    return () => {
+      socket.off('statusSiteDriver');
+    };
+  }, []);
+  React.useEffect(() => {
+    setTimeout(() => {
+
+
+
+
+
+      
+    }, 3000);
+  }, []);
   return (
     <View style={styles.container}>
       {/* Section de l'icône */}
