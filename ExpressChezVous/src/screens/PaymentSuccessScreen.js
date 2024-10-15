@@ -237,7 +237,7 @@ console.log('------------------------------------');
       };
 
       animateDeliveryImage();
-      let totalTimeRemaining = duration;
+      let totalTimeRemaining = duration*60;
 
       const interval = setInterval(() => {
         totalTimeRemaining -= 1;
@@ -315,7 +315,7 @@ console.log('------------------------------------');
         <Text style={styles.redirectMessage2}> 
   {orderStatus === 'in_progress' 
     ? (duration !== null 
-        ? `${Math.floor(duration / 60)}m et ${((1000 - (progress * 100) / 100) % 60).toFixed(0)}s` 
+        ? `Il reste ${Math.floor(duration / 60)}m ` 
         : 'Calcul en cours...') 
     : " "}
 </Text>
@@ -351,7 +351,7 @@ console.log('------------------------------------');
 
             <View style={styles.circularContainer}>
              
-              <Text style={styles.deliveryTimetext}>{duration !== null ? `Il reste ${Math.floor(duration / 60)}m et ${((283 - (progress * 283) / 100)%60).toFixed(0) }s` : 'Calcul en cours...'}</Text>
+              <Text style={styles.deliveryTimetext}>{duration !== null ? `Il reste ${Math.floor(duration / 60)}min` : 'Calcul en cours...'}</Text>
 
               
                </View>

@@ -3,111 +3,144 @@ import { StyleSheet, Dimensions } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF5E1', // Light orange background
     alignItems: 'center',
     justifyContent: 'flex-start',
+    paddingHorizontal: 15,
   },
   header: {
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 30,
-    marginTop: 3,
+    paddingTop: 25,
+    backgroundColor: '#FF9800', // Deep orange for header
+    paddingVertical: 15,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    marginBottom: 10,
   },
   chatIcon: {
     width: 40,
     height: 40,
   },
   disabledChatIcon: {
-    opacity: 0.3, 
+    opacity: 0.3,
   },
   successContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    marginTop: 10,
-  }, successContainer2: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    
+    marginTop: 20,
+  },
+  successText: {
+    color: '#2C3E50', // Dark gray text
+    fontWeight: 'bold',
+    fontSize: 22,
+    textAlign: 'center',
   },
   deliveryImageContainer: {
     position: 'absolute',
-    top: Dimensions.get('window').height * 0.667,
+    top: Dimensions.get('window').height * 0.6,
   },
   bottomFixed: {
     width: '100%',
-    backgroundColor: '#FFA500',
+    backgroundColor: '#FF9800', // Orange background for bottom bar
     paddingVertical: 15,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    bottom: 9,
+    bottom: 0,
+    shadowColor: '#FFA726',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
+    paddingVertical: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 8,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
-   bottomFixed2: {
-    backgroundColor: '#ffab0e4e',
+  bottomFixed2: {
+    backgroundColor: '#FFCC80', // Light orange with some transparency
     paddingVertical: 15,
     alignItems: 'center',
     justifyContent: 'center',
-  
-
-    borderRadius: 45,
-   
-    padding: 20,
-    justifyContent: 'center',
-  },  exitButton: {
-   
-    alignItems: 'center',
-    backgroundColor: '#26a115a7',
     borderRadius: 30,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.9,
+    shadowOpacity: 0.4,
     shadowRadius: 5,
-    elevation: 5,
+    elevation: 8,
+    marginHorizontal: 20,
+    shadowColor: '#FFA726',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
     marginTop: 20,
-    padding: 30,
-    justifyContent: 'center',
+    paddingVertical: 15,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  exitButton: {
+    width: '80%',
+    backgroundColor: '#FF9800', // Strong orange for button
+    borderRadius: 25,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginTop: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  exitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   deliveryText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
+    
+    marginTop: 10,
   },
-  deliveryTime: {
-    color: '#249715',
+  deliveryTimetext: {
+    fontSize: 22,
+    color: '#d4c6b8', // Deep orange text
     fontWeight: 'bold',
-
-    marginTop: 5,
-  }, redirectMessage2: {
-    color: '#179407',
-    fontWeight: 'bold',
-    alignContent:"flex-start",
-    fontSize: 19,
-
-
-  }, successText: {
-    color: '#2c3b2a',
-    fontWeight: 'bold',
-    alignContent:"flex-start",
-    fontSize: 18,
-
-
-  },
-    deliveryTimetext: {
-    fontSize: 19,
-    color: '#249715',
-    fontWeight: 'bold',
-
-    marginTop: 5,
-    alignContent:"center"
+    marginTop: 10,
+    textAlign: 'center',
   },
   circularContainer: {
-    fontSize: 19,
-    color: '#249715',
+    fontSize: 22,
+    color: '#FF6F00',
     fontWeight: 'bold',
-
+    padding: 15,
+  },
+  redirectMessage2: {
+    color: '#F57C00', // Deep orange for text
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+ 
+  image: {
+    borderRadius: 20,
+    shadowColor: '#FF9800',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
 });
 
