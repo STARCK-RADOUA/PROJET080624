@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, Image, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { Modal, View, Text, Image, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
@@ -18,7 +18,8 @@ const ProductModal = ({ visible, onClose, product }) => {
   const [image, setImage] = useState(editableProduct.image_url);
   const [uploading, setUploading] = useState(false);
   const [uploadButtonVisible, setUploadButtonVisible] = useState(false);
-
+  const [tHeserviceModalVisible, settHeserviceModalVisible] = useState(false); // Modal visibility state for driver selection
+  const [selectedtHeservice, setSelectedtHeservice] = useState(null);
   useEffect(() => {
     axios.get(`${BASE_URL}/api/services`)
       .then(response => {
@@ -179,6 +180,49 @@ const ProductModal = ({ visible, onClose, product }) => {
     );
   };
 
+  // Render a custom dropdown for tHeservice selection
+  const rendertHeserviceDropdown = () => (
+    <Modal
+      transparent={true}
+      visible={tHeserviceModalVisible}
+      animationType="fade"
+      onRequestClose={() => settHeserviceModalVisible(false)}  // Close the modal on back press or overlay tap
+    >
+      <View style={styles.tHeserviceModalContainer}>
+        <View style={styles.tHeserviceModalContent}>
+          <ScrollView>
+            {serviceTypeOptions.map(tHeservice => (
+              <TouchableOpacity
+                key={tHeservice._id}
+                style={styles.tHeserviceItem}
+                onPress={() => {
+                  // Set the selected service
+                  setSelectedtHeservice(tHeservice.name);
+  
+                  // Update the editableProduct with the selected service type
+                  setEditableProduct(prevProduct => ({
+                    ...prevProduct,
+                    service_type: tHeservice.name,  // Update service type field with the selected service
+                  }));
+  
+                  settHeserviceModalVisible(false); // Close the modal after selection
+                }}
+              >
+                <Text style={styles.tHeserviceName}>{tHeservice.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+  
+          {/* Add a close button at the bottom to manually close the modal */}
+          <TouchableOpacity style={styles.closeButton} onPress={() => settHeserviceModalVisible(false)}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+  
+
   return (
     <Modal
       animationType="slide"
@@ -269,15 +313,15 @@ const ProductModal = ({ visible, onClose, product }) => {
 
           <View style={styles.fieldRow}>
             {isEditing ? (
-              <Picker
-                selectedValue={editableProduct.service_type}
-                style={styles.editInput}
-                onValueChange={(itemValue) => handleInputChange('service_type', itemValue)}
+              <TouchableOpacity
+                style={styles.driverSelectButton}
+                onPress={() => settHeserviceModalVisible(true)}
               >
-                {serviceTypeOptions.map((option) => (
-                  <Picker.Item key={option._id} label={option.name} value={option.name} />
-                ))}
-              </Picker>
+                <Text style={styles.driverSelectText}>
+                  {editableProduct.service_type}
+                </Text>
+                <Ionicons name="chevron-down" size={20} color="#ffbf00" />
+              </TouchableOpacity>
             ) : (
               <Text style={styles.serviceType}>Type de service: {editableProduct.service_type}</Text>
             )}
@@ -361,6 +405,7 @@ const ProductModal = ({ visible, onClose, product }) => {
           </TouchableOpacity>
         </View>
       </View>
+      {rendertHeserviceDropdown()}
     </Modal>
   );
 };
@@ -524,6 +569,47 @@ const styles = StyleSheet.create({
     color: '#C7253E', // Bright red for error messages
     marginTop: 10,
     fontSize: 14,
+  },
+  tHeserviceModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  tHeserviceModalContent: {
+    width: '80%',
+    backgroundColor: '#1f1f1f',
+    borderRadius: 10,
+    padding: 20,
+    maxHeight: '50%',
+  },
+  tHeserviceItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  tHeserviceName: {
+    color: '#ffbf00',
+    fontSize: 16,
+  },
+  driverSelectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#333',
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 20,
+    justifyContent: 'space-between',
+  },
+  driverSelectText: {
+    color: '#fff',
+    fontSize: 16,
+  },closeButtonText: {
+    color: '#ff5c5c',  // Customize the color to match your design
+    marginTop: 20,
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

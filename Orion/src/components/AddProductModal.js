@@ -20,6 +20,8 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
   const screenWidth = Dimensions.get('window').width;
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [tHeserviceModalVisible, settHeserviceModalVisible] = useState(false); // Modal visibility state for driver selection
+  const [selectedtHeservice, setSelectedtHeservice] = useState(null);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -155,6 +157,43 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
     setImageUrl('');
   };
 
+
+  const rendertHeserviceDropdown = () => (
+    <Modal
+      transparent={true}
+      visible={tHeserviceModalVisible}
+      animationType="fade"
+      onRequestClose={() => settHeserviceModalVisible(false)}  // Handles closing the modal on back press or outside tap
+    >
+      <View style={styles.tHeserviceModalContainer}>
+        <View style={styles.tHeserviceModalContent}>
+          <ScrollView>
+            {serviceTypeOptions.map(tHeservice => (
+              <TouchableOpacity
+                key={tHeservice._id}
+                style={styles.tHeserviceItem}
+                onPress={() => {
+                  // Set the selected service
+                  setSelectedtHeservice(tHeservice.name);  // Set selected service in state
+                  setServiceType(tHeservice.name);  // Update the service type state
+                  settHeserviceModalVisible(false); // Close the modal after selecting a service
+                }}
+              >
+                <Text style={styles.tHeserviceName}>{tHeservice.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+  
+          {/* Add a close button to manually close the modal */}
+          <TouchableOpacity style={styles.closeButton} onPress={() => settHeserviceModalVisible(false)}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+  
+
   return (
     <Modal
       animationType="slide"
@@ -209,16 +248,15 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
             {/* Type de service */}
             <View>
               <Text style={styles.label}>Type de service</Text>
-              <Picker
-                selectedValue={serviceType}
-                style={styles.input}
-                onValueChange={(itemValue) => setServiceType(itemValue)}
+              <TouchableOpacity
+                style={styles.driverSelectButton}
+                onPress={() => settHeserviceModalVisible(true)}
               >
-                <Picker.Item label="Sélectionnez le type de service" value="" />
-                {serviceTypeOptions.map((option) => (
-                  <Picker.Item key={option._id} label={option.name} value={option.name} />
-                ))}
-              </Picker>
+                <Text style={styles.driverSelectText}>
+                {selectedtHeservice ? selectedtHeservice : 'Sélectionner un chauffeur'}
+                </Text>
+                <Ionicons name="chevron-down" size={20} color="#ffbf00" />
+              </TouchableOpacity>
             </View>
 
             {/* Produit actif */}
@@ -306,6 +344,8 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
 
         </View>
       </View>
+      {rendertHeserviceDropdown()}
+
     </Modal>
   );
 };
@@ -462,6 +502,47 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingBottom: 50,
+  },
+  tHeserviceModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  tHeserviceModalContent: {
+    width: '80%',
+    backgroundColor: '#1f1f1f',
+    borderRadius: 10,
+    padding: 20,
+    maxHeight: '50%',
+  },
+  tHeserviceItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  tHeserviceName: {
+    color: '#ffbf00',
+    fontSize: 16,
+  },
+  driverSelectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#333',
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 20,
+    justifyContent: 'space-between',
+  },
+  driverSelectText: {
+    color: '#fff',
+    fontSize: 16,
+  },closeButtonText: {
+    color: '#ff5c5c',  // Customize the color to match your design
+    marginTop: 20,
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

@@ -35,9 +35,9 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
       toValue: 0,
       friction: 7,
       useNativeDriver: true,
-    }).start(() => onClose());
+    }).start(() => onClose()); // Ensure that onClose is called
   };
-
+  
   // Fetch available drivers when the modal is displayed
   useEffect(() => {
     if (visible) {
@@ -67,47 +67,51 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
   };
 
   // Render a custom dropdown for driver selection
-  const renderDriverDropdown = () => (
-    <Modal
-      transparent={true}
-      visible={driverModalVisible}
-      animationType="fade"
-      onRequestClose={() => setDriverModalVisible(false)}
-    >
-      <View style={styles.driverModalContainer}>
-        <View style={styles.driverModalContent}>
-          <ScrollView>
-            {drivers.map(driver => (
-              <TouchableOpacity
-                key={driver.driver_id}
-                style={styles.driverItem}
-                onPress={() => {
-                  setSelectedDriver(driver.driver_id);
-                  setDriverModalVisible(false);
-                }}
-              >
-                <Text style={styles.driverName}>{`${driver.firstName} ${driver.lastName}`}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+  // Render a custom dropdown for driver selection with a close button
+const renderDriverDropdown = () => (
+  <Modal
+    transparent={true}
+    visible={driverModalVisible}
+    animationType="fade"
+    onRequestClose={() => setDriverModalVisible(false)}
+  >
+    <View style={styles.driverModalContainer}>
+      <View style={styles.driverModalContent}>
+        {/* Add a close button to manually close the modal */}
+        <TouchableOpacity style={styles.closeButton} onPress={() => setDriverModalVisible(false)}>
+          <Text style={styles.closeButtonText}>Close</Text>
+        </TouchableOpacity>
+        <ScrollView>
+          {drivers.map(driver => (
+            <TouchableOpacity
+              key={driver.driver_id}
+              style={styles.driverItem}
+              onPress={() => {
+                setSelectedDriver(driver.driver_id);
+                setDriverModalVisible(false); // Close the modal when a driver is selected
+              }}
+            >
+              <Text style={styles.driverName}>{`${driver.firstName} ${driver.lastName}`}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
-    </Modal>
-  );
+    </View>
+  </Modal>
+);
 
   return (
     <Modal
-      animationType="none"
-      transparent={true}
-      visible={visible}
-      onShow={animateIn}
-      onRequestClose={animateOut}
+    animationType="none"
+    transparent={true}
+    visible={visible}
+    onShow={animateIn}
+    onRequestClose={animateOut}
     >
       <View style={styles.modalContainer}>
-        <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
-          {/* Close button */}
+      <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
           <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
-            <Ionicons name="close-circle" size={37} color="#ff5c5c" />
+            <Ionicons s name="close-circle" size={37} color="#ff5c5c"  />
           </TouchableOpacity>
 
           <ScrollView>
@@ -179,8 +183,8 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
             )}
 
             {/* Total Price */}
-            <View style={styles.totalContainer}>
-              <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
+            <View style={styles.totalContainer}>       
+                <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
             </View>
           </ScrollView>
         </Animated.View>
@@ -211,9 +215,11 @@ const styles = StyleSheet.create({
     elevation: 15,
   },
   closeButton: {
-    position: 'absolute',
-    top: 30,
-    right: 10,
+    color: '#ff5c5c',  // Customize the color as needed
+    marginTop: 20,
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
   orderInfo: {
     paddingTop: 20,
@@ -340,6 +346,13 @@ const styles = StyleSheet.create({
   driverName: {
     color: '#ffbf00',
     fontSize: 16,
+  },
+  closeButtonText: {
+    color: '#ff5c5c',  // Customize the color as needed
+    marginTop: 20,
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

@@ -56,8 +56,6 @@ const ClientChatScreen = ({ navigation }) => {
         if (lastMessage && lastMessage.sender === 'admin' && !lastMessage.seen) {
           const unseenMessages = data.messages.filter(message => !message.seen);
           setMessages(unseenMessages);
-        } else {
-          setMessages(data.messages);
         }
       });
 
