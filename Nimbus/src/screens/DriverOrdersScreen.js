@@ -167,7 +167,7 @@ const DriverOrdersScreen = ({ navigation }) => {
   };
 
   const getDistance = async (startLat, startLng, endLat, endLng) => {
-    const osrmUrl = `http://192.168.1.11:5000/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=false`;
+    const osrmUrl = `http://192.168.8.159:5000/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=false`;
 
     try {
         const response = await axios.get(osrmUrl,{ timeout: 10000 });
