@@ -1,26 +1,37 @@
-import React, { useState, useEffect, useRef  } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet,   Keyboard,  ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Import des icônes
 import io from 'socket.io-client';
-import { BASE_URLIO  , BASE_URL} from '@env';
+import { BASE_URL } from '@env';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 
 const RoomScreen = ({ route }) => {
-  const { clientName, orderId , clientId  , driverId} = route.params;
-  const scrollViewRef = useRef(null); // Reference to ScrollView
+  const { clientName, orderId, clientId, driverId } = route.params;
+  const scrollViewRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [chatId, setChatId] = useState(null);
-  const socket = io(BASE_URL); // Initialize socket globally
-
+  const socket = io(BASE_URL);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
   useFocusEffect(
     React.useCallback(() => {
       const markMessagesAsSeen = async () => {
         try {
           if (chatId) {
-            await axios.post(`${BASE_URL}/api/chat/mark-seenFD`, {
-              chatId,
-            });
+            await axios.post(`${BASE_URL}/api/chat/mark-seenFD`, { chatId });
             console.log("Messages marked as seen");
           }
         } catch (error) {
@@ -35,7 +46,7 @@ const RoomScreen = ({ route }) => {
       };
     }, [chatId])
   );
- 
+
   useEffect(() => {
     socket.on('connect', () => {
       console.log('Socket connected');
@@ -48,11 +59,7 @@ const RoomScreen = ({ route }) => {
     const initiateChat = async () => {
       try {
         if (orderId && driverId) {
-          socket.emit('initiateChats', {
-            orderId,
-            clientId,
-            driverId,
-          });
+          socket.emit('initiateChats', { orderId, clientId, driverId });
         }
       } catch (error) {
         console.error('Error initiating chat:', error);
@@ -86,13 +93,7 @@ const RoomScreen = ({ route }) => {
 
   const sendMessage = () => {
     if (newMessage.trim() && chatId) {
-      // Emit sendMessages event through Socket.IO
-      socket.emit('sendMessages', {
-        chatId,
-        sender: 'driver',
-        content: newMessage,
-      });
-      // Do not optimistically add the message to the UI. The real-time listener will do that when confirmed by the server.
+      socket.emit('sendMessages', { chatId, sender: 'driver', content: newMessage });
       setNewMessage('');
     }
   };
@@ -100,35 +101,25 @@ const RoomScreen = ({ route }) => {
   const formatTimestamp = (timestamp) => {
     const messageDate = new Date(timestamp);
     const now = new Date();
-  
+
     const isToday = messageDate.toDateString() === now.toDateString();
-  
-    const formatDate = (date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${year}-${month}-${day} ${hours}:${minutes}`;
-    };
-  
+
     if (isToday) {
       const hours = String(messageDate.getHours()).padStart(2, '0');
       const minutes = String(messageDate.getMinutes()).padStart(2, '0');
       return `Today, ${hours}:${minutes}`;
     } else {
-      const oneWeekAgo = new Date(now);
-      oneWeekAgo.setDate(now.getDate() - 7);
-  
-      return formatDate(messageDate);
+      const year = messageDate.getFullYear();
+      const month = String(messageDate.getMonth() + 1).padStart(2, '0');
+      const day = String(messageDate.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     }
   };
-  
 
   return (
     <View style={styles.container}>
       <ScrollView 
-        ref={scrollViewRef} // Assign the reference to ScrollView
+        ref={scrollViewRef} 
         contentContainerStyle={styles.messagesContainer}
       >
         {messages.map((message, index) => (
@@ -157,25 +148,26 @@ const RoomScreen = ({ route }) => {
           </View>
         ))}
       </ScrollView>
-
-      <View style={styles.inputContainer}>
-      <TextInput
-  style={[styles.input, !chatId && styles.disabledInput]} // Apply disabled style when chatId is null
-  placeholder="Ecrire un message..."
-  value={newMessage}
-  onChangeText={setNewMessage}
-  editable={!!chatId} // Disable the input if chatId is null
-/>
-
-       <TouchableOpacity 
-  style={[styles.sendButton, !chatId && styles.disabledSendButton]} 
-  onPress={sendMessage}
-  disabled={!chatId} // Disable the button if chatId is null
->
-  <Text style={styles.sendButtonText}>Envoyer</Text>
-</TouchableOpacity>
-
-      </View>
+      <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Adjust offset for iOS
+          style={[styles.inputContainer, { marginBottom: keyboardHeight*0.01 }]} // Add keyboard height for Android
+        >
+        <TextInput
+          style={[styles.input, !chatId && styles.disabledInput]}
+          placeholder="Ecrire un message..."
+          value={newMessage}
+          onChangeText={setNewMessage}
+          editable={!!chatId}
+        />
+        <TouchableOpacity 
+          style={[styles.sendButton, !chatId && styles.disabledSendButton]} 
+          onPress={sendMessage}
+          disabled={!chatId}
+        >
+          <Ionicons name="send" size={24} color="white" /> 
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -183,17 +175,15 @@ const RoomScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-    padding: 15,
-    paddingHorizontal : '0%' ,
-    paddingVertical : '0%'
+    backgroundColor: '#fff',
   },
   messagesContainer: {
     paddingVertical: 10,
+    paddingHorizontal: 15,
   },
   messageWrapper: {
     flexDirection: 'row',
-    marginVertical: 8,
+    marginVertical: 18,
     alignItems: 'flex-start',
   },
   myMessage: {
@@ -210,7 +200,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 8,
-    backgroundColor: '#4682B4',
+    backgroundColor: '#007AFF',
   },
   avatarText: {
     color: '#fff',
@@ -220,25 +210,22 @@ const styles = StyleSheet.create({
   messageContent: {
     maxWidth: '75%',
     padding: 10,
-    borderRadius: 10,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderRadius: 20,
   },
   myMessageContent: {
-    backgroundColor: '#D1E7DD',
+    backgroundColor: '#DCF8C6',
   },
   theirMessageContent: {
-    backgroundColor: '#F8D7DA',
+    backgroundColor: '#F1F0F0',
   },
   messageHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 5,
   },
   senderName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#495057',
+    color: '#007AFF',
   },
   messageTime: {
     fontSize: 12,
@@ -247,16 +234,19 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 15,
     color: '#212529',
-    marginVertical: 5,
-    lineHeight: 20,
   },
   inputContainer: {
+    
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
+    paddingHorizontal: 14,
+    backgroundColor: '#0e3a10',
     borderTopWidth: 1,
-    borderColor: '#e9ecef',
-    backgroundColor: '#f8f9fa',
+    borderTopColor: '#E5E5EA',
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    paddingVertical: 15,
+    paddingRight: 20,
   },
   input: {
     flex: 1,
@@ -264,27 +254,23 @@ const styles = StyleSheet.create({
     borderColor: '#ced4da',
     borderWidth: 1,
     borderRadius: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 25,
     backgroundColor: '#ffffff',
   },
   sendButton: {
     marginLeft: 10,
-    backgroundColor: '#4682B4',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    backgroundColor: '#007AFF',
+    padding: 10,
     borderRadius: 20,
   },
-  sendButtonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },disabledInput: {
-    backgroundColor: '#f0f0f0', // Lighter background for the disabled input
-    color: '#a0a0a0', // Change text color to grey to indicate disabled state
+  disabledInput: {
+    backgroundColor: '#f0f0f0',
+    color: '#a0a0a0',
   },
   disabledSendButton: {
-    backgroundColor: '#cccccc', // Greyed-out color for the disabled state
+    backgroundColor: '#cccccc',
   },
-    
 });
 
 export default RoomScreen;

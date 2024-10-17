@@ -328,7 +328,7 @@ console.log('------------------------------------');
         <Text style={styles.redirectMessage2}> 
   {orderStatus === 'in_progress' 
     ? (duration !== null 
-        ? `Il reste ${Math.floor(duration / 60)}m ` 
+        ? duration<1? "Le livreur est là, prêt à vous faire sourire avec votre commande ! 😊":`Il reste ${Math.floor(duration / 60)}m ` 
         : 'Calcul en cours...') 
     : " "}
 </Text>
@@ -395,7 +395,7 @@ console.log('------------------------------------');
         </View>
       )}
 
-      {(orderStatus === 'in_progress' || orderStatus === 'delivered') && (
+      {(orderStatus === 'in_progress' || !isChatDisabled ) && (
   <BottomSheet ref={bottomSheetRef} orderId={orderId} clientId={clientId} driverId={driverId}>
     <View>
       <Text style={{ padding: 20, fontSize: 16 }}>Chat with us</Text>

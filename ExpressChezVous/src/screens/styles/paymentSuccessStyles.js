@@ -20,10 +20,25 @@ const styles = StyleSheet.create({
    borderBottomLeftRadius: 35,
    position: 'absolute',
    right: 0,
+   resizeMode: 'contain',
+   shadowRadius: 50,
+   elevation: 9,
+   shadowColor: '#070707',
+   shadowOffset: { width: 1, height: 5 },
+   shadowOpacity: 0.9,
   },
   chatIcon: {
     width: 40,
     height: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 7 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    paddingHorizontal: 35,
+    elevation: 8,
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    
     
   },
   disabledChatIcon: {
@@ -32,6 +47,7 @@ const styles = StyleSheet.create({
   },
   successContainer: {
     flexDirection: 'column',
+    
     alignItems: 'center',
     marginTop: 20,
   },
@@ -45,6 +61,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Dimensions.get('window').height * 0.6,
     
+    
   },
   bottomFixed: {
     width: '90%',
@@ -54,18 +71,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     bottom: 0,
-    shadowColor: '#FFA726',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.9,
     shadowRadius: 5,
     elevation: 8,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+
+
   },
   bottomFixed2: {
 

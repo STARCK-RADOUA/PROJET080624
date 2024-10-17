@@ -15,6 +15,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
   const [reportReason, setReportReason] = useState('');
   const [comment, setComment] = useState('');
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showLivredModal, setShowLivredModal] = useState(false);
 
   if (!order) return null;
 
@@ -41,47 +42,32 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
 
   // Récupérer les chauffeurs disponibles lorsque le modal est affiché
 
-
+  // Affiche une alerte de confirmation avant la livraison
   const confirmLivraison = () => {
-    // Affiche une alerte de confirmation avant la déconnexion
     Alert.alert(
       'Confirmation',
-      'Êtes-vous sûr de vouloir vous comfirmer la livraison de cette commande ?',
+      'Êtes-vous sûr de vouloir confirmer la livraison de cette commande ?',
       [
-        {
-          text: 'Annuler',
-          onPress: () => console.log('livraison annulée'),
-          style: 'cancel',
-        },
-        {
-          text: 'Livrer',
-          onPress: () => commandeLivree(), // Appelle la fonction logout si l'utilisateur confirme
-          style: 'destructive',
-        },
+        { text: 'Annuler', onPress: () => console.log('livraison annulée'), style: 'cancel' },
+        { text: 'Livrer', onPress: () => setShowLivredModal(true), style: 'destructive' },
       ],
       { cancelable: true }
     );
   }; 
-   const cancelLivraison = () => {
-    // Affiche une alerte de confirmation avant la déconnexion
+
+  // Affiche une alerte de confirmation avant l'annulation de la commande
+  const cancelLivraison = () => {
     Alert.alert(
       'Confirmation',
-      'Êtes-vous sûr de vouloir vous comfirmer la livraison de cette commande ?',
+      'Êtes-vous sûr de vouloir annuler cette commande ?',
       [
-        {
-          text: 'Annuler',
-          onPress: () => console.log('Commande non annulée'),
-          style: 'cancel',
-        },
-        {
-          text: 'annuler la commande',
-          onPress: () =>       setShowCancelModal(true),          // Appelle la fonction logout si l'utilisateur confirme
-          style: 'destructive',
-        },
+        { text: 'Annuler', onPress: () => console.log('Commande non annulée'), style: 'cancel' },
+        { text: 'Annuler la commande', onPress: () => setShowCancelModal(true), style: 'destructive' },
       ],
       { cancelable: true }
     );
   };
+
   
   const commandeLivree = async () => {
     
@@ -96,7 +82,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ order_number }),
+        body: JSON.stringify({ order_number,comment }),
       });
   
       const l = await response.json();
@@ -118,13 +104,16 @@ const deviceId = Device.osBuildId;
     } catch (error) {
       Alert.alert('Erreur', 'Une erreur est survenue pendant la déconnexion.');
     } finally {  
-            animateOut();
-
+      setShowLivredModal(false);
+      animateOut();
     }
   };
   
   const commandeCancled = async () => {
-    
+    if (reportReason.trim() === '' || comment.trim() === '') {
+      Alert.alert('Erreur', 'Veuillez fournir un motif et un commentaire pour annuler la commande.');
+      return;  // Ne pas procéder à l'annulation si les champs sont vides
+    }
     const order_number = order.order_number ;
     console.log('------------------------------------');
     console.log(' trying livred...', order_number);
@@ -294,6 +283,42 @@ const deviceId = Device.osBuildId;
       <TouchableOpacity
         style={styles.affectButton33}
         onPress={() => setShowCancelModal(false)}
+      >
+        <Text style={styles.affectButtonText}>Annuler</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>  
+ <Modal
+  animationType="slide"
+  transparent={true}
+  visible={showLivredModal}
+  onRequestClose={() => setShowLivredModal(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalView}>
+      <Text style={styles.sectionHeader}>Livrer la commande</Text>
+
+      
+
+      <Text style={styles.label}>Commentaire :</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Commentaire"
+        value={comment}
+        onChangeText={setComment}
+      />
+
+      <TouchableOpacity
+        style={styles.affectButton}
+        onPress={commandeLivree}
+      >
+        <Text style={styles.affectButtonText}>Envoyer</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.affectButton33}
+        onPress={() => setShowLivredModal(false)}
       >
         <Text style={styles.affectButtonText}>Annuler</Text>
       </TouchableOpacity>
