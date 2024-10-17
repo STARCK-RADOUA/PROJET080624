@@ -9,23 +9,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   header: {
-    width: '100%',
+    width: '25%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 25,
+    justifyContent: 'end',
+    paddingTop: 30,
     backgroundColor: '#FF9800', // Deep orange for header
     paddingVertical: 15,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    marginBottom: 10,
+    paddingHorizontal: 12,
+    paddingRight :30,
+   borderBottomLeftRadius: 35,
+   position: 'absolute',
+   right: 0,
   },
   chatIcon: {
     width: 40,
     height: 40,
+    
   },
   disabledChatIcon: {
     opacity: 0.3,
+    
   },
   successContainer: {
     flexDirection: 'column',
@@ -41,9 +44,10 @@ const styles = StyleSheet.create({
   deliveryImageContainer: {
     position: 'absolute',
     top: Dimensions.get('window').height * 0.6,
+    
   },
   bottomFixed: {
-    width: '100%',
+    width: '90%',
     backgroundColor: '#FF9800', // Orange background for bottom bar
     paddingVertical: 15,
     alignItems: 'center',
@@ -55,7 +59,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 10,
-    paddingVertical: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
@@ -65,6 +68,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
   },
   bottomFixed2: {
+
     backgroundColor: '#FFCC80', // Light orange with some transparency
     paddingVertical: 15,
     alignItems: 'center',
@@ -73,7 +77,6 @@ const styles = StyleSheet.create({
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
     shadowRadius: 5,
     elevation: 8,
     marginHorizontal: 20,
@@ -111,27 +114,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     
-    marginTop: 10,
-  },
+marginBottom: 15, 
+ },
   deliveryTimetext: {
     fontSize: 22,
     color: '#d4c6b8', // Deep orange text
     fontWeight: 'bold',
-    marginTop: 10,
     textAlign: 'center',
   },
   circularContainer: {
     fontSize: 22,
     color: '#FF6F00',
     fontWeight: 'bold',
-    padding: 15,
   },
   redirectMessage2: {
     color: '#F57C00', // Deep orange for text
     fontWeight: 'bold',
     fontSize: 20,
     textAlign: 'center',
-    marginVertical: 10,
   },
  
   image: {
@@ -141,6 +141,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
+
+    marginTop: Dimensions.get('window').height * 0.06,
   },
 });
 

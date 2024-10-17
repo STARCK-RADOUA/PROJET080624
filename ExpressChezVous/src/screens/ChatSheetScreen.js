@@ -122,7 +122,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
       translateY.value = Math.max(translateY.value, MAX_TRANSLATE_Y);
     })
     .onEnd(() => {
-      if (translateY.value > -SCREEN_HEIGHT / 3) {
+      if (translateY.value > -SCREEN_HEIGHT / 1) {
         scrollTo(0);
       } else if (translateY.value < -SCREEN_HEIGHT / 1.5) {
         scrollTo(MAX_TRANSLATE_Y);
@@ -187,12 +187,12 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
 const styles = StyleSheet.create({
   bottomSheetContainer: {
     height: SCREEN_HEIGHT * 0.7, // Set the max height to 70% of the screen
-    width: '100%',
+    width: '90%',
     backgroundColor: 'white',
     position: 'absolute',
     top: SCREEN_HEIGHT*1.27,
-    borderRadius: 25,
-  },
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,  },
   line: {
     width: 75,
     height: 4,

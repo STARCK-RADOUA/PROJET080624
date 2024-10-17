@@ -35,7 +35,7 @@ const [uniqueId, setUniqueId] = useState('');
     setUniqueId(route?.params?.uniqueId )
     
     const validatePhoneNumber = (phone) => {
-      const phoneRegex = /^\d{10}$/;
+      const phoneRegex = /^(?:\+33|0)[1-9](?:[ .-]?\d{2}){4}$/;
       return phoneRegex.test(phone);
     };
 

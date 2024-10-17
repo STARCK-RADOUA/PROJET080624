@@ -15,11 +15,10 @@ import styles from './styles/styles';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
 
-
 const DriverOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [deviceId, setDeviceId] = useState(null);
+  const [deviceId1, setDeviceId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [driverId, setDriverId] = useState(null);
   const [driverInfo, setDriverInfo] = useState({ firstName: '', lastName: '' });
@@ -32,12 +31,14 @@ const DriverOrdersScreen = ({ navigation }) => {
   const [appState, setAppState] = useState(AppState.currentState);
   const [messages, setMessages] = useState([]); // State for messages
 
+const deviceId =Device.osBuildId;
 
-  useFocusEffect(
-    React.useCallback(() => {
+const socket = io(BASE_URLIO, {
+  query: { deviceId },
+});
+  useEffect(() => {
       if (deviceId) {
-        const socket = io(BASE_URLIO);
-  
+    
         socket.emit('watchChatMessagesDriver', deviceId);
   
         socket.on('OrderchatMessagesDriverUpdated', (data) => {
@@ -58,7 +59,7 @@ const DriverOrdersScreen = ({ navigation }) => {
         };
       }
     }, [deviceId])
-  );
+  
 
   useEffect(() => {
     getDeviceId(setDeviceId);
@@ -74,9 +75,7 @@ const DriverOrdersScreen = ({ navigation }) => {
   }, [deviceId]);
 
   useEffect(() => {
-      const socket = io(BASE_URLIO, {
-        query: { deviceId },
-      });
+   
       
       socket.emit('driverConnected', deviceId);
 
@@ -101,9 +100,7 @@ const DriverOrdersScreen = ({ navigation }) => {
     
   }, [deviceId]); 
   useEffect(() => {
-    const socket = io(BASE_URLIO, {
-      query: { deviceId },
-    });
+   
     
     socket.emit('driverConnected', deviceId);
     const subscription = AppState.addEventListener('change', nextAppState => {
@@ -352,7 +349,7 @@ const DriverOrdersScreen = ({ navigation }) => {
                             })}
                           >
                             <Ionicons name="send-outline" size={24} color="white" />
-                            <Text style={styles.navigateText}>Chat</Text>
+                            <Text style={styles.navigateText}></Text>
 
                             {/* Check each message for unread status */}
                             {messages.map((message, index) => {

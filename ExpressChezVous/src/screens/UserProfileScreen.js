@@ -35,12 +35,12 @@ const UserProfileScreen = ({ navigation }) => {
 
   const handleNameChange = async () => {
     if (!editedFirstName || !editedLastName) {
-      Alert.alert('Validation Error', 'Both first and last names are required.');
+      Alert.alert('Erreur de Validation', 'Le prénom et le nom de famille sont tous deux requis.');
       return; // Stop the function if validation fails
     }
   
     if (editedFirstName.length < 2 || editedLastName.length < 2) {
-      Alert.alert('Validation Error', 'Names must be at least 2 characters long.');
+      Alert.alert('Erreur de Validation', 'Les noms doivent comporter au moins 2 caractères.');
       return;
     }
   
@@ -56,10 +56,10 @@ const UserProfileScreen = ({ navigation }) => {
       });
       setFirstName(editedFirstName);
       setLastName(editedLastName);
-      Alert.alert('Success', 'Name changed successfully!');
+      Alert.alert('Succès', 'Le nom a été modifié avec succès !');
       setNameModalVisible(false);
     } catch (error) {
-      Alert.alert('Error', 'Failed to change name. Please try again.');
+      Alert.alert('Erreur', 'Échec de la modification du nom. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }
@@ -81,12 +81,12 @@ const UserProfileScreen = ({ navigation }) => {
 
   const handlePasswordChange = async () => {
     if (!newPassword || newPassword.length < 8) {
-      Alert.alert('Validation Error', 'Password must be at least 8 characters long.');
+      Alert.alert('Erreur de Validation', 'Le mot de passe doit contenir au moins 8 caractères.');
       return;
     }
   
     if (!isPasswordMatch) {
-      Alert.alert('Validation Error', 'Passwords do not match.');
+      Alert.alert('Erreur de Validation', 'Les mots de passe ne correspondent pas.');
       return;
     }
   
@@ -102,10 +102,10 @@ const UserProfileScreen = ({ navigation }) => {
         newPassword,
       });
   
-      Alert.alert('Success', 'Password changed successfully!');
+      Alert.alert('Succès', 'Le mot de passe a été modifié avec succès !');
       setPasswordModalVisible(false);
     } catch (error) {
-      Alert.alert('Error', error.message || 'Failed to change password.');
+      Alert.alert('Erreur', error.message || 'Échec de la modification du mot de passe.');
     } finally {
       setLoading(false);
     }
@@ -123,7 +123,7 @@ const UserProfileScreen = ({ navigation }) => {
   
   const handleCurrentPasswordValidation = async () => {
     if (!currentPassword) {
-      Alert.alert('Validation Error', 'Please enter your current password.');
+      Alert.alert('Erreur de Validation', 'Veuillez entrer votre mot de passe actuel.');
       return;
     }
   
@@ -139,13 +139,13 @@ const UserProfileScreen = ({ navigation }) => {
       if (response.data.isValid) {
         setIsCurrentPasswordValid(true); 
         setShowValidateSection(false); 
-        Alert.alert('Success', 'Current password is correct.');
+        Alert.alert('Succès', 'Le mot de passe actuel est correct.');
       } else {
-        Alert.alert('Error', 'Current password is incorrect.');
+        Alert.alert('Erreur', 'Le mot de passe actuel est incorrect.');
       }
     } catch (err) {
       console.error('Error validating password:', err);
-      Alert.alert('Error', 'Something went wrong with password validation.');
+      Alert.alert('Erreur', 'Un problème est survenu lors de la validation du mot de passe.');
     } finally {
       setLoading(false); 
     }
@@ -153,13 +153,13 @@ const UserProfileScreen = ({ navigation }) => {
   
   const handlePhoneChange = async () => {
     if (!phoneNumber) {
-      Alert.alert('Validation Error', 'Phone number is required.');
+      Alert.alert('Erreur de Validation', 'Le numéro de téléphone est requis.');
       return; // Stop the function if validation fails
     }
   
-    const phoneNumberPattern = /^[0-9]{10}$/; // Example pattern for a 10-digit phone number
+    const phoneNumberPattern =  /^(?:\+33|0)[1-9](?:[ .-]?\d{2}){4}$/; // Example pattern for a 10-digit phone number
     if (!phoneNumberPattern.test(phoneNumber)) {
-      Alert.alert('Validation Error', 'Please enter a valid 10-digit phone number.');
+      Alert.alert('Erreur de Validation', 'Veuillez entrer un numéro de téléphone valide de 10 chiffres.');
       return; // Stop the function if validation fails
     }
   
@@ -172,10 +172,10 @@ const UserProfileScreen = ({ navigation }) => {
         phoneNumber: phoneNumber.trim(), // Trim any spaces
         id
       });
-      Alert.alert('Success', 'Phone number changed successfully!');
+      Alert.alert('Succès', 'Numéro de téléphone modifié avec succès !');
       setPhoneModalVisible(false);
     } catch (error) {
-      Alert.alert('Error', 'Failed to change phone number. Please try again.');
+      Alert.alert('Erreur', 'Échec de la modification du numéro de téléphone. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }
@@ -200,13 +200,15 @@ const UserProfileScreen = ({ navigation }) => {
             </View>
           </View>
 
-       
+          <View style={styles.horizontalLayout}>
+
           <Text style={styles.userName}>{`${firstName} ${lastName}`}</Text>
           <TouchableOpacity 
   style={styles.iconButton} 
   onPress={() => setNameModalVisible(true)}>
   <MaterialIcons name="edit" size={24} color="#e9ab25" />
 </TouchableOpacity>
+          </View>
 
           </View>
 
@@ -223,7 +225,7 @@ const UserProfileScreen = ({ navigation }) => {
 <TouchableOpacity 
   style={styles.changePasswordButton} 
   onPress={() => setPasswordModalVisible(true)}>
-  <Text style={styles.buttonText}>Change Password</Text>
+  <Text style={styles.buttonText}>lmot de passe</Text>
 </TouchableOpacity>
 
 </View>
@@ -232,13 +234,13 @@ const UserProfileScreen = ({ navigation }) => {
       <Modal visible={isPhoneModalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Change Phone Number</Text>
-            <Text style={styles.modalTitle2}>Numerro de telephone</Text>
+            <Text style={styles.modalTitle}>Changer le numéro de téléphone</Text>
+            <Text style={styles.modalTitle2}>Numéro de téléphone</Text>
 
             <TextInput
              
                 keyboardType="phone-pad"
-              placeholder="Enter new phone number"
+              placeholder="Saisir un nouveau numéro de téléphone"
               value={phoneNumber}
               onChangeText={setPhoneNumber}
               style={styles.modalInput}
@@ -254,7 +256,7 @@ const UserProfileScreen = ({ navigation }) => {
               style={styles.modalCloseButton}
               onPress={() => setPhoneModalVisible(false)}
             >
-              <Text style={styles.modalCloseText}>Cancel</Text>
+              <Text style={styles.modalCloseText}>Annuler</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -264,7 +266,7 @@ const UserProfileScreen = ({ navigation }) => {
       <Modal visible={isPasswordModalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Change Password</Text>
+            <Text style={styles.modalTitle}>Changer le mot de passe</Text>
 
             {showValidateSection && (
               <View >
@@ -284,17 +286,17 @@ const UserProfileScreen = ({ navigation }) => {
                   onPress={handleCurrentPasswordValidation}
                   disabled={loading}
                 >
-                  {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.validateButtonText}>Validate</Text>}
+                  {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.validateButtonText}>Valider</Text>}
                 </TouchableOpacity>
               </View>
               </View>
             )}
 
-            <Text style={styles.modalTitle2}>New mot de pass</Text>
+            <Text style={styles.modalTitle2}>Nouveau mot de passe</Text>
 
 
             <TextInput
-              placeholder="New Password"
+              placeholder="Créer un nouveau mot de passe"
               value={newPassword}
               onChangeText={(text) => {
                 setNewPassword(text);
@@ -307,7 +309,7 @@ const UserProfileScreen = ({ navigation }) => {
                   <Text style={styles.modalTitle2}>Confirmee le mot de pass</Text>
 
             <TextInput
-              placeholder="Confirm New Password"
+              placeholder="Confirmer le nouveau mot de passe"
               value={confirmNewPassword}
               onChangeText={(text) => {
                 setConfirmNewPassword(text);
@@ -336,7 +338,7 @@ const UserProfileScreen = ({ navigation }) => {
               style={styles.modalCloseButton}
               onPress={() => setPasswordModalVisible(false)}
             >
-              <Text style={styles.modalCloseText}>Cancel</Text>
+              <Text style={styles.modalCloseText}>Annuler</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -347,11 +349,11 @@ const UserProfileScreen = ({ navigation }) => {
 <Modal visible={isNameModalVisible} transparent animationType="slide">
   <View style={styles.modalOverlay}>
     <View style={styles.modalContainer}>
-      <Text style={styles.modalTitle}>Change Name</Text>
+      <Text style={styles.modalTitle}>Changer de nom</Text>
       <Text style={styles.modalTitle2}>Prenom</Text>
 
       <TextInput
-        placeholder="First Name"
+        placeholder="Prenom"
         value={editedFirstName}
         onChangeText={setEditedFirstName}
         style={styles.modalInput}
@@ -359,7 +361,7 @@ const UserProfileScreen = ({ navigation }) => {
             <Text style={styles.modalTitle2}>Nom</Text>
 
       <TextInput
-        placeholder="Last Name"
+        placeholder="Nom"
         value={editedLastName}
         onChangeText={setEditedLastName}
         style={styles.modalInput}
@@ -376,7 +378,7 @@ const UserProfileScreen = ({ navigation }) => {
         style={styles.modalCloseButton}
         onPress={() => setNameModalVisible(false)}
       >
-        <Text style={styles.modalCloseText}>Cancel</Text>
+        <Text style={styles.modalCloseText}>Annuler</Text>
       </TouchableOpacity>
     </View>
   </View>
@@ -392,24 +394,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   profileContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 40,
+    paddingTop: 40,
   },
   phoneNumber: {
     fontSize: 24,
+    alignContent:"flex-start",
     fontWeight: 'bold',
     color: '#4A4A4A', // Darker color for futuristic look
     
     flex: 1,
   },
-  row: {
-    flexDirection: 'row',
+  horizontalLayout: {
+    flexDirection: 'row',  // Horizontal layout
     alignItems: 'center',
-    justifyContent: 'flex-start', // Align the number and icon side by side
+    justifyContent: 'space-between',  // Ensure spacing between elements
+    width: '100%',  // Full width layout
+  },
+  row: {
+    flexDirection: 'row',  // Horizontal layout
+    alignItems: 'center',
+    justifyContent: 'space-between', // Align the number and icon side by side
     width: '100%',
-    marginBottom: 20,
   },
   iconButton: {
     backgroundColor: '#E0F7FA', // Light futuristic color
@@ -425,8 +433,7 @@ const styles = StyleSheet.create({
   profileWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
-    padding: 50,
+    paddingBottom: 30,
 
   },
   profileImageContainer: {
