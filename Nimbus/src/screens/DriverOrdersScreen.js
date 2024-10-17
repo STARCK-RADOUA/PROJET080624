@@ -15,11 +15,10 @@ import styles from './styles/styles';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
 
-
 const DriverOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [deviceId, setDeviceId] = useState(null);
+  const [deviceId1, setDeviceId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [driverId, setDriverId] = useState(null);
   const [driverInfo, setDriverInfo] = useState({ firstName: '', lastName: '' });
@@ -193,7 +192,7 @@ const DriverOrdersScreen = ({ navigation }) => {
   };
 
   const getDistance = async (startLat, startLng, endLat, endLng) => {
-    const osrmUrl = `http://192.168.1.11:5000/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=false`;
+    const osrmUrl = `http://192.168.8.159:5000/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=false`;
 
     try {
       const response = await axios.get(osrmUrl, { timeout: 10000 });
@@ -378,7 +377,7 @@ const DriverOrdersScreen = ({ navigation }) => {
                             })}
                           >
                             <Ionicons name="send-outline" size={24} color="white" />
-                            <Text style={styles.navigateText}>Chat</Text>
+                            <Text style={styles.navigateText}></Text>
 
                             {/* Check each message for unread status */}
                             {messages.map((message, index) => {

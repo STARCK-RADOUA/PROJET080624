@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from 'react-native';
 import React, { useCallback, useImperativeHandle, useState, useEffect, useRef } from 'react';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
@@ -34,6 +35,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const flatListRef = useRef(null); // Reference to the FlatList
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const scrollTo = useCallback((destination) => {
     'worklet';
@@ -112,6 +114,21 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
     }
   };
 
+  // Listeners for Android to handle keyboard height manually
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   const context = useSharedValue({ y: 0 });
   const gesture = Gesture.Pan()
     .onStart(() => {
@@ -122,7 +139,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
       translateY.value = Math.max(translateY.value, MAX_TRANSLATE_Y);
     })
     .onEnd(() => {
-      if (translateY.value > -SCREEN_HEIGHT / 3) {
+      if (translateY.value > -SCREEN_HEIGHT / 1) {
         scrollTo(0);
       } else if (translateY.value < -SCREEN_HEIGHT / 1.5) {
         scrollTo(MAX_TRANSLATE_Y);
@@ -163,11 +180,14 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
             </View>
           )}
           style={styles.messageList}
+          onContentSizeChange={scrollToBottom} // Scroll to bottom when content changes
+          onLayout={scrollToBottom} // Scroll to bottom when layout changes
         />
 
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.inputContainer}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Adjust offset for iOS
+          style={[styles.inputContainer, { marginBottom: keyboardHeight }]} // Add keyboard height for Android
         >
           <TextInput
             style={styles.input}
@@ -187,28 +207,29 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
 const styles = StyleSheet.create({
   bottomSheetContainer: {
     height: SCREEN_HEIGHT * 0.7, // Set the max height to 70% of the screen
-    width: '100%',
-    backgroundColor: 'white',
+    width: '90%',
+    backgroundColor: '#f7f5f3ef',
     position: 'absolute',
-    top: SCREEN_HEIGHT*1.27,
-    borderRadius: 25,
+    top: SCREEN_HEIGHT * 1.27,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
   },
   line: {
     width: 75,
     height: 4,
-    backgroundColor: 'grey',
+    backgroundColor: '#e2b41b',
     alignSelf: 'center',
     marginVertical: 15,
-    borderRadius: 2,
+    borderRadius: 20,
   },
   messageList: {
     flex: 1,
     paddingHorizontal: '5%',
-    paddingVertical: 20,
+    paddingVertical: 7,
   },
   messageContainer: {
     maxWidth: '80%',
-    padding: 10,
+    padding: 11,
     borderRadius: 20,
     marginVertical: 5,
   },
@@ -221,17 +242,19 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   messageText: {
-    color: 'black', // Changed color for readability
+    color: 'black',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 10,
-    marginBottom:  Platform.OS === 'ios' ? SCREEN_HEIGHT * 0.07: 5,
     backgroundColor: '#F2F2F2',
     borderTopWidth: 1,
     borderTopColor: '#E5E5EA',
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    paddingBottom: 20,
   },
   input: {
     flex: 1,

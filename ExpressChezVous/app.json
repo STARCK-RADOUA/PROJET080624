@@ -19,7 +19,7 @@
           "fetch",
           "remote-notification"
         ],
-        "NSCameraUsageDescription": "This app uses the camera to scan QR codes and take photos.",
+        "NSCameraUsageDescription": "Cette application a besoin d'accéder à la caméra pour scanner les QR codes.",
         "NSLocationWhenInUseUsageDescription": "This app requires access to your location to provide accurate address services.",
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
       }

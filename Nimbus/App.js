@@ -14,7 +14,9 @@ import * as Device from 'expo-device';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
 
-
+const deviceId = Device.osBuildId;
+// Initialize socket connection
+const socket = io(BASE_URLIO, { query: { deviceId } });
 
 export default function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
@@ -29,7 +31,6 @@ export default function App() {
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
-      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
       console.log('Sending background ping');
       socket.emit('driverPing', { deviceId: Device.osBuildId });
       return BackgroundFetch.Result.NewData;
@@ -41,7 +42,6 @@ export default function App() {
 
   useEffect(() => {
     // Initialize socket connection
-    const socket = io(BASE_URLIO);
     // Listen to the socket for the system status
     socket.on('statusSiteDriver', (systemActive) => {
       // Check the system status from the server
@@ -83,9 +83,7 @@ navigate('SystemDownScreen')
     configureNotifications();
     registerBackgroundTask();
 
-    const deviceId = Device.osBuildId;
-    // Initialize socket connection
-    const socket = io(BASE_URLIO, { query: { deviceId } });
+  
     socketRef.current = socket;
     socket.emit('toggleSystemDriver'); // For example, emit an event to check system status
 

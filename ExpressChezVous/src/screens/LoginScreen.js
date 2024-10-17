@@ -26,6 +26,8 @@ const LoginScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const deviceId = Device.osBuildId;
   const logoAnim = useRef(new Animated.Value(0)).current;
+  const [phoneError, setPhoneError] = useState('');
+
   const [hasNavigated, setHasNavigated] = useState(false); // Track if we've already navigated
   useEffect(() => {
     const deviceId = Device.osBuildId;
@@ -53,8 +55,21 @@ const LoginScreen = ({ navigation }) => {
 if(isLocationObtained == false){
  fetchCurrentLocation();
 }
+
+
+   const validatePhoneNumber = (phone) => {
+      const phoneRegex = /^(?:\+33|0)[1-9](?:[ .-]?\d{2}){4}$/;
+      return phoneRegex.test(phone);
+    };
+
+    if (phone !== '' && !validatePhoneNumber(phone)) {
+      setPhoneError('Invalid phone number format.');
+    } else {
+      setPhoneError('');
+    }
+
     // Fetch the location once the component mounts
-    
+   
 
     Animated.spring(logoAnim, {
       toValue: 1,
@@ -64,11 +79,7 @@ if(isLocationObtained == false){
     }).start();
 
     // Connexion au socket
-    const socket = io(BASE_URLIO, {
-      query: {
-        deviceId: deviceId,  // Passer l'identifiant unique
-      }
-    });
+ 
 
     // Écouter l'événement d'activation de l'administrateur
     socket.on('adminActivateClient', () => {
@@ -79,7 +90,7 @@ if(isLocationObtained == false){
     return () => {
       socket.off('adminActivateClient');
     };
-  }, [isLoginSuccess]);
+  }, [isLoginSuccess,phone,phoneError]);
 
   // Fonction pour obtenir la localisation
   const handleGetLocation = async () => {
@@ -253,21 +264,20 @@ if(isLocationObtained == false){
   };
 
   return (
-    <ImageBackground source={require('../assets/8498789sd.png')} style={styles.backgroundImage}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
-      >
-        <Animated.View style={[styles.imageContainer, { transform: [{ scale: logoAnim }] }]}>
-          <Image
-            source={require('../assets/images/8498789.png')}
-            style={[styles.image, { width: width, height: width }]}
-          />
-        </Animated.View>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
+                         <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
+
           <View style={styles.container1}>
+          <ImageBackground source={require('../assets/8498789sd.png')} style={styles.backgroundImage}>
+
+<Animated.View style={[styles.imageContainer, { transform: [{ scale: logoAnim }] }]}>
+  <Image
+    source={require('../assets/images/8498789.png')}
+    style={[styles.image, { width: width, height: width }]}
+  />
+</Animated.View>
+</ImageBackground>
             <View style={styles.container}>
+         
               <TextInput
                 style={styles.input}
                 placeholder="Numéro de Téléphone"
@@ -275,6 +285,8 @@ if(isLocationObtained == false){
                 value={phone}
                 onChangeText={setPhone}
               />
+                    {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+
               <TextInput
                 style={styles.input}
                 placeholder="Mot de Passe"
@@ -294,14 +306,18 @@ if(isLocationObtained == false){
                 <TouchableOpacity onPress={() => navigation.navigate('QRScanner')}>
                   <Icon name="qrcode-scan" size={40} color="#000" />
                 </TouchableOpacity>
+                
               </View>
-
+           
               {loading && <ActivityIndicator size="large" color="orange" />}
+
+               
             </View>
+        
+
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+            </ScrollView>
+
   );
 };
 

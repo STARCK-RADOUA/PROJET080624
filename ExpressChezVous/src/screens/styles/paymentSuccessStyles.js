@@ -3,111 +3,164 @@ import { StyleSheet, Dimensions } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF5E1', // Light orange background
     alignItems: 'center',
     justifyContent: 'flex-start',
+    paddingHorizontal: 15,
   },
   header: {
-    width: '100%',
+    width: '25%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    justifyContent: 'end',
     paddingTop: 30,
-    marginTop: 3,
+    backgroundColor: '#FF9800', // Deep orange for header
+    paddingVertical: 15,
+    paddingHorizontal: 12,
+    paddingRight :30,
+   borderBottomLeftRadius: 35,
+   position: 'absolute',
+   right: 0,
+   resizeMode: 'contain',
+   shadowRadius: 50,
+   elevation: 9,
+   shadowColor: '#070707',
+   shadowOffset: { width: 1, height: 5 },
+   shadowOpacity: 0.9,
   },
   chatIcon: {
     width: 40,
     height: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 7 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    paddingHorizontal: 35,
+    elevation: 8,
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    
+    
   },
   disabledChatIcon: {
-    opacity: 0.3, 
+    opacity: 0.3,
+    
   },
   successContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  }, successContainer2: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
     
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  successText: {
+    color: '#2C3E50', // Dark gray text
+    fontWeight: 'bold',
+    fontSize: 22,
+    textAlign: 'center',
   },
   deliveryImageContainer: {
     position: 'absolute',
-    top: Dimensions.get('window').height * 0.667,
+    top: Dimensions.get('window').height * 0.6,
+    
+    
   },
   bottomFixed: {
-    width: '100%',
-    backgroundColor: '#FFA500',
+    width: '90%',
+    backgroundColor: '#FF9800', // Orange background for bottom bar
     paddingVertical: 15,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    bottom: 9,
-  },
-   bottomFixed2: {
-    backgroundColor: '#ffab0e4e',
-    paddingVertical: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-  
-
-    borderRadius: 45,
-   
-    padding: 20,
-    justifyContent: 'center',
-  },  exitButton: {
-   
-    alignItems: 'center',
-    backgroundColor: '#26a115a7',
-    borderRadius: 30,
+    bottom: 0,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.9,
     shadowRadius: 5,
-    elevation: 5,
-    marginTop: 20,
-    padding: 30,
+    elevation: 8,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+
+
+  },
+  bottomFixed2: {
+
+    backgroundColor: '#FFCC80', // Light orange with some transparency
+    paddingVertical: 15,
+    alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 30,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 8,
+    marginHorizontal: 20,
+    shadowColor: '#FFA726',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
+    marginTop: 20,
+    paddingVertical: 15,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  exitButton: {
+    width: '80%',
+    backgroundColor: '#FF9800', // Strong orange for button
+    borderRadius: 25,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginTop: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  exitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   deliveryText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
-  },
-  deliveryTime: {
-    color: '#249715',
+    
+marginBottom: 15, 
+ },
+  deliveryTimetext: {
+    fontSize: 22,
+    color: '#d4c6b8', // Deep orange text
     fontWeight: 'bold',
-
-    marginTop: 5,
-  }, redirectMessage2: {
-    color: '#179407',
-    fontWeight: 'bold',
-    alignContent:"flex-start",
-    fontSize: 19,
-
-
-  }, successText: {
-    color: '#2c3b2a',
-    fontWeight: 'bold',
-    alignContent:"flex-start",
-    fontSize: 18,
-
-
-  },
-    deliveryTimetext: {
-    fontSize: 19,
-    color: '#249715',
-    fontWeight: 'bold',
-
-    marginTop: 5,
-    alignContent:"center"
+    textAlign: 'center',
   },
   circularContainer: {
-    fontSize: 19,
-    color: '#249715',
+    fontSize: 22,
+    color: '#FF6F00',
     fontWeight: 'bold',
+  },
+  redirectMessage2: {
+    color: '#F57C00', // Deep orange for text
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign: 'center',
+  },
+ 
+  image: {
+    borderRadius: 20,
+    shadowColor: '#FF9800',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
 
+    marginTop: Dimensions.get('window').height * 0.06,
   },
 });
 

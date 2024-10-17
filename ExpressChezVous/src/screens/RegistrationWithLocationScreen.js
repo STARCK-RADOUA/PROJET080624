@@ -33,7 +33,7 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
     getDeviceId();
 
     const validatePhoneNumber = (phone) => {
-      const phoneRegex = /^\d{10}$/;
+      const phoneRegex = /^(?:\+33|0)[1-9](?:[ .-]?\d{2}){4}$/;
       return phoneRegex.test(phone);
     };
 

@@ -48,8 +48,9 @@ const FeedbackScreen = ({ route, navigation }) => {
       // Simulate 3-second delay before navigating to HomeScreen
       setTimeout(() => {
         setLoading(false); // Stop loading after 3 seconds
-        navigation.replace('Home'); // Navigate to HomeScreen
+        navigation.replace('Services'); // Navigate to HomeScreen
       }, 3000);
+
   
     } catch (error) {
       setLoading(false); // Stop loading in case of error

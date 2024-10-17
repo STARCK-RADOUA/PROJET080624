@@ -11,8 +11,11 @@ import { updateOrderItems, updateUserPoints } from '../services/orderService';
 import styles from './styles/paymentSuccessStyles';
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
+const deviceId = Device.osBuildId;
 
-
+const socket = io(BASE_URLIO, {
+  query: { deviceId },
+});
 const PaymentSuccessScreen = ({ route }) => {
   const totalTimeInSeconds = 5 * 60;
   const [progress, setProgress] = useState(0);
@@ -33,11 +36,8 @@ const PaymentSuccessScreen = ({ route }) => {
   const navigation = useNavigation();
   const [duration, setDuration] = useState(null);
   const [distance, setDistance] = useState(null);
-  const deviceId = Device.osBuildId;
 
-  const socket = io(BASE_URLIO, {
-    query: { deviceId },
-  });
+ 
   // Save screen state to AsyncStorage before closing the app
   const saveStateToStorage = async (orderId, orderStatus, orders, nezPoint) => {
     try {
@@ -52,7 +52,19 @@ const PaymentSuccessScreen = ({ route }) => {
     }
   };
 
-
+  useEffect(() => {
+    if (orderStatus === 'delivered') {
+      // Active le chat pendant 2 minutes lorsque la commande est livrée
+      setIsChatDisabled(false);
+  
+      const timer = setTimeout(() => {
+        setIsChatDisabled(true);
+      }, 2 * 60 * 1000); // 2 minutes
+  
+      return () => clearTimeout(timer); // Nettoie le timer si le composant est démonté
+    }
+  }, [orderStatus]);
+  
  
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -119,6 +131,9 @@ const PaymentSuccessScreen = ({ route }) => {
   // Emit orderId when component mounts
   useEffect(() => {
     retrieveStateFromStorage();
+    if (!socket.connected) {
+      socket.connect();  // Connecter le socket seulement s'il n'est pas connecté
+    }
 
     socket.emit('watchOrderStatuss', { order_id: orderId });
 
@@ -135,9 +150,7 @@ const PaymentSuccessScreen = ({ route }) => {
 
       if (status === 'delivered') {
         socket.emit('disconnectRoute');
-        setIsChatDisabled(false);
 
-        setRedirectMessage('Votre commande a été livrée. Chat pendant 2 minutes.');
         setShowExitButton(true);
         if ((nezPoint || nezPoint === 0) && orders.length > 0) {
           await updateUserPoints(nezPoint);
@@ -145,7 +158,6 @@ const PaymentSuccessScreen = ({ route }) => {
         }
         await clearAllData(); // Clear all data once cancelled  
 
-        navigation.navigate('feedback', { orderId });
       }
 
       if (status === 'cancelled') {
@@ -156,8 +168,8 @@ const PaymentSuccessScreen = ({ route }) => {
         setShowExitButton(true);
     // Clear all data once cancelled  
              await clearAllData(); // Clear all data once cancelled  
-             navigation.navigate('Services', );
-      }
+             navigation.navigate('Services', {});
+            }
 
       if (status === 'in_progress') {
         setIsChatDisabled(false);
@@ -192,6 +204,7 @@ console.log('------------------------------------');
 
     return () => socket.off('orderStatusUpdates');
   }, [nezPoint]);
+  
 
   // Handle back button press logic
   useEffect(() => {
@@ -237,7 +250,7 @@ console.log('------------------------------------');
       };
 
       animateDeliveryImage();
-      let totalTimeRemaining = duration;
+      let totalTimeRemaining = duration*60;
 
       const interval = setInterval(() => {
         totalTimeRemaining -= 1;
@@ -309,13 +322,13 @@ console.log('------------------------------------');
       <View style={styles.bottomFixed2}>
 
         <Text style={styles.successText}>
-          {orderStatus === 'pending' ? 'VOTRE COMMANDE EN COURS DE TRAITEMENT' : `Votre Comande est comfirmée ` }
+          {orderStatus === 'pending' ? 'VOTRE COMMANDE EN COURS DE TRAITEMENT' : orderStatus === 'in_progress' ? 'Votre Comande est comfirmée':  orderStatus === 'delivered' ? 'Votre commande a été livrée. Chat pendant 2 minutes.': orderStatus}
 
         </Text>
         <Text style={styles.redirectMessage2}> 
   {orderStatus === 'in_progress' 
     ? (duration !== null 
-        ? `${Math.floor(duration / 60)}m et ${((1000 - (progress * 100) / 100) % 60).toFixed(0)}s` 
+        ? duration<1? "Le livreur est là, prêt à vous faire sourire avec votre commande ! 😊":`Il reste ${Math.floor(duration / 60)}m ` 
         : 'Calcul en cours...') 
     : " "}
 </Text>
@@ -351,7 +364,7 @@ console.log('------------------------------------');
 
             <View style={styles.circularContainer}>
              
-              <Text style={styles.deliveryTimetext}>{duration !== null ? `Il reste ${Math.floor(duration / 60)}m et ${((283 - (progress * 283) / 100)%60).toFixed(0) }s` : 'Calcul en cours...'}</Text>
+              <Text style={styles.deliveryTimetext}>{duration !== null ? `Il reste ${Math.floor(duration / 60)}min` : 'Calcul en cours...'}</Text>
 
               
                </View>
@@ -377,19 +390,20 @@ console.log('------------------------------------');
       {showExitButton && (
         <View style={styles.exitButtonContainer}>
           <TouchableOpacity style={styles.exitButton} onPress={handleExitPress}>
-            <Text style={styles.exitButtonText}>Exit to Feedback</Text>
+            <Text style={styles.exitButtonText}>  La touche finale  </Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {orderStatus === 'in_progress' && (
-        <BottomSheet ref={bottomSheetRef} orderId={orderId} clientId={clientId} driverId={driverId} >
-          <View>
-            <Text style={{ padding: 20, fontSize: 16 }}>Chat with us</Text>
-            
-          </View>
-        </BottomSheet>
-      )}
+      {(orderStatus === 'in_progress' || !isChatDisabled ) && (
+  <BottomSheet ref={bottomSheetRef} orderId={orderId} clientId={clientId} driverId={driverId}>
+    <View>
+      <Text style={{ padding: 20, fontSize: 16 }}>Chat with us</Text>
+    </View>
+  </BottomSheet>
+)}
+
+     
     </SafeAreaView>
   );
 };
