@@ -6,6 +6,8 @@ import { BASE_URLIO, BASE_URL } from '@env';
 import { getClientId } from '../services/userService';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
+import * as Device from 'expo-device';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -14,10 +16,20 @@ const ClientChatScreen = ({ navigation }) => {
   const [messages, setMessages] = useState([]);  // Chat messages
   const [newMessage, setNewMessage] = useState('');  // Input message
   const [chatId, setChatId] = useState(null);  // Chat ID obtained after initiation
+  const [deviceId, setDeviceId] = useState(null);
 
   const userType = 'Client';
   const socket = useRef(io(BASE_URLIO)).current;  // Initialize socket.io client
   const flatListRef = useRef(null);  // Reference for FlatList
+
+  const getDeviceId = async () => {
+    const id = await Device.osBuildId
+    setDeviceId(id);
+  };
+
+  useEffect(() => {
+    getDeviceId() ;
+  }, [deviceId]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -54,7 +66,7 @@ const ClientChatScreen = ({ navigation }) => {
         setChatId(data.chatId);
         const lastMessage = data.messages.length > 0 ? data.messages[data.messages.length - 1] : null;
         if (lastMessage && lastMessage.sender === 'admin' && !lastMessage.seen) {
-          const unseenMessages = data.messages.filter(message => !message.seen);
+          const unseenMessages = data.messages.filter(message => !message.seen && message.sender ==="admin"  );
           setMessages(unseenMessages);
         }
       });
@@ -79,10 +91,12 @@ const ClientChatScreen = ({ navigation }) => {
 
   const sendMessage = () => {
     if (newMessage.trim() && chatId) {
+      console.log(deviceId , "gj")
       socket.emit('sendMessage', {
         chatId,
         sender: 'client',
         content: newMessage,
+        deviceId  : deviceId
       });
       setNewMessage('');
     }

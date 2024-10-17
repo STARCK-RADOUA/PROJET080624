@@ -1,222 +1,213 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import { Card, Icon } from 'react-native-elements';
+import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Modal } from 'react-native';
+import { Card } from 'react-native-elements';
 import { LineChart } from 'react-native-chart-kit';
-import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
+import axios from 'axios';
+import { BASE_URL, BASE_URLIO } from '@env';
+import { Ionicons } from '@expo/vector-icons';
 
 const HomeScreen = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState('Weekly');
-  const [selectedFilter, setSelectedFilter] = useState('All');
+  const [selectedFilter, setSelectedFilter] = useState('Product');
   const [totalSum, setTotalSum] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
-  const [error, setError] = useState('');
   const [totalClients, setTotalClients] = useState(0);
   const [totalProducts, setTotalProducts] = useState(0);
   const [dailyRevenue, setDailyRevenue] = useState([]);
+  const [showDriverRevenue, setShowDriverRevenue] = useState(false);
+  const [drivers, setDrivers] = useState([]);
+  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [driverModalVisible, setDriverModalVisible] = useState(false);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = io(BASE_URLIO);
-
-    // Emit the event to get daily revenue
-    socket.emit('getDailyRevenue');
-
-    // Listen for daily revenue response
-    socket.on('dailyRevenue', (data) => {
-      setDailyRevenue(data.dailyRevenue);
-      console.log(data)
-    });
-
-    // Listen for errors
-    socket.on('error', (message) => {
-      setError(message);
-    });
-
-    // Cleanup on component unmount
-    return () => {
-      socket.disconnect();
-    };
+    axios.get(`${BASE_URL}/api/driver/forChart`)
+      .then(response => setDrivers(response.data))
+      .catch(error => console.error('Erreur de récupération des chauffeurs :', error.message));
   }, []);
+
   useEffect(() => {
-    const socket = io(BASE_URLIO);
+    const socketInstance = io(BASE_URLIO);
+    setSocket(socketInstance);
 
-    // Emit the event to get total products
-    socket.emit('getTotalProducts');
+    socketInstance.emit('getDailyRevenue');
+    socketInstance.on('dailyRevenue', (data) => {
+      if (data && data.dailyRevenue) {
+        setDailyRevenue(data.dailyRevenue);
+      }
+    });
 
-    // Listen for total products response
-    socket.on('totalProducts', (data) => {
+    socketInstance.emit('getTotalProducts');
+    socketInstance.on('totalProducts', (data) => {
       setTotalProducts(data.totalProducts);
     });
 
-    // Listen for errors
-    socket.on('error', (message) => {
-      setError(message);
-    });
-
-    // Cleanup on component unmount
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-  useEffect(() => {
-    const socket = io(BASE_URLIO);
-
-    // Emit the event to get total clients
-    socket.emit('getTotalClients');
-
-    // Listen for total clients response
-    socket.on('totalClients', (data) => {
+    socketInstance.emit('getTotalClients');
+    socketInstance.on('totalClients', (data) => {
       setTotalClients(data.totalClients);
     });
 
-    // Listen for errors
-    socket.on('error', (message) => {
-      setError(message);
-    });
-
-    // Cleanup on component unmount
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    const socket = io(BASE_URLIO);
-
-    // Fetch delivered orders summary when the component mounts
-    socket.emit('getDeliveredOrdersSummary');
-
-    // Listen for delivered orders summary
-    socket.on('deliveredOrdersSummary', (data) => {
-      console.log('data' , data)
+    socketInstance.emit('getDeliveredOrdersSummary');
+    socketInstance.on('deliveredOrdersSummary', (data) => {
       setTotalSum(data.totalSum);
       setTotalCount(data.totalCount);
     });
 
-    // Listen for errors
-    socket.on('error', (message) => {
-      setError(message);
-    });
-
-    // Cleanup on component unmount
     return () => {
-      socket.disconnect();
+      socketInstance.disconnect();
     };
-  }, []); // Empty depend
+  }, []);
 
-  const handlePeriodChange = (period) => {
-    setSelectedPeriod(period);
+  const handleDriverSelect = (driverId) => {
+    setSelectedDriver(driverId);
+    setDriverModalVisible(false);
+
+    if (socket) {
+      socket.emit('getDailyRevenueDriver', driverId);
+      socket.on('dailyRevenueDriver', (data) => {
+        if (data && data.dailyRevenue) {
+          setDailyRevenue(data.dailyRevenue);
+        }
+      });
+    }
   };
 
   const handleFilterChange = (filter) => {
     setSelectedFilter(filter);
+    if (filter === 'Driver') {
+      setShowDriverRevenue(true);
+    } else {
+      setShowDriverRevenue(false);
+      if (socket) {
+        socket.emit('getDailyRevenue');
+      }
+    }
   };
+
+  const getChartData = () => {
+    const labels = dailyRevenue.map((item) => item._id.slice(5)); // Extract MM-DD for labels
+    const data = dailyRevenue.map((item) => item.totalRevenue);
+
+    return {
+      labels: labels.length > 0 ? labels : ['Pas de données'],
+      datasets: [
+        {
+          data: data.length > 0 ? data : [0],
+          color: (opacity = 1) => `rgba(138, 43, 226, ${opacity})`, // Violin color
+          strokeWidth: 2,
+        },
+      ],
+    };
+  };
+
+  const renderDriverDropdown = () => (
+    <Modal
+      transparent={true}
+      visible={driverModalVisible}
+      animationType="fade"
+      onRequestClose={() => setDriverModalVisible(false)}
+    >
+      <View style={styles.driverModalContainer}>
+        <View style={styles.driverModalContent}>
+          <TouchableOpacity style={styles.closeButton} onPress={() => setDriverModalVisible(false)}>
+            <Text style={styles.closeButtonText}>Fermer</Text>
+          </TouchableOpacity>
+          <ScrollView>
+            {drivers.map(driver => (
+              <TouchableOpacity
+                key={driver.driver_id}
+                style={styles.driverItem}
+                onPress={() => handleDriverSelect(driver.driver_id)}
+              >
+                <Text style={styles.driverName}>{`${driver.firstName} ${driver.lastName}`}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header Section */}
       <View style={styles.header}>
-        <Text style={styles.title}>tableau de bord</Text>
-        
+        <Text style={styles.title}>Tableau de bord</Text>
       </View>
 
-      {/* Stats Cards Section */}
       <View style={styles.statsContainer}>
         <View style={styles.cardWrapper}>
           <Card containerStyle={[styles.card, styles.card1]}>
-            <Text>Total Menus</Text>
+            <Text>Menus totaux</Text>
             <Text style={styles.statNumber}>{totalProducts}</Text>
           </Card>
           <Card containerStyle={[styles.card, styles.card2]}>
-            <Text>Total Orders</Text>
+            <Text>Commandes totales</Text>
             <Text style={styles.statNumber}>{totalCount}</Text>
           </Card>
           <Card containerStyle={[styles.card, styles.card3]}>
-            <Text>Total Clients</Text>
+            <Text>Clients totaux</Text>
             <Text style={styles.statNumber}>{totalClients}</Text>
           </Card>
           <Card containerStyle={[styles.card, styles.card4]}>
-            <Text>Total Revenue</Text>
+            <Text>Revenu total</Text>
             <Text style={styles.statNumber}>{totalSum} €</Text>
           </Card>
         </View>
       </View>
 
-      {/* Filter Section */}
       <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedFilter === 'All' && styles.activeFilter]}
-          onPress={() => handleFilterChange('All')}
-        >
-          <Text style={styles.filterText}>All</Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterButton, selectedFilter === 'Product' && styles.activeFilter]}
           onPress={() => handleFilterChange('Product')}
         >
-          <Text style={styles.filterText}>Product Revenue</Text>
+          <Text style={styles.filterText}>Revenu Géneral</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterButton, selectedFilter === 'Driver' && styles.activeFilter]}
           onPress={() => handleFilterChange('Driver')}
         >
-          <Text style={styles.filterText}>Driver Revenue</Text>
+          <Text style={styles.filterText}>Revenu des chauffeurs</Text>
         </TouchableOpacity>
       </View>
+      {showDriverRevenue && (
+        <View>
+          <Text style={styles.sectionHeader}>choisir un livreur :</Text>
+          <TouchableOpacity
+            style={styles.driverSelectButton}
+            onPress={() => setDriverModalVisible(true)}
+          >
+            <Text style={styles.driverSelectText}>
+              {selectedDriver
+                ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName
+                : 'Sélectionner un chauffeur'}
+            </Text>
+            <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
+          </TouchableOpacity>
+        </View>
+      )}
 
-      {/* Revenue Chart Section */}
       <View style={styles.chartContainer}>
         <View style={styles.chartHeader}>
-          <Text style={styles.chartTitle}>Revenue</Text>
-          <View style={styles.periodContainer}>
-            <TouchableOpacity onPress={() => handlePeriodChange('Weekly')}>
-              <Text style={[styles.periodText, selectedPeriod === 'Weekly' && styles.activePeriod]}>
-                Weekly
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handlePeriodChange('Monthly')}>
-              <Text style={[styles.periodText, selectedPeriod === 'Monthly' && styles.activePeriod]}>
-                Monthly
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.chartTitle}>Revenu</Text>
         </View>
         <LineChart
-          data={{
-            labels: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-            datasets: [
-              {
-                data: selectedFilter === 'All' || selectedFilter === 'Product'
-                  ? [5000, 10000, 7500, 15000, 12000, 17000, 14000]
-                  : [0, 0, 0, 0, 0, 0, 0],
-                color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // Product Revenue
-                strokeWidth: 2,
-              },
-              {
-                data: selectedFilter === 'All' || selectedFilter === 'Driver'
-                  ? [4000, 8000, 6000, 12000, 10000, 14000, 13000]
-                  : [0, 0, 0, 0, 0, 0, 0],
-                color: (opacity = 1) => `rgba(66, 194, 244, ${opacity})`, // Driver Revenue
-                strokeWidth: 2,
-              },
-            ],
-          }}
-          width={Dimensions.get('window').width - 40} // from react-native
+          data={getChartData()}
+          width={Dimensions.get('window').width - 40}
           height={250}
           chartConfig={{
-            backgroundColor: '#ffffff',
-            backgroundGradientFrom: '#f5f5f5',
-            backgroundGradientTo: '#f5f5f5',
-            decimalPlaces: 0, // optional, defaults to 2dp
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            backgroundColor: '#312C63',
+            backgroundGradientFrom: '#3A1C71',
+            backgroundGradientTo: '#D76D77',
+            decimalPlaces: 2,
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
             style: {
               borderRadius: 16,
             },
             propsForDots: {
-              r: '6',
-              strokeWidth: '2',
-              stroke: '#81b0ff',
+              r: '2',
+              strokeWidth: '5',
+              stroke: 'black',
             },
           }}
           bezier
@@ -226,6 +217,8 @@ const HomeScreen = () => {
           }}
         />
       </View>
+
+      {renderDriverDropdown()}
     </ScrollView>
   );
 };
@@ -233,104 +226,141 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f8f9fa',  // Light background for a modern look
+    backgroundColor: '#ffff', // Dark background for violin theme
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#3A1C71',
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
     marginBottom: 20,
   },
   title: {
-    fontSize: 26,  // Slightly larger for modern headings
-    fontWeight: '700',  // Bolder font for emphasis
-    color: '#333',  // Dark gray text for modern contrast
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#FFF',
   },
   statsContainer: {
     marginBottom: 20,
   },
   cardWrapper: {
     flexDirection: 'row',
-    flexWrap: 'wrap', // Allows the cards to wrap into multiple lines
-    justifyContent: 'space-between', // Aligns cards with space between them
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   card: {
-    width: '43%',  // Each card takes up 48% of the width
-    padding: 20,
-    borderRadius: 15,  // Increased rounding for a softer, modern feel
+    width: '40%',
+    borderRadius: 15,
     alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',  // Subtle shadow for depth
+    marginBottom: 10,
+    paddingVertical: 15,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 3,  // Elevation for Android shadow
+    elevation: 4,
   },
   card1: {
-    backgroundColor: '#ffe4e1', // Soft red/pink tone
+    backgroundColor: '#5D3FD3',
   },
   card2: {
-    backgroundColor: '#e0f7fa', // Soft cyan/blue tone
+    backgroundColor: '#6A0DAD',
   },
   card3: {
-    backgroundColor: '#fff9c4', // Soft yellow tone
+    backgroundColor: '#8A2BE2',
   },
   card4: {
-    backgroundColor: '#d1c4e9', // Soft lavender tone
+    backgroundColor: '#9370DB',
   },
   statNumber: {
-    fontSize: 24,  // Bigger font for better emphasis
-    fontWeight: 'bold',
-    marginTop: 12,
-    color: '#81b0ff',  // Theme color accent for consistency
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFF',
   },
   filterContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginBottom: 20,
   },
   filterButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 12,  // Consistent rounding across components
-    backgroundColor: '#f0f0f0',  // Flat, minimal background for inactive buttons
-    marginHorizontal: 6,
-    alignItems: 'center',
+    padding: 10,
+    borderRadius: 10,
+    marginHorizontal: 5,
+    backgroundColor: '#5D3FD3',
   },
   activeFilter: {
-    backgroundColor: '#81b0ff',  // Active filter color matches the theme
+    backgroundColor: '#8A2BE2',
   },
   filterText: {
-    color: '#333',  // Modern, dark gray text for better contrast
-    fontWeight: '500',  // Medium weight for modern buttons
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  sectionHeader: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: 'black',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  driverSelectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#5D3FD3',
+    padding: 12,
+    borderRadius: 10,
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  driverSelectText: {
+    color: '#FFF',
+    fontWeight: '600',
   },
   chartContainer: {
-    marginTop: 30,  // Increased spacing for better structure
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 15,
+    backgroundColor: '#ffff',
   },
   chartHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   chartTitle: {
-    fontSize: 20,  // Slightly larger title for clarity
+    fontSize: 18,
     fontWeight: '700',
-    color: '#333',  // Dark gray for modern look
+    color: 'black',
   },
-  periodContainer: {
-    flexDirection: 'row',
+  driverModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  periodText: {
-    fontSize: 16,
-    marginHorizontal: 12,
-    color: '#81b0ff',  // Period color consistent with theme
-    fontWeight: '500',
+  driverModalContent: {
+    backgroundColor: '#312C63',
+    padding: 20,
+    borderRadius: 15,
+    width: '80%',
   },
-  activePeriod: {
-    fontWeight: 'bold',
-    color: '#333',  // Active period has dark gray for readability
+  closeButton: {
+    alignSelf: 'flex-end',
+    padding: 10,
+    backgroundColor: '#5D3FD3',
+    borderRadius: 10,
+  },
+  closeButtonText: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  driverItem: {
+    padding: 10,
+    borderBottomColor: '#8A2BE2',
+    borderBottomWidth: 1,
+  },
+  driverName: {
+    color: '#FFF',
   },
 });
 

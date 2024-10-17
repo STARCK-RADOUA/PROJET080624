@@ -97,28 +97,41 @@ if(isLocationObtained == false){
     autoLogin(currentLocation.coords);
   };
   const fetchCurrentLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      console.error('Permission Denied', 'You need to allow location access to continue.');
-      return;
-    }
-    setLoading(true);
-    let location = await Location.getCurrentPositionAsync({});
-    console.log('Current Location:', location);
-
-    if (location) {
-      console.log('------------------------------------');
-      console.log('Current Location:', location);
-      console.log('------------------------------------');
-      setLocation(location.coords); // Store the coordinates
-      setIsLocationObtained(true);
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.error('Permission Denied', 'You need to allow location access to continue.');
+        Alert.alert('Permission refusée', 'La permission de localisation est requise pour continuer.');
+        return;
+      }
+  
+      setLoading(true);
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High, // Try setting high accuracy for better results
+        timeout: 10000, // Set a timeout in case the location takes too long to fetch
+      });
+  
+      if (location) {
+        console.log('Current Location:', location);
+        setLocation(location.coords); // Store the coordinates
+        setIsLocationObtained(true);
+        setLoading(false);
+        autoLogin(location.coords);
+        console.log('Location Obtained:', location.coords); // Enable form fields once location is fetched
+      } else {
+        console.error('Error fetching location. Please try again.');
+        Alert.alert('Erreur de localisation', 'Impossible de récupérer la localisation.');
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error during location fetch:', error);
+      Alert.alert('Erreur', 'Une erreur s\'est produite lors de la récupération de la localisation.');
       setLoading(false);
-      autoLogin(location.coords);
-      console.log('Location Obtained:', location.coords); // Enable form fields once location is fetched
-    } else {
-      console.error('Error fetching location. Please try again.');
-    }
-  };
+    }
+  };
+
+
+
 
 
 
