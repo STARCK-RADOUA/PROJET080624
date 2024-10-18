@@ -150,6 +150,7 @@ const PaymentSuccessScreen = ({ route }) => {
 
       if (status === 'delivered') {
         socket.emit('disconnectRoute');
+        setIsChatDisabled(false);
 
         setShowExitButton(true);
         if ((nezPoint || nezPoint === 0) && orders.length > 0) {
@@ -169,6 +170,12 @@ const PaymentSuccessScreen = ({ route }) => {
     // Clear all data once cancelled  
              await clearAllData(); // Clear all data once cancelled  
              navigation.navigate('Services', {});
+            }
+            if (status === 'pending') {
+
+        setIsChatDisabled(true);
+        
+    
             }
 
       if (status === 'in_progress') {
@@ -236,6 +243,7 @@ console.log('------------------------------------');
   // Animation for delivery image
   useEffect(() => {
     if (orderStatus !== 'pending') {
+
       const animateDeliveryImage = () => {
         animatedValue.setValue(0);
         Animated.loop(

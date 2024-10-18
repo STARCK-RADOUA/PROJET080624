@@ -31,6 +31,7 @@ export default function App() {
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
+      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
       console.log('Sending background ping');
       socket.emit('driverPing', { deviceId: Device.osBuildId });
       return BackgroundFetch.Result.NewData;
@@ -83,7 +84,8 @@ navigate('SystemDownScreen')
     configureNotifications();
     registerBackgroundTask();
 
-  
+    const deviceId = Device.osBuildId;
+    // Initialize socket connection
     socketRef.current = socket;
     socket.emit('toggleSystemDriver'); // For example, emit an event to check system status
 

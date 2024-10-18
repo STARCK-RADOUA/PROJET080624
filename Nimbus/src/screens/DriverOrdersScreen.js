@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext,useRef, useEffect } from 'react';
 import { View, AppState, Text, FlatList, TouchableOpacity, Switch, Image, Alert, Linking } from 'react-native';
 import { io } from 'socket.io-client';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -31,65 +31,51 @@ const DriverOrdersScreen = ({ navigation }) => {
   const [appState, setAppState] = useState(AppState.currentState);
   const [messages, setMessages] = useState([]); // State for messages
   const [supportMessages, setsupportMessages] = useState([]); // State for messages
-
-
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (deviceId) {
-        const socket = io(BASE_URLIO);
-
-        socket.emit('watchChatMessagesDriver', deviceId);
-
-        socket.on('OrderchatMessagesDriverUpdated', (data) => {
-          console.log(data, "plz data");
-
-          const filteredMessages = data.messages.filter(message => message.lastMessage); // Filtrer les messages avec lastMessage
-          if (filteredMessages.length > 0) {
-            setMessages(filteredMessages); // Stocker uniquement les messages avec lastMessage dans l'état
-          }
-          console.log(filteredMessages, "plz");
-        });
-
-
-
-
-        return () => {
-          socket.disconnect(); // Déconnecter le socket quand on quitte l'écran
-        };
-      }
-    }, [deviceId])
-  );
-
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (deviceId) {
-        const socket = io(BASE_URLIO);
-
-        socket.emit('watchSupportChatMessagesDriver', deviceId);
-
-        socket.on('SupportchatMessagesUpdatedForDriver', (data) => {
-          console.log(data.messages, "bailizo data");
-
-          const filteredMessages = data.messages.filter(message => message.lastMessage);
-          if (filteredMessages.length > 0) {
-            setsupportMessages(filteredMessages);
-          }
-          console.log(filteredMessages, "plzé");
-        });
-        return () => {
-          socket.disconnect();
-        };
-      }
-    }, [deviceId])
-  );
+  const socketRef = useRef(null);
+  const deviceId = Device.osBuildId;
 
   useEffect(() => {
-    getDeviceId(setDeviceId);
-    startTracking(deviceId);
-  }, []);
+    // Initialisation du socket si ce n'est pas déjà fait
+    if (!socketRef.current) {
+      socketRef.current = io(BASE_URLIO, {
+        query: { deviceId },
+      });
 
+      socketRef.current.on('connect', () => {
+        console.log('Socket connected:', deviceId);
+        socketRef.current.emit('driverConnected', deviceId);
+      });
+
+      socketRef.current.on('orderInprogressUpdatedForDriver',async (data) => {
+        console.log('Order data received:', data);
+         setOrders(data.orders || []);
+        setLoading(false);
+        setIsEnabled(data.active);
+      });
+
+      socketRef.current.on('OrderchatMessagesDriverUpdated', (data) => {
+        const filteredMessages = data.messages.filter(message => message.lastMessage);
+        if (filteredMessages.length > 0) {
+          setMessages(filteredMessages);
+        }
+      });
+
+      socketRef.current.on('SupportchatMessagesUpdatedForDriver', (data) => {
+        const filteredMessages = data.messages.filter(message => message.lastMessage);
+        if (filteredMessages.length > 0) {
+          setsupportMessages(filteredMessages);
+        }
+      });
+    }
+
+    // Nettoyage du socket lors du démontage du composant
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [deviceId]);
   useEffect(() => {
     if (deviceId) {
 
@@ -98,42 +84,11 @@ const DriverOrdersScreen = ({ navigation }) => {
     }
   }, [deviceId]);
 
+
   useEffect(() => {
-    const socket = io(BASE_URLIO, {
-      query: { deviceId },
-    });
-
-    socket.emit('driverConnected', deviceId);
-
-    socket.on('connect', () => startTracking(deviceId));
-    socket.on('orderInprogressUpdatedForDriver', (data) => {
-      console.log('------------------------------------');
-      console.log(data);
-      console.log('------------------------------------');
-      setOrders(data.orders || []);
-      setLoading(false);
-      setIsEnabled(data.active);
-
-    });
-
-
-
-
-
-    return () => {
-      socket.disconnect();
-    };
-
-  }, [deviceId]);
-  useEffect(() => {
-    const socket = io(BASE_URLIO, {
-      query: { deviceId },
-    });
-
-    socket.emit('driverConnected', deviceId);
+    // Gérer les changements d'état de l'application
     const subscription = AppState.addEventListener('change', nextAppState => {
       if (appState.match(/inactive|background/) && nextAppState === 'active') {
-        // Rafraîchir les commandes ou d'autres données ici
         console.log('App is back to foreground - refreshing data');
         refreshDistances(); // Rafraîchir les distances ou autres données
       }
@@ -206,7 +161,7 @@ const DriverOrdersScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.error(error);
-      return { distance: 'N/A' };
+      return { distance: 'que quelques' };
     }
   };
 
@@ -232,7 +187,6 @@ const DriverOrdersScreen = ({ navigation }) => {
   };
 
   const logout = async () => {
-    const deviceId = Device.osBuildId;
     console.log('------------------------------------');
     console.log('Logging out...', deviceId);
     console.log('------------------------------------');
@@ -268,10 +222,10 @@ const DriverOrdersScreen = ({ navigation }) => {
 
 
       refreshDistances();
-      console.log("ymmmmmmooo")
+      console.log("refrech distance")
 
 
-    }, 5000);
+    }, 10000);
 
 
 
