@@ -223,7 +223,7 @@ borderRadius: 20,
   },
   content: {
     fontSize: 16,
-    color: '#fff',
+    color: '#7a663b',
   },
   contentAdmin: {
     fontSize: 16,
@@ -231,7 +231,7 @@ borderRadius: 20,
   },
   timestamp: {
     fontSize: 12,
-    color: '#bbb',
+    color: '#8f8f8f',
     textAlign: 'right',
     marginTop: 5,
   },

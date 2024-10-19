@@ -5,7 +5,11 @@ import * as Device from 'expo-device';
 import { useFocusEffect } from '@react-navigation/native';
 import { BASE_URLIO, BASE_URL } from '@env';
 import { io } from 'socket.io-client';
+const deviceId = Device.osBuildId;
 
+const socket = io(BASE_URLIO, {
+  query: { deviceId },
+});
 const { width, height } = Dimensions.get('window');
 
 const Header = ({ navigation }) => {
@@ -18,14 +22,45 @@ const Header = ({ navigation }) => {
     const id = Device.osBuildId; // Ensure this is synchronous
     setDeviceId(id);
   }, []);
+  useEffect(() => {
 
+    getDeviceId();
+
+    const deviceId = Device.osBuildId;
+
+    if (deviceId) {
+      const socket = io(BASE_URLIO, {
+        query: { deviceId },
+      });
+      socket.emit('watchSupportChatMessagesDriver', deviceId);
+
+      socket.on('SupportchatMessagesUpdatedForDriver', (data) => {
+        const filteredMessages = data.messages.filter((message) => message.lastMessage);
+
+        if (filteredMessages.length > 0) {
+          setSupportMessages(filteredMessages);
+
+          // Check if there are any unread messages and update the state
+          const unread = filteredMessages.some(
+            (msg) => !msg.lastMessage.seen && msg.lastMessage.sender !== 'client'
+          );
+          setHasUnreadMessages(unread);
+        }
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [deviceId]);
   useFocusEffect(
     React.useCallback(() => {
       getDeviceId();
 
       if (deviceId) {
-        const socket = io(BASE_URLIO);
-
+        const socket = io(BASE_URLIO, {
+          query: { deviceId },
+        });
         socket.emit('watchSupportChatMessagesDriver', deviceId);
 
         socket.on('SupportchatMessagesUpdatedForDriver', (data) => {
