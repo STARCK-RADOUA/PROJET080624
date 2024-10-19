@@ -124,7 +124,7 @@ const renderDriverDropdown = () => (
               <Text style={styles.label}><Ionicons name="cash" size={16} color="#ffbf00" /> Prix Total : €{order.total_price.toFixed(2)}</Text>
               <Text style={styles.label}><Ionicons name="swap-horizontal" size={16} color="#ffbf00" /> Échange : €{order.exchange.toFixed(2)}</Text>
               <Text style={styles.label}><Ionicons name="home" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
-              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Livraison : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> creat at : {moment(order.created_at).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
             {/* Products */}

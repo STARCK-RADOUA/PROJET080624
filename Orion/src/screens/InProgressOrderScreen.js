@@ -64,12 +64,14 @@ const InProgreesgOrdersScreen = () => {
     setRecherche(query);
     const filtrees = commandes.filter(commande => {
       const nomClient = commande.client_name ? commande.client_name.toLowerCase() : '';
+      const nomDriver = commande.driver_name ? commande.driver_name.toLowerCase() : '';
       const nomsProduits = commande.products
         .map(p => p.product?.name ? p.product.name.toLowerCase() : '')
         .join(' ');
       const texteRecherche = query.toLowerCase();
       return (
         nomClient.includes(texteRecherche) ||
+        nomDriver.includes(texteRecherche) ||
         nomsProduits.includes(texteRecherche)
       );
     });
@@ -172,11 +174,12 @@ const InProgreesgOrdersScreen = () => {
               <View style={styles.card}>
                 <Ionicons name="timer-outline" size={50} color="#1E90FF" style={styles.orderIcon} />
                 <View style={styles.cardContent}>
-                  <Text style={styles.orderNumber}>Commande #{item.order_number ?? 'N/A'}</Text>
+                  <Text style={styles.orderNumber}>Le client {item.client_name ?? 'N/A'} {"  \n"} Le livreur: {item.driver_name ?? 'N/A'}</Text>
                   <Text style={styles.location}>{item.address_line}</Text>
                   <View style={styles.rightContainer}>
                     <Text style={styles.price}>€{item.total_price.toFixed(2)}</Text>
-                    <Text style={styles.date}>{moment(item.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+                    <Text style={styles.date}>creat_at: {moment(item.created_at).format('YYYY-MM-DD HH:mm')}</Text>
+                    <Text style={styles.date}>creat_at: {moment(item.created_at).format('YYYY-MM-DD HH:mm')}</Text>
                   </View>
                 </View>
               </View>
