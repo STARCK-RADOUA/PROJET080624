@@ -5,11 +5,15 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // QR Code 
 import TabNavigator from './TabNavigator';
 import SupportChat from '../screens/SupportChatScreen';
 import Logout from '../screens/logout';
-import { BASE_URLIO } from '@env';
-import io from 'socket.io-client';
 import { getClientId } from '../services/userService';
 import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import * as Device from 'expo-device';
+import { useFocusEffect } from '@react-navigation/native';
+import { io } from 'socket.io-client';
+import { BASE_URLIO, BASE_URL } from '@env';
 
+const deviceId = Device.osBuildId;
 const { width, height } = Dimensions.get('window');
 
 const CustomDrawerContent = (props) => {
@@ -24,6 +28,7 @@ const CustomDrawerContent = (props) => {
   const handleQRCodePress = () => {
     navigation.navigate('Parrainage');
   };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +47,9 @@ const CustomDrawerContent = (props) => {
     fetchData();
   }, []);
 
+
   return (
+
     <ImageBackground source={require('../assets/8498789sd.png')} style={styles.backgroundImage}>
       <DrawerContentScrollView {...props}>
         {/* Profile Section */}
@@ -86,6 +93,79 @@ const CustomDrawerContent = (props) => {
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
+
+  
+  
+  const [deviceId, setDeviceId] = useState(null);
+  const [supportMessages, setSupportMessages] = useState([]);
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
+
+  const getDeviceId = React.useCallback(async () => {
+    const id = Device.osBuildId; // Ensure this is synchronous
+    setDeviceId(id);
+  }, []);
+  useEffect(() => {
+
+    getDeviceId();
+
+    const deviceId = Device.osBuildId;
+
+    if (deviceId) {
+      const socket = io(BASE_URLIO, {
+        query: { deviceId },
+      });
+      socket.emit('watchSupportChatMessagesDriver', deviceId);
+
+      socket.on('SupportchatMessagesUpdatedForDriver', (data) => {
+        const filteredMessages = data.messages.filter((message) => message.lastMessage);
+
+        if (filteredMessages.length > 0) {
+          setSupportMessages(filteredMessages);
+
+          // Check if there are any unread messages and update the state
+          const unread = filteredMessages.some(
+            (msg) => !msg.lastMessage.seen && msg.lastMessage.sender !== 'client'
+          );
+          setHasUnreadMessages(unread);
+        }
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [deviceId]);
+  useFocusEffect(
+    React.useCallback(() => {
+      getDeviceId();
+
+      if (deviceId) {
+        const socket = io(BASE_URLIO, {
+          query: { deviceId },
+        });
+        socket.emit('watchSupportChatMessagesDriver', deviceId);
+
+        socket.on('SupportchatMessagesUpdatedForDriver', (data) => {
+          const filteredMessages = data.messages.filter((message) => message.lastMessage);
+
+          if (filteredMessages.length > 0) {
+            setSupportMessages(filteredMessages);
+
+            // Check if there are any unread messages and update the state
+            const unread = filteredMessages.some(
+              (msg) => !msg.lastMessage.seen && msg.lastMessage.sender !== 'client'
+            );
+            setHasUnreadMessages(unread);
+          }
+        });
+
+        return () => {
+          socket.disconnect();
+        };
+      }
+    }, [deviceId])
+  );
+
   return (
     <Drawer.Navigator
       initialRouteName="ExpressChezVous"
@@ -122,17 +202,38 @@ const DrawerNavigator = () => {
           ),
         }}
       />
+  
       <Drawer.Screen
         name="SupportChat"
         component={SupportChat}
         options={{
-          drawerIcon: ({ color, size }) => (
-            <Icon name="chat-outline" color={color} size={size} />
-          ),
+          drawerIcon: ({ color, size }) => {
+            // Check if there are unread messages
+            const hasUnread =
+              supportMessages?.length > 0 &&
+              !supportMessages[0]?.lastMessage?.seen &&
+              supportMessages[0]?.lastMessage?.sender !== "client";
+  
+            return (
+              <View style={{ position: 'relative' }}>
+                
+                {/* Unread Indicator */}
+                {hasUnread && (
+                  <View style={styles.unreadIndicator}>
+                    <View style={styles.redButton} />
+                  </View>
+                )}
+                {/* Chat Icon */}
+                <Icon name="chat-outline" color={color} size={size} />
+  
+              </View>
+            );
+          },
         }}
       />
     </Drawer.Navigator>
   );
+  
 };
 const styles = StyleSheet.create({
   backgroundImage: {
@@ -228,6 +329,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 10,
     fontWeight: 'bold',
+  },
+  redButton: {
+    width: 10,  // size of the red dot
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'red',
   },
 });
 

@@ -53,19 +53,9 @@ const DriverOrdersScreen = ({ navigation }) => {
         setIsEnabled(data.active);
       });
 
-      socketRef.current.on('OrderchatMessagesDriverUpdated', (data) => {
-        const filteredMessages = data.messages.filter(message => message.lastMessage);
-        if (filteredMessages.length > 0) {
-          setMessages(filteredMessages);
-        }
-      });
+    
 
-      socketRef.current.on('SupportchatMessagesUpdatedForDriver', (data) => {
-        const filteredMessages = data.messages.filter(message => message.lastMessage);
-        if (filteredMessages.length > 0) {
-          setsupportMessages(filteredMessages);
-        }
-      });
+     
     }
 
     // Nettoyage du socket lors du démontage du composant
@@ -85,6 +75,47 @@ const DriverOrdersScreen = ({ navigation }) => {
   }, [deviceId]);
 
 
+  useFocusEffect(
+    React.useCallback(() => {
+      getDeviceId();
+
+      if (deviceId) {
+        const socket = io(BASE_URLIO, {
+          query: { deviceId },
+        });
+
+        socket.emit('watchChatMessagesDriver', deviceId);
+        socket.on('OrderchatMessagesDriverUpdated', (data) => {
+          const filteredMessages = data.messages.filter(message => message.lastMessage);
+          if (filteredMessages.length > 0) {
+            setMessages(filteredMessages);
+          }
+        });
+  
+        
+
+
+        socket.emit('watchSupportChatMessagesDriver', deviceId);
+
+        socket.on('SupportchatMessagesUpdatedForDriver', (data) => {
+          const filteredMessages = data.messages.filter((message) => message.lastMessage);
+
+          if (filteredMessages.length > 0) {
+            setsupportMessages(filteredMessages);
+
+            // Check if there are any unread messages and update the state
+            const unread = filteredMessages.some(
+              (msg) => !msg.lastMessage.seen && msg.lastMessage.sender !== 'client'
+            );
+          }
+        });
+
+        return () => {
+          socket.disconnect();
+        };
+      }
+    }, [deviceId])
+  );
   useEffect(() => {
     // Gérer les changements d'état de l'application
     const subscription = AppState.addEventListener('change', nextAppState => {
