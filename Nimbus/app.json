@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "runtimeVersion": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/splash.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -41,7 +41,9 @@
 
       ],
       "package": "com.riderhard.nimbus",
-      "runtimeVersion": "1.0.0"
+      "runtimeVersion": "1.0.0",
+      "jsEngine": "jsc"   
+
     },
     "web": {
       "favicon": "./assets/favicon.png"

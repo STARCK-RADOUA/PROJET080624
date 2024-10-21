@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     width: '90%',
     backgroundColor: '#f7f5f3ef',
     position: 'absolute',
-    top: SCREEN_HEIGHT * 1.27,
+    top: SCREEN_HEIGHT * 1.2,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
   },
@@ -254,7 +254,6 @@ const styles = StyleSheet.create({
     borderTopColor: '#E5E5EA',
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
-    paddingBottom: 20,
   },
   input: {
     flex: 1,

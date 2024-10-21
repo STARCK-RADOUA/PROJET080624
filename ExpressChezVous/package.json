@@ -51,7 +51,8 @@
     "socket.io-client": "^4.7.5",
     "typescript": "~5.3.3",
     "uuid": "^10.0.0",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "expo-constants": "~16.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

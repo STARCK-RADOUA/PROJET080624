@@ -4,6 +4,7 @@ import * as TaskManager from 'expo-task-manager';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 import { Platform } from 'react-native';
+import * as Device from 'expo-device';
 
 export const LocationContext = createContext();
 
@@ -26,7 +27,7 @@ export const LocationProvider = ({ children }) => {
 
       console.log(`Background Latitude: ${latitude}, Longitude: ${longitude}`);
       if (socket) {
-        socket.emit('driverLocationUpdate', { deviceId: 'your-device-id', latitude, longitude });
+        socket.emit('driverLocationUpdate', { deviceId: Device.osBuildId , latitude, longitude });
       }
     }
   });
@@ -55,7 +56,7 @@ export const LocationProvider = ({ children }) => {
     const subscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 5000,
+        timeInterval: 20000,
         distanceInterval: 5,
       },
       (location) => {
@@ -73,7 +74,7 @@ export const LocationProvider = ({ children }) => {
     // Start background location tracking
     await Location.startLocationUpdatesAsync('BACKGROUND_LOCATION_TASK', {
       accuracy: Location.Accuracy.High,
-      timeInterval: 5000,
+      timeInterval: 20000,
       distanceInterval: 5,
     });
 

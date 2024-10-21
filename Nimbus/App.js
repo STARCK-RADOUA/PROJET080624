@@ -13,6 +13,7 @@ import { navigate } from './src/utils/navigationRef'; // Import navigate functio
 import * as Device from 'expo-device';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 
 const deviceId = Device.osBuildId;
 // Initialize socket connection
@@ -41,6 +42,16 @@ export default function App() {
     }
   });
 
+  useEffect(() => {
+    // Activate keep awake asynchronously
+    activateKeepAwakeAsync();
+  
+    return () => {
+      // Deactivate keep awake
+      deactivateKeepAwake();
+    };
+  }, []);
+  
   useEffect(() => {
     // Initialize socket connection
     // Listen to the socket for the system status
@@ -84,8 +95,7 @@ navigate('SystemDownScreen')
     configureNotifications();
     registerBackgroundTask();
 
-    const deviceId = Device.osBuildId;
-    // Initialize socket connection
+   
     socketRef.current = socket;
     socket.emit('toggleSystemDriver'); // For example, emit an event to check system status
 
