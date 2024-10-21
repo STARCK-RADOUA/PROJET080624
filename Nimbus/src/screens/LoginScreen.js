@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } fro
 import axios from 'axios';
 import * as Device from 'expo-device';
 import io from 'socket.io-client';
-import { LocationContext } from '../utils/LocationContext'; // Import the LocationContext
 import { BASE_URL ,BASE_URLIO} from '@env';
 import { navigate } from '../utils/navigationRef';
 const LoginScreen = ({ navigation }) => {
@@ -11,7 +10,6 @@ const LoginScreen = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
-  const { startTracking } = useContext(LocationContext); // Use the LocationContext
   const socket = io(BASE_URLIO, {
     query: {
       deviceId:deviceId ,  // Pass the unique clientId
@@ -61,14 +59,19 @@ return () => {
         phone,
         password,
       });
-
-      if (response.status === 200) {
-        Alert.alert('Login Successful', 'hi ,Welcome!');
+      if (response.status === 401) {
+        Alert.alert('');
         
         // Start tracking after successful login
         
-        navigate('Test'); // Navigate to the main screen after login
+        navigate('Home');
       }
+      if (response.status === 200) {
+        Alert.alert('activation', ' Une nouvelle activation est nécessaire pour continuer.!');
+        
+        // Start tracking after successful login
+        
+return;      }
     } catch (error) {
       Alert.alert('Login Failed', error.response?.data?.message || 'An error occurred');
     }

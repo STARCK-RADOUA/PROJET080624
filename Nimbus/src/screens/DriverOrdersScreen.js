@@ -70,7 +70,6 @@ const DriverOrdersScreen = ({ navigation }) => {
     if (deviceId) {
 
       fetchDriverId(deviceId, setDriverId, setDriverInfo, setActiveStatusMessage);
-      startTracking(deviceId);
     }
   }, [deviceId]);
 
@@ -118,24 +117,26 @@ const DriverOrdersScreen = ({ navigation }) => {
   );
   useEffect(() => {
     // Gérer les changements d'état de l'application
-    const subscription = AppState.addEventListener('change', nextAppState => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App is back to foreground - refreshing data');
         refreshDistances(); // Rafraîchir les distances ou autres données
       }
       setAppState(nextAppState);
     });
-
+  
+    // Cleanup the subscription on component unmount
     return () => {
-      subscription.remove();
+      subscription?.remove(); // Properly remove the subscription
     };
   }, [appState]);
+  
   const subscribeToLocation = async () => {
     const subscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 5000, // 10 secondes
-        distanceInterval: 100, // Met à jour toutes les 10 mètres
+        timeInterval: 15000, // 10 secondes
+        distanceInterval: 1000, // Met à jour toutes les 10 mètres
       },
       async (location) => {
         const { latitude, longitude } = location.coords;
@@ -156,11 +157,14 @@ const DriverOrdersScreen = ({ navigation }) => {
             return order;
           })
         );
-        setOrders(updatedOrders);
-        console.log(`Updated location: Latitude: ${latitude}, Longitude: ${longitude}`);
-        console.log('------------sub------------------------');
-        console.log(locationSubscription);
-        console.log('------------------------------------');
+        if(updatedOrders){
+
+          setOrders(updatedOrders);
+       console.log(`Updated location: Latitude: ${latitude}, Longitude: ${longitude}`);
+       console.log('------------sub------------------------');
+       console.log(locationSubscription);
+       }
+      
       },
       (error) => {
         console.error('Location error:', error);
@@ -248,15 +252,18 @@ const DriverOrdersScreen = ({ navigation }) => {
     }
   };
   useEffect(() => {
+
     const intervalId = setInterval(async () => {
       console.log("yooo")
 
-
+      if (!isTracking && orders.length > 0) {
+        startTracking(deviceId);
+      }
       refreshDistances();
       console.log("refrech distance")
 
 
-    }, 10000);
+    }, 20000);
 
 
 
