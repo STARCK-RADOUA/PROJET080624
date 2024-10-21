@@ -6,12 +6,14 @@ import BottomSheet from './ChatSheetScreen';
 import io from 'socket.io-client';
 import { useNavigation } from '@react-navigation/native';
 import { DataContext } from '../navigation/DataContext';
-import { BASE_URLIO } from '@env'; 
+import { BASE_URLIO , BASE_URL } from '@env'; 
 import { updateOrderItems, updateUserPoints } from '../services/orderService';
 import styles from './styles/paymentSuccessStyles';
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 const deviceId = Device.osBuildId;
+import { useFocusEffect } from '@react-navigation/native';
+import axios from 'axios';
 
 const socket = io(BASE_URLIO, {
   query: { deviceId },
@@ -37,7 +39,36 @@ const PaymentSuccessScreen = ({ route }) => {
   const [duration, setDuration] = useState(null);
   const [distance, setDistance] = useState(null);
 
- 
+  const [messages, setMessages] = useState([]); // State for messages
+  const socketRef = React.useRef(null);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (orderId) {
+        // Check if socket is already instantiated
+        if (!socketRef.current) {
+          socketRef.current = io(BASE_URLIO, { query: { orderId } });
+          socketRef.current.emit('watchChatMessagesOCLient', orderId);
+          
+          socketRef.current.on('OrderchatMessagesClientUpdated', (data) => {
+            console.log("cgf" , data)
+            const filteredMessages = data.messages.filter(message => message.lastMessage);
+            if (filteredMessages.length > 0) {
+              setMessages(filteredMessages);
+            }
+          });
+  
+          console.log("Socket connected for orderId:", orderId);
+        }
+  
+        return () => {
+          socketRef.current.disconnect();
+          socketRef.current = null; // Clear the reference
+        };
+      }
+    }, [orderId])
+  );
+  
   // Save screen state to AsyncStorage before closing the app
   const saveStateToStorage = async (orderId, orderStatus, orders, nezPoint) => {
     try {
@@ -288,6 +319,39 @@ console.log('------------------------------------');
     if (!isChatDisabled && bottomSheetRef.current) {
       const screenHeight = Dimensions.get('window').height;
       bottomSheetRef.current.scrollTo(-screenHeight + 50);
+      markMessagesAsSeen() ;
+
+    }
+  };
+
+
+  const markMessagesAsSeen = async () => {
+    try {
+      if (orderId) {
+        await axios.post(`${BASE_URL}/api/chat/mark-seenFCC`, { orderId });
+        console.log("Messages marked as seen");
+        if (orderId) {
+          // Check if socket is already instantiated
+        
+            socketRef.current = io(BASE_URLIO, { query: { orderId } });
+            socketRef.current.emit('watchChatMessagesOCLient', orderId);
+            
+            socketRef.current.on('OrderchatMessagesClientUpdated', (data) => {
+              console.log("cgf" , data)
+              const filteredMessages = data.messages.filter(message => message.lastMessage);
+              if (filteredMessages.length > 0) {
+                setMessages(filteredMessages);
+              }
+            });
+    
+            console.log("Socket connected for orderId:", orderId);
+          
+    
+        
+        }
+      }
+    } catch (error) {
+      console.error("Error marking messages as seen:", error);
     }
   };
 
@@ -306,6 +370,17 @@ console.log('------------------------------------');
       <View style={styles.header}>
         <Text style={styles.menuIcon}></Text>
         <TouchableOpacity onPress={openBottomSheet} disabled={isChatDisabled}>
+        {messages.map((message, index) => {
+                              const hasUnread =  !message.lastMessage.seen && message.lastMessage.sender !== "client";
+                              console.log(message.sender, "hgfg")
+                              return (
+                                hasUnread && (
+                                  <View key={index} style={styles.unreadIndicator}>
+                                    <View style={styles.redButton} />
+                                  </View>
+                                )
+                              );
+                            })}
           <Image
             source={{
               uri: 'https://firebasestorage.googleapis.com/v0/b/deliver-90a33.appspot.com/o/2665038.png?alt=media&token=9d61891a-3fa0-4673-b035-e4d29126563a',
@@ -313,6 +388,7 @@ console.log('------------------------------------');
             style={[styles.chatIcon, isChatDisabled ? styles.disabledChatIcon : null]}
             resizeMode="contain"
           />
+
         </TouchableOpacity>
       </View>
 

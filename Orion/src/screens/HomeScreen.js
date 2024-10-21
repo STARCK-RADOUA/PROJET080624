@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 const HomeScreen = () => {
   const [selectedFilter, setSelectedFilter] = useState('Product');
+  const [selectedTimeFilter, setSelectedTimeFilter] = useState('Daily');
   const [totalSum, setTotalSum] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [totalClients, setTotalClients] = useState(0);
@@ -19,12 +20,28 @@ const HomeScreen = () => {
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [driverModalVisible, setDriverModalVisible] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [productModalVisible, setProductModalVisible] = useState(false);
+  const [showProductRevenue, setShowProductRevenue] = useState(false);
+
+  const [productDailyRevenue, setProductDailyRevenue] = useState([]);
+
 
   useEffect(() => {
     axios.get(`${BASE_URL}/api/driver/forChart`)
       .then(response => setDrivers(response.data))
       .catch(error => console.error('Erreur de récupération des chauffeurs :', error.message));
   }, []);
+
+
+  useEffect(() => {
+    axios.get(`${BASE_URL}/api/products/getList`)
+      .then(response =>  setProducts(response.data)) 
+      .catch(error => console.error('Erreur de récupération des produis :', error.message));
+      
+  }, []);
+
 
   useEffect(() => {
     const socketInstance = io(BASE_URLIO);
@@ -36,6 +53,10 @@ const HomeScreen = () => {
         setDailyRevenue(data.dailyRevenue);
       }
     });
+
+
+    
+
 
     socketInstance.emit('getTotalProducts');
     socketInstance.on('totalProducts', (data) => {
@@ -65,14 +86,33 @@ const HomeScreen = () => {
     if (socket) {
       socket.emit('getDailyRevenueDriver', driverId);
       socket.on('dailyRevenueDriver', (data) => {
+        console.log("dadad" , data)
         if (data && data.dailyRevenue) {
           setDailyRevenue(data.dailyRevenue);
         }
       });
+
     }
   };
 
-  const handleFilterChange = (filter) => {
+
+  const handleProductSelect = (productId) => {
+    setSelectedProduct(productId);
+    setProductModalVisible(false);
+
+    if (socket) {
+      socket.emit('getDailyRevenueProduct', productId);
+      socket.on('dailyRevenueProduct', (data) => {
+        console.log("dadad" , data)
+        if (data && data.dailyRevenue) {
+          setDailyRevenue(data.dailyRevenue);
+        }
+      });
+
+    }
+  };
+
+  const handleFilterChangeg = (filter) => {
     setSelectedFilter(filter);
     if (filter === 'Driver') {
       setShowDriverRevenue(true);
@@ -84,16 +124,43 @@ const HomeScreen = () => {
     }
   };
 
+
+  const handleFilterChange = (filter) => {
+    setSelectedFilter(filter);
+  
+    if (filter === 'Driver') {
+      setShowDriverRevenue(true);
+      setShowProductRevenue(false); // Ensure Product revenue is hidden when 'Driver' is selected
+    } else if (filter === 'ProductRevenue') {
+      setShowDriverRevenue(false); // Ensure Driver revenue is hidden when 'Product' is selected
+      setShowProductRevenue(true);
+    } else {
+      // When neither 'Driver' nor 'Product' is selected
+      setShowDriverRevenue(false);
+      setShowProductRevenue(false);
+  
+      if (socket) {
+        socket.emit('getDailyRevenue');
+      }
+    }
+  };
+  
+
+  const handleTimeFilterChange = (filter) => {
+    setSelectedTimeFilter(filter);
+  };
+
   const getChartData = () => {
-    const labels = dailyRevenue.map((item) => item._id.slice(5)); // Extract MM-DD for labels
-    const data = dailyRevenue.map((item) => item.totalRevenue);
+    const aggregatedData = aggregateRevenueData(dailyRevenue, selectedTimeFilter);
+    const labels = aggregatedData.map(item => item.label);
+    const data = aggregatedData.map(item => item.totalRevenue);
 
     return {
       labels: labels.length > 0 ? labels : ['Pas de données'],
       datasets: [
         {
           data: data.length > 0 ? data : [0],
-          color: (opacity = 1) => `rgba(138, 43, 226, ${opacity})`, // Violin color
+          color: (opacity = 1) => `rgba(138, 43, 226, ${opacity})`,
           strokeWidth: 2,
         },
       ],
@@ -101,32 +168,143 @@ const HomeScreen = () => {
   };
 
   const renderDriverDropdown = () => (
+
     <Modal
+
       transparent={true}
+
       visible={driverModalVisible}
+
       animationType="fade"
+
       onRequestClose={() => setDriverModalVisible(false)}
+
     >
+
       <View style={styles.driverModalContainer}>
+
         <View style={styles.driverModalContent}>
+
           <TouchableOpacity style={styles.closeButton} onPress={() => setDriverModalVisible(false)}>
+
             <Text style={styles.closeButtonText}>Fermer</Text>
+
           </TouchableOpacity>
+
           <ScrollView>
+
             {drivers.map(driver => (
+
               <TouchableOpacity
+
                 key={driver.driver_id}
+
                 style={styles.driverItem}
+
                 onPress={() => handleDriverSelect(driver.driver_id)}
+
               >
+
                 <Text style={styles.driverName}>{`${driver.firstName} ${driver.lastName}`}</Text>
+
               </TouchableOpacity>
+
             ))}
+
           </ScrollView>
+
         </View>
+
       </View>
+
     </Modal>
+    
+
   );
+
+
+  const renderProductDropDown = () => (
+
+    <Modal
+
+      transparent={true}
+
+      visible={productModalVisible}
+
+      animationType="fade"
+
+      onRequestClose={() => setProductModalVisible(false)}
+
+    >
+
+      <View style={styles.driverModalContainer}>
+
+        <View style={styles.driverModalContent}>
+
+          <TouchableOpacity style={styles.closeButton} onPress={() => setProductModalVisible(false)}>
+
+            <Text style={styles.closeButtonText}>Fermer</Text>
+
+          </TouchableOpacity>
+
+          <ScrollView>
+
+            {products.map(product => (
+
+              <TouchableOpacity
+
+                key={product._id}
+
+                style={styles.driverItem}
+
+                onPress={() => handleProductSelect(product._id)}
+
+              >
+
+                <Text style={styles.driverName}>{product.name}</Text>
+
+              </TouchableOpacity>
+
+            ))}
+
+          </ScrollView>
+
+        </View>
+
+      </View>
+
+    </Modal>
+    
+
+  );
+
+  const aggregateRevenueData = (data, filter) => {
+    const groupedData = {};
+
+    data.forEach(item => {
+      const date = new Date(item._id);
+      let label;
+
+      if (filter === 'Weekly') {
+        const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
+        label = `${weekStart.getMonth() + 1}/${weekStart.getDate()}`;
+      } else if (filter === 'Monthly') {
+        label = `${date.getFullYear()}-${date.getMonth() + 1}`;
+      } else {
+        label = item._id.slice(5); // MM-DD
+      }
+
+      if (!groupedData[label]) {
+        groupedData[label] = 0;
+      }
+      groupedData[label] += item.totalRevenue;
+    });
+
+    return Object.entries(groupedData).map(([label, totalRevenue]) => ({
+      label,
+      totalRevenue,
+    }));
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -166,25 +344,102 @@ const HomeScreen = () => {
           style={[styles.filterButton, selectedFilter === 'Driver' && styles.activeFilter]}
           onPress={() => handleFilterChange('Driver')}
         >
-          <Text style={styles.filterText}>Revenu des chauffeurs</Text>
+          <Text style={styles.filterText}>Revenu des livreurs</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, selectedFilter === 'ProductRevenue' && styles.activeFilter]}
+          onPress={() => handleFilterChange('ProductRevenue')}
+        >
+          <Text style={styles.filterText}>Revenu des produitss</Text>
         </TouchableOpacity>
       </View>
       {showDriverRevenue && (
-        <View>
-          <Text style={styles.sectionHeader}>choisir un livreur :</Text>
-          <TouchableOpacity
-            style={styles.driverSelectButton}
-            onPress={() => setDriverModalVisible(true)}
-          >
-            <Text style={styles.driverSelectText}>
-              {selectedDriver
-                ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName
-                : 'Sélectionner un chauffeur'}
-            </Text>
-            <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
-          </TouchableOpacity>
-        </View>
-      )}
+
+<View>
+
+  <Text style={styles.sectionHeader}>choisir un livreur :</Text>
+
+  <TouchableOpacity
+
+    style={styles.driverSelectButton}
+
+    onPress={() => setDriverModalVisible(true)}
+
+  >
+
+    <Text style={styles.driverSelectText}>
+
+      {selectedDriver
+
+        ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName
+
+        : 'Sélectionner un chauffeur'}
+
+    </Text>
+
+    <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
+
+  </TouchableOpacity>
+
+</View>
+
+)}
+
+
+
+{showProductRevenue && (
+
+<View>
+
+  <Text style={styles.sectionHeader}>choisir un Product :</Text>
+
+  <TouchableOpacity
+
+    style={styles.driverSelectButton}
+
+    onPress={() => setProductModalVisible(true)}
+
+  >
+
+    <Text style={styles.driverSelectText}>
+
+      {selectedProduct
+
+        ? products.find(product => product._id === selectedProduct)?.name
+
+        : 'Sélectionner un produit'}
+
+    </Text>
+
+    <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
+
+  </TouchableOpacity>
+
+</View>
+
+)}
+
+
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={[styles.filterButton, selectedTimeFilter === 'Daily' && styles.activeFilter]}
+          onPress={() => handleTimeFilterChange('Daily')}
+        >
+          <Text style={styles.filterText}>Journalier</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, selectedTimeFilter === 'Weekly' && styles.activeFilter]}
+          onPress={() => handleTimeFilterChange('Weekly')}
+        >
+          <Text style={styles.filterText}>Hebdomadaire</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, selectedTimeFilter === 'Monthly' && styles.activeFilter]}
+          onPress={() => handleTimeFilterChange('Monthly')}
+        >
+          <Text style={styles.filterText}>Mensuel</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.chartContainer}>
         <View style={styles.chartHeader}>
@@ -217,12 +472,11 @@ const HomeScreen = () => {
           }}
         />
       </View>
-
       {renderDriverDropdown()}
+      {renderProductDropDown()}
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -363,5 +617,4 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
 });
-
 export default HomeScreen;

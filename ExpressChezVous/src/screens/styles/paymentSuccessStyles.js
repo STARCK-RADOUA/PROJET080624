@@ -162,6 +162,12 @@ marginBottom: 15,
 
     marginTop: Dimensions.get('window').height * 0.06,
   },
+  redButton: {
+    width: 10,  // size of the red dot
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'red',
+  },
 });
 
 export default styles;
