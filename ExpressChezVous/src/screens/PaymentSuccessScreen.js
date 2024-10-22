@@ -230,7 +230,7 @@ console.log('------------------------------------');
         console.log('----------daaataaa--------------------------');
         console.log(data);
         console.log('------------------------------------');
-          setDuration(data.duration);
+          setDuration(data.resultDuration*60);
           setDistance(data.distance);
       });
           console.log('Items:', items);
@@ -239,8 +239,10 @@ console.log('------------------------------------');
         }
       }
     });
-
-    return () => socket.off('orderStatusUpdates');
+    return () => {
+      socket.off('orderStatusUpdates');  
+      };
+    
   }, [nezPoint]);
   
 

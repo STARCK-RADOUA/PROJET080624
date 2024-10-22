@@ -81,7 +81,7 @@ navigate('SystemDownScreen')
   async function registerBackgroundTask() {
     try {
       await BackgroundFetch.registerTaskAsync(BACKGROUND_PING_TASK, {
-        minimumInterval: 10, // Ping every 5 minutes
+        minimumInterval: 100, // Ping every 5 minutes
         stopOnTerminate: false,
         startOnBoot: true,
       });
@@ -127,8 +127,10 @@ navigate('SystemDownScreen')
       setAppState(nextAppState);
       if (nextAppState === 'active' && isConnected) {
         console.log('App is active, restarting ping interval');
-        pingInterval = startPingInterval();
-      } else if (nextAppState === 'background') {
+        if (pingInterval) {
+          clearInterval(pingInterval);
+        }
+        pingInterval = startPingInterval();      } else if (nextAppState === 'background') {
         console.log('App is in the background, clearing ping interval');
         clearInterval(pingInterval);
       }
@@ -175,6 +177,8 @@ navigate('SystemDownScreen')
       clearInterval(pingInterval);
       if (socketRef.current) {
         socketRef.current.disconnect();
+        socketRef.current = null;
+
       }
     };
   }, []);

@@ -15,7 +15,7 @@ const QrcodeGeneratorDriverScreen = () => {
   const [deviceId, setDeviceId] = useState('');
   
   const getDeviceId = async () => {
-   await setDeviceId(Device.osBuildId);
+    setDeviceId(Device.osBuildId);
     // Set deviceId using expo-device's osBuildId
   };
   // Fonction pour générer le QR code
