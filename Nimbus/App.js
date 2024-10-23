@@ -53,6 +53,7 @@ export default function App() {
   }, []);
   
   useEffect(() => {
+  
     // Initialize socket connection
     // Listen to the socket for the system status
     socket.on('statusSiteDriver', (systemActive) => {

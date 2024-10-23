@@ -40,7 +40,9 @@
     "react-native-vector-icons": "^10.2.0",
     "semver": "^7.6.3",
     "socket.io-client": "^4.7.5",
-    "xml2js": "^0.6.2"
+    "xml2js": "^0.6.2",
+    "expo-system-ui": "~3.0.7",
+    "expo-updates": "~0.25.27"
   },
   "private": true
 }

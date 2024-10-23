@@ -76,7 +76,6 @@ const DriverOrdersScreen = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      getDeviceId();
 
       if (deviceId) {
         const socket = io(BASE_URLIO, {
