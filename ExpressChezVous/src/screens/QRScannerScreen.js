@@ -15,6 +15,9 @@ const QrCodeScannerScreen = ({ navigation }) => {
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Erreur', 'L\'accès à la caméra est nécessaire pour scanner les QR codes.');
+      }
       setHasPermission(status === 'granted');
     })();
   }, []);
@@ -66,9 +69,7 @@ Alert.alert('Succès', 'QR Code validé avec succès');
         style={styles.camera}
         type={type}
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barCodeScannerSettings={{
-          barCodeTypes: ['qr'], // Scan only QR codes
-        }}
+      
       />
       <Text style={styles.scannerText}>Scannez le QR code</Text>
 

@@ -46,11 +46,12 @@ const PaymentSuccessScreen = ({ route }) => {
     React.useCallback(() => {
       if (orderId) {
         // Check if socket is already instantiated
-        if (!socketRef.current) {
-          socketRef.current = io(BASE_URLIO, { query: { orderId } });
-          socketRef.current.emit('watchChatMessagesOCLient', orderId);
+        if (!socket.connected) {
+          socket.connect();  // Connecter le socket seulement s'il n'est pas connecté
+        }
+        socket.emit('watchChatMessagesOCLient', orderId);
           
-          socketRef.current.on('OrderchatMessagesClientUpdated', (data) => {
+        socket.on('OrderchatMessagesClientUpdated', (data) => {
             console.log("cgf" , data)
             const filteredMessages = data.messages.filter(message => message.lastMessage);
             if (filteredMessages.length > 0) {
@@ -59,11 +60,10 @@ const PaymentSuccessScreen = ({ route }) => {
           });
   
           console.log("Socket connected for orderId:", orderId);
-        }
+        
   
         return () => {
-          socketRef.current.disconnect();
-          socketRef.current = null; // Clear the reference
+          socket.disconnect();
         };
       }
     }, [orderId])

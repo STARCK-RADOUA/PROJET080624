@@ -1,6 +1,8 @@
 {
   "cli": {
-    "version": ">= 12.4.1"  },
+    "version": ">= 12.4.1",
+    "appVersionSource": "remote"
+  },
   "build": {
     "development": {
       "developmentClient": true,
@@ -10,7 +12,7 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": false
     }
   },
   "submit": {

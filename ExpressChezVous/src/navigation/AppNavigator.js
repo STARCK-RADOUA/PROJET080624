@@ -42,7 +42,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />  
         <Stack.Screen name="Services" component={ServicesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="feedback" component={FeedBackScreen} />
+        <Stack.Screen name="feedback" component={FeedBackScreen}  options={{ headerShown: false }}/>
 
         <Stack.Screen  name="SystemDownScreen"
           component={SystemDownScreen}

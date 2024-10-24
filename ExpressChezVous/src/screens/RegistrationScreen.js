@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, AppState, TextInput, TouchableOpacity, Alert, Animated, Easing } from 'react-native';
+import { Keyboard, KeyboardAvoidingView,Platform, TouchableWithoutFeedback, ScrollView } from 'react-native';
+
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
@@ -178,6 +180,12 @@ const [uniqueId, setUniqueId] = useState('');
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <KeyboardAvoidingView 
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // Adjust layout when keyboard is visible
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
     <LinearGradient colors={['#0f2027', '#203a43', '#e9ab25']} style={styles.container}>
       <Text style={styles.title}> Complétez votre inscription</Text>
 
@@ -230,6 +238,9 @@ const [uniqueId, setUniqueId] = useState('');
         </TouchableOpacity>
       </Animated.View>
     </LinearGradient>
+    </ScrollView>
+    </KeyboardAvoidingView>
+  </TouchableWithoutFeedback>
   );
 };const styles = StyleSheet.create({
   container: {

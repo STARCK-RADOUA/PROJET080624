@@ -40,9 +40,7 @@
 
       ],
       "package": "com.riderhard.nimbus",
-      "runtimeVersion": "1.0.0",
-      "jsEngine": "jsc"   
-    },
+      "runtimeVersion": "1.0.0"    },
     "web": {
       "favicon": "./assets/favicon.png"
     },

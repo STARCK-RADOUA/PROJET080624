@@ -82,7 +82,7 @@ navigate('SystemDownScreen')
   async function registerBackgroundTask() {
     try {
       await BackgroundFetch.registerTaskAsync(BACKGROUND_PING_TASK, {
-        minimumInterval: 10, // Ping every 5 minutes
+        minimumInterval: 1*60, // Ping every 5 minutes
         stopOnTerminate: false,
         startOnBoot: true,
       });
