@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Switch, Alert, Linking, TextInput } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Switch, Alert, Linking, TextInput, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL } from '@env';
@@ -11,10 +11,10 @@ const DriverModal = ({ visible, onClose, driver }) => {
   if (!driver) return null;
 
   const [editableDriver, setEditableDriver] = useState({ ...driver });
-  const [location, setLocation] = useState(null); // Store real-time location data
-  const [isConnected, setIsConnected] = useState(false); // Store connection status
-  const [isDisponible, setDisponible] = useState(false); // Store connection status
-  const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
+  const [location, setLocation] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isDisponible, setDisponible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleDeleteDriver = () => {
     Alert.alert(
@@ -33,7 +33,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
               const response = await axios.delete(`${BASE_URL}/api/driver/delete/${editableDriver._id}`);
               if (response.status === 200) {
                 Alert.alert('Succès', 'Conducteur supprimé avec succès.');
-                onClose(); // Close the modal after successful deletion
+                onClose();
               }
             } catch (error) {
               console.error('Erreur lors de la suppression du conducteur:', error);
@@ -49,23 +49,20 @@ const DriverModal = ({ visible, onClose, driver }) => {
   useEffect(() => {
     setEditableDriver({ ...driver });
     socket.emit('locationUpdateForAdminRequest', { deviceId: driver.deviceId });
-    
-    // Listen for real-time location updates and connection status
+
     socket.on('locationUpdateForAdmin', ({ deviceId, latitude, longitude, isConnected, isDisponible }) => {
       if (deviceId === driver.deviceId) {
         setLocation({ latitude, longitude });
-        setIsConnected(isConnected); // Update connection status
-        setDisponible(isDisponible); // Update connection status
+        setIsConnected(isConnected);
+        setDisponible(isDisponible);
       }
     });
 
-    // Clean up on unmount
     return () => {
       socket.off('locationUpdateForAdmin');
     };
   }, [driver]);
 
-  // Function to activate or deactivate a driver via Socket.IO
   const handleActivateDeactivate = (isActive) => {
     try {
       setEditableDriver((prevDriver) => ({
@@ -73,7 +70,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
         activated: isActive,
       }));
 
-      // Send activation/deactivation event to server via Socket.IO
       socket.emit('adminActivateDeactivateDriver', { driverId: editableDriver._id, isActive, deviceId: editableDriver.deviceId });
 
       Alert.alert('Success', `Driver ${isActive ? 'activated' : 'deactivated'} successfully.`);
@@ -87,7 +83,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
     }
   };
 
-  // Function to toggle the login status of a driver via Socket.IO
   const handleToggleLoginStatus = () => {
     try {
       const newLoginStatus = !editableDriver.isLogin;
@@ -96,7 +91,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
         isLogin: newLoginStatus,
       }));
 
-      // Send toggle login status event to server via Socket.IO
       socket.emit('adminToggleDriverLoginStatus', { driverId: editableDriver._id });
 
       Alert.alert('Success', `Login status ${newLoginStatus ? 'enabled' : 'disabled'} successfully.`);
@@ -110,13 +104,11 @@ const DriverModal = ({ visible, onClose, driver }) => {
     }
   };
 
-  // Open Google Maps with the driver's real-time location
   const openGoogleMaps = () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`;
     Linking.openURL(url).catch(err => console.error('Erreur lors de l\'ouverture de Google Maps', err));
   };
 
-  // Open Waze with the driver's real-time location
   const openWaze = () => {
     const url = `waze://?ll=${location.latitude},${location.longitude}&navigate=yes`;
     Linking.openURL(url).catch(err => {
@@ -132,18 +124,36 @@ const DriverModal = ({ visible, onClose, driver }) => {
   };
 
   const handleUpdateDriver = async () => {
-    try {
-      const response = await axios.put(`${BASE_URL}/api/driver/update/${editableDriver._id}`, editableDriver);
-      if (response.status === 200) {
-        Alert.alert('Succès', 'Conducteur mis à jour avec succès.');
-        setIsEditing(false); // Exit editing mode
-      }
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du conducteur:', error);
-      Alert.alert('Erreur', 'Échec de la mise à jour du conducteur. Veuillez réessayer.');
-    }
+    Alert.alert(
+      'Confirmation',
+      'Voulez-vous vraiment mettre à jour les informations de ce conducteur ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              const response = await axios.put(`${BASE_URL}/api/users/update/${editableDriver._id}`, editableDriver);
+              if (response.status === 200) {
+                Alert.alert('Succès', 'Conducteur mis à jour avec succès.');
+                setIsEditing(false);
+                onClose();
+              }
+            } catch (error) {
+              if (error.response) {
+                // Error from the server, e.g., validation or duplicate key errors
+                Alert.alert('Erreur', error.response.data.message || 'Erreur lors de la mise à jour.');
+              } else {
+                // Network error or other unforeseen errors
+                Alert.alert('Erreur', 'Échec de la mise à jour du conducteur. Veuillez réessayer.');
+              }
+            }
+          }
+        }
+      ]
+    );
   };
-
+  
   return (
     <Modal
       animationType="slide"
@@ -156,102 +166,132 @@ const DriverModal = ({ visible, onClose, driver }) => {
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Ionicons name="close-circle" size={30} color="black" />
           </TouchableOpacity>
-
-          <Text style={styles.name}>{editableDriver.firstName} {editableDriver.lastName}</Text>
-
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>Téléphone :</Text>
+          <ScrollView>
             {isEditing ? (
-              <TextInput
-                style={styles.textInput}
-                value={editableDriver.phone}
-                onChangeText={(value) => handleInputChange('phone', value)}
-              />
+              <>
+                <Text style={styles.label}>Prénom :</Text>
+                <TextInput
+                  style={styles.textInput}
+                  value={editableDriver.firstName}
+                  onChangeText={(value) => handleInputChange('firstName', value)}
+                />
+                <Text style={styles.label}>Nom :</Text>
+                <TextInput
+                  style={styles.textInput}
+                  value={editableDriver.lastName}
+                  onChangeText={(value) => handleInputChange('lastName', value)}
+                />
+                <Text style={styles.label}>ID de l'appareil :</Text>
+                <TextInput
+                  style={styles.textInput}
+                  value={editableDriver.deviceId}
+                  onChangeText={(value) => handleInputChange('deviceId', value)}
+                />
+                <Text style={styles.label}>Mot de passe :</Text>
+                <TextInput
+                  style={styles.textInput}
+                  value={editableDriver.password}
+                  secureTextEntry
+                  onChangeText={(value) => handleInputChange('password', value)}
+                />
+              </>
             ) : (
-              <Text style={styles.textValue}>+33 {editableDriver.phone}</Text>
+              <>
+                <Text style={styles.name}>{editableDriver.firstName} {editableDriver.lastName}</Text>
+                <Text style={styles.label}>ID de l'appareil :</Text>
+                <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">
+                  {editableDriver.deviceId}
+                </Text>
+              </>
             )}
-          </View>
 
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>ID de l'appareil :</Text>
-          
-          </View>
-  <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">
-        {editableDriver.deviceId}
-            </Text>
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>Points accumulés :</Text>
-            <Text style={styles.textValue}>{editableDriver.points_earned}</Text>
-          </View>
+            <View style={styles.fieldRow}>
+              <Text style={styles.label}>Téléphone :</Text>
+              {isEditing ? (
+                <TextInput
+                  style={styles.textInput}
+                  value={editableDriver.phone}
+                  onChangeText={(value) => handleInputChange('phone', value)}
+                />
+              ) : (
+                <Text style={styles.textValue}>+33 {editableDriver.phone}</Text>
+              )}
+            </View>
 
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>Type d'utilisateur :</Text>
-            <Text style={styles.textValue}>{editableDriver.userType}</Text>
-          </View>
+            <View style={styles.fieldRow}>
+              <Text style={styles.label}>Points accumulés :</Text>
+              <Text style={styles.textValue}>{editableDriver.points_earned}</Text>
+            </View>
 
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>Statut de connexion :</Text>
-            <Text style={[styles.textValue, { color: isConnected ? 'green' : 'red' }]}>
-              {isConnected ? 'Connected' : 'Disconnected'}
-            </Text>
-          </View>
-          
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>Disponibility Status:</Text>
-            <Text style={[styles.textValue, { color: isDisponible ? 'green' : 'red' }]}>
-              {isDisponible ? 'Disponible' : 'inDisponible'}
-            </Text>
-          </View>
+            <View style={styles.fieldRow}>
+              <Text style={styles.label}>Type d'utilisateur :</Text>
+              <Text style={styles.textValue}>{editableDriver.userType}</Text>
+            </View>
 
-          <View style={styles.separator} />
+            <View style={styles.fieldRow}>
+              <Text style={styles.label}>Statut de connexion :</Text>
+              <Text style={[styles.textValue, { color: isConnected ? 'green' : 'red' }]}>
+                {isConnected ? 'Connected' : 'Disconnected'}
+              </Text>
+            </View>
 
-          <View style={styles.fieldRow}>
-            <TouchableOpacity style={styles.navigateButton} onPress={openGoogleMaps}>
-              <Ionicons name="navigate-outline" size={24} color="white" />
-              <Text style={styles.navigateText}>Google Maps</Text>
+            <View style={styles.fieldRow}>
+              <Text style={styles.label}>Disponibility Status:</Text>
+              <Text style={[styles.textValue, { color: isDisponible ? 'green' : 'red' }]}>
+                {isDisponible ? 'Disponible' : 'inDisponible'}
+              </Text>
+            </View>
+
+            <View style={styles.separator} />
+
+            <View style={styles.fieldRow}>
+              <TouchableOpacity style={styles.navigateButton} onPress={openGoogleMaps}>
+                <Ionicons name="navigate-outline" size={24} color="white" />
+                <Text style={styles.navigateText}>Google Maps</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.navigateButton} onPress={openWaze}>
+                <Ionicons name="navigate-outline" size={24} color="white" />
+                <Text style={styles.navigateText}>Waze</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.fieldRow}>
+              <Text style={styles.label}>Activé :</Text>
+              <Switch
+                value={editableDriver.activated}
+                onValueChange={handleActivateDeactivate}
+                thumbColor={editableDriver.activated ? "#5A67D8" : "#f4f3f4"}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+              />
+            </View>
+
+            <View style={styles.fieldRow}>
+              <Text style={styles.label}>Statut de connexion :</Text>
+              <Switch
+                value={editableDriver.isLogin}
+                onValueChange={handleToggleLoginStatus}
+                thumbColor={editableDriver.isLogin ? "#5A67D8" : "#f4f3f4"}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+              />
+            </View>
+
+            {isEditing ? (
+              <TouchableOpacity style={styles.saveButton} onPress={handleUpdateDriver}>
+                <Text style={styles.saveText}>Sauvegarder</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
+                <Ionicons name="create-outline" size={24} color="white" />
+                <Text style={styles.editText}>Modifier</Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteDriver}>
+              <Ionicons name="trash" size={24} color="white" />
+              <Text style={styles.deleteText}>Supprimer le conducteur</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity style={styles.navigateButton} onPress={openWaze}>
-              <Ionicons name="navigate-outline" size={24} color="white" />
-              <Text style={styles.navigateText}>Waze</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>Activé :</Text>
-            <Switch
-              value={editableDriver.activated}
-              onValueChange={handleActivateDeactivate}
-              thumbColor={editableDriver.activated ? "#5A67D8" : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-            />
-          </View>
-
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>Statut de connexion :</Text>
-            <Switch
-              value={editableDriver.isLogin}
-              onValueChange={handleToggleLoginStatus}
-              thumbColor={editableDriver.isLogin ? "#5A67D8" : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-            />
-          </View>
-
-          {isEditing ? (
-            <TouchableOpacity style={styles.saveButton} onPress={handleUpdateDriver}>
-              <Text style={styles.saveText}>Sauvegarder</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
-              <Ionicons name="create-outline" size={24} color="white" />
-              <Text style={styles.editText}>Modifier</Text>
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteDriver}>
-            <Ionicons name="trash" size={24} color="white" />
-            <Text style={styles.deleteText}>Supprimer le conducteur</Text>
-          </TouchableOpacity>
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -263,9 +303,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginVertical: 100,
+    marginHorizontal: 0,
   },
   modalView: {
-    width: '80%',
+    width: '90%',
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 20,
@@ -285,6 +327,13 @@ const styles = StyleSheet.create({
   },
   textValue: {
     fontSize: 16,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#CED4DA',
+    borderRadius: 5,
+    padding: 5,
+    flex: 1,
   },
   navigateButton: {
     flexDirection: 'row',
@@ -335,13 +384,6 @@ const styles = StyleSheet.create({
   deleteText: {
     color: 'white',
     fontWeight: 'bold',
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#CED4DA',
-    borderRadius: 5,
-    padding: 5,
-    flex: 1,
   },
 });
 

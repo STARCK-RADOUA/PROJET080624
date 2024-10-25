@@ -560,16 +560,31 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   card1: {
-    backgroundColor: '#EB8317',
+    backgroundColor: '#B4D6CD',
   },
   card2: {
-    backgroundColor: '#FFE700',
+    backgroundColor: '#FFDA76',
   },
   card3: {
-    backgroundColor: '#F3C623',
+    backgroundColor: '#FF8C9E',
   },
   card4: {
-    backgroundColor: '#FD8B51',
+    backgroundColor: '#E0E5B6',
+  },
+  card5: {
+    backgroundColor: '#D1E9F6',
+  },
+  card6: {
+    backgroundColor: '#F6EACB',
+  },
+  card7: {
+    backgroundColor: '#F1D3CE',
+  },
+  card8: {
+    backgroundColor: '#F1DEC6',
+  },
+  card9: {
+    backgroundColor: '#EECAD5',
   },
   statNumber: {
     fontSize: 22,
