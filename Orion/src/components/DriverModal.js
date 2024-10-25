@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Switch, Alert, Linking } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Switch, Alert, Linking, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL } from '@env';
@@ -14,24 +14,48 @@ const DriverModal = ({ visible, onClose, driver }) => {
   const [location, setLocation] = useState(null); // Store real-time location data
   const [isConnected, setIsConnected] = useState(false); // Store connection status
   const [isDisponible, setDisponible] = useState(false); // Store connection status
+  const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
+
+  const handleDeleteDriver = () => {
+    Alert.alert(
+      'Confirmation',
+      'Voulez-vous vraiment supprimer ce conducteur ?',
+      [
+        {
+          text: 'Annuler',
+          onPress: () => console.log('Suppression annulée'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              const response = await axios.delete(`${BASE_URL}/api/driver/delete/${editableDriver._id}`);
+              if (response.status === 200) {
+                Alert.alert('Succès', 'Conducteur supprimé avec succès.');
+                onClose(); // Close the modal after successful deletion
+              }
+            } catch (error) {
+              console.error('Erreur lors de la suppression du conducteur:', error);
+              Alert.alert('Erreur', 'Échec de la suppression du conducteur. Veuillez réessayer.');
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   useEffect(() => {
     setEditableDriver({ ...driver });
     socket.emit('locationUpdateForAdminRequest', { deviceId: driver.deviceId });
-    console.log('------------------------------------');
-    console.log('Mise à jour de la localisation reçue :', driver.deviceId);
-    console.log('------------------------------------');
-
+    
     // Listen for real-time location updates and connection status
     socket.on('locationUpdateForAdmin', ({ deviceId, latitude, longitude, isConnected, isDisponible }) => {
-      console.log('------------------------------------');
-      console.log('Received location update:', { deviceId, latitude, longitude, isConnected ,isDisponible});
-      console.log('------------------------------------');
       if (deviceId === driver.deviceId) {
         setLocation({ latitude, longitude });
         setIsConnected(isConnected); // Update connection status
         setDisponible(isDisponible); // Update connection status
-        console.log(`Driver's new location: Latitude ${latitude}, Longitude ${longitude}, Connected: ${isConnected}`);
       }
     });
 
@@ -41,53 +65,50 @@ const DriverModal = ({ visible, onClose, driver }) => {
     };
   }, [driver]);
 
- // Assuming you have already connected the admin to Socket.IO
+  // Function to activate or deactivate a driver via Socket.IO
+  const handleActivateDeactivate = (isActive) => {
+    try {
+      setEditableDriver((prevDriver) => ({
+        ...prevDriver,
+        activated: isActive,
+      }));
 
-// Function to activate or deactivate a driver via Socket.IO
-const handleActivateDeactivate = (isActive) => {
-  try {
-    setEditableDriver((prevDriver) => ({
-      ...prevDriver,
-      activated: isActive,
-    }));
+      // Send activation/deactivation event to server via Socket.IO
+      socket.emit('adminActivateDeactivateDriver', { driverId: editableDriver._id, isActive, deviceId: editableDriver.deviceId });
 
-    // Send activation/deactivation event to server via Socket.IO
-    socket.emit('adminActivateDeactivateDriver', { driverId: editableDriver._id, isActive, deviceId: editableDriver.deviceId });
+      Alert.alert('Success', `Driver ${isActive ? 'activated' : 'deactivated'} successfully.`);
+    } catch (error) {
+      console.error('Error activating/deactivating driver:', error);
+      Alert.alert('Error', 'Failed to update activation status. Please try again.');
+      setEditableDriver((prevDriver) => ({
+        ...prevDriver,
+        activated: !isActive,
+      }));
+    }
+  };
 
-    Alert.alert('Success', `Driver ${isActive ? 'activated' : 'deactivated'} successfully.`);
-  } catch (error) {
-    console.error('Error activating/deactivating driver:', error);
-    Alert.alert('Error', 'Failed to update activation status. Please try again.');
-    setEditableDriver((prevDriver) => ({
-      ...prevDriver,
-      activated: !isActive,
-    }));
-  }
-};
+  // Function to toggle the login status of a driver via Socket.IO
+  const handleToggleLoginStatus = () => {
+    try {
+      const newLoginStatus = !editableDriver.isLogin;
+      setEditableDriver((prevDriver) => ({
+        ...prevDriver,
+        isLogin: newLoginStatus,
+      }));
 
-// Function to toggle the login status of a driver via Socket.IO
-const handleToggleLoginStatus = () => {
-  try {
-    const newLoginStatus = !editableDriver.isLogin;
-    setEditableDriver((prevDriver) => ({
-      ...prevDriver,
-      isLogin: newLoginStatus,
-    }));
+      // Send toggle login status event to server via Socket.IO
+      socket.emit('adminToggleDriverLoginStatus', { driverId: editableDriver._id });
 
-    // Send toggle login status event to server via Socket.IO
-    socket.emit('adminToggleDriverLoginStatus', { driverId: editableDriver._id });
-
-    Alert.alert('Success', `Login status ${newLoginStatus ? 'enabled' : 'disabled'} successfully.`);
-  } catch (error) {
-    console.error('Error toggling login status:', error);
-    Alert.alert('Error', 'Failed to update login status. Please try again.');
-    setEditableDriver((prevDriver) => ({
-      ...prevDriver,
-      isLogin: !prevDriver.isLogin,
-    }));
-  }
-};
-
+      Alert.alert('Success', `Login status ${newLoginStatus ? 'enabled' : 'disabled'} successfully.`);
+    } catch (error) {
+      console.error('Error toggling login status:', error);
+      Alert.alert('Error', 'Failed to update login status. Please try again.');
+      setEditableDriver((prevDriver) => ({
+        ...prevDriver,
+        isLogin: !prevDriver.isLogin,
+      }));
+    }
+  };
 
   // Open Google Maps with the driver's real-time location
   const openGoogleMaps = () => {
@@ -101,6 +122,26 @@ const handleToggleLoginStatus = () => {
     Linking.openURL(url).catch(err => {
       Alert.alert("Impossible d'ouvrir Waze", "Assurez-vous que Waze est installé sur votre appareil.");
     });
+  };
+
+  const handleInputChange = (field, value) => {
+    setEditableDriver((prevDriver) => ({
+      ...prevDriver,
+      [field]: value,
+    }));
+  };
+
+  const handleUpdateDriver = async () => {
+    try {
+      const response = await axios.put(`${BASE_URL}/api/driver/update/${editableDriver._id}`, editableDriver);
+      if (response.status === 200) {
+        Alert.alert('Succès', 'Conducteur mis à jour avec succès.');
+        setIsEditing(false); // Exit editing mode
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du conducteur:', error);
+      Alert.alert('Erreur', 'Échec de la mise à jour du conducteur. Veuillez réessayer.');
+    }
   };
 
   return (
@@ -120,7 +161,15 @@ const handleToggleLoginStatus = () => {
 
           <View style={styles.fieldRow}>
             <Text style={styles.label}>Téléphone :</Text>
-            <Text style={styles.textValue}>{editableDriver.phone}</Text>
+            {isEditing ? (
+              <TextInput
+                style={styles.textInput}
+                value={editableDriver.phone}
+                onChangeText={(value) => handleInputChange('phone', value)}
+              />
+            ) : (
+              <Text style={styles.textValue}>{editableDriver.phone}</Text>
+            )}
           </View>
 
           <View style={styles.fieldRow}>
@@ -140,14 +189,14 @@ const handleToggleLoginStatus = () => {
             <Text style={styles.textValue}>{editableDriver.userType}</Text>
           </View>
 
-          {/* Connection Status */}
           <View style={styles.fieldRow}>
             <Text style={styles.label}>Statut de connexion :</Text>
             <Text style={[styles.textValue, { color: isConnected ? 'green' : 'red' }]}>
               {isConnected ? 'Connected' : 'Disconnected'}
             </Text>
-          </View> 
-           <View style={styles.fieldRow}>
+          </View>
+          
+          <View style={styles.fieldRow}>
             <Text style={styles.label}>Disponibility Status:</Text>
             <Text style={[styles.textValue, { color: isDisponible ? 'green' : 'red' }]}>
               {isDisponible ? 'Disponible' : 'inDisponible'}
@@ -156,7 +205,6 @@ const handleToggleLoginStatus = () => {
 
           <View style={styles.separator} />
 
-          {/* Buttons to open navigation apps */}
           <View style={styles.fieldRow}>
             <TouchableOpacity style={styles.navigateButton} onPress={openGoogleMaps}>
               <Ionicons name="navigate-outline" size={24} color="white" />
@@ -189,42 +237,42 @@ const handleToggleLoginStatus = () => {
             />
           </View>
 
+          {isEditing ? (
+            <TouchableOpacity style={styles.saveButton} onPress={handleUpdateDriver}>
+              <Text style={styles.saveText}>Sauvegarder</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
+              <Ionicons name="create-outline" size={24} color="white" />
+              <Text style={styles.editText}>Modifier</Text>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteDriver}>
+            <Ionicons name="trash" size={24} color="white" />
+            <Text style={styles.deleteText}>Supprimer le conducteur</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
   );
 };
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Dark background for modal
-    paddingVertical: "20%",
   },
   modalView: {
-    width: '90%',
-    backgroundColor: '#38435a88', // Dark background for modal view
-    borderRadius: 12,
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.6,
-    shadowRadius: 7,
-    elevation: 10, // For Android shadow
+    elevation: 5,
   },
   closeButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 1,
-  },
-  name: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#5A67D8', // Primary theme color for title
-    textAlign: 'center',
-    marginVertical: 15,
+    alignSelf: 'flex-end',
   },
   fieldRow: {
     flexDirection: 'row',
@@ -233,44 +281,68 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   label: {
-    fontSize: 16,
     fontWeight: 'bold',
-    color: '#E2E8F0', // Light grey for labels
   },
   textValue: {
     fontSize: 16,
-    color: '#FFFFFF', // White for text
-    fontWeight: '500',
-    flex: 2,
-    textAlign: 'right',
   },
   navigateButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#5A67D8', // Primary theme color for navigation buttons
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 5,
-    flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#5A67D8',
+    borderRadius: 10,
+    padding: 10,
+    margin: 5,
   },
   navigateText: {
-    color: '#FFFFFF', // White text for navigation button
-    marginLeft: 10,
-    fontWeight: 'bold',
+    color: 'white',
+    marginLeft: 5,
   },
   separator: {
     height: 1,
-    backgroundColor: '#CBD5E0', // Light grey separator
-    marginVertical: 15,
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    backgroundColor: '#CED4DA',
     marginVertical: 10,
   },
+  saveButton: {
+    backgroundColor: '#5A67D8',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  saveText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  editButton: {
+    backgroundColor: '#5A67D8',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  editText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  deleteText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#CED4DA',
+    borderRadius: 5,
+    padding: 5,
+    flex: 1,
+  },
 });
-
 
 export default DriverModal;
