@@ -25,7 +25,7 @@ const HomeScreen = () => {
   const [productModalVisible, setProductModalVisible] = useState(false);
   const [showProductRevenue, setShowProductRevenue] = useState(false);
 
-  const [productDailyRevenue, setProductDailyRevenue] = useState([]);
+  const [commendesStats, setCommendesStats] = useState([]);
 
 
   useEffect(() => {
@@ -37,9 +37,17 @@ const HomeScreen = () => {
 
   useEffect(() => {
     axios.get(`${BASE_URL}/api/products/getList`)
-      .then(response =>  setProducts(response.data)) 
+      .then(response => setProducts(response.data))
       .catch(error => console.error('Erreur de récupération des produis :', error.message));
-      
+
+  }, []);
+
+
+  useEffect(() => {
+    axios.get(`${BASE_URL}/api/orders/order-status-counts`)
+      .then(response => setCommendesStats(response.data[0]))
+      .catch(error => console.error('Erreur de récupération des produis :', error.message));
+
   }, []);
 
 
@@ -55,7 +63,7 @@ const HomeScreen = () => {
     });
 
 
-    
+
 
 
     socketInstance.emit('getTotalProducts');
@@ -86,7 +94,7 @@ const HomeScreen = () => {
     if (socket) {
       socket.emit('getDailyRevenueDriver', driverId);
       socket.on('dailyRevenueDriver', (data) => {
-        console.log("dadad" , data)
+        console.log("dadad", data)
         if (data && data.dailyRevenue) {
           setDailyRevenue(data.dailyRevenue);
         }
@@ -103,7 +111,7 @@ const HomeScreen = () => {
     if (socket) {
       socket.emit('getDailyRevenueProduct', productId);
       socket.on('dailyRevenueProduct', (data) => {
-        console.log("dadad" , data)
+        console.log("dadad", data)
         if (data && data.dailyRevenue) {
           setDailyRevenue(data.dailyRevenue);
         }
@@ -127,7 +135,7 @@ const HomeScreen = () => {
 
   const handleFilterChange = (filter) => {
     setSelectedFilter(filter);
-  
+
     if (filter === 'Driver') {
       setShowDriverRevenue(true);
       setShowProductRevenue(false); // Ensure Product revenue is hidden when 'Driver' is selected
@@ -138,13 +146,13 @@ const HomeScreen = () => {
       // When neither 'Driver' nor 'Product' is selected
       setShowDriverRevenue(false);
       setShowProductRevenue(false);
-  
+
       if (socket) {
         socket.emit('getDailyRevenue');
       }
     }
   };
-  
+
 
   const handleTimeFilterChange = (filter) => {
     setSelectedTimeFilter(filter);
@@ -218,7 +226,7 @@ const HomeScreen = () => {
       </View>
 
     </Modal>
-    
+
 
   );
 
@@ -274,7 +282,7 @@ const HomeScreen = () => {
       </View>
 
     </Modal>
-    
+
 
   );
 
@@ -307,174 +315,211 @@ const HomeScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
+
       <View style={styles.header}>
         <Text style={styles.title}>Tableau de bord</Text>
       </View>
 
-      <View style={styles.statsContainer}>
-        <View style={styles.cardWrapper}>
-          <Card containerStyle={[styles.card, styles.card1]}>
-            <Text>Menus totaux</Text>
-            <Text style={styles.statNumber}>{totalProducts}</Text>
-          </Card>
-          <Card containerStyle={[styles.card, styles.card2]}>
-            <Text>Commandes totales</Text>
-            <Text style={styles.statNumber}>{totalCount}</Text>
-          </Card>
-          <Card containerStyle={[styles.card, styles.card3]}>
-            <Text>Clients totaux</Text>
-            <Text style={styles.statNumber}>{totalClients}</Text>
-          </Card>
-          <Card containerStyle={[styles.card, styles.card4]}>
-            <Text>Revenu total</Text>
-            <Text style={styles.statNumber}>{totalSum} €</Text>
-          </Card>
+      <ScrollView >
+
+        <View style={styles.statsContainer}>
+          <View style={styles.cardWrapper}>
+            <Card containerStyle={[styles.card, styles.card1]}>
+              <Text>Menus totaux</Text>
+              <Text style={styles.statNumber}>{totalProducts}</Text>
+            </Card>
+            <Card containerStyle={[styles.card, styles.card2]}>
+              <Text>Commandes totales</Text>
+              <Text style={styles.statNumber}>{totalCount}</Text>
+            </Card>
+            <Card containerStyle={[styles.card, styles.card3]}>
+              <Text>Clients totaux</Text>
+              <Text style={styles.statNumber}>{totalClients}</Text>
+            </Card>
+            <Card containerStyle={[styles.card, styles.card4]}>
+              <Text>Revenu total</Text>
+              <Text style={styles.statNumber}>{totalSum} €</Text>
+            </Card>
+          </View>
+          <View style={styles.cardWrapper}>
+            <Card containerStyle={[styles.card, styles.card5]}>
+              <Text>Comms . En attentes </Text>
+              <Text style={styles.statNumber}>{commendesStats.find(item => item.pending)?.pending.count || 0}</Text>
+            </Card>
+            <Card containerStyle={[styles.card, styles.card6]}>
+              <Text>Comms . En cours</Text>
+              <Text style={styles.statNumber}>{commendesStats.find(item => item.in_progress)?.in_progress.count || 0}</Text>
+            </Card>
+            <Card containerStyle={[styles.card, styles.card7]}>
+              <Text>Comms . Livrés</Text>
+              <Text style={styles.statNumber}>{commendesStats.find(item => item.delivered)?.delivered.count || 0}</Text>
+            </Card>
+            <Card containerStyle={[styles.card, styles.card8]}>
+              <Text>Comms . Annulés  </Text>
+              <Text style={styles.statNumber}> {commendesStats.find(item => item.cancelled)?.cancelled.count || 0}
+              </Text>
+            </Card>
+            <Card containerStyle={[styles.card, styles.card8]}>
+              <Text>Comms . du Test  </Text>
+              <Text style={styles.statNumber}>{commendesStats.find(item => item.test)?.test.count || 0}</Text>
+            </Card>
+          </View>
         </View>
-      </View>
 
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedFilter === 'Product' && styles.activeFilter]}
-          onPress={() => handleFilterChange('Product')}
-        >
-          <Text style={styles.filterText}>Revenu Géneral</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedFilter === 'Driver' && styles.activeFilter]}
-          onPress={() => handleFilterChange('Driver')}
-        >
-          <Text style={styles.filterText}>Revenu des livreurs</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedFilter === 'ProductRevenue' && styles.activeFilter]}
-          onPress={() => handleFilterChange('ProductRevenue')}
-        >
-          <Text style={styles.filterText}>Revenu des produitss</Text>
-        </TouchableOpacity>
-      </View>
-      {showDriverRevenue && (
-
-<View>
-
-  <Text style={styles.sectionHeader}>choisir un livreur :</Text>
-
-  <TouchableOpacity
-
-    style={styles.driverSelectButton}
-
-    onPress={() => setDriverModalVisible(true)}
-
-  >
-
-    <Text style={styles.driverSelectText}>
-
-      {selectedDriver
-
-        ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName
-
-        : 'Sélectionner un chauffeur'}
-
-    </Text>
-
-    <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
-
-  </TouchableOpacity>
-
-</View>
-
-)}
-
-
-
-{showProductRevenue && (
-
-<View>
-
-  <Text style={styles.sectionHeader}>choisir un Product :</Text>
-
-  <TouchableOpacity
-
-    style={styles.driverSelectButton}
-
-    onPress={() => setProductModalVisible(true)}
-
-  >
-
-    <Text style={styles.driverSelectText}>
-
-      {selectedProduct
-
-        ? products.find(product => product._id === selectedProduct)?.name
-
-        : 'Sélectionner un produit'}
-
-    </Text>
-
-    <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
-
-  </TouchableOpacity>
-
-</View>
-
-)}
-
-
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedTimeFilter === 'Daily' && styles.activeFilter]}
-          onPress={() => handleTimeFilterChange('Daily')}
-        >
-          <Text style={styles.filterText}>Journalier</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedTimeFilter === 'Weekly' && styles.activeFilter]}
-          onPress={() => handleTimeFilterChange('Weekly')}
-        >
-          <Text style={styles.filterText}>Hebdomadaire</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedTimeFilter === 'Monthly' && styles.activeFilter]}
-          onPress={() => handleTimeFilterChange('Monthly')}
-        >
-          <Text style={styles.filterText}>Mensuel</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.chartContainer}>
-        <View style={styles.chartHeader}>
-          <Text style={styles.chartTitle}>Revenu</Text>
+        <View style={styles.filterContainer}>
+          <TouchableOpacity
+            style={[styles.filterButton, selectedFilter === 'Product' && styles.activeFilter]}
+            onPress={() => handleFilterChange('Product')}
+          >
+            <Text style={styles.filterText}>Revenu Géneral</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, selectedFilter === 'Driver' && styles.activeFilter]}
+            onPress={() => handleFilterChange('Driver')}
+          >
+            <Text style={styles.filterText}>Revenu des livreurs</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, selectedFilter === 'ProductRevenue' && styles.activeFilter]}
+            onPress={() => handleFilterChange('ProductRevenue')}
+          >
+            <Text style={styles.filterText}>Revenu des produitss</Text>
+          </TouchableOpacity>
         </View>
-        <LineChart
-          data={getChartData()}
-          width={Dimensions.get('window').width - 40}
-          height={250}
-          chartConfig={{
-            backgroundColor: '#312C63',
-            backgroundGradientFrom: '#3A1C71',
-            backgroundGradientTo: '#D76D77',
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
+        {showDriverRevenue && (
+
+          <View>
+
+            <Text style={styles.sectionHeader}>choisir un livreur :</Text>
+
+            <TouchableOpacity
+
+              style={styles.driverSelectButton}
+
+              onPress={() => setDriverModalVisible(true)}
+
+            >
+
+              <Text style={styles.driverSelectText}>
+
+                {selectedDriver
+
+                  ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName
+
+                  : 'Sélectionner un chauffeur'}
+
+              </Text>
+
+              <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
+
+            </TouchableOpacity>
+
+          </View>
+
+        )}
+
+
+
+        {showProductRevenue && (
+
+          <View>
+
+            <Text style={styles.sectionHeader}>choisir un Product :</Text>
+
+            <TouchableOpacity
+
+              style={styles.driverSelectButton}
+
+              onPress={() => setProductModalVisible(true)}
+
+            >
+
+              <Text style={styles.driverSelectText}>
+
+                {selectedProduct
+
+                  ? products.find(product => product._id === selectedProduct)?.name
+
+                  : 'Sélectionner un produit'}
+
+              </Text>
+
+              <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
+
+            </TouchableOpacity>
+
+          </View>
+
+        )}
+
+
+
+
+        <View style={styles.chartContainer}>
+          <View style={styles.chartHeader}>
+            <View style={styles.filterContainerTime}>
+              <TouchableOpacity
+                style={[styles.filterButtonTime, selectedTimeFilter === 'Daily' && styles.activeFilterTime]}
+                onPress={() => handleTimeFilterChange('Daily')}
+              >
+                <Text style={styles.filterTextTime}>Jour</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.filterButtonTime, selectedTimeFilter === 'Weekly' && styles.activeFilterTime]}
+                onPress={() => handleTimeFilterChange('Weekly')}
+              >
+                <Text style={styles.filterTextTime}>Hebdo</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.filterButtonTime, selectedTimeFilter === 'Monthly' && styles.activeFilterTime]}
+                onPress={() => handleTimeFilterChange('Monthly')}
+              >
+                <Text style={styles.filterTextTime}>Mens</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <LineChart
+            data={getChartData()}
+            width={Dimensions.get('window').width - 20}
+            height={300}
+            chartConfig={{
+              backgroundColor: '#ffffff',
+              backgroundGradientFrom: '#FFF5E4',
+              backgroundGradientTo: '#FFF5E4',
+              decimalPlaces: 0, // optional, defaults to 2dp
+              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, 
+              style: {
+                borderRadius: 16,    
+
+              },
+              propsForLabels: {
+                fontSize: 9.5,
+                rotation: 60, // Rotate the labels by 90 degrees
+                anchor: 'middle', // Adjust anchor point to align better
+              },
+              propsForDots: {
+                r: '2',
+                strokeWidth: '5',
+                stroke: 'black',
+              },
+              
+            }}
+            bezier
+            style={{
+              marginVertical: 8,
               borderRadius: 16,
-            },
-            propsForDots: {
-              r: '2',
-              strokeWidth: '5',
-              stroke: 'black',
-            },
-          }}
-          bezier
-          style={{
-            marginVertical: 8,
-            borderRadius: 16,
-          }}
-        />
-      </View>
-      {renderDriverDropdown()}
-      {renderProductDropDown()}
-    </ScrollView>
+
+            }}
+          />
+
+        </View>
+        {renderDriverDropdown()}
+        {renderProductDropDown()}
+      </ScrollView>
+    </View>
+
   );
 };
 const styles = StyleSheet.create({
@@ -484,7 +529,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    backgroundColor: '#3A1C71',
+    backgroundColor: '#10375C',
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
     marginBottom: 20,
@@ -495,7 +540,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   statsContainer: {
-    marginBottom: 20,
+    marginBottom: 50,
   },
   cardWrapper: {
     flexDirection: 'row',
@@ -506,8 +551,8 @@ const styles = StyleSheet.create({
     width: '40%',
     borderRadius: 15,
     alignItems: 'center',
-    marginBottom: 10,
-    paddingVertical: 15,
+    marginBottom: 0,
+    paddingVertical: 19,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
@@ -515,38 +560,59 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   card1: {
-    backgroundColor: '#5D3FD3',
+    backgroundColor: '#EB8317',
   },
   card2: {
-    backgroundColor: '#6A0DAD',
+    backgroundColor: '#FFE700',
   },
   card3: {
-    backgroundColor: '#8A2BE2',
+    backgroundColor: '#F3C623',
   },
   card4: {
-    backgroundColor: '#9370DB',
+    backgroundColor: '#FD8B51',
   },
   statNumber: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#FFF',
+    color: 'black',
   },
   filterContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  filterContainerTime: {
+    flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 20,
+    borderWidth : 1.9,
+    borderColor : "#F4F6FF" , 
+    borderRadius: 10
   },
   filterButton: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: '#FFAD60',
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  filterButtonTime: {
     padding: 10,
     borderRadius: 10,
-    marginHorizontal: 5,
-    backgroundColor: '#5D3FD3',
+    backgroundColor: '#F4F6FF',
   },
   activeFilter: {
-    backgroundColor: '#8A2BE2',
+    backgroundColor: '#10375C',
+  },
+  activeFilterTime: {
+    backgroundColor: '#FFF5E4',
   },
   filterText: {
     color: '#FFF',
+    fontWeight: '600',
+  },
+  filterTextTime: {
+    color: 'black',
     fontWeight: '600',
   },
   sectionHeader: {
@@ -560,7 +626,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#5D3FD3',
+    backgroundColor: '#10375C',
     padding: 12,
     borderRadius: 10,
     marginHorizontal: 20,
@@ -571,7 +637,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   chartContainer: {
-    marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 15,
     backgroundColor: '#ffff',
@@ -593,15 +658,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   driverModalContent: {
-    backgroundColor: '#312C63',
+    backgroundColor: "grey",
     padding: 20,
     borderRadius: 15,
+    marginVertical: "40%",
     width: '80%',
   },
   closeButton: {
     alignSelf: 'flex-end',
     padding: 10,
-    backgroundColor: '#5D3FD3',
+    backgroundColor: '#10375C',
     borderRadius: 10,
   },
   closeButtonText: {
@@ -610,11 +676,12 @@ const styles = StyleSheet.create({
   },
   driverItem: {
     padding: 10,
-    borderBottomColor: '#8A2BE2',
+    borderBottomColor: '#10375C',
     borderBottomWidth: 1,
   },
   driverName: {
     color: '#FFF',
   },
+
 });
 export default HomeScreen;
