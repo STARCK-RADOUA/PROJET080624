@@ -30,11 +30,12 @@ const PaymentScreen = ({ navigation, route }) => {
     // Affiche une alerte de confirmation avant la déconnexion
     Alert.alert(
       'Confirmation',
-      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      'Êtes-vous sûr de vouloir confirmer la commande ?',
+      
       [
         {
           text: 'Annuler',
-          onPress: () => console.log('Déconnexion annulée'),
+          onPress: () => console.log('comande annulée'),
           style: 'cancel',
         },
         {
@@ -67,13 +68,13 @@ const PaymentScreen = ({ navigation, route }) => {
 
         socket.on('orderAdded', (order) => {
           if (!serviceTest) {
-            Alert.alert('Success', 'Your order is being created!');
+            Alert.alert('Succès', 'Votre commande est en cours de création !');
           }
           const dataToSend = {
             order_id: order,
           };
           if (serviceTest) {
-            Alert.alert('Failure', 'Service unavailable at the moment');
+            Alert.alert('Échec', 'Service indisponible pour le moment');
             navigation.replace('Home');
           }
           if (!serviceTest) {
@@ -82,7 +83,7 @@ const PaymentScreen = ({ navigation, route }) => {
         });
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to update the order.');
+      Alert.alert('Erreur', "Échec de la mise à jour de la commande.");
     } finally {
       setLoading(false);
     }
@@ -90,10 +91,10 @@ const PaymentScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Payment</Text>
+      <Text style={styles.title}>Type de Paiement</Text>
 
       <View style={styles.exchangeContainer}>
-        <Text style={styles.label}>Exchange</Text>
+        <Text style={styles.label}>Échange</Text>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -127,7 +128,7 @@ const PaymentScreen = ({ navigation, route }) => {
         disabled={!selectedPayment}
         onPress={confirmLogout}
       >
-        <Text style={styles.okText}>{loading ? 'Processing...' : 'Confirm Payment'}</Text>
+<Text style={styles.okText}>{loading ? 'Traitement en cours...' : 'Confirmer le paiement'}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -144,21 +145,27 @@ const styles = StyleSheet.create({
     justifyContent: 'top',
   },
   title: {
-    fontSize: 30,
+    fontSize: 37,
     fontWeight: 'bold',
-    color: '#d69a17', // Futuristic orange for title
-    marginBottom: 40,
+    marginBottom: 10,
     textAlign: 'center',
+    color: '#e9ab25',
+    fontWeight: '900',
+    textShadowColor: '#312a1f',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   exchangeContainer: {
     marginBottom: 30,
     alignItems: 'center',
     width: '100%',
+   
   },
   label: {
     fontSize: 20,
     marginBottom: 10,
-    color: '#271917', // Bright orange for label
+    color: '#271917',
+  // Bright orange for label
   },
   inputContainer: {
     flexDirection: 'row',
@@ -173,7 +180,7 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#d3a747', // Futuristic orange for input text
+    color: '#f0b330', // Futuristic orange for input text
     textAlign: 'center',
   },
   paymentOption: {
@@ -195,7 +202,11 @@ const styles = StyleSheet.create({
   paymentText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#e6dbc5', // Futuristic orange for payment text
+    color: '#e6dbc5', 
+    fontWeight: '900',
+    textShadowColor: '##271e0d',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,// Futuristic orange for payment text
   },
   okButton: {
     width: width * 0.8,
@@ -204,6 +215,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#e9ab25', // Solid orange button
     borderRadius: 12,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.7,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 10,
+    elevation: 12,
+   
   },
   disabledButton: {
     backgroundColor: '#cccccc', // Grey background when disabled
@@ -212,6 +229,11 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
+    fontWeight: '900',
+    textShadowColor: '#312a1f',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
+    
   },
 });
 

@@ -11,7 +11,15 @@ const { width, height } = Dimensions.get('window');
 
 // Dynamic background colors based on service index
 const getBackgroundColor = (index) => {
-  const colors = ['#da8910b2', '#149b1b86', '#1a75c081', '#ba68c89d', '#ff89658b', '#ffd64f88'];
+  // Couleurs pour Android
+  const androidColors = ['#8b580bb1', '#794007', '#683308', '#683907', '#664508', '#6b4c0d'];
+
+  // Couleurs pour iOS
+  const iosColors =  ['#8b580bb1', '#794007', '#683308', '#683907', '#664508', '#6b4c0d'];
+
+  // Choix de la palette en fonction de la plateforme
+  const colors = Platform.OS === 'android' ? androidColors : iosColors;
+
   return colors[index % colors.length];
 };
 
@@ -21,6 +29,12 @@ const ServicesScreen = ({ navigation }) => {
   const [hasNavigated, setHasNavigated] = useState(false); // Track if we've already navigated
   const animations = useRef([]); 
   const { setSharedData } = useContext(DataContext);
+  const [isContentReady, setIsContentReady] = useState(false); // Nouvel état pour contrôler l'affichage
+// Précharger les images avant affichage
+const prefetchImages = async (services) => {
+  const imagePrefetches = services.map(service => Image.prefetch(service.image));
+  await Promise.all(imagePrefetches);
+};
 
   // Check order status and navigate to PaymentSuccessScreen if needed
   const checkOrderStatus = async () => {
@@ -55,14 +69,18 @@ const ServicesScreen = ({ navigation }) => {
   useEffect(() => {
     const socket = io(BASE_URLIO);
 
-    socket.on('servicesUpdated', ({ services }) => {
+    socket.on('servicesUpdated', async({ services }) => {
       setServices(services);
       setIsLoading(false);
 
       if (services.length > 0) {
         animations.current = services.map(() => new Animated.Value(0));
+        await prefetchImages(services);
+
         InteractionManager.runAfterInteractions(() => {
           triggerAnimations();
+          setIsContentReady(true); // Met à jour l'état pour indiquer que le contenu est prêt
+
         });
       }
     });
@@ -85,6 +103,7 @@ const ServicesScreen = ({ navigation }) => {
     });
   };
 
+  
   const handleServicePress = (serviceName, serviceTest, id) => {
     setSharedData({ serviceName, serviceTest, id });
     navigation.navigate('Home', { serviceName, serviceTest, id });
@@ -109,11 +128,11 @@ const ServicesScreen = ({ navigation }) => {
 <View style={styles.locationContainer}>
   <Text style={styles.headerText}>  Découvrez Nos {"\n"}   Services Premium</Text>
 
-  <Ionicons name="shield-checkmark-outline" size={40} color="#fff" />
+  <Ionicons name="shield-checkmark-outline" size={50} color="#09881e" />
   
 </View>
 
-{isLoading ? (
+{isLoading || !isContentReady ? (
   <View style={styles.loadingContainer}>
     <ActivityIndicator size="large" color="#ffffff" />
     <Text style={styles.loadingText}>Chargement des services...</Text>
@@ -161,11 +180,11 @@ const ServicesScreen = ({ navigation }) => {
     </ImageBackground>
   );
 };
-
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover',
+    backgroundColor: '#1a1a1a', // Un fond sombre pour un contraste fort avec les éléments
   },
   header: {
     flexDirection: 'row',
@@ -178,38 +197,72 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     paddingTop: height * (Platform.OS === 'ios' ? 0.06 : 0.05),
     alignItems: 'center',
-    backgroundColor: '#e9ab25',
+    backgroundColor: Platform.OS === 'ios' ? '#e9ab25' : '#e2a600',
+
     borderRadius: 20,
     padding: 2,
     marginVertical: 5,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOpacity: 0.5, // Ombre plus profonde
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 8,
   },
   userIcon: {
-    paddingRight: 10,
+    width: 40,   // Légère augmentation de taille pour plus de présence
+    height: 50,
+    borderRadius: 25, // Toujours circulaire pour plus de modernité
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    backgroundColor: '#fff',
   },
   searchPlaceholder: {
     fontSize: 18,
     color: '#fff',
     flex: 1,
     textAlign: 'center',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 5,
+    letterSpacing: 1, // Espacement pour un effet plus propre
   },
   cartIcon: {
-    paddingLeft: 10,
+    margin: 10,
   },
   locationContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 15,
-  },
-  locationText: {
-    fontSize: 16,
-    color: '#fff',
-    paddingRight: 5,
+    backgroundColor: '#644304be', // Ajout d'un fond sombre avec un léger effet de transparence
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
+   
+
+    marginVertical: width * 0.02,
+    marginHorizontal: width * 0.02,
+    ...Platform.select({
+      ios: {    borderRadius: 25,
+
+      // Ombre plus grande pour plus de profondeur
+        shadowRadius: 12,
+      },  android: {
+      borderWidth: 1.5,
+      backgroundColor: '#644304be', // Ajout d'un fond sombre avec un léger effet de transparence
+      borderColor: '#ffffff50',
+
+      shadowColor: '#3f3b3b',
+      shadowOpacity: 0.5,
+      shadowOffset: { width: 0, height: 8 },
+      shadowRadius: 20,
+      elevation: 9, 
+           borderTopLeftRadius: 50,
+    borderTopRightRadius:50,
+
+      },})
   },
   loadingContainer: {
     flex: 1,
@@ -220,64 +273,70 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: '#ffffff',
     fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   headerText: {
-    fontSize: 34,
+    fontSize: width * 0.08,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#b4ddb3',
     marginBottom: 20,
-    letterSpacing: 1.5,
+    letterSpacing: 2, // Plus d'espacement pour un effet moderne
     textAlign: 'center',
     textShadowColor: '#000',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 10,
-  },
-  userIcon: {
-    width: 32,   // la largeur de l'image
-    height: 42,  // la hauteur de l'image
-    borderRadius: 16, // rend l'image circulaire si c'est un carré
-    textAlign: 'center',
-    textShadowColor: '#000',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 10,
+    textShadowOffset: { width: 0, height: 5 },
+    textShadowRadius: 15,
   },
   servicesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    width: '100%',
-    paddingHorizontal: 15,
-      shadowOpacity: 0.9,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 5,
-    elevation: 18,
-  },
-  serviceItem: {
-    width: 130,
-    height: 130,
-    borderRadius: 90,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#27262618',
-    margin: 15,
-    borderWidth: 2,
-    borderColor: '#fab828',
+  
+
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
+        width: '100%',
+        paddingHorizontal: 15,
         shadowOpacity: 0.9,
-        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 5 }, // Ombre plus grande pour plus de profondeur
+        shadowRadius: 12,
+        elevation: 18,
       },  android: {
-    padding: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.9,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    
-    elevation: 18,
+        borderWidth: 1.5,
+        borderBottomLeftRadius: 40,
+        borderBottomRightRadius: 40,
+        
+        borderColor: '#ffffff50',
+        backgroundColor: '#acabab24',
+        marginVertical: width * 0.01,
+        marginHorizontal: width * 0.02,
+           shadowColor: '#3f3b3b',
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 20,
+    elevation: 9,
+
       },
     }),
+  },
+  serviceItem: {
+    width: width * 0.33,
+    height: width * 0.33,
+    borderRadius: width * 0.175, // Plus arrondi pour un effet de bulle 3D
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#333333', // Couleur sombre pour contraster avec les images
+    margin: width * 0.06,
+    marginBottom: width * 0.05,
+
+    borderWidth: 2,
+    borderColor: '#7c570699', // Une couleur dorée pour un effet luxueux
+    shadowColor: '#000',
+    shadowOpacity: 0.7,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 10,
+    elevation: 12,
+    transform: [{ perspective: 1000 }],
   },
   shadowImageContainer: {
     position: 'absolute',
@@ -286,38 +345,41 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   shadowImage: {
-    width: 150,
-    height: 110,
+    width: width * 0.3,
+    height: width * 0.3,
     resizeMode: 'contain',
-    tintColor: '#000',
-    opacity: 0.9,
+    opacity: 0.8,
     shadowColor: '#000',
     shadowOpacity: 0.9,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 10,
-    
     elevation: 18,
-    
   },
   serviceImage: {
-    width: 150,
-    height: 110,
+    width: width * 0.34,
+    height: width * 0.32,
     resizeMode: 'contain',
-    borderRadius: 15,
-    marginVertical: 10,
+    borderRadius: 75,
     zIndex: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.9,
-    shadowRadius: 5,
+    shadowRadius: 30, // Plus de rayon pour un effet 3D
+    elevation: 20,
+    backgroundColor: Platform.OS === 'ios' ? '#f7f1e43d' : '#200b0b75',
+    borderWidth: 2,
+    borderColor: '#fab828',
   },
   serviceText: {
-    marginTop: 15,
     textAlign: 'center',
-    fontSize: 17,
+    fontSize: 18, // Augmentation légère pour une meilleure lisibilité
     color: '#f3ebebfd',
     fontWeight: '600',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
 });
+
 
 export default ServicesScreen;

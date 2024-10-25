@@ -15,7 +15,8 @@ import { getClientId } from '../services/userService'; // Import the getClient f
 import { DataContext } from '../navigation/DataContext';
 import { BASE_URL } from '@env';
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
-const MAX_TRANSLATE_Y = -SCREEN_HEIGHT / 1.5;
+const MAX_TRANSLATE_Y = -SCREEN_HEIGHT / 1.45;
+const { width, height } = Dimensions.get('window');
 
 const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
   const translateY = useSharedValue(0);
@@ -198,6 +199,9 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
               <Text style={styles.heading}>{item.name}</Text>
               <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
             </View>
+
+            <Text style={styles.menuItemDescription}>{item.description}</Text>
+
             <View style={styles.quantityAndLabelContainer}>
               <Text style={styles.extrasLabel}>Select Extras:</Text>
               <View style={styles.quantityContainer}>
@@ -241,10 +245,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
               ))}
             </View>
                     </ScrollView>
-
-          </View>
-
-        <View style={styles.buttonContainer}>
+                    <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[
               styles.button,
@@ -258,6 +259,12 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
             </Text>
           </TouchableOpacity>
         </View>
+
+
+          </View>
+
+       
+        
       </View>
     </Animated.View>
   </GestureDetector>
@@ -310,39 +317,66 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH * 0.7,
     height: SCREEN_WIDTH * 0.4,
     alignSelf: 'center',
+    borderWidth: 1.5,
+    backgroundColor: '#cfcdcd37',
+    borderColor: '#ffffff50',
+
+    shadowColor: '#3f3b3b',
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 20,
+    elevation: 9, 
+   borderBottomLeftRadius: 50,
+   borderBottomRightRadius: 50,
+   paddingHorizontal: width * 0.12,
+  },
+
+  menuItemDescription: {
+    fontSize: 16,
+    color: '#777',
+    marginBottom: 10,
+    fontWeight: '600',
+    textShadowColor: '#221f1b',
+    textShadowOffset: { width: 0, height: 0.5 },
+    textShadowRadius: 1.9,
   },
   price: {
     fontSize: 22,
-    color: '#575450',
+    color: '#ce7100',
     fontWeight: 'bold',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 6,
+    color: '#f3ebebfd',
+    fontWeight: '600',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   heading: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    color: '#d37604',
+    fontWeight: '600',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   container: {},
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: height*0.008,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 6,
+    
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#FF8C00',
+    
   },
   heart: {
     fontSize: 24,
@@ -352,30 +386,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    borderWidth: 1.5,
+    backgroundColor: '#cfcdcd37',
+    borderColor: '#ffffff50',
+marginBottom: height*0.008,
+padding:height*0.008,
+    shadowColor: '#3f3b3b',
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 20,
+    elevation: 9, 
+borderRadius:50,
+   paddinVertical: width * 0.1,
+   paddingHorizontal: width * 0.12,
   },
   extrasLabel: {
     fontSize: 18,
     fontWeight: 'bold',
+    fontWeight: '600',
+    textShadowColor: '#d8d2d2',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    
   },
   quantityButton: {
     fontSize: 22,
     color: '#FF8C00',
-    paddingHorizontal: 10,
   },
   quantityText: {
     fontSize: 20,
     marginHorizontal: 10,
+    
   },
   optionContainer: {
     borderTopWidth: 1,
     borderTopColor: '#ddd',
-    paddingTop: 10,
-    marginTop: 10,
+
+
   },
   border: {
     borderBottomWidth: 1,
@@ -396,6 +447,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#8B4513',
     marginRight: 10,
+    fontWeight: '600',
+    textShadowColor: '#daaa0f',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   optionPrice: {
     fontSize: 18,
@@ -421,9 +476,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   button: {
-    marginTop: 20,
+    marginTop: 10,
     backgroundColor: '#FF8C00',
-    paddingVertical: 15,
+    paddingVertical: 11,
     borderRadius: 30,
     alignItems: 'center',
     marginHorizontal: 40,
@@ -432,6 +487,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 8,
+    
   },
   buttonDisabled: {
     backgroundColor: '#cccccc',
@@ -440,6 +496,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
+    fontWeight: '600',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   errorText: {
     fontSize: 16,

@@ -9,7 +9,7 @@ import { getClient } from '../services/userService'; // Add a function to get us
 
 // Validation schema using Yup
 const addressValidationSchema = Yup.object().shape({
-  address_line: Yup.string().required('Address Line is required'),
+  address_line: Yup.string().required("L'adresse est requise"),
   building: Yup.string(),
   floor: Yup.string(),
   door_number: Yup.string(),
@@ -30,7 +30,7 @@ const AddressFormScreen = ({ navigation, route }) => {
         const id = await getClient(); // Assuming getClient fetches the user ID from local storage or API
         setUserId(id);
       } catch (error) {
-        console.error('Error fetching user ID:', error);
+        console.error('Erreur lors de la récupération de l’ID utilisateur :', error);
       }
     };
 
@@ -42,7 +42,7 @@ const AddressFormScreen = ({ navigation, route }) => {
     const fetchCurrentLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.error('Permission Denied', 'You need to allow location access to continue.');
+        console.error('Permission refusée', 'Vous devez autoriser l’accès à la localisation pour continuer.');
         return;
       }
 
@@ -56,7 +56,7 @@ const AddressFormScreen = ({ navigation, route }) => {
         setLocation(location.coords); // Store the coordinates
         setLocationFetched(true); // Enable form fields once location is fetched
       } else {
-        console.error('Error fetching location. Please try again.');
+        console.error('Erreur lors de la récupération de la localisation. Veuillez réessayer.');
       }
     };
 
@@ -72,13 +72,13 @@ const AddressFormScreen = ({ navigation, route }) => {
         ...values,
         user_id: userId,
         newOrder: route.params, // Include user_id in the request body
-        location: location ? `${location.latitude}, ${location.longitude}` : 'Location not fetched', // Send location if available
+        location: location ? `${location.latitude}, ${location.longitude}` : 'Localisation non récupérée', // Send location if available
       };
 
       // Navigate back or to another screen
       navigation.replace('PaymentScreen', { data: dataToSend });
     } catch (error) {
-      console.error('Error saving address:', error);
+      console.error('Erreur lors de l’enregistrement de l’adresse :', error);
     }
     setIsSubmitting(false);
   };
@@ -89,7 +89,7 @@ const AddressFormScreen = ({ navigation, route }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"} // Avoid layout shift when keyboard is visible
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Add New Address</Text>
+        <Text style={styles.title}>Ajoutez une nouvelle adresse facilement</Text>
 
         <Formik
           initialValues={{
@@ -105,81 +105,82 @@ const AddressFormScreen = ({ navigation, route }) => {
         >
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
             <>
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Address Line *</Text>
-                <TextInput
-                  style={[styles.input, !locationFetched && styles.disabledInput]}  // Disable input if location is not fetched
-                  onChangeText={handleChange('address_line')}
-                  onBlur={handleBlur('address_line')}
-                  value={values.address_line}
-                  placeholder="Enter your address"
-                  editable={locationFetched}  // Disable editing if location is not fetched
-                />
-                {touched.address_line && errors.address_line && (
-                  <Text style={styles.error}>{errors.address_line}</Text>
-                )}
-              </View>
+            <View style={styles.inputContainer}>
+    <Text style={styles.label}>Adresse *</Text>
+    <TextInput
+      style={[styles.input, !locationFetched && styles.disabledInput]}  // Désactiver si la localisation n'est pas récupérée
+      onChangeText={handleChange('address_line')}
+      onBlur={handleBlur('address_line')}
+      value={values.address_line}
+      placeholder="Entrez votre adresse"
+      editable={locationFetched}  // Empêche la saisie si la localisation n'est pas récupérée
+    />
+    {touched.address_line && errors.address_line && (
+      <Text style={styles.error}>{errors.address_line}</Text>
+    )}
+</View>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Building</Text>
-                <TextInput
-                  style={[styles.input, !locationFetched && styles.disabledInput]}
-                  onChangeText={handleChange('building')}
-                  onBlur={handleBlur('building')}
-                  value={values.building}
-                  placeholder="Building name or number"
-                  editable={locationFetched}
-                />
-              </View>
+<View style={styles.inputContainer}>
+    <Text style={styles.label}>Bâtiment</Text>
+    <TextInput
+      style={[styles.input, !locationFetched && styles.disabledInput]}
+      onChangeText={handleChange('building')}
+      onBlur={handleBlur('building')}
+      value={values.building}
+      placeholder="Nom ou numéro du bâtiment"
+      editable={locationFetched}
+    />
+</View>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Floor</Text>
-                <TextInput
-                  style={[styles.input, !locationFetched && styles.disabledInput]}
-                  onChangeText={handleChange('floor')}
-                  onBlur={handleBlur('floor')}
-                  value={values.floor}
-                  placeholder="Floor number"
-                  editable={locationFetched}
-                />
-              </View>
+<View style={styles.inputContainer}>
+    <Text style={styles.label}>Étage</Text>
+    <TextInput
+      style={[styles.input, !locationFetched && styles.disabledInput]}
+      onChangeText={handleChange('floor')}
+      onBlur={handleBlur('floor')}
+      value={values.floor}
+      placeholder="Numéro de l'étage"
+      editable={locationFetched}
+    />
+</View>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Door Number</Text>
-                <TextInput
-                  style={[styles.input, !locationFetched && styles.disabledInput]}
-                  onChangeText={handleChange('door_number')}
-                  onBlur={handleBlur('door_number')}
-                  value={values.door_number}
-                  placeholder="Door number"
-                  editable={locationFetched}
-                />
-              </View>
+<View style={styles.inputContainer}>
+    <Text style={styles.label}>Numéro de porte</Text>
+    <TextInput
+      style={[styles.input, !locationFetched && styles.disabledInput]}
+      onChangeText={handleChange('door_number')}
+      onBlur={handleBlur('door_number')}
+      value={values.door_number}
+      placeholder="Numéro de porte"
+      editable={locationFetched}
+    />
+</View>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Digicode</Text>
-                <TextInput
-                  style={[styles.input, !locationFetched && styles.disabledInput]}
-                  onChangeText={handleChange('digicode')}
-                  onBlur={handleBlur('digicode')}
-                  value={values.digicode}
-                  placeholder="Enter digicode"
-                  editable={locationFetched}
-                />
-              </View>
+<View style={styles.inputContainer}>
+    <Text style={styles.label}>Digicode</Text>
+    <TextInput
+      style={[styles.input, !locationFetched && styles.disabledInput]}
+      onChangeText={handleChange('digicode')}
+      onBlur={handleBlur('digicode')}
+      value={values.digicode}
+      placeholder="Entrez le digicode"
+      editable={locationFetched}
+    />
+</View>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Comment</Text>
-                <TextInput
-                  style={[styles.input, !locationFetched && styles.disabledInput]}
-                  onChangeText={handleChange('comment')}
-                  onBlur={handleBlur('comment')}
-                  value={values.comment}
-                  placeholder="Additional instructions"
-                  multiline
-                  editable={locationFetched}
-                />
-              </View>
+<View style={styles.inputContainer}>
+    <Text style={styles.label}>Commentaire</Text>
+    <TextInput
+      style={[styles.input, !locationFetched && styles.disabledInput]}
+      onChangeText={handleChange('comment')}
+      onBlur={handleBlur('comment')}
+      value={values.comment}
+      placeholder="Instructions supplémentaires"
+      multiline
+      editable={locationFetched}
+    />
+</View>
+
 
               {/* Confirm Button */}
               <TouchableOpacity
@@ -188,7 +189,7 @@ const AddressFormScreen = ({ navigation, route }) => {
                 disabled={!locationFetched || isSubmitting}  // Disable button if location is not fetched
               >
                 <Text style={styles.submitButtonText}>
-                  {isSubmitting ? 'Submitting...' : 'Save Address'}
+                {isSubmitting ? 'Enregistrement...' : 'Enregistrer l’adresse'}
                 </Text>
               </TouchableOpacity>
             </>
@@ -206,15 +207,19 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    padding: 30,
+    padding: 20,
     backgroundColor: '#f7f7f7',
   },
   title: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
     textAlign: 'center',
     color: '#e9ab25',
+    fontWeight: '900',
+    textShadowColor: '#312a1f',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   inputContainer: {
     marginBottom: 20,
@@ -223,6 +228,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginBottom: 5,
+    fontWeight: '600',
+    textShadowColor: '#312a1f52',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   input: {
     borderWidth: 1,

@@ -19,6 +19,7 @@
     "expo": "~51.0.24",
     "expo-barcode-scanner": "~13.0.1",
     "expo-camera": "~15.0.15",
+    "expo-constants": "~16.0.2",
     "expo-crypto": "~13.0.2",
     "expo-device": "~6.0.2",
     "expo-linear-gradient": "^13.0.2",
@@ -35,6 +36,7 @@
     "react-native-calendar-picker": "^8.0.5",
     "react-native-dotenv": "^3.4.11",
     "react-native-elements": "^3.4.3",
+    "react-native-fast-image": "^8.6.3",
     "react-native-flash-message": "^0.4.2",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-get-random-values": "^1.11.0",
@@ -51,8 +53,7 @@
     "socket.io-client": "^4.7.5",
     "typescript": "~5.3.3",
     "uuid": "^10.0.0",
-    "yup": "^1.4.0",
-    "expo-constants": "~16.0.2"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

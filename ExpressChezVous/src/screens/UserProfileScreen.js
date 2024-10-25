@@ -225,7 +225,7 @@ const UserProfileScreen = ({ navigation }) => {
 <TouchableOpacity 
   style={styles.changePasswordButton} 
   onPress={() => setPasswordModalVisible(true)}>
-  <Text style={styles.buttonText}>lmot de passe</Text>
+  <Text style={styles.buttonText}>Mot de Passe</Text>
 </TouchableOpacity>
 
 </View>
@@ -456,10 +456,15 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   userName: {
-    fontSize: 22,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#4A4A4A',
     marginTop: 10,
+    fontWeight: 'bold',
+    color: '#e9ab25',
+    fontWeight: '600',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   inputSmall: {
     width: '65%',
@@ -492,6 +497,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600', // Slightly bolder text for modern feel
     letterSpacing: 1.2,
+    fontWeight: 'bold',
+    fontWeight: '600',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   modalOverlay: {
     flex: 1,

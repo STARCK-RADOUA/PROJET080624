@@ -52,14 +52,17 @@ const AppNavigator = () => {
         <Stack.Screen 
           name="Home" 
           component={DrawerNavigator} 
-          options={{ headerShown: false }}  
+          options={{ title: 'Accueil', headerShown: false ,    // This enables the swipe back gesture
+          }}  
         /> 
           <Stack.Screen name="Parrainage" component={ParrainageScreen} />
           <Stack.Screen name="ShoppingCartScreen" component={ShoppingCartScreen} />
 
         <Stack.Screen name="SupportChat" component={SupportChat}   options={{ headerShown: false }}  />
-        <Stack.Screen name="AdressForm" component={AdressForm} />
-        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+        <Stack.Screen name="AdressForm" options={{ title: 'Nouvelle Adresse', headerShown: true ,    // This enables the swipe back gesture
+          }}  component={AdressForm} />
+        <Stack.Screen name="PaymentScreen" options={{ title: 'Paiement', headerShown: true ,    // This enables the swipe back gesture
+          }}  component={PaymentScreen} />
         <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Logout" component={Logout} options={{ headerShown: false }} />
       </Stack.Navigator>

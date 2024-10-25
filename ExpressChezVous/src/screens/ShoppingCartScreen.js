@@ -402,6 +402,12 @@ alert("vous devez avoir au moins un item gratuit")
         <Text style={styles.errorText}>{error}</Text>
       ) : (
         <>
+        {isSystemPointModalVisible && (
+              <View style={styles.pointsCounter1}>
+                <Text style={styles.systemtest}>Les points sont désactivés pour l'instant.Merci!</Text>
+              </View>
+             
+          )}
           <ScrollView 
             style={styles.menuList}
             onScroll={handleScroll}  // Attach the scroll event
@@ -474,22 +480,7 @@ alert("vous devez avoir au moins un item gratuit")
         </>
       )}
 
-      <Modal
-        transparent={true}
-        visible={isSystemPointModalVisible}
-        animationType="slide"
-        onRequestClose={() => {}} 
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Important Notice</Text>
-            <Text style={styles.modalText}>lAdmin Hayd No9at </Text>
-            <TouchableOpacity style={styles.okButton} onPress={handleOkClick}>
-              <Text style={styles.okButtonText}>OK</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+     
     </View>
   );
 };
@@ -530,10 +521,14 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   menuItemName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2d2d2d',
-    marginBottom: 4,
+    fontSize: 19,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 5,
+    fontWeight: '600',
+    textShadowColor: '#ffa726',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   menuItemDescription: {
     color: '#8e8e93',
@@ -546,9 +541,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   priceText: {
-    fontSize: 18,
+     fontSize: 17,
+    fontWeight: 'bold',
+    color: '#ffa726',
     fontWeight: '600',
-    color: '#333',
+    textShadowColor: '#b46f07',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 5,
   },
   switchButton: {
     transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
@@ -587,11 +586,20 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 18,
+  },  pointsCounter1: {
+    borderRadius: 20,
+    alignItems: 'center',
+
+    paddingHorizontal: 18,
   },
   pointsText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+    fontWeight: '600',
+    textShadowColor: '#ffa726',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   },
   orderButton: {
     backgroundColor: '#e9ab25',
@@ -607,6 +615,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    fontWeight: '600',
+    textShadowColor: '#30271b',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
+  }, systemtest: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    fontWeight: 'bold',
+    color: '#e95d25',
+    fontWeight: '600',
+    textShadowColor: '#ce9a0ad3',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 8,
   },
   disabledOrderButton: {
     backgroundColor: '#cccccc',
