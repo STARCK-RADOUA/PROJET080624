@@ -78,16 +78,16 @@ const handleToggleLoginStatus = () => {
 
           <View style={styles.fieldRow}>
             <Text style={styles.label}>Téléphone:</Text>
-            <Text style={styles.textValue}>{editableClient.phone}</Text>
+            <Text style={styles.textValue}>+33 {editableClient.phone}</Text>
           </View>
 
           <View style={styles.fieldRow}>
             <Text style={styles.label}>ID de l'appareil:</Text>
-            <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">
+         
+          </View>
+   <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">
               {editableClient.deviceId}
             </Text>
-          </View>
-
           <View style={styles.fieldRow}>
             <Text style={styles.label}>Points accumulés:</Text>
             <Text style={styles.textValue}>{editableClient.points_earned}</Text>
@@ -131,53 +131,85 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
   },
   modalView: {
-    width: '85%',
-    backgroundColor: '#333',
-    borderRadius: 12,
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
     padding: 20,
-    alignItems: 'stretch',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7,
-    shadowRadius: 4,
+    elevation: 5,
   },
   closeButton: {
     alignSelf: 'flex-end',
-  },
-  name: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#1f695a',
-    textAlign: 'center',
-    marginVertical: 10,
   },
   fieldRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
-    flexWrap: 'wrap',
+    marginVertical: 10,
   },
   label: {
-    fontSize: 16,
-    color: '#ddd',
-    flex: 1,
-    flexWrap: 'wrap',
+    fontWeight: 'bold',
   },
   textValue: {
     fontSize: 16,
-    color: '#fff',
-    fontWeight: '500',
-    flex: 2,
-    textAlign: 'right',
+  },
+  navigateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#5A67D8',
+    borderRadius: 10,
+    padding: 10,
+    margin: 5,
+  },
+  navigateText: {
+    color: 'white',
+    marginLeft: 5,
   },
   separator: {
     height: 1,
-    backgroundColor: '#555',
-    marginVertical: 15,
+    backgroundColor: '#CED4DA',
+    marginVertical: 10,
+  },
+  saveButton: {
+    backgroundColor: '#5A67D8',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  saveText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  editButton: {
+    backgroundColor: '#5A67D8',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  editText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  deleteText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#CED4DA',
+    borderRadius: 5,
+    padding: 5,
+    flex: 1,
   },
 });
 

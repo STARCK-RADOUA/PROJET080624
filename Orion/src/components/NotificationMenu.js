@@ -235,16 +235,15 @@ const NotificationMenu = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f4f4c3',
+    backgroundColor: '#f5f4f4c3', // Couleur de fond légèrement transparente pour un effet subtil
     paddingTop: 10,
   },
   header: {
     padding: 10,
-    backgroundColor: '#6472743e',
+    backgroundColor: '#ecf5f7fd',
     borderRadius: 10,
     marginHorizontal: 10,
     marginBottom: 10,
@@ -252,6 +251,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
+    shadowColor: '#000',  // Ombre pour donner un effet de profondeur
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,  // Ombre pour Android
   },
   headerText: {
     fontSize: 18,
@@ -260,7 +264,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',
-    
   },
   searchInput: {
     flex: 1,
@@ -269,6 +272,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginHorizontal: 10,
     height: 40,
+    shadowColor: '#000',  // Ajout d'une légère ombre pour plus de profondeur
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   sortButton: {
     backgroundColor: '#156974',
@@ -277,6 +284,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 2,
   },
   sortButtonText: {
     color: '#fff',
@@ -289,6 +301,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 2,
   },
   filterToggleText: {
     color: '#fff',
@@ -299,12 +316,23 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     paddingHorizontal: 10,
     paddingVertical: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderRadius: 10,  // Bordure arrondie pour une finition plus propre
   },
   dateButton: {
     backgroundColor: '#1f695a',
     padding: 10,
     borderRadius: 5,
     marginVertical: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   dateButtonText: {
     color: '#fff',
@@ -315,6 +343,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 5,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   filterButtonText: {
     color: '#fff',
@@ -328,6 +361,11 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     flexDirection: 'row',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
   },
   addButtonText: {
     color: '#fff',
@@ -338,7 +376,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond obscurci pour l'arrière-plan
   },
   pickerWrapper: {
     backgroundColor: '#fff',
@@ -346,6 +384,11 @@ const styles = StyleSheet.create({
     padding: 20,
     width: '80%',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
   },
   dateTimePicker: {
     width: '100%',
@@ -355,11 +398,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#1f695a',
     padding: 10,
     borderRadius: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   closeButtonText: {
     color: '#fff',
     textAlign: 'center',
   },
 });
+
 
 export default NotificationMenu;

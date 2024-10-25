@@ -165,64 +165,89 @@ export default function ClientScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 10,
-    paddingBottom: 20,
+    backgroundColor: '#F9F9F9', // Light background
+    paddingTop: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#38435A', // Dark grey for titles
     marginBottom: 20,
-    textAlign: 'left',
   },
   searchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   searchInput: {
     flex: 1,
     height: 50,
-    paddingLeft: 40,
-    borderColor: '#d1d5db',
+    paddingLeft: 15,
+    borderColor: '#DDD', // Light grey border
     borderWidth: 1,
-    borderRadius: 8,
-    backgroundColor: '#f9fafb',
-    color: '#111827',
+    borderRadius: 12,
+    backgroundColor: '#FFF', // White input background
+    color: '#111827', // Dark text color
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
     marginRight: 10,
+  },
+  addButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#5A67D8', // Primary button color
+    borderRadius: 12, // Rounded corners for buttons
+  },
+  addButtonText: {
+    color: '#FFFFFF', // White text for contrast
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   filterContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 15,
+    backgroundColor: '#EEE', // Subtle background for filter options
+    borderRadius: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
   dropdownButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    backgroundColor: '#ddd',
-    borderRadius: 8,
+    flex: 1,
+    paddingVertical: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#5A67D8', // Primary theme color for dropdown buttons
+    borderRadius: 12,
+    marginHorizontal: 5,
+  },
+  dropdownButtonText: {
+    color: '#FFFFFF', // White text for dropdown buttons
+    fontSize: 14,
   },
   dropdown: {
-    position: 'absolute',
-    top: 150,
-    left: 10,
-    right: 10,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    zIndex: 9999,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    marginVertical: 5,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
   dropdownItem: {
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#F0F0F0', // Light grey for dropdown item borders
   },
   cardContainer: {
     flexDirection: 'column',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });

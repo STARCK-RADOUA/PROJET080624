@@ -166,34 +166,40 @@ const DeliveredOrdersScreen = () => {
       )}
 
       <FlatList
-        data={chargement ? Array.from({ length: 3 }) : commandesFiltrees.sort((a, b) => moment(b.delivery_time) - moment(a.delivery_time))} // Trier les commandes par heure de livraison
-        keyExtractor={(item, index) => item?._id || index.toString()}
-        renderItem={({ item }) => (
-          chargement ? (
-            rendreSkeleton()
-          ) : (
-            <TouchableOpacity onPress={() => appuyerCarteCommande(item)}>
-              <View style={styles.card}>
-                <Ionicons name="checkmark-circle-outline" size={50} color="#4CAF50" style={styles.orderIcon} />
-                <View style={styles.cardContent}>
-                  <Text style={styles.orderNumber}>Commande #{item.order_number ?? 'N/A'}</Text>
-                  <Text style={styles.location}>{item.address_line}</Text>
-                  <View style={styles.rightContainer}>
-                    <Text style={styles.price}>€{item.total_price.toFixed(2)}</Text>
-                    <Text style={styles.date}>{moment(item.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )
-        )}
-      />
+  data={chargement ? Array.from({ length: 3 }) : commandesFiltrees.sort((a, b) => moment(b.delivery_time) - moment(a.delivery_time))} 
+  keyExtractor={(item, index) => item?._id || index.toString()}
+  renderItem={({ item }) => (
+    chargement ? (
+      rendreSkeleton()
+    ) : (
+      <TouchableOpacity onPress={() => appuyerCarteCommande(item)}>
+        <View style={styles.card}>
+          <Ionicons name="checkmark-circle-outline" size={50} color="#4CAF50" style={styles.orderIcon} />
+          <View style={styles.cardContent}>
+            <Text style={styles.orderNumber}>Le client : {item.client_name ?? 'N/A'} {"\n"} Le livreur: {item.driver_name ?? 'N/A'}</Text>
+            <Text style={styles.location}>{item.address_line}</Text>
+            <View style={styles.rightContainer}>
+              <Text style={styles.price}>€{(item.total_price ?? 0).toFixed(2)}</Text>
+              <Text style={styles.date}>Créé à: {moment(item.created_at).format('YYYY-MM-DD HH:mm')}</Text>
+              <Text style={styles.date}>Livré à: {moment(item.updated_at).format('YYYY-MM-DD HH:mm')}</Text>      
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    )
+  )}
+  initialNumToRender={10} // Rend les premiers 10 éléments au départ
+  maxToRenderPerBatch={10} // Rend jusqu'à 10 éléments par lot
+  windowSize={10} // Taille de la fenêtre pour charger des éléments en dehors de l'écran
+/>
+
 
       <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>
-          Total en Euros: €
-          {commandesFiltrees.reduce((total, commande) => total + commande.total_price, 0).toFixed(2)}
-        </Text>
+      <Text style={styles.totalText}>
+  Total en Euros: €
+  {commandesFiltrees.reduce((total, commande) => total + (commande.total_price || 0), 0).toFixed(2)}
+</Text>
+
       </View>
 
       {commandeSelectionnee && (

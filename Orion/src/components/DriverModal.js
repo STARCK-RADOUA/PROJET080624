@@ -168,17 +168,17 @@ const DriverModal = ({ visible, onClose, driver }) => {
                 onChangeText={(value) => handleInputChange('phone', value)}
               />
             ) : (
-              <Text style={styles.textValue}>{editableDriver.phone}</Text>
+              <Text style={styles.textValue}>+33 {editableDriver.phone}</Text>
             )}
           </View>
 
           <View style={styles.fieldRow}>
             <Text style={styles.label}>ID de l'appareil :</Text>
-            <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">
-              {editableDriver.deviceId}
-            </Text>
+          
           </View>
-
+  <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">
+        {editableDriver.deviceId}
+            </Text>
           <View style={styles.fieldRow}>
             <Text style={styles.label}>Points accumulés :</Text>
             <Text style={styles.textValue}>{editableDriver.points_earned}</Text>

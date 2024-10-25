@@ -22,22 +22,21 @@ const WarnItem = ({ item, scaleAnim, fadeAnim, handlePressIn, handlePressOut, on
     </TouchableOpacity>
   </Animated.View>
 );
-
 const styles = StyleSheet.create({
   warnItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: '#6472743e',
-    borderRadius: 10,
-    marginHorizontal: 10,
-    marginVertical: 5,
-    shadowColor: '#6472743e',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.7,
-    shadowRadius: 5,
-    elevation: 3,
+    width: '90%', // Largeur similaire à `card`
+    backgroundColor: '#FFFFFF', // Fond blanc comme `card`
+    borderRadius: 12, // Coins arrondis comme `card`
+    padding: 20, // Ajustement du padding comme `card`
+    marginVertical: 10, // Espacement vertical similaire
+    shadowColor: '#000', // Ombre sombre comme `card`
+    shadowOffset: { width: 0, height: 4 }, // Ajustement de l'ombre
+    shadowOpacity: 0.1, // Douceur de l'ombre comme `card`
+    shadowRadius: 6, // Rayon de l'ombre
+    elevation: 5, // Ombre pour Android
+    borderWidth: 1, // Bordure fine
+    borderColor: '#E2E8F0', // Bordure claire pour une définition subtile
+    marginHorizontal: 10, // Marges latérales
   },
   warnInfo: {
     width: '100%',
@@ -52,12 +51,13 @@ const styles = StyleSheet.create({
   },
   warnName: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#1f695a',
+    fontWeight: 'bold', // Correspond à `cardTitle`
+    color: '#2C5282', // Bleu profond similaire à `cardTitle`
   },
   warnPhone: {
-    fontSize: 17,
-    color: '#272711',
+    fontSize: 16, // Taille ajustée pour correspondre au `cardSubtitle`
+    color: '#4A5568', // Gris moyen similaire au `cardSubtitle`
+    marginTop: 6, // Espacement entre le titre et le sous-titre
   },
   warnTimestamp: {
     fontSize: 15,

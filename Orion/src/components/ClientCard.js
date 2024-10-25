@@ -26,16 +26,18 @@ const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
   card: {
-    width: screenWidth - 40,
-    backgroundColor: '#b4b4b4',
-    borderRadius: 10,
+    width: screenWidth *0.9,
+    backgroundColor: '#FFFFFF', // White background for contrast
+    borderRadius: 12, // Rounded corners
     padding: 20,
     marginVertical: 10,
-    shadowColor: '#b4b4b4',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowColor: '#000', // Dark shadow for more contrast
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1, // Soft shadow
+    shadowRadius: 6,
+    elevation: 5, // Android shadow
+    borderWidth: 1,
+    borderColor: '#E2E8F0', // Light border for subtle definition
   },
   cardContent: {
     flexDirection: 'row',
@@ -51,30 +53,30 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#1f695a',
+    fontWeight: 'bold',
+    color: '#2C5282', // Deep blue for the title
   },
   cardSubtitle: {
-    fontSize: 17,
-    color: '#272711',
-    marginTop: 4,
+    fontSize: 16,
+    color: '#4A5568', // Medium grey for subtitle
+    marginTop: 6, // Space between title and subtitle
   },
   statusText: {
     fontSize: 15,
     fontWeight: '600',
-    marginTop: 2,
+    marginTop: 6,
   },
   loggedIn: {
-    color: '#199638',
+    color: '#38A169', // Green color for "Logged In"
   },
   loggedOut: {
-    color: '#FF3B30',
+    color: '#E53E3E', // Red color for "Logged Out"
   },
   activated: {
-    color: '#199638',
+    color: '#38A169', // Green color for "Activated"
   },
   deactivated: {
-    color: '#FF3B30',
+    color: '#E53E3E', // Red color for "Deactivated"
   },
 });
 

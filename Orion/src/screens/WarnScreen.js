@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 10,
-    backgroundColor: '#6472743e',
+    backgroundColor: '#ecf5f7fd',
     borderRadius: 10,
     marginHorizontal: 10,
     marginBottom: 10,

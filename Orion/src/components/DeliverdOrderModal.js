@@ -77,7 +77,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                     {developpe === index && (
                       <View>
                         <Text style={styles.productQuantity}>Qté : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit"}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €"+item.price.toFixed(2) }</Text>
                         <Text style={styles.productServiceType}>Type de service : {item.service_type}</Text>
                       </View>
                     )}

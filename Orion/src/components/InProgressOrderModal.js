@@ -145,7 +145,7 @@ const renderDriverDropdown = () => (
                     {expanded === index && (
                       <View>
                         <Text style={styles.productQuantity}>Quantité : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit"}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €"+item.price.toFixed(2) }</Text>
                       </View>
                     )}
                   </View>

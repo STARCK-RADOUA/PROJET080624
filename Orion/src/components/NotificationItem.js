@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   notificationItem: {
     paddingVertical: 15,
     paddingHorizontal: 20,
-    backgroundColor: '#b4b4b4',
+    backgroundColor: '#fffffff9',
     borderRadius: 10,
     marginHorizontal: 10,
     marginVertical: 5,
