@@ -26,6 +26,7 @@ const MainNavigator = ({ onLogin }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(false); // Track unread driver messages
   const [unreadAdminMessages, setUnreadAdminMessages] = useState(false); // Track unread admin messages
+  const [warn, setWarn] = useState(); // Track unread admin messages
 
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
@@ -37,6 +38,7 @@ const MainNavigator = ({ onLogin }) => {
   useEffect(() => {
     // Request initial chat messages on connect
     socket.emit('watchChatMessages');
+    socket.emit('watchLatestWarn'); // Request the latest warn on connect
 
     // Listen for the updated messages when they are received from the server
     socket.on('chatMessagesUpdated', (data) => {
@@ -50,10 +52,16 @@ const MainNavigator = ({ onLogin }) => {
       );
       setUnreadAdminMessages(hasUnreadAdmin);
     });
+    socket.on('newWarning', (data) => {
+      console.log(data , "ba3ba3")
+      setWarn(data.seen); // Update local warn status
+    });
 
     // Cleanup socket listener
     return () => {
       socket.off('chatMessagesUpdated');
+      socket.off('newWarning');
+
     };
   }, [socket]);
 
@@ -118,7 +126,8 @@ const MainNavigator = ({ onLogin }) => {
         setCurrentTab={handleTabChange} 
         onLogin={onLogin} 
         unreadMessages={unreadMessages} 
-        unreadAdminMessages={unreadAdminMessages} 
+        unreadAdminMessages={unreadAdminMessages}
+        warn = {warn} 
       />
 
       <Animated.View

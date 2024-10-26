@@ -5,65 +5,56 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { io } from 'socket.io-client';
 import moment from 'moment';
-import DeliveredOrderModal from '../components/CanceledOrderModal';
+import DeliveredOrderModal from '../components/DeliverdOrderModal';
 import { format } from 'date-fns';
 
-
-const CanceledOrderScreen = () => {
+const SpamOrdersScreen = () => {
   const [commandes, setCommandes] = useState([]);
   const [commandesFiltrees, setCommandesFiltrees] = useState([]);
-
   const [recherche, setRecherche] = useState('');
   const [commandeSelectionnee, setCommandeSelectionnee] = useState(null);
   const [chargement, setChargement] = useState(true);
 
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
 
-   // Date filter states
-   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-   const [startDate, setStartDate] = useState(new Date());
-   const [endDate, setEndDate] = useState(new Date());
-   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const applyFilters = () => {
+    const filteredOrders = commandes.filter((commande) => {
+      const chatDate = new Date(commande.created_at);
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+      return chatDate >= new Date(formattedStartDate) && chatDate <= new Date(formattedEndDate);
+    });
+    setCommandesFiltrees(filteredOrders);
+    setShowFilterMenu(false);
+  };
 
-     // Filter chats by date range
-     const applyFilters = () => {
-      const filteredOrders = commandes.filter((commande) => {
-        const chatDate = new Date(commande.created_at); // Filtering by chatCreatedAt
-        const formattedStartDate = format(startDate, 'yyyy-MM-dd');
-        const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-        return chatDate >= new Date(formattedStartDate) && chatDate <= new Date(formattedEndDate);
-      });
-      setCommandesFiltrees(filteredOrders);
-      setShowFilterMenu(false);
-    };
-  
   const toggleFilterMenu = () => {
     setShowFilterMenu(!showFilterMenu);
   };
 
-
   useEffect(() => {
     const socket = io(BASE_URLIO);
 
-    socket.emit('getCancelledOrders');
-
-    socket.on('orderCanceledUpdated', (data) => {
+    socket.emit('getSpamOrders');
+    socket.on('spamOrdersUpdated', (data) => {
       setCommandes(data.orders);
-      setCommandesFiltrees(data.orders); // Afficher toutes les commandes par défaut
-      setChargement(false); // Arrêter le chargement une fois les données récupérées
+      setCommandesFiltrees(data.orders);
+      setChargement(false);
     });
 
     socket.on('error', (err) => {
       console.error('Erreur de socket:', err.message);
-      setChargement(false); // Arrêter le chargement en cas d'erreur
+      setChargement(false);
     });
 
     return () => {
       socket.disconnect();
     };
   }, []);
-
-
 
   const filtrerCommandesParRecherche = (query) => {
     setRecherche(query);
@@ -84,15 +75,15 @@ const CanceledOrderScreen = () => {
   };
 
   const afficherTout = () => {
-    setCommandesFiltrees(commandes); // Afficher toutes les commandes lorsque "Afficher tout" est pressé
+    setCommandesFiltrees(commandes);
   };
 
   const appuyerCarteCommande = (commande) => {
-    setCommandeSelectionnee(commande); // Afficher la commande sélectionnée dans le modal
+    setCommandeSelectionnee(commande);
   };
 
   const fermerModal = () => {
-    setCommandeSelectionnee(null); // Fermer le modal
+    setCommandeSelectionnee(null);
   };
 
   const rendreSkeleton = () => (
@@ -108,9 +99,8 @@ const CanceledOrderScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Commandes Annulées</Text>
+      <Text style={styles.header}>Commandes Marquées comme Spam</Text>
 
-      {/* Champ de recherche */}
       <TextInput
         style={styles.searchInput}
         placeholder="Rechercher par client, chauffeur, ou nom de produit..."
@@ -119,7 +109,7 @@ const CanceledOrderScreen = () => {
       />
 
       <View style={styles.filterContainer}>
-        <TouchableOpacity onPress={toggleFilterMenu}style={styles.datePicker}>
+        <TouchableOpacity onPress={toggleFilterMenu} style={styles.datePicker}>
           <Ionicons name="calendar-outline" size={24} color="white" />
           <Text style={styles.filterText}>Filtrer</Text>
         </TouchableOpacity>
@@ -168,7 +158,7 @@ const CanceledOrderScreen = () => {
       )}
 
       <FlatList
-        data={chargement ? Array.from({ length: 3 }) : commandesFiltrees.sort((a, b) => moment(b.delivery_time) - moment(a.delivery_time))} // Trier par date d'annulation
+        data={chargement ? Array.from({ length: 3 }) : commandesFiltrees.sort((a, b) => moment(b.delivery_time) - moment(a.delivery_time))}
         keyExtractor={(item, index) => item?._id || index.toString()}
         renderItem={({ item }) => (
           chargement ? (
@@ -176,25 +166,29 @@ const CanceledOrderScreen = () => {
           ) : (
             <TouchableOpacity onPress={() => appuyerCarteCommande(item)}>
               <View style={styles.card}>
-                <Ionicons name="close-circle-outline" size={50} color="#FF6347" style={styles.orderIcon} />
+                <Ionicons name="alert-circle-outline" size={50} color="#740938" style={styles.orderIcon} />
                 <View style={styles.cardContent}>
-                  <Text style={styles.orderNumber}>Commande #{item.order_number ?? 'N/A'}</Text>
+                  <Text style={styles.orderNumber}>Le client : {item.client_name ?? 'N/A'} {"\n"} Le livreur: {item.driver_name ?? 'N/A'}</Text>
                   <Text style={styles.location}>{item.address_line}</Text>
                   <View style={styles.rightContainer}>
-                    <Text style={styles.price}>€{item.total_price.toFixed(2)}</Text>
-                    <Text style={styles.date}>{moment(item.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+                    <Text style={styles.price}>€{(item.total_price ?? 0).toFixed(2)}</Text>
+                    <Text style={styles.date}>Créé à: {moment(item.created_at).format('YYYY-MM-DD HH:mm')}</Text>
+                    <Text style={styles.date}>Livré à: {moment(item.updated_at).format('YYYY-MM-DD HH:mm')}</Text>
                   </View>
                 </View>
               </View>
             </TouchableOpacity>
           )
         )}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={10}
       />
 
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>
           Total en Euros: €
-          {commandesFiltrees.reduce((total, commande) => total + commande.total_price, 0).toFixed(2)}
+          {commandesFiltrees.reduce((total, commande) => total + (commande.total_price || 0), 0).toFixed(2)}
         </Text>
       </View>
 
@@ -219,7 +213,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#FF6347',
+    color: '#740938',
   },
   searchInput: {
     height: 40,
@@ -240,7 +234,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    backgroundColor: '#FF6347',
+    backgroundColor: '#740938',
     borderRadius: 10,
     padding: 10,
   },
@@ -252,7 +246,7 @@ const styles = StyleSheet.create({
   showAllButton: {
     paddingVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: '#FF7F50',
+    backgroundColor: '#5a052d',
     borderRadius: 8,
     marginLeft: 10,
   },
@@ -264,7 +258,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFE4E1',
+    backgroundColor: '#f7e9ef',
     padding: 10,
     borderRadius: 10,
     marginBottom: 20,
@@ -286,7 +280,7 @@ const styles = StyleSheet.create({
   orderNumber: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6347',
+    color: '#740938',
     marginBottom: 5,
   },
   location: {
@@ -310,7 +304,7 @@ const styles = StyleSheet.create({
   totalContainer: {
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#FF6347',
+    backgroundColor: '#740938',
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -321,7 +315,7 @@ const styles = StyleSheet.create({
   },
   skeletonCard: {
     height: 100,
-    backgroundColor: '#FFCCCB',
+    backgroundColor: '#f2d3de',
     borderRadius: 8,
     marginBottom: 15,
     padding: 10,
@@ -329,20 +323,20 @@ const styles = StyleSheet.create({
   skeletonTitle: {
     width: '50%',
     height: 20,
-    backgroundColor: '#FF7F7F',
+    backgroundColor: '#c54876',
     borderRadius: 4,
     marginBottom: 10,
   },
   skeletonDescription: {
     width: '80%',
     height: 15,
-    backgroundColor: '#FF7F7F',
+    backgroundColor: '#c54876',
     borderRadius: 4,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e27a3f',
+    backgroundColor: '#5a052d',
     padding: 10,
     borderRadius: 5,
     marginLeft: 10,
@@ -358,7 +352,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   dateButton: {
-    backgroundColor: '#FF6347',
+    backgroundColor: '#5a052d',
     padding: 10,
     borderRadius: 5,
     marginVertical: 5,
@@ -368,7 +362,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   applyFilterButton: {
-    backgroundColor: '#FF7F50',
+    backgroundColor: '#740938',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
@@ -379,4 +373,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CanceledOrderScreen;
+export default SpamOrdersScreen;

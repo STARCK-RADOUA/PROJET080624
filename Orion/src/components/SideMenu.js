@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TabButton from './TabButton';  // Import TabButton component
 
-const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages, unreadAdminMessages }) => {
+const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages,unreadAdminMessages ,  warn }) => {
   return (
     <View style={styles.container}>
       {/* Profile Section */}
@@ -25,7 +25,7 @@ const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages, unreadAd
           {TabButton({ currentTab, setCurrentTab, title: "Historique Chat", iconName: "time-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Analyse", iconName: "stats-chart-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Chiffre d'affaire", iconName: "cash-outline" })}
-          {TabButton({ currentTab, setCurrentTab, title: "invité", iconName: "stats-chart-outline" })}
+          {TabButton({ currentTab, setCurrentTab, title: "invité", iconName: "stats-chart-outline"  , warn})}
           {TabButton({ currentTab, setCurrentTab, title: "Chat Client", iconName: "send-outline", unreadMessages })}
           {TabButton({ currentTab, setCurrentTab, title: "Chat Livreur", iconName: "chatbubble-ellipses-outline", unreadMessages: unreadAdminMessages })}
           {TabButton({ currentTab, setCurrentTab, title: "Recherche", iconName: "search-outline" })}

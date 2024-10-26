@@ -34,6 +34,16 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
     setDeveloppe(developpe === index ? null : index);
   };
 
+  const renderStars = (stars) => {
+    const starIcons = [];
+    for (let i = 0; i < stars; i++) {
+      starIcons.push(
+        <Ionicons key={i} name="star" size={20} color="#ffbf00" />
+      );
+    }
+    return <View style={styles.starsContainer}>{starIcons}</View>;
+  };
+
   return (
     <Modal
       animationType="none"
@@ -61,6 +71,22 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Livraison : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
+            {/* Display Stars if available */}
+            {order.stars && (
+              <View style={styles.starsRow}>
+                <Text style={styles.label}>Évaluation :</Text>
+                {renderStars(order.stars)}
+              </View>
+            )}
+
+            {/* Display clientcomment and report_comment if they exist */}
+            {order.comment && (
+              <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire du client : {order.comment}</Text>
+            )}
+            {order.report_comment && (
+              <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="#ff5c5c" /> Commentaire du livreur : {order.report_comment}</Text>
+            )}
+
             {/* Produits */}
             <Text style={styles.sectionHeader}>Produits :</Text>
             <View style={styles.productsContainer}>
@@ -77,7 +103,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                     {developpe === index && (
                       <View>
                         <Text style={styles.productQuantity}>Qté : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €"+item.price.toFixed(2) }</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €" + item.price.toFixed(2)}</Text>
                         <Text style={styles.productServiceType}>Type de service : {item.service_type}</Text>
                       </View>
                     )}
@@ -124,7 +150,7 @@ const styles = StyleSheet.create({
     elevation: 15,
   },
   closeButton: {
-    color: '#ff5c5c',  // Customize the color as needed
+    color: '#ff5c5c',
     marginTop: 20,
     fontWeight: 'bold',
     fontSize: 16,
@@ -132,12 +158,21 @@ const styles = StyleSheet.create({
   },
   orderInfo: {
     paddingTop: 20,
-   marginBottom: 20,
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
     marginBottom: 5,
     color: '#ccc',
+  },
+  starsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    marginLeft: 10,
   },
   sectionHeader: {
     fontSize: 18,
@@ -200,6 +235,11 @@ const styles = StyleSheet.create({
   showMoreText: {
     color: '#007bff',
     fontSize: 16,
+  },
+  commentText: {
+    fontSize: 14,
+    color: '#ffbf00',
+    marginTop: 10,
   },
 });
 

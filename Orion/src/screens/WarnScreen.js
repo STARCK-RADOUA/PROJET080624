@@ -3,9 +3,10 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Animated
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
-import { BASE_URLIO } from '@env';
+import { BASE_URLIO  , BASE_URL} from '@env';
 import WarnItem from './WarnItem';
 import WarnDetailModal from './WarnDetailModal';
+import axios from 'axios';
 
 const socket = io(BASE_URLIO);
 
@@ -24,7 +25,22 @@ const WarnList = () => {
   const scaleAnim = useState(new Animated.Value(1))[0];
   const fadeAnim = useState(new Animated.Value(0))[0];
 
+  const updateAllWarnsToSeen = async () => {
+    try {
+      const response = await axios.put(`${BASE_URL}/api/warns/update-all-warns-seen`);
+      if (response.status === 200) {
+        console.log('All warnings have been marked as seen.');
+        return response.data;
+      } else {
+        console.error('Failed to update warnings.');
+      }
+    } catch (error) {
+      console.error('Error updating all warnings:', error);
+    }
+  };
+  
   useEffect(() => {
+
     socket.emit('requestAllWarns');
 
     socket.on('warnsData', (data) => {
@@ -50,6 +66,9 @@ const WarnList = () => {
       setWarns((prevWarns) => prevWarns.filter((warn) => warn._id !== deletedWarn._id));
       setFilteredWarns((prevWarns) => prevWarns.filter((warn) => warn._id !== deletedWarn._id));
     });
+
+    updateAllWarnsToSeen();
+
 
     Animated.timing(fadeAnim, {
       toValue: 1,

@@ -8,7 +8,7 @@ import CanceledOrderScreen from './CanceledOrderScreen';
 import OngoingOrdersScreen from './PendingOrdersScreen';
 import InProgreesgOrdersScreen from './InProgressOrderScreen';
 import TestOrdersScreen from './TestOrdersScreen'; // Import the new screen
-
+import SpamOrdersScreen from './SpamOrdersScreen'; // Import the SpamOrdersScreen
 const OrdersScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -58,6 +58,25 @@ const OrdersScreen = ({ navigation }) => {
           <Text style={styles.cardDescription}>Voir et gérer les commandes de test</Text>
         </View>
       </TouchableOpacity>
+
+
+      
+
+      {/* Spam Orders Card */}
+
+      <TouchableOpacity style={[styles.card, styles.darkPurpleCard]} onPress={() => navigation.navigate('SpamOrders')}>
+
+        <Ionicons name="bug-outline" size={32} color="white" style={styles.cardIcon} />
+
+        <View style={styles.cardTextContainer}>
+
+          <Text style={styles.cardTitle}>Commandes Spam</Text>
+
+          <Text style={styles.cardDescription}>Voir et gérer les commandes marquées comme spam</Text>
+
+        </View>
+
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -98,6 +117,8 @@ const App = () => {
           component={TestOrdersScreen} // New screen for Commandes de test
           options={{ headerShown: false }} 
         />
+              <Stack.Screen name="SpamOrders" component={SpamOrdersScreen} options={{ headerShown: false }}/>
+
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -111,6 +132,11 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 20,
+  },
+  darkPurpleCard: {
+
+    backgroundColor: '#740938', // Darker purple for Spam Orders
+
   },
   title: {
     fontSize: 24,

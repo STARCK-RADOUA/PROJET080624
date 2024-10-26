@@ -1,19 +1,19 @@
 import React, { useContext, useState } from 'react';
-import { TouchableOpacity, View, Text, ActivityIndicator, StyleSheet , Alert } from 'react-native';
+import { TouchableOpacity, View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../redux/AuthProvider';
 import * as Device from 'expo-device';
 import { BASE_URL } from '@env';
 
 
-const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, onLogin }) => {
+const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, warn, onLogin }) => {
   const [loading, setLoading] = useState(false);
   const { logout } = useContext(AuthContext);
 
   const handleLogout = async () => {
     setLoading(true);
     const deviceId = Device.osBuildId;
-    
+
     try {
       const response = await fetch(`${BASE_URL}/api/clients/logout`, {
         method: 'POST',
@@ -71,6 +71,15 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages,
             color="red"
             style={styles.notificationIcon}
           />
+        )}
+
+        {title === "invité" && warn === false && (
+         <Ionicons
+         name="notifications-outline"  // Or choose another notification icon
+         size={20}
+         color="red"
+         style={styles.notificationIcon}
+       />
         )}
       </View>
     </TouchableOpacity>

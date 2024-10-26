@@ -57,6 +57,18 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
               </Text>
             </View>
 
+            {/* Display Report Reason and Report Comment if they exist */}
+            {order.report_reason && (
+              <Text style={styles.reportText}>
+                <Ionicons name="alert-circle" size={16} color="#ff5c5c" /> Motif: {order.report_reason}
+              </Text>
+            )}
+            {order.report_comment && (
+              <Text style={styles.reportText}>
+                <Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Livreur Comment: {order.report_comment}
+              </Text>
+            )}
+
             {/* Products */}
             <Text style={styles.sectionHeader}>Products:</Text>
             <View style={styles.productsContainer}>
@@ -73,7 +85,7 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
                   <View style={styles.productDetails}>
                     <Text style={styles.productName}>{item.product?.name || 'Unavailable'}</Text>
                     <Text style={styles.productQuantity}>Qty: {item.quantity}</Text>
-                    <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €"+item.price.toFixed(2) }</Text>
+                    <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €" + item.price.toFixed(2)}</Text>
                   </View>
                 </View>
               ))}
@@ -119,11 +131,11 @@ const styles = StyleSheet.create({
     elevation: 15,
   },
   closeButton: {
-    color: '#ff5c5c',  // Customize the color as needed
-  marginTop: 20,
-  fontWeight: 'bold',
-  fontSize: 16,
-  textAlign: 'center',
+    color: '#ff5c5c', 
+    marginTop: 20,
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
   orderInfo: {
     marginBottom: 20,
@@ -182,6 +194,11 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     color: '#ff5c5c',
+  },
+  reportText: {
+    fontSize: 14,
+    color: '#ffbf00',
+    marginTop: 10,
   },
   showMoreButton: {
     marginTop: 10,
