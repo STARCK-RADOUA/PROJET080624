@@ -490,16 +490,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   menuList: {
-    paddingHorizontal: 16,
-    paddingBottom: 10,
+    marginTop: 10,
+
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffff',
     borderRadius: 20,
-    padding: 10,
-    marginVertical: 8,
+    padding: 5,
+    marginVertical: 5,
+    marginHorizontal: 15,
     shadowColor: '#000',
     shadowOpacity: 0.15,
     shadowOffset: { width: 0, height: 5 },

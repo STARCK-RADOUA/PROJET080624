@@ -33,6 +33,14 @@ const DriverOrdersScreen = ({ navigation }) => {
   const [supportMessages, setsupportMessages] = useState([]); // State for messages
   const socketRef = useRef(null);
   const deviceId = Device.osBuildId;
+const [hasInitialRefreshRun, setHasInitialRefreshRun] = useState(false);
+
+useEffect(() => {
+  if (orders.length > 0 && !hasInitialRefreshRun) {
+    refreshDistances(); // Exécuter une fois immédiatement si des commandes sont présentes
+    setHasInitialRefreshRun(true); // Empêche l'exécution répétée
+  }
+}, [orders]);
 
   useEffect(() => {
     // Initialisation du socket si ce n'est pas déjà fait
@@ -158,7 +166,10 @@ const DriverOrdersScreen = ({ navigation }) => {
         );
         if(updatedOrders){
 
-          setOrders(updatedOrders);
+                    setOrders(updatedOrders);
+
+          setOrders((prevOrders) => sortOrdersByDistanceAscending([...prevOrders]));
+
        console.log(`Updated location: Latitude: ${latitude}, Longitude: ${longitude}`);
        console.log('------------sub------------------------');
        console.log(locationSubscription);
@@ -171,8 +182,11 @@ const DriverOrdersScreen = ({ navigation }) => {
     );
     setLocationSubscription(subscription);
   };
-
-
+  const sortOrdersByDistanceAscending = (orders) => {
+    return orders.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+  };
+  
+  
   const refreshDistances = async () => {
 
     await subscribeToLocation();
@@ -250,6 +264,11 @@ const DriverOrdersScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
+
+
+
+  
+
   useEffect(() => {
 
     const intervalId = setInterval(async () => {

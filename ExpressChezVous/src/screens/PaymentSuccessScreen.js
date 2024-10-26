@@ -414,8 +414,8 @@ console.log('------------------------------------');
         <Text style={styles.redirectMessage2}> 
   {orderStatus === 'in_progress' 
     ? (duration !== null 
-        ? duration<1? "Le livreur est là, prêt à vous faire sourire avec votre commande ! 😊":`Il reste ${Math.floor(duration / 60)}m ` 
-        : 'Calcul en cours...') 
+        ? (Math.floor(duration/60) <1 ? "Le livreur est là, prêt à vous faire sourire avec votre commande ! 😊":`Il reste ${Math.floor(duration / 60)} min ` 
+        ): 'Calcul en cours...') 
     : " "}
 </Text>
 

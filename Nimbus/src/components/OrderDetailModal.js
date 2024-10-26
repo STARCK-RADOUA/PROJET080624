@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text,Alert,TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
+import { Modal, View,Switch, Text,Alert,TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import { BASE_URLIO, BASE_URL } from '@env';
@@ -16,6 +16,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
   const [comment, setComment] = useState('');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showLivredModal, setShowLivredModal] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   if (!order) return null;
 
@@ -91,11 +92,16 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
         console.log('------------------------------------');
         console.log('livred successful');
         console.log('------------------------------------');
+
+        setTimeout(() => {
 const deviceId = Device.osBuildId;
         const socket = io(BASE_URLIO, {
           query: { deviceId },
         });
-        socket.emit('driverConnected', deviceId);
+
+                 socket.emit('driverConnected', deviceId);
+
+        }, 2 * 60 * 1000); // 50 secondes
   
      
       } else {
@@ -125,7 +131,7 @@ const deviceId = Device.osBuildId;
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ order_number, reportReason, comment }),
+        body: JSON.stringify({ order_number, reportReason, comment,isChecked }),
       });
   
       const l = await response.json();
@@ -272,6 +278,14 @@ const deviceId = Device.osBuildId;
         value={comment}
         onChangeText={setComment}
       />
+      <View style={styles.switchContainer}>
+        <Switch
+          value={isChecked}
+          onValueChange={setIsChecked}
+        />
+        <Text style={styles.switchLabel}>Signaler</Text>
+      </View>
+
 
       <TouchableOpacity
         style={styles.affectButton}
@@ -373,6 +387,15 @@ const styles = StyleSheet.create({
   },
   productsContainer: {
     marginTop: 10,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  switchLabel: {
+    marginLeft: 8,
+    fontSize: 16,
   },
   productContainer: {
     flexDirection: 'row',
