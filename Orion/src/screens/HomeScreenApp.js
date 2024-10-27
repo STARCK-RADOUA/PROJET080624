@@ -7,7 +7,7 @@ import HomeScreenSkeleton from './HomeScreenSkeleton';
 const HomeScreenApp = () => {
     const [dataLoaded, setDataLoaded] = useState(false);
   
-    useEffect(() => {
+    useEffect(() => { 
       // Simulate data loading
       setTimeout(() => setDataLoaded(true), 2000);
     }, []);

@@ -28,6 +28,9 @@ const MainNavigator = ({ onLogin }) => {
   const [unreadMessages, setUnreadMessages] = useState(false); // Track unread driver messages
   const [unreadAdminMessages, setUnreadAdminMessages] = useState(false); // Track unread admin messages
   const [warn, setWarn] = useState(); // Track unread admin messages
+  const [isClientDesactiv, setIsClientDesactiv] = useState(); // Track unread admin messages
+  const [isDriverDesactiv, setIsDriverDesactiv] = useState(); // Track unread admin messages
+
 
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
@@ -40,6 +43,16 @@ const MainNavigator = ({ onLogin }) => {
     // Request initial chat messages on connect
     socket.emit('watchChatMessages');
     socket.emit('watchLatestWarn'); // Request the latest warn on connect
+    socket.emit('checkActivationStatus'); // Request the latest warn on connect
+
+    socket.on('activationStatus', (data) => {
+      setIsClientDesactiv(data.clients) ; 
+      setIsDriverDesactiv(data.drivers) ;    
+      console.log(isClientDesactiv) ;
+      console.log(isDriverDesactiv) ;
+
+
+    });
 
     // Listen for the updated messages when they are received from the server
     socket.on('chatMessagesUpdated', (data) => {
@@ -54,9 +67,10 @@ const MainNavigator = ({ onLogin }) => {
       setUnreadAdminMessages(hasUnreadAdmin);
     });
     socket.on('newWarning', (data) => {
-      console.log(data , "ba3ba3")
+      console.log("dddd")
       setWarn(data.seen); // Update local warn status
     });
+
 
     // Cleanup socket listener
     return () => {
@@ -129,6 +143,8 @@ const MainNavigator = ({ onLogin }) => {
         unreadMessages={unreadMessages} 
         unreadAdminMessages={unreadAdminMessages}
         warn = {warn} 
+        isClientDesactiv = {isClientDesactiv}
+        isDriverDesactiv = {isDriverDesactiv}
       />
 
       <Animated.View

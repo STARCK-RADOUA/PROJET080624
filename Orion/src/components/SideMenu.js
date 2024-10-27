@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TabButton from './TabButton';  // Import TabButton component
 
-const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages,unreadAdminMessages ,  warn }) => {
+const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages,unreadAdminMessages ,  warn ,isClientDesactiv , isDriverDesactiv }) => {
   return (
     <View style={styles.container}>
       {/* Profile Section */}
@@ -16,8 +16,8 @@ const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages,unreadAdm
         <View style={styles.menuButtons}>
           {TabButton({ currentTab, setCurrentTab, title: "Accueil", iconName: "home-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Notifications", iconName: "notifications-outline" })}
-          {TabButton({ currentTab, setCurrentTab, title: "Clients", iconName: "people-outline" })}
-          {TabButton({ currentTab, setCurrentTab, title: "Livreur", iconName: "car-outline" })}
+          {TabButton({ currentTab, setCurrentTab, title: "Clients", iconName: "people-outline" , isClientDesactiv})}
+          {TabButton({ currentTab, setCurrentTab, title: "Livreur", iconName: "car-outline" , isDriverDesactiv})}
           {TabButton({ currentTab, setCurrentTab, title: "Produits", iconName: "pricetag-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Commandes", iconName: "clipboard-outline" })}
           {TabButton({ currentTab, setCurrentTab, title: "Services", iconName: "briefcase-outline" })}

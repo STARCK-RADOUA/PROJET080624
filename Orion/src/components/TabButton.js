@@ -6,7 +6,7 @@ import * as Device from 'expo-device';
 import { BASE_URL } from '@env';
 
 
-const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, warn, onLogin }) => {
+const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, warn,isClientDesactiv , isDriverDesactiv , onLogin }) => {
   const [loading, setLoading] = useState(false);
   const { logout } = useContext(AuthContext);
 
@@ -76,6 +76,25 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages,
         {title === "invité" && warn === false && (
          <Ionicons
          name="notifications-outline"  // Or choose another notification icon
+         size={20}
+         color="red"
+         style={styles.notificationIcon}
+       />
+        )}
+
+         {title === "Clients" && isClientDesactiv === true && (
+         <Ionicons
+         name="alert-circle-outline"  // Warning icon
+         size={20}
+         color="red"
+         style={styles.notificationIcon}
+       />
+        )}
+
+
+        {title === "Livreur" && isDriverDesactiv === true && (
+         <Ionicons
+         name="alert-circle-outline"  // Warning icon
          size={20}
          color="red"
          style={styles.notificationIcon}
