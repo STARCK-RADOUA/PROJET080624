@@ -6,7 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import DriversRevenueScreen from './DriversRevenueScreen';
 import ProductsRevenueScreen from './ProductsRevenueScreen';
 
-const RevenueScreen = ({ navigation }) => {
+ export const RevenueScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Section d'en-tête */}
@@ -116,3 +116,5 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+

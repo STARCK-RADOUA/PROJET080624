@@ -9,7 +9,8 @@ import OngoingOrdersScreen from './PendingOrdersScreen';
 import InProgreesgOrdersScreen from './InProgressOrderScreen';
 import TestOrdersScreen from './TestOrdersScreen'; // Import the new screen
 import SpamOrdersScreen from './SpamOrdersScreen'; // Import the SpamOrdersScreen
-const OrdersScreen = ({ navigation }) => {
+
+export const OrdersScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Section d'en-tête */}

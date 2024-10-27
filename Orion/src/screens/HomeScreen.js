@@ -6,8 +6,23 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import { BASE_URL, BASE_URLIO } from '@env';
 import { Ionicons } from '@expo/vector-icons';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import ProdScreen from './ProductScreen';
+import {OrdersScreen} from './OrdersScreen';
+import DeliveredOrdersScreen from './DeliveredOrdersScreen';
+import CanceledOrderScreen from './CanceledOrderScreen';
+import OngoingOrdersScreen from './PendingOrdersScreen';
+import InProgreesgOrdersScreen from './InProgressOrderScreen';
+import TestOrdersScreen from './TestOrdersScreen'; // Import the new screen
+import SpamOrdersScreen from './SpamOrdersScreen'; // I
+import ClientScreen from './ClientScreen';
+import { RevenueScreen } from './RevenueScreen';
+import DriversRevenueScreen from './DriversRevenueScreen';
+import ProductsRevenueScreen from './ProductsRevenueScreen';
 
-const HomeScreen = () => {
+
+const HomeScreen = ({ navigation }) => {
   const [selectedFilter, setSelectedFilter] = useState('Product');
   const [selectedTimeFilter, setSelectedTimeFilter] = useState('Daily');
   const [totalSum, setTotalSum] = useState(0);
@@ -314,6 +329,9 @@ const HomeScreen = () => {
     }));
   };
 
+
+
+  
   return (
     <View style={styles.container}>
 
@@ -322,199 +340,228 @@ const HomeScreen = () => {
       </View>
 
       <ScrollView >
-
         <View style={styles.statsContainer}>
-          <View style={styles.cardWrapper}>
-            <Card containerStyle={[styles.card, styles.card1]}>
-              <Text>Menus totaux</Text>
-              <Text style={styles.statNumber}>{totalProducts}</Text>
-            </Card>
-            <Card containerStyle={[styles.card, styles.card2]}>
-              <Text>Commandes totales</Text>
-              <Text style={styles.statNumber}>{totalCount}</Text>
-            </Card>
-            <Card containerStyle={[styles.card, styles.card3]}>
-              <Text>Clients totaux</Text>
-              <Text style={styles.statNumber}>{totalClients}</Text>
-            </Card>
-            <Card containerStyle={[styles.card, styles.card4]}>
-              <Text>Revenu total</Text>
-              <Text style={styles.statNumber}>{totalSum} €</Text>
-            </Card>
-          </View>
-          <View style={styles.cardWrapper}>
-            <Card containerStyle={[styles.card, styles.card5]}>
-              <Text>Comms . En attentes </Text>
-              <Text style={styles.statNumber}>{commendesStats.find(item => item.pending)?.pending.count || 0}</Text>
-            </Card>
-            <Card containerStyle={[styles.card, styles.card6]}>
-              <Text>Comms . En cours</Text>
-              <Text style={styles.statNumber}>{commendesStats.find(item => item.in_progress)?.in_progress.count || 0}</Text>
-            </Card>
-            <Card containerStyle={[styles.card, styles.card7]}>
-              <Text>Comms . Livrés</Text>
-              <Text style={styles.statNumber}>{commendesStats.find(item => item.delivered)?.delivered.count || 0}</Text>
-            </Card>
-            <Card containerStyle={[styles.card, styles.card8]}>
-              <Text>Comms . Annulés  </Text>
-              <Text style={styles.statNumber}> {commendesStats.find(item => item.cancelled)?.cancelled.count || 0}
-              </Text>
-            </Card>
-            <Card containerStyle={[styles.card, styles.card8]}>
-              <Text>Comms . du Test  </Text>
-              <Text style={styles.statNumber}>{commendesStats.find(item => item.test)?.test.count || 0}</Text>
-            </Card>
-          </View>
-        </View>
 
-        <View style={styles.filterContainer}>
-          <TouchableOpacity
-            style={[styles.filterButton, selectedFilter === 'Product' && styles.activeFilter]}
-            onPress={() => handleFilterChange('Product')}
-          >
-            <Text style={styles.filterText}>Revenu Géneral</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterButton, selectedFilter === 'Driver' && styles.activeFilter]}
-            onPress={() => handleFilterChange('Driver')}
-          >
-            <Text style={styles.filterText}>Revenu des livreurs</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterButton, selectedFilter === 'ProductRevenue' && styles.activeFilter]}
-            onPress={() => handleFilterChange('ProductRevenue')}
-          >
-            <Text style={styles.filterText}>Revenu des produitss</Text>
-          </TouchableOpacity>
-        </View>
-        {showDriverRevenue && (
-
-          <View>
-
-            <Text style={styles.sectionHeader}>choisir un livreur :</Text>
-
+          <View style={styles.filterContainer}>
             <TouchableOpacity
-
-              style={styles.driverSelectButton}
-
-              onPress={() => setDriverModalVisible(true)}
-
+              style={[styles.filterButton, selectedFilter === 'Product' && styles.activeFilter]}
+              onPress={() => handleFilterChange('Product')}
             >
-
-              <Text style={styles.driverSelectText}>
-
-                {selectedDriver
-
-                  ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName
-
-                  : 'Sélectionner un chauffeur'}
-
-              </Text>
-
-              <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
-
+              <Text style={styles.filterText}>Revenu Géneral</Text>
             </TouchableOpacity>
-
-          </View>
-
-        )}
-
-
-
-        {showProductRevenue && (
-
-          <View>
-
-            <Text style={styles.sectionHeader}>choisir un Product :</Text>
-
             <TouchableOpacity
-
-              style={styles.driverSelectButton}
-
-              onPress={() => setProductModalVisible(true)}
-
+              style={[styles.filterButton, selectedFilter === 'Driver' && styles.activeFilter]}
+              onPress={() => handleFilterChange('Driver')}
             >
-
-              <Text style={styles.driverSelectText}>
-
-                {selectedProduct
-
-                  ? products.find(product => product._id === selectedProduct)?.name
-
-                  : 'Sélectionner un produit'}
-
-              </Text>
-
-              <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
-
+              <Text style={styles.filterText}>Revenu des livreurs</Text>
             </TouchableOpacity>
-
+            <TouchableOpacity
+              style={[styles.filterButton, selectedFilter === 'ProductRevenue' && styles.activeFilter]}
+              onPress={() => handleFilterChange('ProductRevenue')}
+            >
+              <Text style={styles.filterText}>Revenu des produitss</Text>
+            </TouchableOpacity>
           </View>
+          {showDriverRevenue && (
 
-        )}
+            <View>
 
+              <Text style={styles.sectionHeader}>choisir un livreur :</Text>
 
-
-
-        <View style={styles.chartContainer}>
-          <View style={styles.chartHeader}>
-            <View style={styles.filterContainerTime}>
               <TouchableOpacity
-                style={[styles.filterButtonTime, selectedTimeFilter === 'Daily' && styles.activeFilterTime]}
-                onPress={() => handleTimeFilterChange('Daily')}
+
+                style={styles.driverSelectButton}
+
+                onPress={() => setDriverModalVisible(true)}
+
               >
-                <Text style={styles.filterTextTime}>Jour</Text>
+
+                <Text style={styles.driverSelectText}>
+
+                  {selectedDriver
+
+                    ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName
+
+                    : 'Sélectionner un chauffeur'}
+
+                </Text>
+
+                <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
+
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.filterButtonTime, selectedTimeFilter === 'Weekly' && styles.activeFilterTime]}
-                onPress={() => handleTimeFilterChange('Weekly')}
-              >
-                <Text style={styles.filterTextTime}>Hebdo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.filterButtonTime, selectedTimeFilter === 'Monthly' && styles.activeFilterTime]}
-                onPress={() => handleTimeFilterChange('Monthly')}
-              >
-                <Text style={styles.filterTextTime}>Mens</Text>
-              </TouchableOpacity>
+
             </View>
+
+          )}
+
+
+
+          {showProductRevenue && (
+
+            <View>
+
+              <Text style={styles.sectionHeader}>choisir un Product :</Text>
+
+              <TouchableOpacity
+
+                style={styles.driverSelectButton}
+
+                onPress={() => setProductModalVisible(true)}
+
+              >
+
+                <Text style={styles.driverSelectText}>
+
+                  {selectedProduct
+
+                    ? products.find(product => product._id === selectedProduct)?.name
+
+                    : 'Sélectionner un produit'}
+
+                </Text>
+
+                <Ionicons name="chevron-down" size={20} color="#8A2BE2" />
+
+              </TouchableOpacity>
+
+            </View>
+
+          )}
+
+
+
+
+          <View style={styles.chartContainer}>
+            <View style={styles.chartHeader}>
+              <View style={styles.filterContainerTime}>
+                <TouchableOpacity
+                  style={[styles.filterButtonTime, selectedTimeFilter === 'Daily' && styles.activeFilterTime]}
+                  onPress={() => handleTimeFilterChange('Daily')}
+                >
+                  <Text style={styles.filterTextTime}>Jour</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.filterButtonTime, selectedTimeFilter === 'Weekly' && styles.activeFilterTime]}
+                  onPress={() => handleTimeFilterChange('Weekly')}
+                >
+                  <Text style={styles.filterTextTime}>Hebdo</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.filterButtonTime, selectedTimeFilter === 'Monthly' && styles.activeFilterTime]}
+                  onPress={() => handleTimeFilterChange('Monthly')}
+                >
+                  <Text style={styles.filterTextTime}>Mens</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <LineChart
+              data={getChartData()}
+              width={Dimensions.get('window').width - 20}
+              height={300}
+              chartConfig={{
+                backgroundColor: '#ffffff',
+                backgroundGradientFrom: '#FFF5E4',
+                backgroundGradientTo: '#FFF5E4',
+                decimalPlaces: 0, // optional, defaults to 2dp
+                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+
+                },
+                propsForLabels: {
+                  fontSize: 9.5,
+                  rotation: 60, // Rotate the labels by 90 degrees
+                  anchor: 'middle', // Adjust anchor point to align better
+                },
+                propsForDots: {
+                  r: '2',
+                  strokeWidth: '5',
+                  stroke: 'black',
+                },
+
+              }}
+              bezier
+              style={{
+                marginVertical: 8,
+                borderRadius: 16,
+
+              }}
+            />
+
           </View>
-          <LineChart
-            data={getChartData()}
-            width={Dimensions.get('window').width - 20}
-            height={300}
-            chartConfig={{
-              backgroundColor: '#ffffff',
-              backgroundGradientFrom: '#FFF5E4',
-              backgroundGradientTo: '#FFF5E4',
-              decimalPlaces: 0, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, 
-              style: {
-                borderRadius: 16,    
 
-              },
-              propsForLabels: {
-                fontSize: 9.5,
-                rotation: 60, // Rotate the labels by 90 degrees
-                anchor: 'middle', // Adjust anchor point to align better
-              },
-              propsForDots: {
-                r: '2',
-                strokeWidth: '5',
-                stroke: 'black',
-              },
-              
-            }}
-            bezier
-            style={{
-              marginVertical: 8,
-              borderRadius: 16,
+          <View style={styles.cardWrapper}>
 
-            }}
-          />
+            <Card containerStyle={[styles.card, styles.card1]}   >
+              <TouchableOpacity onPress={() => navigation.navigate('ProductScreen')}>
+                <Text>Menus totaux</Text>
+                <Text style={styles.statNumber}>{totalProducts}</Text>
+              </TouchableOpacity >
+            </Card>
 
+            <Card containerStyle={[styles.card, styles.card2]}>
+              <TouchableOpacity onPress={() => navigation.navigate('Orders')}>
+                <Text>Commandes totales</Text>
+                <Text style={styles.statNumber}>{totalCount}</Text>
+              </TouchableOpacity >
+            </Card>
+
+            <Card containerStyle={[styles.card, styles.card3]}>
+              <TouchableOpacity onPress={() => navigation.navigate('ClientScreen')}>
+                <Text>Clients totaux</Text>
+                <Text style={styles.statNumber}>{totalClients}</Text>
+              </TouchableOpacity >
+            </Card>
+
+            <Card containerStyle={[styles.card, styles.card4]}>
+              <TouchableOpacity  onPress={() => navigation.navigate('RevenuScren')}>
+                <Text>Revenu total</Text>
+                <Text style={styles.statNumber}>{totalSum} €</Text>
+              </TouchableOpacity >
+            </Card>
+          </View>
+          <View style={styles.cardWrapper}>
+
+            <Card containerStyle={[styles.card, styles.card5]}>
+              <TouchableOpacity onPress={() => navigation.navigate('OngoingOrders')}>
+                <Text>Comms . En attentes </Text>
+                <Text style={styles.statNumber}>{commendesStats.find(item => item.pending)?.pending.count || 0}</Text>
+              </TouchableOpacity >
+            </Card>
+
+            <Card containerStyle={[styles.card, styles.card6]}>
+              <TouchableOpacity onPress={() => navigation.navigate('InProgressOrders')}  >
+                <Text>Comms . En cours</Text>
+                <Text style={styles.statNumber}>{commendesStats.find(item => item.in_progress)?.in_progress.count || 0}</Text>
+              </TouchableOpacity >
+            </Card>
+
+            <Card containerStyle={[styles.card, styles.card7]}>
+              <TouchableOpacity onPress={() => navigation.navigate('DeliveredOrders')}>
+                <Text>Comms . Livrés</Text>
+                <Text style={styles.statNumber}>{commendesStats.find(item => item.delivered)?.delivered.count || 0}</Text>
+              </TouchableOpacity >
+            </Card>
+
+            <Card containerStyle={[styles.card, styles.card8]}>
+              <TouchableOpacity onPress={() => navigation.navigate('UndeliveredOrders')}>
+                <Text>Comms . Annulés  </Text>
+                <Text style={styles.statNumber}> {commendesStats.find(item => item.cancelled)?.cancelled.count || 0}
+                </Text>
+              </TouchableOpacity >
+            </Card>
+
+            <Card containerStyle={[styles.card, styles.card8]}>
+              <TouchableOpacity onPress={() => navigation.navigate('TestOrders')}>
+                <Text>Comms . du Test  </Text>
+                <Text style={styles.statNumber}>{commendesStats.find(item => item.test)?.test.count || 0}</Text>
+              </TouchableOpacity >
+            </Card>
+
+          </View>
         </View>
+
         {renderDriverDropdown()}
         {renderProductDropDown()}
       </ScrollView>
@@ -522,6 +569,88 @@ const HomeScreen = () => {
 
   );
 };
+
+
+const Stack = createStackNavigator();
+
+const Dashnav = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Dashoard">
+        <Stack.Screen
+          name="Dashboard"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ProductScreen"
+          component={ProdScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="OngoingOrders"
+          component={OngoingOrdersScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="DeliveredOrders"
+          component={DeliveredOrdersScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="UndeliveredOrders"
+          component={CanceledOrderScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="InProgressOrders"
+          component={InProgreesgOrdersScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="TestOrders"
+          component={TestOrdersScreen} // New screen for Commandes de test
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SpamOrders"
+          component={SpamOrdersScreen}
+          options={{ headerShown: false }
+          } />
+           <Stack.Screen
+          name="ClientScreen"
+          component={ClientScreen}
+          options={{ headerShown: false }
+          } />
+
+          <Stack.Screen
+          name="RevenuScren"
+          component={RevenueScreen}
+          options={{ headerShown: false }
+          } />
+
+<Stack.Screen 
+          name="DriverRevenue" 
+          component={DriversRevenueScreen} // Use the component reference directly
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="ProductRevenue" 
+          component={ProductsRevenueScreen} // Use the component reference directly
+          options={{ headerShown: false }} 
+        />
+
+<Stack.Screen 
+          name="Orders" 
+          component={OrdersScreen} // Use the component reference directly
+          options={{ headerShown: false }} 
+        />
+
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -599,8 +728,8 @@ const styles = StyleSheet.create({
   filterContainerTime: {
     flexDirection: 'row',
     justifyContent: 'center',
-    borderWidth : 1.9,
-    borderColor : "#F4F6FF" , 
+    borderWidth: 1.9,
+    borderColor: "#F4F6FF",
     borderRadius: 10
   },
   filterButton: {
@@ -699,4 +828,4 @@ const styles = StyleSheet.create({
   },
 
 });
-export default HomeScreen;
+export default Dashnav;

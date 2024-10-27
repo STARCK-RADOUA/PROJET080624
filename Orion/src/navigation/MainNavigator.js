@@ -20,6 +20,7 @@ import SideMenu from '../components/SideMenu';
 import DriverChatScreenComponent from '../screens/DriverChatScreen';
 import RevenueScreen from '../screens/RevenueScreen';
 import QrScreen from '../screens/QrScreen';
+import HomeScreenApp from '../screens/HomeScreenApp';
 
 const MainNavigator = ({ onLogin }) => {
   const [currentTab, setCurrentTab] = useState("Accueil");
@@ -78,7 +79,7 @@ const MainNavigator = ({ onLogin }) => {
   const renderScreen = () => {
     switch (currentTab) {
       case 'Accueil':
-        return <HomeScreen />;
+        return <HomeScreenApp />;
       case 'Recherche':
         return <SearchScreen />;
       case 'Notifications':
@@ -110,7 +111,7 @@ const MainNavigator = ({ onLogin }) => {
       case "Chiffre d'affaire": // Using double quotes
         return < RevenueScreen/>;
       default:
-        return <HomeScreen />;
+        return <HomeScreenApp />;
     }
   };
 
