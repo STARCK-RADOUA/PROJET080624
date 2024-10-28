@@ -1,79 +1,90 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import axios from 'axios';
 import * as Device from 'expo-device';
+import * as Location from 'expo-location';
 import io from 'socket.io-client';
-import { BASE_URL ,BASE_URLIO} from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 import { navigate } from '../utils/navigationRef';
+
 const LoginScreen = ({ navigation }) => {
-  const deviceId =Device.osBuildId;
+  const deviceId = Device.osBuildId;
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [location, setLocation] = useState(null);
 
   const socket = io(BASE_URLIO, {
     query: {
-      deviceId:deviceId ,  // Pass the unique clientId
-    }
+      deviceId: deviceId,
+    },
   });
- 
 
   useEffect(() => {
-    autoLogin();
+    // Demande de permission et récupération de la localisation
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission refusée', 'La localisation est nécessaire pour cette fonctionnalité.');
+        return;
+      }
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+    })();
+  }, []);
 
-    
-
-
-
-    // Connect to Socket.IO
-  
-
-    // Listen for admin deactivation event
-    socket.on('adminActivateDriver', () => {
-      console.log('Admin actiiive driver');
-      // Navigate to Login screen when driver is deactivated:
+  useEffect(() => {
+    // Auto-login dès que la localisation est disponible
+    if (deviceId && location) {
       autoLogin();
-        });
-return () => {
-  socket.off('adminActivateDriver');
-};
-    
-
-}, []);
-  const autoLogin = async () => {
-    const deviceId = Device.osBuildId;
-
-    if (deviceId) {
-      socket.emit('autoLoginDriver', { deviceId });
-      socket.on('loginSuccess', () => {
-        navigate('Home');
-       return socket.off('loginSuccess');
-
-      });
     }
+  }, [location]);
+
+  useEffect(() => {
+    socket.on('adminActivateDriver', () => {
+      autoLogin();
+    });
+
+    return () => {
+      socket.off('adminActivateDriver');
+    };
+  }, [location]);
+
+  const autoLogin = () => {
+    socket.emit('autoLoginDriver', { deviceId, location: `${location.coords.latitude} ${location.coords.longitude}` });
+    socket.on('loginSuccess', () => {
+      navigate('Home');
+      socket.off('loginSuccess');
+    });
   };
 
   const handleLogin = async () => {
+    if (!location) {
+      Alert.alert('Erreur', 'Localisation en attente. Veuillez réessayer.');
+      return;
+    }
+
     try {
       const response = await axios.post(`${BASE_URL}/api/users/login`, {
         deviceId,
         phone,
         password,
+        location: `${location.coords.latitude} ${location.coords.longitude}`
       });
+
       if (response.status === 401) {
-        Alert.alert('');
-        
-        // Start tracking after successful login
-        
+        Alert.alert('Connexion', 'Veuillez activer votre compte.');
+      } else if (response.status === 200) {
+        Alert.alert('Bienvenue');
         navigate('Home');
+
+
+      }else if (response.status === 404) {
+        Alert.alert('Activation requise', 'Une activation supplémentaire est requise.');
+
+
       }
-      if (response.status === 200) {
-        Alert.alert('activation', ' Une nouvelle activation est nécessaire pour continuer.!');
-        
-        // Start tracking after successful login
-        
-return;      }
     } catch (error) {
-      Alert.alert('Login Failed', error.response?.data?.message || 'An error occurred');
+      Alert.alert('Échec de la connexion', error.response?.data?.message || 'Une erreur est survenue.');
     }
   };
 
@@ -116,7 +127,7 @@ return;      }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1B3B1F', 
+    backgroundColor: '#1B3B1F',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,

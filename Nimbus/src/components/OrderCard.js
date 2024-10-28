@@ -12,14 +12,13 @@ const OrderCard = ({ item, openGoogleMaps, openWaze, handleCardPress }) => {
           style={styles.orderIcon}
         />
         <View style={styles.cardContent}>
-          <Text style={styles.orderNumber}>Order #{item.order_number || 'N/A'}</Text>
-          <Text style={styles.address_line}>{item.address_line || 'No Address Provided'}</Text>
+          <Text style={styles.orderNumber}>Commande #{item.order_number || 'N/A'}</Text>
+          <Text style={styles.addressLine}>{item.address_line || 'Aucune adresse fournie'}</Text>
           <View style={styles.fieldRow}>
             <TouchableOpacity style={styles.navigateButtonGoogle} onPress={() => openGoogleMaps(item.location)}>
               <Ionicons name="navigate-outline" size={24} color="white" />
               <Text style={styles.navigateText}>Google Maps</Text>
             </TouchableOpacity>
-
             <TouchableOpacity style={styles.navigateButtonWaze} onPress={() => openWaze(item.location)}>
               <Ionicons name="navigate-outline" size={24} color="white" />
               <Text style={styles.navigateText}>Waze</Text>
@@ -27,7 +26,7 @@ const OrderCard = ({ item, openGoogleMaps, openWaze, handleCardPress }) => {
           </View>
           <View style={styles.rightContainer}>
             <Text style={styles.date}>
-              {moment(item.delivery_time).format('YYYY-MM-DD HH:mm') || 'No Delivery Time'}
+              {moment(item.delivery_time).format('YYYY-MM-DD HH:mm') || 'Aucune heure de livraison'}
             </Text>
           </View>
         </View>
@@ -40,18 +39,18 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 20,
+    backgroundColor: '#ffffff',
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowRadius: 4,
+    elevation: 3,
   },
   orderIcon: {
-    width: '15%',
+    width: 50,
     height: 50,
     resizeMode: 'contain',
     marginRight: 15,
@@ -63,41 +62,43 @@ const styles = StyleSheet.create({
   orderNumber: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#2e7d32', // Vert sombre pour une bonne lisibilité
     marginBottom: 5,
   },
-  address_line: {
+  addressLine: {
     fontSize: 16,
-    color: '#666',
+    color: '#4b4b4b', // Gris foncé
   },
   fieldRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 10,
     flexWrap: 'wrap',
   },
   navigateButtonGoogle: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#eeb90b',
+    backgroundColor: '#388e3c', // Vert foncé harmonieux
     padding: 10,
     borderRadius: 8,
     flex: 1,
     justifyContent: 'center',
+    marginHorizontal: 5,
   },
   navigateButtonWaze: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1ca5a5',
+    backgroundColor: '#2e7d32', // Vert légèrement plus sombre pour contraste
     padding: 10,
     borderRadius: 8,
     flex: 1,
     justifyContent: 'center',
+    marginHorizontal: 5,
   },
   navigateText: {
     color: '#fff',
-    marginLeft: 10,
+    marginLeft: 8,
     fontWeight: 'bold',
   },
   rightContainer: {
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 14,
-    color: '#999',
+    color: '#6d6d6d', // Gris modéré
   },
 });
 

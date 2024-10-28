@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Switch, Alert, Linking, TextInput, ScrollView } from 'react-native';
+import { Modal, View, Text,Dimensions, TouchableOpacity, StyleSheet, Switch, Alert, Linking, TextInput,FlatList, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL } from '@env';
 import io from 'socket.io-client';
+import moment from 'moment';
+const { width , height} = Dimensions.get('window');
 
 const socket = io(BASE_URL);
 
@@ -16,6 +18,22 @@ const DriverModal = ({ visible, onClose, driver }) => {
   const [isDisponible, setDisponible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  const [historyVisible, setHistoryVisible] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
+
+  const fetchHistory = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/history/${driver._id}`);
+      setHistoryData(response.data);
+    } catch (error) {
+      console.error('Erreur lors de la récupération de l’historique:', error);
+    }
+  };
+  const openInWaze = (location) => {
+    const [latitude, longitude] = location.split(' ');
+    const wazeUrl = `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`;
+    Linking.openURL(wazeUrl);
+  };
   const handleDeleteDriver = () => {
     Alert.alert(
       'Confirmation',
@@ -166,6 +184,33 @@ const DriverModal = ({ visible, onClose, driver }) => {
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Ionicons name="close-circle" size={30} color="black" />
           </TouchableOpacity>
+          <TouchableOpacity style={styles.historyButton} onPress={() => { setHistoryVisible(!historyVisible); fetchHistory(); }}>
+            <Ionicons name="time-outline" size={24} color="#5A67D8" />
+            <Text style={styles.historyText}>Historique des connexions</Text>
+            
+          </TouchableOpacity> 
+          <TouchableOpacity style={styles.historyButton} onPress={() => { setHistoryVisible(!historyVisible); fetchHistory(); }}>
+          <Text style={styles.historyText}>{editableDriver.firstName} {editableDriver.lastName}</Text>
+            
+          </TouchableOpacity>
+          
+            {historyVisible && (
+            <FlatList
+            
+              data={historyData}
+              keyExtractor={(item) => item._id}
+              renderItem={({ item }) => (
+                <View style={styles.historyItem}>
+                  <Text style={styles.historyDescription}>{item.description}</Text>
+                  <Text style={styles.historyDate}>{moment(item.dateAction).format('YYYY-MM-DD HH:mm')}</Text>
+                  <TouchableOpacity style={styles.wazeButton} onPress={() => openInWaze(item.location)}>
+                    <Ionicons name="navigate-outline" size={20} color="white" />
+                    <Text style={styles.wazeButtonText}>Ouvrir dans Waze</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+          )}
           <ScrollView>
             {isEditing ? (
               <>
@@ -197,7 +242,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
               </>
             ) : (
               <>
-                <Text style={styles.name}>{editableDriver.firstName} {editableDriver.lastName}</Text>
                 <Text style={styles.label}>ID de l'appareil :</Text>
                 <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">
                   {editableDriver.deviceId}
@@ -243,7 +287,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
             </View>
 
             <View style={styles.separator} />
-
+           
             <View style={styles.fieldRow}>
               <TouchableOpacity style={styles.navigateButton} onPress={openGoogleMaps}>
                 <Ionicons name="navigate-outline" size={24} color="white" />
@@ -255,8 +299,9 @@ const DriverModal = ({ visible, onClose, driver }) => {
                 <Text style={styles.navigateText}>Waze</Text>
               </TouchableOpacity>
             </View>
-
+           
             <View style={styles.fieldRow}>
+            
               <Text style={styles.label}>Activé :</Text>
               <Switch
                 value={editableDriver.activated}
@@ -275,11 +320,15 @@ const DriverModal = ({ visible, onClose, driver }) => {
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
               />
             </View>
-
-            {isEditing ? (
+       
+            {isEditing ? (<>
               <TouchableOpacity style={styles.saveButton} onPress={handleUpdateDriver}>
                 <Text style={styles.saveText}>Sauvegarder</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.deleteButton} onPress={() => setIsEditing(false)}>
+                <Text style={styles.saveText}>Anuller</Text>
+              </TouchableOpacity>
+              </>
             ) : (
               <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
                 <Ionicons name="create-outline" size={24} color="white" />
@@ -303,15 +352,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 100,
-    marginHorizontal: 0,
   },
   modalView: {
     width: '90%',
-    backgroundColor: '#FEF9F2',
+    backgroundColor: '#ffffff',
     borderRadius: 20,
     padding: 20,
     elevation: 5,
+    maxHeight: height,
+
   },
   closeButton: {
     alignSelf: 'flex-end',
@@ -383,6 +432,53 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     color: 'white',
+    fontWeight: 'bold',
+  },
+  historyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  historyText: {
+    color: '#5A67D8',
+    marginLeft: 8,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+    historyItem: {
+      padding: 15,
+      marginVertical: 8,
+      backgroundColor: '#2330a534',
+      borderRadius: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.8,
+      shadowRadius: 5,
+      elevation: 2,
+  },
+  historyDescription: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  historyDate: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 10,
+  },
+  wazeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#34A853',
+    padding: 8,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+  },
+  wazeButtonText: {
+    color: '#fff',
+    marginLeft: 5,
     fontWeight: 'bold',
   },
 });

@@ -206,7 +206,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
 
 const styles = StyleSheet.create({
   bottomSheetContainer: {
-    height: SCREEN_HEIGHT * 0.7, // Set the max height to 70% of the screen
+    height: SCREEN_HEIGHT * 0.75, // Set the max height to 70% of the screen
     width: '90%',
     backgroundColor: '#f7f5f3ef',
     position: 'absolute',

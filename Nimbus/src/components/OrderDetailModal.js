@@ -159,7 +159,9 @@ const deviceId = Device.osBuildId;
     }
   };
   
-
+console.log('------------------------------------');
+console.log(order);
+console.log('------------------------------------');
 
 
 
@@ -212,7 +214,8 @@ const deviceId = Device.osBuildId;
                   <View style={styles.productDetails}>
                     <Text style={styles.productName}>{item.product?.name || 'Indisponible'}</Text>
                     <Text style={styles.productQuantity}>Quantité : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit"}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €" + item.price.toFixed(2)}</Text>
+
 
                     {expanded === index && (
                       <View>
@@ -492,7 +495,7 @@ const styles = StyleSheet.create({
   totalContainer: {
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#5a4f4fae',
+    backgroundColor: '#5a4f4fc3',
     borderRadius: 10,
     alignItems: 'center',
   }, 
@@ -503,11 +506,7 @@ const styles = StyleSheet.create({
 
     justifyContent: 'space-between',
     borderRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.9,
-    shadowRadius: 5,
-    elevation: 5,
+  
     flexDirection: 'row',
   },
   totalText: {

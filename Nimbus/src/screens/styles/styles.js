@@ -1,27 +1,23 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width , height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: 10,
         paddingTop: 20,
-        backgroundColor: '#cecbcb',
-        
+        backgroundColor: '#d8d8d8',
+        height: height*0.97,
+
       },
       container2: {
-        paddingTop: 10,
-        padding: 10,
-        marginTop: 10,
-        height: '70%',
-        backgroundColor: '#ffffffda',
+       
+        height: height*0.75,
+        backgroundColor: '#8a8a170',
         borderRadius: 30,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.9,
-        shadowRadius: 5,
-        elevation: 5,
+        marginTop:10,
+marginBottom:10,    
       },
       headerv: {
         alignItems: 'center',
@@ -32,27 +28,35 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 5,
         flexDirection: 'row',
+
+
+        
       },  
       footer: {
         alignItems: 'center',
         backgroundColor: '#f5a5a557',
-        marginTop: 20,
 
         justifyContent: 'space-between',
-        backgroundColor: '#ffffff',
-        borderRadius: 30,
-        shadowColor: '#000',
+        paddingVertical: 3,
+
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.9,
+        shadowRadius: 5,
+        flexDirection: 'row',
+        shadowColor: '#0a2e0b',
+        shadowOpacity: 2,
         shadowRadius: 5,
         elevation: 5,
-        flexDirection: 'row',
+        backgroundColor: '#223d02',
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+        borderBottomLeftRadius:55,
+        borderBottomRightRadius:55,
       },
       navigateButtonGoogle: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#ee8c0b',
-        padding: 10,
+        padding: 8,
         borderRadius: 28,
         marginVertical: 5,
         flex: 1,
@@ -62,7 +66,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#1ca5a5',
-        padding: 10,
+        padding: 8,
         borderRadius: 28,
         marginVertical: 5,
         flex: 1,
@@ -72,14 +76,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#0b5017',
-        padding: 10,
+        padding: 8,
         borderRadius: 80,
         justifyContent: 'center',
       },      navigateButtonSupportChat: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f82929',
-        padding: 30,
+        backgroundColor: '#ee1a1a7d',
+        padding: 15,
         borderRadius: 80,
         justifyContent: 'center',
         shadowColor: '#000',
@@ -93,7 +97,7 @@ const styles = StyleSheet.create({
       },      navigateButtonStop: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1ca2d6',
+        backgroundColor: '#1ca1d676',
         borderRadius: 30,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -101,12 +105,16 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 5,
         marginRight: 20,
-        padding: 30,
+        padding: 15,
         borderRadius: 80,
         justifyContent: 'center',
       },
       navigateText: {
         color: '#fff',
+        marginLeft: 10,
+        fontWeight: 'bold',
+      },   distance: {
+        color: '#3b6603',
         marginLeft: 10,
         fontWeight: 'bold',
       },
@@ -145,20 +153,18 @@ const styles = StyleSheet.create({
         justifyContent: 'start',
       },
       headerh: {
-        marginTop: 28,
-        shadowColor: '#1b6691',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 2,
-        shadowRadius: 5,
-        elevation: 5,
-        backgroundColor: '#034164',
+        marginTop: height*0.014,
+                shadowColor: '#4A7A4C',
+
+        elevation:30,
+        backgroundColor: '#223d02',
         paddingVertical: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        borderBottomLeftRadius: 95,
-        borderTopLeftRadius: 95,
-        borderBottomRightRadius: 95,
-        borderTopRightRadius: 95,
+        borderTopLeftRadius: 55,
+        borderTopRightRadius: 55,
+        borderBottomLeftRadius:5,
+        borderBottomRightRadius:5,
       },
       headerText: {
         color: '#FFFFFF',
@@ -172,27 +178,19 @@ const styles = StyleSheet.create({
       card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f3eee7',
-        padding: 10,
-        borderRadius: 30,
-        marginBottom: 20,
+        backgroundColor: '#ffffff',
+        padding: 15,
+        borderRadius: 12,
+        marginBottom: 15,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.9,
-        shadowRadius: 5,
-        marginHorizontal: 10,
-
-        elevation: 9,
-      }, cardContent: {
-    
-  backgroundColor: '#b88641',
-        margingHorizontal: 20,
-
-        elevation: 9,
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
       },
       orderIcon: {
-        width: '15%',
-        height: width * 0.15,
+        width: 50,
+        height: 50,
         resizeMode: 'contain',
         marginRight: 15,
       },
@@ -203,32 +201,65 @@ const styles = StyleSheet.create({
       orderNumber: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#021214', // Vert sombre pour une bonne lisibilité
         marginBottom: 5,
       },
-      location: {
+      addressLine: {
         fontSize: 16,
-        color: '#666',
-        marginBottom: 5,
+        color: '#4b4b4b', // Gris foncé
+      },
+      fieldRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginVertical: 10,
+        flexWrap: 'wrap',
+      },
+      navigateButtonGoogle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f0ae33', // Vert foncé harmonieux
+        padding: 10,
+        borderRadius: 8,
+        flex: 1,
+        justifyContent: 'center',
+        marginHorizontal: 5,
+      },
+      navigateButtonWaze: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#2e7a7d', // Vert légèrement plus sombre pour contraste
+        padding: 10,
+        borderRadius: 8,
+        flex: 1,
+        justifyContent: 'center',
+        marginHorizontal: 5,
+      },
+      navigateText: {
+        color: '#fff',
+        marginLeft: 8,
+        fontWeight: 'bold',
       },
       rightContainer: {
         alignItems: 'flex-end',
       },
       date: {
         fontSize: 14,
-        color: '#999',
+        color: '#6d6d6d', // Gris modéré
       },
+
       disabledView: {
         backgroundColor: '#ffffff',
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 40,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.9,
         shadowRadius: 5,
         elevation: 5,
+        borderBottomLeftRadius:40,
+        borderBottomRightRadius:40,
       },
       disabledText: {
         color: '#A5A5A5',
@@ -266,7 +297,7 @@ const styles = StyleSheet.create({
         borderRadius: 4,
       },
       navigateButtonChat: {
-        backgroundColor: '#08C2FF',
+        backgroundColor: '#77ddff',
 borderRadius : 30 ,
 padding : 10 ,
     flexDirection: 'row',
@@ -277,7 +308,7 @@ padding : 10 ,
     width: 10,  // size of the red dot
     height: 10,
     borderRadius: 5,
-    backgroundColor: 'red',
+    backgroundColor: '#f79b9b',
   },
   navigateText: {
     color: 'white',

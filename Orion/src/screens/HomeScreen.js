@@ -552,7 +552,7 @@ const HomeScreen = ({ navigation }) => {
               </TouchableOpacity >
             </Card>
 
-            <Card containerStyle={[styles.card, styles.card8]}>
+            <Card containerStyle={[styles.card, styles.card9]}>
               <TouchableOpacity onPress={() => navigation.navigate('TestOrders')}>
                 <Text>Comms . du Test  </Text>
                 <Text style={styles.statNumber}>{commendesStats.find(item => item.test)?.test.count || 0}</Text>
@@ -692,28 +692,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#B4D6CD',
   },
   card2: {
-    backgroundColor: '#FFDA76',
+    backgroundColor: '#76ffd6',
   },
   card3: {
     backgroundColor: '#FF8C9E',
   },
   card4: {
-    backgroundColor: '#E0E5B6',
+    backgroundColor: '#e0e5b675',
   },
   card5: {
-    backgroundColor: '#D1E9F6',
+    backgroundColor: '#f3e350',
   },
   card6: {
-    backgroundColor: '#F6EACB',
+    backgroundColor: '#1f93f1',
   },
   card7: {
-    backgroundColor: '#F1D3CE',
+    backgroundColor: '#5fec77',
   },
   card8: {
-    backgroundColor: '#F1DEC6',
+    backgroundColor: '#f16565',
   },
   card9: {
-    backgroundColor: '#EECAD5',
+    backgroundColor: '#b671aa',
   },
   statNumber: {
     fontSize: 22,

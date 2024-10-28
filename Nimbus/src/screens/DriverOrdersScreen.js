@@ -314,8 +314,14 @@ useEffect(() => {
           <TouchableOpacity style={styles.qr} onPress={() => navigate('QrcodeGeneratorDriverScreen')}>
             <Icon name="qrcode-scan" size={45} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerText}>     Driver Availability     </Text>
-          <Switch
+          {isEnabled ? (
+            <>
+          <Text style={styles.headerText}>     Livraison : On Fire 🔥     </Text>
+          </>
+           ) : (
+          <Text style={styles.headerText}>     Hors Service 😴     </Text>
+           )}
+            <Switch
             trackColor={{ false: '#7a2424', true: '#1c7745' }}
             thumbColor={isEnabled ? '#36d815' : '#ca6411'}
             onValueChange={toggleSwitch}
@@ -347,21 +353,18 @@ useEffect(() => {
                         style={styles.orderIcon}
                       />
                       <View style={styles.cardContent}>
-                        <Text style={styles.orderNumber}>
-                          Commande de{'\n'}
+                        <Text style={styles.orderNumber}>Client #
                           <Text style={{ color: item.client_name ? '#28a745' : '#dc3545', fontWeight: 'bold' }}>
                             {item.client_name ?? 'N/A'}
                           </Text>
                         </Text>
-                        <Text style={styles.address_line}>
-                          Adresse:
-                          <Text style={{ color: item.address_line ? '#20c997' : '#dc3545', fontWeight: 'bold' }}>
+                        <Text style={styles.distance}>Adresse:  {"\n"}
+                          <Text style={{ color: item.address_line ? '#1ca5a5' : '#dc3545', fontWeight: 'bold' }}>
                             {item.address_line ?? 'Aucune adresse fournie'}
                           </Text>
                         </Text>
-                        <Text style={styles.distance}>
-                          Distance:
-                          <Text style={{ color: item.distance ? '#28a745' : '#dc3545', fontWeight: 'bold' }}>
+                        <Text style={styles.distance}>Distance:
+                          <Text style={{ color: item.distance ? '#1ca5a5' : '#dc3545', fontWeight: 'bold' }}>
                             {item.distance ? `${item.distance} km` : 'Calcul en cours...'}
                           </Text>
                         </Text>
