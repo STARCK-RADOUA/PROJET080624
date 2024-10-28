@@ -50,7 +50,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
       'Êtes-vous sûr de vouloir confirmer la livraison de cette commande ?',
       [
         { text: 'Annuler', onPress: () => console.log('livraison annulée'), style: 'cancel' },
-        { text: 'Livrer', onPress: () => setShowLivredModal(true), style: 'destructive' },
+        { text: 'Livrer', onPress: () => setShowLivredModal(true), style: 'default' },
       ],
       { cancelable: true }
     );
@@ -67,9 +67,29 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
       ],
       { cancelable: true }
     );
+  }; 
+   const redestlLivraison = () => {
+    Alert.alert(
+      'Confirmation',
+      'Êtes-vous sûr de vouloir redestiner cette commande à un autre livreur ?',
+      [
+        { 
+          text: 'Non', 
+          onPress: () => console.log('Commande non redistribuée'), 
+          style: 'cancel' 
+        },
+        { 
+          text: 'Redistribuer la commande', 
+          onPress: () => {
+            // Replace this with the actual function to reassign or redistribute the order.
+            commandeRedestrubier();
+          }, 
+          style: 'destructive' 
+        },
+      ],
+      { cancelable: true }
+    );
   };
-
-  
   const commandeLivree = async () => {
     
     const order_number = order.order_number ;
@@ -109,6 +129,52 @@ const deviceId = Device.osBuildId;
       }
     } catch (error) {
       Alert.alert('Erreur', 'Une erreur est survenue pendant la déconnexion.');
+    } finally {  
+      setShowLivredModal(false);
+      animateOut();
+    }
+  };
+  
+  const commandeRedestrubier = async () => {
+    const deviceId = Device.osBuildId;
+
+    const order_number = order.order_number ;
+    console.log('------------------------------------');
+    console.log(' trying destrubier...', order_number,deviceId);
+    console.log('------------------------------------');
+  
+    try {
+      const response = await fetch(`${BASE_URL}/api/driver/commandeRedestrubier`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ order_number,deviceId}),
+      });
+  
+      const l = await response.json();
+  
+      if (response.ok) {
+        console.log('------------------------------------');
+        console.log('redestrubier  successful');
+        console.log('------------------------------------');
+
+
+
+
+        const socket = io(BASE_URLIO, {
+          query: { deviceId },
+        });
+
+        socket.emit('driverConnected', deviceId);
+
+  
+     
+      } else {
+        Alert.alert(' échouée', data.errors ? data.errors.join(', ') : data.message);
+      }
+    } catch (error) {
+      Alert.alert('Erreur', 'Une erreur est survenue pendant la redestrubition.');
     } finally {  
       setShowLivredModal(false);
       animateOut();
@@ -252,7 +318,10 @@ console.log('------------------------------------');
           <TouchableOpacity style={styles.affectButton} onPress={() => confirmLivraison()} >
                 <Text style={styles.affectButtonText}>Commande Livrée</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.affectButton33} onPress={() => cancelLivraison()} >
+              <TouchableOpacity style={styles.affectButton334} onPress={() => redestlLivraison()} >
+              <Ionicons name={"reload"} size={20} color="#1f1e1d" />
+              </TouchableOpacity>
+               <TouchableOpacity style={styles.affectButton33} onPress={() => cancelLivraison()} >
                 <Text style={styles.affectButtonText}>Cancel</Text>
               </TouchableOpacity>
               </View>
@@ -473,6 +542,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 15,
     backgroundColor: '#ac3838',
+    borderRadius: 10,
+    alignItems: 'center',
+  }, affectButton334: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#eccd3f',
     borderRadius: 10,
     alignItems: 'center',
   },
