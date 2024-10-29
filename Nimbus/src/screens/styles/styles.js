@@ -174,6 +174,9 @@ marginBottom:10,
       statusText: {
         color: '#A5A5A5',
         fontSize: 19,
+      },   statusText3: {
+        color: '#ac5e16',
+        fontSize: 19,
       },
       card: {
         flexDirection: 'row',

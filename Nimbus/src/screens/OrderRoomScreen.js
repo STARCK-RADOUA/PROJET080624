@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   messageContent: {
-    maxWidth: '75%',
+    maxWidth: '78%',
     padding: 10,
     borderRadius: 20,
   },
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#E5E5EA',
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
-    paddingVertical: 15,
+    paddingVertical: 20,
     paddingRight: 20,
   },
   input: {
@@ -256,12 +256,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 15,
     backgroundColor: '#ffffff',
+    marginBottom: 10,
   },
   sendButton: {
     marginLeft: 10,
     backgroundColor: '#007AFF',
     padding: 10,
     borderRadius: 20,
+    marginBottom: 10,
+
   },
   disabledInput: {
     backgroundColor: '#f0f0f0',

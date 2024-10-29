@@ -252,15 +252,58 @@ console.log('------------------------------------');
 
             {/* Infos sur la commande */}
             <View style={styles.orderInfo}>
-              <Text style={styles.label}><MaterialIcons name="receipt" size={16} color="#ffbf00" /> Commande #{order.order_number ?? 'N/A'}</Text>
-              <Text style={styles.label}><Ionicons name="person" size={16} color="#ffbf00" /> Client : {order.client_name}</Text>
-              <Text style={styles.label}><Ionicons name="car" size={16} color="#ffbf00" /> Chauffeur : {order.driver_name}</Text>
-              <Text style={styles.label}><Ionicons name="card" size={16} color="#ffbf00" /> Paiement : {order.payment_method}</Text>
-              <Text style={styles.label}><Ionicons name="cash" size={16} color="#ffbf00" /> Prix Total : €{order.total_price.toFixed(2)}</Text>
-              <Text style={styles.label}><Ionicons name="swap-horizontal" size={16} color="#ffbf00" /> Échange : €{order.exchange.toFixed(2)}</Text>
-              <Text style={styles.label}><Ionicons name="home" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
-              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date de creation : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
-            </View>
+  
+  <Text style={styles.label}>
+    <MaterialIcons name="receipt" size={18} color="#2c7edb" />
+    <Text style={styles.sectionTitle}> Commande </Text>
+    <Text style={styles.textInfo}>{order.order_number ?? 'N/A'}</Text>
+  </Text>
+
+  <Text style={styles.label}>
+    <Ionicons name="person" size={18} color="#17a112" />
+    <Text style={styles.sectionTitle}> Client : </Text>
+    <Text style={styles.sectionTitle}>{order.client_name}</Text>
+  </Text>
+
+ 
+
+  <Text style={styles.label}>
+    <Ionicons name="card" size={18} color="#17a112" />
+    <Text style={styles.sectionTitle}> Paiement : </Text>
+    <Text style={styles.sectionTitle}>{order.payment_method}</Text>
+  </Text>
+
+  <Text style={styles.label}>
+    <Ionicons name="cash" size={18} color="#17a112" />
+    <Text style={styles.sectionTitle}> Prix Total : </Text>
+    <Text style={styles.sectionTitle}>€{order.total_price.toFixed(2)}</Text>
+  </Text>
+
+  <Text style={styles.label}>
+    <Ionicons name="swap-horizontal" size={18} color="#17a112" />
+    <Text style={styles.sectionTitle}> Échange : </Text>
+    <Text style={styles.sectionTitle}>€{order.exchange.toFixed(2)}</Text>
+  </Text>
+
+  <Text style={styles.label}>
+    <Ionicons name="home" size={18} color="#ffbf00" />
+    <Text style={styles.textTitle}> Adresse : </Text>
+    <Text style={styles.textInfo}>{order.address_line}</Text>
+  </Text>
+
+  <Text style={styles.label}>
+    <Ionicons name="time" size={18} color="#17a112" />
+    <Text style={styles.textTitle}> Affectation : </Text>
+    <Text style={styles.textInfo}>{moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+  </Text>
+
+  <Text style={styles.label}>
+    <Ionicons name="time" size={18} color="#ac1010" />
+    <Text style={styles.textTitle}> Création : </Text>
+    <Text style={styles.textInfo}>{moment(order.created_at).format('YYYY-MM-DD HH:mm')}</Text>
+  </Text>
+</View>
+
 
             {/* Produits */}
             <Text style={styles.sectionHeader}>Produits :</Text>
@@ -443,13 +486,31 @@ const styles = StyleSheet.create({
     right: 10,
   },
   orderInfo: {
-    paddingTop: 20,
-    marginBottom: 20,
+    padding: 20,
+    backgroundColor: '#c9e7e989',
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
   },
   label: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: '#1f2f16', // Dark green text
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 4,
+  },
+  textTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#555',
+  },
+  textInfo: {
+    fontSize: 15,
+    fontWeight: '400',
+    color: '#333',
   },
   sectionHeader: {
     fontSize: 18,

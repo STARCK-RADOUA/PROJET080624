@@ -7,12 +7,13 @@ export const getDeviceId = async (setDeviceId) => {
   setDeviceId(Device.osBuildId);
 };
 
-export const fetchDriverId = async (deviceId, setDriverId, setDriverInfo, setActiveStatusMessage) => {
+export const fetchDriverId = async (deviceId, setDriverId, setDriverInfo,setPoint, setActiveStatusMessage) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/driver/device`, { deviceId });
     if (response.status === 200 && response.data.driverId) {
       setDriverId(response.data.driverId);
       setDriverInfo(response.data.user || { firstName: 'Unknown', lastName: '' });
+      setPoint(response.data.user || { points_earned: '0'})
       setActiveStatusMessage(response.data.driverInfo?.isDisponible ? 'True' : 'False');
     }
   } catch (error) {

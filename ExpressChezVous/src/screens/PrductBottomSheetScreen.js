@@ -32,7 +32,11 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
   });
 
   const [totalPrice, setTotalPrice] = useState(item?.price || 0);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription);
+  };
   const scrollTo = useCallback((destination) => {
     'worklet';
     active.value = destination !== 0;
@@ -195,15 +199,30 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
       <View style={styles.line} />
       <View style={styles.contentContainer}>
           <View style={styles.container}>
+          
             <View style={styles.header}>
-              <Text style={styles.heading}>{item.name}</Text>
+              <Text style={styles.heading}>{item.name} </Text>
               <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
-            </View>
 
-            <Text style={styles.menuItemDescription}>{item.description}</Text>
+            </View>
+            <Text
+        style={styles.menuItemDescription}
+        numberOfLines={showFullDescription ? undefined : 1} // Afficher en 2 lignes par défaut
+      >
+        {item.description}
+      </Text>
+
+      {item.description.length > 41 && ( // Affiche "Voir plus" si le texte est long
+        <TouchableOpacity onPress={toggleDescription}>
+          <Text style={styles.seeMoreText}>
+            {showFullDescription ? 'Voir moins' : 'Voir plus'}
+          </Text>
+        </TouchableOpacity>
+      )}
 
             <View style={styles.quantityAndLabelContainer}>
               <Text style={styles.extrasLabel}>Select Extras:</Text>
+              
               <View style={styles.quantityContainer}>
                 <TouchableOpacity onPress={() => handleQuantityChange('decrement')}>
                   <Text style={styles.quantityButton}>-</Text>
@@ -212,7 +231,9 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
                 <TouchableOpacity onPress={() => handleQuantityChange('increment')}>
                   <Text style={styles.quantityButton}>+</Text>
                 </TouchableOpacity>
+                
               </View>
+
             </View>
             
             <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
@@ -245,7 +266,15 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
               ))}
             </View>
                     </ScrollView>
-                    <View style={styles.buttonContainer}>
+                   
+
+
+          </View>
+ 
+       
+        
+      </View>
+      <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[
               styles.button,
@@ -259,13 +288,6 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
             </Text>
           </TouchableOpacity>
         </View>
-
-
-          </View>
-
-       
-        
-      </View>
     </Animated.View>
   </GestureDetector>
 );
@@ -287,9 +309,8 @@ const styles = StyleSheet.create({
   line: {
     width: 75,
     height: 4,
-    backgroundColor: '#8f53531',
+    backgroundColor: '#d6c6c6111',
     alignSelf: 'center',
-    marginTop: 10,
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -298,7 +319,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   contentContainer: {
-    paddingHorizontal: 40,
+    paddingHorizontal: 20,
     paddingTop: 30,
   },
   productImage: {
@@ -315,7 +336,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     width: SCREEN_WIDTH * 0.7,
-    height: SCREEN_WIDTH * 0.4,
+    height: SCREEN_WIDTH * 0.30,
     alignSelf: 'center',
     borderWidth: 1.5,
     backgroundColor: '#cfcdcd37',
@@ -341,16 +362,18 @@ const styles = StyleSheet.create({
     textShadowRadius: 1.9,
   },
   price: {
-    fontSize: 22,
-    color: '#ce7100',
+    fontSize: 27,
     fontWeight: 'bold',
     color: '#f3ebebfd',
     fontWeight: '600',
     textShadowColor: '#000',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 5,
+
   },
   heading: {
+    textAlign: 'start',
+    width: width*0.6,
     fontSize: 28,
     fontWeight: 'bold',
     color: '#d37604',
@@ -359,12 +382,22 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 5,
   },
-  container: {},
+  container: {
+
+
+    backgroundColor: '#a7907529',
+    
+    borderRadius: 20,
+    padding: height*0.012,
+    width: width*0.9,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: height*0.008,
+
+  
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.4,
@@ -379,7 +412,7 @@ const styles = StyleSheet.create({
     
   },
   heart: {
-    fontSize: 24,
+    fontSize: 2,
     color: '#FF8C00',
   },
   quantityAndLabelContainer: {
@@ -397,8 +430,7 @@ padding:height*0.008,
     shadowRadius: 20,
     elevation: 9, 
 borderRadius:50,
-   paddinVertical: width * 0.1,
-   paddingHorizontal: width * 0.12,
+   paddingHorizontal: width * 0.08,
   },
   extrasLabel: {
     fontSize: 18,
@@ -475,18 +507,29 @@ borderRadius:50,
     fontSize: 18,
     color: '#FFFFFF',
   },
+  seeMoreText: {
+    color: '#FF8C00',
+    fontSize: 17,
+
+    fontWeight: 'bold',
+  },
   button: {
-    marginTop: 10,
     backgroundColor: '#FF8C00',
     paddingVertical: 11,
     borderRadius: 30,
     alignItems: 'center',
-    marginHorizontal: 40,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 8,
+    
+  },buttonContainer: {
+   width: width*0.6,
+   backgroundColor: '#fdfbfbc1',
+   alignSelf: 'center',
+   padding:4,
+   borderRadius: 30,
     
   },
   buttonDisabled: {

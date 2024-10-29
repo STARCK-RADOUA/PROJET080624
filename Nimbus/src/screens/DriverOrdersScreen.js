@@ -22,6 +22,7 @@ const DriverOrdersScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [driverId, setDriverId] = useState(null);
   const [driverInfo, setDriverInfo] = useState({ firstName: '', lastName: '' });
+  const [point, setPoint] = useState({ points_earned: ''});
   const [isEnabled, setIsEnabled] = useState(false);
   const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
   const [activeStatusMessage, setActiveStatusMessage] = useState('Fetching status...');
@@ -77,7 +78,7 @@ useEffect(() => {
   useEffect(() => {
     if (deviceId) {
 
-      fetchDriverId(deviceId, setDriverId, setDriverInfo, setActiveStatusMessage);
+      fetchDriverId(deviceId, setDriverId, setDriverInfo,setPoint, setActiveStatusMessage);
     }
   }, [deviceId]);
 
@@ -312,15 +313,20 @@ useEffect(() => {
       }]}>
         <View style={styles.headerv}>
           <TouchableOpacity style={styles.qr} onPress={() => navigate('QrcodeGeneratorDriverScreen')}>
+
+
             <Icon name="qrcode-scan" size={45} color="#fff" />
+
           </TouchableOpacity>
           {isEnabled ? (
             <>
-          <Text style={styles.headerText}>     Livraison : On Fire 🔥     </Text>
+          <Text style={styles.headerText}>  Livraison : On Fire 🔥</Text>
           </>
            ) : (
-          <Text style={styles.headerText}>     Hors Service 😴     </Text>
+          <Text style={styles.headerText}>     Hors Service 😴 </Text>
            )}
+           <Text style={styles.statusText3}>{`${point.points_earned}  `}</Text>
+
             <Switch
             trackColor={{ false: '#7a2424', true: '#1c7745' }}
             thumbColor={isEnabled ? '#36d815' : '#ca6411'}
@@ -408,7 +414,10 @@ useEffect(() => {
 
                         </View>
                         <Text style={styles.date}>
-                          {moment(item.delivery_time).format('YYYY-MM-DD HH:mm') || 'No Delivery Time'}
+                        Date  d’affectation : {moment(item.delivery_time).format('YYYY-MM-DD HH:mm') || 'No Delivery Time'}
+                        </Text>
+                         <Text style={styles.date}>
+                         Date  de création   : {moment(item.created_at).format('YYYY-MM-DD HH:mm') || 'No Delivery Time'}
                         </Text>
                       </View>
                     </View>

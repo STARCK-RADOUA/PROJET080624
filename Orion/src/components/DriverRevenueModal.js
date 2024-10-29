@@ -162,7 +162,7 @@ export default function DriverRevenueModal({ visible, onClose, driver }) {
 
           {revenueData && (
             <View style={styles.resultContainer}>
-              <Text>Total des revenus : {revenueData.totalRevenue} MAD</Text>
+              <Text>Total des revenus : {revenueData.totalRevenue} €</Text>
               <Text>Total des commandes livrées : {revenueData.totalDeliveredOrders}</Text>
             </View>
           )}
