@@ -523,7 +523,7 @@ const HomeScreen = ({ navigation }) => {
             <Card containerStyle={[styles.card, styles.card4]}>
               <TouchableOpacity  onPress={() => navigation.navigate('RevenuScren')}>
                 <Text>Revenu total</Text>
-                <Text style={styles.statNumber}>{totalSum} €</Text>
+                <Text style={styles.statNumber}>{totalSum.toFixed(3)} €</Text>
               </TouchableOpacity >
             </Card>
           </View>
