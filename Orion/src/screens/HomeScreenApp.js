@@ -9,7 +9,7 @@ const HomeScreenApp = () => {
   
     useEffect(() => { 
       // Simulate data loading
-      setTimeout(() => setDataLoaded(true), 2000);
+      setTimeout(() => setDataLoaded(true), 4000);
     }, []);
   
     return dataLoaded ? (

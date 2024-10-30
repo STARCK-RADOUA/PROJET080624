@@ -6,6 +6,7 @@ import moment from 'moment';
 const DeliveredOrderModal = ({ visible, onClose, order }) => {
   const [afficherTousProduits, setAfficherTousProduits] = useState(false);
   const [developpe, setDeveloppe] = useState(null);
+  const [expandAddress, setExpandAddress] = useState(false);
 
   if (!order) return null;
 
@@ -63,12 +64,34 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
             <View style={styles.orderInfo}>
               <Text style={styles.label}><MaterialIcons name="receipt" size={16} color="#ffbf00" /> Commande #{order.order_number ?? 'N/A'}</Text>
               <Text style={styles.label}><Ionicons name="person" size={16} color="#ffbf00" /> Client : {order.client_name}</Text>
-              <Text style={styles.label}><Ionicons name="car" size={16} color="#ffbf00" /> Chauffeur : {order.driver_name}</Text>
+              <Text style={styles.label}><Ionicons name="car" size={16} color="#ffbf00" /> Livreur : {order.driver_name}</Text>
               <Text style={styles.label}><Ionicons name="card" size={16} color="#ffbf00" /> Paiement : {order.payment_method}</Text>
               <Text style={styles.label}><Ionicons name="cash" size={16} color="#ffbf00" /> Prix Total : €{order.total_price.toFixed(2)}</Text>
               <Text style={styles.label}><Ionicons name="swap-horizontal" size={16} color="#ffbf00" /> Échange : €{order.exchange.toFixed(2)}</Text>
-              <Text style={styles.label}><Ionicons name="home" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
-              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Livraison : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+              
+              {/* Adresse expandable section */}
+              <TouchableOpacity onPress={() => setExpandAddress(!expandAddress)} style={styles.expandableSection}>
+                <Text style={styles.expandableLabel}><Ionicons name="location" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
+                <Ionicons name={expandAddress ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
+              </TouchableOpacity>
+              {expandAddress && (
+                <View style={styles.additionalAddressInfo}>
+                  {order.building && (
+                    <Text style={styles.additionalInfo}><Ionicons name="business" size={16} color="#ffbf00" /> Bâtiment : {order.building}</Text>
+                  )}
+                  {order.floor && (
+                    <Text style={styles.additionalInfo}><Ionicons name="layers" size={16} color="#ffbf00" /> Étage : {order.floor}</Text>
+                  )}
+                  {order.digicode && (
+                    <Text style={styles.additionalInfo}><Ionicons name="key" size={16} color="#ffbf00" /> Digicode : {order.digicode}</Text>
+                  )}
+                  {order.door_number && (
+                    <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
+                  )}
+                </View>
+              )}
+
+              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
             {/* Display Stars if available */}
@@ -79,7 +102,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
               </View>
             )}
 
-            {/* Display clientcomment and report_comment if they exist */}
+            {/* Display client comment and report_comment if they exist */}
             {order.comment && (
               <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire du client : {order.comment}</Text>
             )}
@@ -103,7 +126,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                     {developpe === index && (
                       <View>
                         <Text style={styles.productQuantity}>Qté : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €" + item.price.toFixed(2)}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity: "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
                         <Text style={styles.productServiceType}>Type de service : {item.service_type}</Text>
                       </View>
                     )}
@@ -164,6 +187,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     color: '#ccc',
+  },
+  expandableSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  expandableLabel: {
+    fontSize: 16,
+    color: '#ffbf00',
+  },
+  additionalAddressInfo: {
+    paddingLeft: 20,
+    marginVertical: 5,
+  },
+  additionalInfo: {
+    fontSize: 14,
+    color: '#ccc',
+    marginBottom: 3,
   },
   starsRow: {
     flexDirection: 'row',

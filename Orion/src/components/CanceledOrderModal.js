@@ -5,15 +5,17 @@ import moment from 'moment';
 
 const CanceledOrderModal = ({ visible, onClose, order }) => {
   const [showAllProducts, setShowAllProducts] = useState(false);
+  const [expandAddress, setExpandAddress] = useState(false);
 
   if (!order) return null;
 
   const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
 
-  // Animation for modal entry
+  // Animation pour l'entrée du modal
   const scaleAnim = new Animated.Value(0);
 
   const animateIn = () => {
+    console.log(order)
     Animated.spring(scaleAnim, {
       toValue: 1,
       friction: 7,
@@ -39,38 +41,62 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
     >
       <View style={styles.modalContainer}>
         <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
-          {/* Close Button */}
+          {/* Bouton de fermeture */}
           <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
             <Ionicons name="close-circle" size={30} color="#ff5c5c" />
           </TouchableOpacity>
 
           <ScrollView>
-            {/* Order Info */}
+            {/* Informations sur la commande */}
             <View style={styles.orderInfo}>
-              <Text style={styles.label}>Order #{order.order_number ?? 'N/A'}</Text>
-              <Text style={styles.label}>Client: {order.client_name}</Text>
-              <Text style={styles.label}>Driver: {order.driver_name}</Text>
-              <Text style={styles.label}>Address: {order.address_line}</Text>
-              <Text style={styles.label}>Payment: {order.payment_method}</Text>
-              <Text style={styles.label}>
-                Delivery: {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}
+              <Text style={styles.label}>Commande #{order.order_number ?? 'N/A'}</Text>
+              <Text style={styles.label}>Client : {order.client_name}</Text>
+              <Text style={styles.label}>Livereur : {order.driver_name}</Text>
+              <Text style={styles.label}>Paiement : {order.payment_method}</Text>
+              <Text style={styles.label}>Échange : €{order.exchange.toFixed(2)}</Text>
+
+        
+              {/* Adresse expandable section */}
+              <TouchableOpacity onPress={() => setExpandAddress(!expandAddress)} style={styles.expandableSection}>
+                <Text style={styles.expandableLabel}><Ionicons name="location" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
+                <Ionicons name={expandAddress ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
+              </TouchableOpacity>
+              {expandAddress && (
+                <View style={styles.additionalAddressInfo}>
+                  {order.building && (
+                    <Text style={styles.additionalInfo}><Ionicons name="business" size={16} color="#ffbf00" /> Bâtiment : {order.building}</Text>
+                  )}
+                  {order.floor && (
+                    <Text style={styles.additionalInfo}><Ionicons name="layers" size={16} color="#ffbf00" /> Étage : {order.floor}</Text>
+                  )}
+                  {order.digicode && (
+                    <Text style={styles.additionalInfo}><Ionicons name="key" size={16} color="#ffbf00" /> Digicode : {order.digicode}</Text>
+                  )}
+                  {order.door_number && (
+                    <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
+                  )}
+                </View>
+              )}
+                    <Text style={styles.label}>
+                Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}
               </Text>
+              
             </View>
 
-            {/* Display Report Reason and Report Comment if they exist */}
+            {/* Afficher le motif et le commentaire du rapport s'ils existent */}
             {order.report_reason && (
               <Text style={styles.reportText}>
-                <Ionicons name="alert-circle" size={16} color="#ff5c5c" /> Motif: {order.report_reason}
+                <Ionicons name="alert-circle" size={16} color="#ff5c5c" /> Motif : {order.report_reason}
               </Text>
             )}
             {order.report_comment && (
               <Text style={styles.reportText}>
-                <Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Livreur Comment: {order.report_comment}
+                <Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire du livreur : {order.report_comment}
               </Text>
             )}
 
-            {/* Products */}
-            <Text style={styles.sectionHeader}>Products:</Text>
+            {/* Produits */}
+            <Text style={styles.sectionHeader}>Produits :</Text>
             <View style={styles.productsContainer}>
               {displayedProducts.map((item, index) => (
                 <View key={index} style={styles.productContainer}>
@@ -83,27 +109,27 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
                     />
                   </View>
                   <View style={styles.productDetails}>
-                    <Text style={styles.productName}>{item.product?.name || 'Unavailable'}</Text>
-                    <Text style={styles.productQuantity}>Qty: {item.quantity}</Text>
-                    <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €" + item.price.toFixed(2)}</Text>
+                    <Text style={styles.productName}>{item.product?.name || 'Indisponible'}</Text>
+                    <Text style={styles.productQuantity}>Qté : {item.quantity}</Text>
+                    <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity: "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
                   </View>
                 </View>
               ))}
 
-              {/* Show more products button */}
+              {/* Bouton pour afficher plus de produits */}
               {order.products.length > 3 && !showAllProducts && (
                 <TouchableOpacity
                   style={styles.showMoreButton}
                   onPress={() => setShowAllProducts(true)}
                 >
-                  <Text style={styles.showMoreText}>Show more products...</Text>
+                  <Text style={styles.showMoreText}>Afficher plus de produits...</Text>
                 </TouchableOpacity>
               )}
             </View>
 
-            {/* Total Price */}
+            {/* Prix Total */}
             <View style={styles.totalContainer}>
-              <Text style={styles.totalText}>Total: €{order.total_price.toFixed(2)}</Text>
+              <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
             </View>
           </ScrollView>
         </Animated.View>
@@ -144,6 +170,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     color: '#ccc',
+  },
+  expandableSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  expandableLabel: {
+    fontSize: 16,
+    color: '#ffbf00',
+  },
+  additionalAddressInfo: {
+    paddingLeft: 20,
+    marginVertical: 5,
+  },
+  additionalInfo: {
+    fontSize: 14,
+    color: '#ccc',
+    marginBottom: 3,
+  },
+  reportText: {
+    fontSize: 14,
+    color: '#ffbf00',
+    marginTop: 10,
   },
   sectionHeader: {
     fontSize: 18,
@@ -194,11 +243,6 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     color: '#ff5c5c',
-  },
-  reportText: {
-    fontSize: 14,
-    color: '#ffbf00',
-    marginTop: 10,
   },
   showMoreButton: {
     marginTop: 10,

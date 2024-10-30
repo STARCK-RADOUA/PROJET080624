@@ -323,7 +323,7 @@ console.log('------------------------------------');
                   <View style={styles.productDetails}>
                     <Text style={styles.productName}>{item.product?.name || 'Indisponible'}</Text>
                     <Text style={styles.productQuantity}>Quantité : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit     €" + item.price.toFixed(2)}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity: "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
 
 
                     {expanded === index && (

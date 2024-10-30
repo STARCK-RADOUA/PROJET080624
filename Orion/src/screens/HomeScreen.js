@@ -27,6 +27,7 @@ const HomeScreen = ({ navigation }) => {
   const [selectedTimeFilter, setSelectedTimeFilter] = useState('Daily');
   const [totalSum, setTotalSum] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [alltotalCount, setAllTotalCount] = useState(0);
   const [totalClients, setTotalClients] = useState(0);
   const [totalProducts, setTotalProducts] = useState(0);
   const [dailyRevenue, setDailyRevenue] = useState([]);
@@ -39,6 +40,7 @@ const HomeScreen = ({ navigation }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productModalVisible, setProductModalVisible] = useState(false);
   const [showProductRevenue, setShowProductRevenue] = useState(false);
+  const [spammedOrdersNumber, setSpammedOrdersNumber] = useState(0);
 
   const [commendesStats, setCommendesStats] = useState([]);
 
@@ -97,6 +99,21 @@ const HomeScreen = ({ navigation }) => {
       setTotalCount(data.totalCount);
     });
 
+
+    socketInstance.emit('getAllOrdersSummary');
+    socketInstance.on('AllOrdersSummary', (data) => {
+      console.log("fegfe" , data.totalCount);
+      setAllTotalCount(data.totalCount);
+    });
+
+
+    socketInstance.emit('getTotalSpamOrdersNumber');
+    socketInstance.on('spamCountResponse', (data) => {
+      console.log("zfzfzsd" , data);
+      setSpammedOrdersNumber(data);
+    });
+
+
     return () => {
       socketInstance.disconnect();
     };
@@ -135,17 +152,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  const handleFilterChangeg = (filter) => {
-    setSelectedFilter(filter);
-    if (filter === 'Driver') {
-      setShowDriverRevenue(true);
-    } else {
-      setShowDriverRevenue(false);
-      if (socket) {
-        socket.emit('getDailyRevenue');
-      }
-    }
-  };
 
 
   const handleFilterChange = (filter) => {
@@ -503,7 +509,7 @@ const HomeScreen = ({ navigation }) => {
             <Card containerStyle={[styles.card, styles.card2]}>
               <TouchableOpacity onPress={() => navigation.navigate('Orders')}>
                 <Text>Commandes totales</Text>
-                <Text style={styles.statNumber}>{totalCount}</Text>
+                <Text style={styles.statNumber}>{alltotalCount}</Text>
               </TouchableOpacity >
             </Card>
 
@@ -559,6 +565,14 @@ const HomeScreen = ({ navigation }) => {
               </TouchableOpacity >
             </Card>
 
+
+            <Card containerStyle={[styles.card, styles.card10]}>
+              <TouchableOpacity onPress={() => navigation.navigate('SpamOrders')}>
+                <Text>Comms . signalées  </Text>
+                <Text style={styles.statNumber}>{spammedOrdersNumber}</Text>
+              </TouchableOpacity >
+            </Card>
+
           </View>
         </View>
 
@@ -580,7 +594,7 @@ const Dashnav = () => {
         <Stack.Screen
           name="Dashboard"
           component={HomeScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown:  false }}
         />
         <Stack.Screen
           name="ProductScreen"
@@ -639,6 +653,8 @@ const Dashnav = () => {
           component={ProductsRevenueScreen} // Use the component reference directly
           options={{ headerShown: false }} 
         />
+
+
 
 <Stack.Screen 
           name="Orders" 
@@ -714,6 +730,9 @@ const styles = StyleSheet.create({
   },
   card9: {
     backgroundColor: '#b671aa',
+  },
+  card10: {
+    backgroundColor: '#740938',
   },
   statNumber: {
     fontSize: 22,

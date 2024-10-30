@@ -48,6 +48,7 @@ const CanceledOrderScreen = () => {
     socket.emit('getCancelledOrders');
 
     socket.on('orderCanceledUpdated', (data) => {
+      console.log(data.orders , "dgeg")
       setCommandes(data.orders);
       setCommandesFiltrees(data.orders); // Afficher toutes les commandes par défaut
       setChargement(false); // Arrêter le chargement une fois les données récupérées

@@ -13,6 +13,9 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [expanded, setExpanded] = useState(null);
   const [driverModalVisible, setDriverModalVisible] = useState(false); // Modal visibility state for driver selection
+  const [expandAddress, setExpandAddress] = useState(false);
+
+
   const socket = io(BASE_URLIO);
 
   if (!order) return null;
@@ -37,7 +40,7 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
       useNativeDriver: true,
     }).start(() => onClose()); // Ensure that onClose is called
   };
-  
+
   // Fetch available drivers when the modal is displayed
   useEffect(() => {
     if (visible) {
@@ -49,16 +52,16 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
 
   const handleAffectOrder = () => {
     if (selectedDriver) {
-      axios.put(`${BASE_URL}/api/orders/affect-order`, { 
-        orderId: order.order_number, 
-        driverId: selectedDriver 
+      axios.put(`${BASE_URL}/api/orders/affect-order`, {
+        orderId: order.order_number,
+        driverId: selectedDriver
       })
-      .then(response => {
-        console.log('Commande affectée avec succès :', response.data);
-        socket.emit('watchOrderStatuss', { order_id: order.order_number });
-        onClose(); // Close the modal after assignment
-      })
-      .catch(error => console.error('Erreur lors de l\'affectation de la commande :', error.message));
+        .then(response => {
+          console.log('Commande affectée avec succès :', response.data);
+          socket.emit('watchOrderStatuss', { order_id: order.order_number });
+          onClose(); // Close the modal after assignment
+        })
+        .catch(error => console.error('Erreur lors de l\'affectation de la commande :', error.message));
     }
   };
 
@@ -68,50 +71,50 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
 
   // Render a custom dropdown for driver selection
   // Render a custom dropdown for driver selection with a close button
-const renderDriverDropdown = () => (
-  <Modal
-    transparent={true}
-    visible={driverModalVisible}
-    animationType="fade"
-    onRequestClose={() => setDriverModalVisible(false)}
-  >
-    <View style={styles.driverModalContainer}>
-      <View style={styles.driverModalContent}>
-        {/* Add a close button to manually close the modal */}
-        <TouchableOpacity style={styles.closeButton} onPress={() => setDriverModalVisible(false)}>
-          <Text style={styles.closeButtonText}>Close</Text>
-        </TouchableOpacity>
-        <ScrollView>
-          {drivers.map(driver => (
-            <TouchableOpacity
-              key={driver.driver_id}
-              style={styles.driverItem}
-              onPress={() => {
-                setSelectedDriver(driver.driver_id);
-                setDriverModalVisible(false); // Close the modal when a driver is selected
-              }}
-            >
-              <Text style={styles.driverName}>{`${driver.firstName} ${driver.lastName}`}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+  const renderDriverDropdown = () => (
+    <Modal
+      transparent={true}
+      visible={driverModalVisible}
+      animationType="fade"
+      onRequestClose={() => setDriverModalVisible(false)}
+    >
+      <View style={styles.driverModalContainer}>
+        <View style={styles.driverModalContent}>
+          {/* Add a close button to manually close the modal */}
+          <TouchableOpacity style={styles.closeButton} onPress={() => setDriverModalVisible(false)}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+          <ScrollView>
+            {drivers.map(driver => (
+              <TouchableOpacity
+                key={driver.driver_id}
+                style={styles.driverItem}
+                onPress={() => {
+                  setSelectedDriver(driver.driver_id);
+                  setDriverModalVisible(false); // Close the modal when a driver is selected
+                }}
+              >
+                <Text style={styles.driverName}>{`${driver.firstName} ${driver.lastName}`}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </View>
-    </View>
-  </Modal>
-);
+    </Modal>
+  );
 
   return (
     <Modal
-    animationType="none"
-    transparent={true}
-    visible={visible}
-    onShow={animateIn}
-    onRequestClose={animateOut}
+      animationType="none"
+      transparent={true}
+      visible={visible}
+      onShow={animateIn}
+      onRequestClose={animateOut}
     >
       <View style={styles.modalContainer}>
-      <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
+        <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
           <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
-            <Ionicons s name="close-circle" size={37} color="#ff5c5c"  />
+            <Ionicons s name="close-circle" size={37} color="#ff5c5c" />
           </TouchableOpacity>
 
           <ScrollView>
@@ -122,8 +125,33 @@ const renderDriverDropdown = () => (
               <Text style={styles.label}><Ionicons name="card" size={16} color="#ffbf00" /> Paiement : {order.payment_method}</Text>
               <Text style={styles.label}><Ionicons name="cash" size={16} color="#ffbf00" /> Prix Total : €{order.total_price.toFixed(2)}</Text>
               <Text style={styles.label}><Ionicons name="swap-horizontal" size={16} color="#ffbf00" /> Échange : €{order.exchange.toFixed(2)}</Text>
-              <Text style={styles.label}><Ionicons name="home" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
-              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Livraison : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+              {/* Adresse expandable section */}
+
+              <TouchableOpacity onPress={() => setExpandAddress(!expandAddress)} style={styles.expandableSection}>
+
+                <Text style={styles.expandableLabel}><Ionicons name="location" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
+
+                <Ionicons name={expandAddress ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
+
+              </TouchableOpacity>
+
+              {expandAddress && (
+                <View style={styles.additionalAddressInfo}>
+                  {order.building && (
+                    <Text style={styles.additionalInfo}><Ionicons name="business" size={16} color="#ffbf00" /> Bâtiment : {order.building}</Text>
+                  )}
+                  {order.floor && (
+                    <Text style={styles.additionalInfo}><Ionicons name="layers" size={16} color="#ffbf00" /> Étage : {order.floor}</Text>
+                  )}
+                  {order.digicode && (
+                    <Text style={styles.additionalInfo}><Ionicons name="key" size={16} color="#ffbf00" /> Digicode : {order.digicode}</Text>
+                  )}
+                  {order.door_number && (
+                    <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
+                  )}
+                </View>
+              )}
+              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
             {/* Products */}
@@ -144,7 +172,7 @@ const renderDriverDropdown = () => (
                     {expanded === index && (
                       <View>
                         <Text style={styles.productQuantity}>Quantité : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.price.toFixed(2) : "Gratuit"}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity: "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
                       </View>
                     )}
                   </View>
@@ -164,13 +192,13 @@ const renderDriverDropdown = () => (
             </View>
 
             {/* Custom Dropdown for Driver Selection */}
-            <Text style={styles.sectionHeader}>Affecter un chauffeur :</Text>
-            <TouchableOpacity 
-              style={styles.driverSelectButton} 
+            <Text style={styles.sectionHeader}>Affecter un Livreur :</Text>
+            <TouchableOpacity
+              style={styles.driverSelectButton}
               onPress={() => setDriverModalVisible(true)}
             >
               <Text style={styles.driverSelectText}>
-                {selectedDriver ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName : 'Sélectionner un chauffeur'}
+                {selectedDriver ? drivers.find(driver => driver.driver_id === selectedDriver)?.firstName : 'Sélectionner un livreur'}
               </Text>
               <Ionicons name="chevron-down" size={20} color="#ffbf00" />
             </TouchableOpacity>
@@ -183,8 +211,8 @@ const renderDriverDropdown = () => (
             )}
 
             {/* Total Price */}
-            <View style={styles.totalContainer}>       
-                <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
+            <View style={styles.totalContainer}>
+              <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
             </View>
           </ScrollView>
         </Animated.View>
@@ -220,6 +248,41 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     textAlign: 'center',
+  },
+  expandableSection: {
+
+    flexDirection: 'row',
+
+    alignItems: 'center',
+
+    marginVertical: 5,
+
+  },
+
+  expandableLabel: {
+
+    fontSize: 16,
+
+    color: '#ffbf00',
+
+  },
+
+  additionalAddressInfo: {
+
+    paddingLeft: 20,
+
+    marginVertical: 5,
+
+  },
+
+  additionalInfo: {
+
+    fontSize: 14,
+
+    color: '#ccc',
+
+    marginBottom: 3,
+
   },
   orderInfo: {
     paddingTop: 20,

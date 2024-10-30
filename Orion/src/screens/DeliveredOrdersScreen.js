@@ -45,6 +45,7 @@ const DeliveredOrdersScreen = () => {
          
     socket.emit('getDeliveredOrders');
     socket.on('orderDeliverredUpdated', (data) => {
+      console.log("sfsfs" ,data.orders)
       setCommandes(data.orders);
       setCommandesFiltrees(data.orders); // Afficher toutes les commandes par défaut
       setChargement(false); // Arrêter le chargement une fois les données récupérées
