@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Modal } from 'react-native';
 import { Card } from 'react-native-elements';
 import { LineChart } from 'react-native-chart-kit';
@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import { BASE_URL, BASE_URLIO } from '@env';
 import { Ionicons } from '@expo/vector-icons';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ProdScreen from './ProductScreen';
 import {OrdersScreen} from './OrdersScreen';
@@ -45,80 +45,71 @@ const HomeScreen = ({ navigation }) => {
   const [commendesStats, setCommendesStats] = useState([]);
 
 
-  useEffect(() => {
-    axios.get(`${BASE_URL}/api/driver/forChart`)
-      .then(response => setDrivers(response.data))
-      .catch(error => console.error('Erreur de récupération des chauffeurs :', error.message));
-  }, []);
-
-
-  useEffect(() => {
-    axios.get(`${BASE_URL}/api/products/getList`)
-      .then(response => setProducts(response.data))
-      .catch(error => console.error('Erreur de récupération des produis :', error.message));
-
-  }, []);
-
-
-  useEffect(() => {
-    axios.get(`${BASE_URL}/api/orders/order-status-counts`)
-      .then(response => setCommendesStats(response.data[0]))
-      .catch(error => console.error('Erreur de récupération des produis :', error.message));
-
-  }, []);
-
-
-  useEffect(() => {
-    const socketInstance = io(BASE_URLIO);
-    setSocket(socketInstance);
-
-    socketInstance.emit('getDailyRevenue');
-    socketInstance.on('dailyRevenue', (data) => {
-      if (data && data.dailyRevenue) {
-        setDailyRevenue(data.dailyRevenue);
-      }
-    });
-
-
-
-
-
-    socketInstance.emit('getTotalProducts');
-    socketInstance.on('totalProducts', (data) => {
-      setTotalProducts(data.totalProducts);
-    });
-
-    socketInstance.emit('getTotalClients');
-    socketInstance.on('totalClients', (data) => {
-      setTotalClients(data.totalClients);
-    });
-
-    socketInstance.emit('getDeliveredOrdersSummary');
-    socketInstance.on('deliveredOrdersSummary', (data) => {
-      setTotalSum(data.totalSum);
-      setTotalCount(data.totalCount);
-    });
-
-
-    socketInstance.emit('getAllOrdersSummary');
-    socketInstance.on('AllOrdersSummary', (data) => {
-      console.log("fegfe" , data.totalCount);
-      setAllTotalCount(data.totalCount);
-    });
-
-
-    socketInstance.emit('getTotalSpamOrdersNumber');
-    socketInstance.on('spamCountResponse', (data) => {
-      console.log("zfzfzsd" , data);
-      setSpammedOrdersNumber(data);
-    });
-
-
-    return () => {
-      socketInstance.disconnect();
-    };
-  }, []);
-
+  useFocusEffect(
+    useCallback(() => {
+      // Appels Axios pour récupérer les données initiales
+      const fetchData = async () => {
+        try {
+          const [driversResponse, productsResponse, ordersResponse] = await Promise.all([
+            axios.get(`${BASE_URL}/api/driver/forChart`),
+            axios.get(`${BASE_URL}/api/products/getList`),
+            axios.get(`${BASE_URL}/api/orders/order-status-counts`)
+          ]);
+          
+          setDrivers(driversResponse.data);
+          setProducts(productsResponse.data);
+          setCommendesStats(ordersResponse.data[0]);
+        } catch (error) {
+          console.error('Erreur lors de la récupération des données :', error.message);
+        }
+      };
+  
+      fetchData();
+  
+      // Configuration du socket
+      const socketInstance = io(BASE_URLIO);
+      setSocket(socketInstance);
+  
+      // Gestion des événements socket
+      socketInstance.emit('getDailyRevenue');
+      socketInstance.on('dailyRevenue', (data) => {
+        if (data && data.dailyRevenue) {
+          setDailyRevenue(data.dailyRevenue);
+        }
+      });
+  
+      socketInstance.emit('getTotalProducts');
+      socketInstance.on('totalProducts', (data) => {
+        setTotalProducts(data.totalProducts);
+      });
+  
+      socketInstance.emit('getTotalClients');
+      socketInstance.on('totalClients', (data) => {
+        setTotalClients(data.totalClients);
+      });
+  
+      socketInstance.emit('getDeliveredOrdersSummary');
+      socketInstance.on('deliveredOrdersSummary', (data) => {
+        setTotalSum(data.totalSum);
+        setTotalCount(data.totalCount);
+      });
+  
+      socketInstance.emit('getAllOrdersSummary');
+      socketInstance.on('AllOrdersSummary', (data) => {
+        setAllTotalCount(data.totalCount);
+      });
+  
+      socketInstance.emit('getTotalSpamOrdersNumber');
+      socketInstance.on('spamCountResponse', (data) => {
+        setSpammedOrdersNumber(data);
+      });
+  
+      // Nettoyage du socket à la fin
+      return () => {
+        socketInstance.disconnect();
+      };
+    }, [])
+  );
   const handleDriverSelect = (driverId) => {
     setSelectedDriver(driverId);
     setDriverModalVisible(false);

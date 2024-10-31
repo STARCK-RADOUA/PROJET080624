@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BASE_URLIO } from '@env';
+import { BASE_URLIO ,BASE_URL } from '@env';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -7,6 +7,8 @@ import { io } from 'socket.io-client';
 import moment from 'moment';
 import OngoingOrderModal from '../components/OngoingOrderModal';
 import { format } from 'date-fns';
+import axios from 'axios';
+
 
 const OngoingOrdersScreen = () => {
   const [orders, setOrders] = useState([]);
@@ -37,8 +39,20 @@ const OngoingOrdersScreen = () => {
   const toggleFilterMenu = () => {
     setShowFilterMenu(!showFilterMenu);
   };
+  const markOrdersAsSeen = async () => {
+    try {
+      const status = "pending" ; 
+      const apiUrl = `${BASE_URL}/api/orders/updat/mark-seen`;
+      const response = await axios.put(apiUrl, { status });
+     console.log('Success', response.data.message);
+    } catch (error) {
+      console.error('Error marking orders as seen:', error);
+      Alert.alert('Error', 'Failed to mark orders as seen.');
+    }
+  };
 
   useEffect(() => {
+    markOrdersAsSeen() ;
     const socket = io(BASE_URLIO);
     socket.emit('getPendingOrders');
 

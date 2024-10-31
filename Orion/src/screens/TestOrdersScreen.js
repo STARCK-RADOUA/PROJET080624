@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BASE_URLIO } from '@env';
+import { BASE_URLIO  ,BASE_URL} from '@env';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -7,6 +7,7 @@ import { io } from 'socket.io-client';
 import moment from 'moment';
 import TestOrderModal from '../components/TestOrderModal';
 import { format } from 'date-fns';
+import axios from 'axios';
 
 
 const TestOrdersScreen = () => {
@@ -25,7 +26,17 @@ const TestOrdersScreen = () => {
    const [endDate, setEndDate] = useState(new Date());
    const [showFilterMenu, setShowFilterMenu] = useState(false);
 
-
+   const markOrdersAsSeen = async () => {
+    try {
+      const status = "test" ; 
+      const apiUrl = `${BASE_URL}/api/orders/updat/mark-seen`;
+      const response = await axios.put(apiUrl, { status });
+     console.log('Success', response.data.message);
+    } catch (error) {
+      console.error('Error marking orders as seen:', error);
+      Alert.alert('Error', 'Failed to mark orders as seen.');
+    }
+  };
 
   const toggleFilterMenu = () => {
     setShowFilterMenu(!showFilterMenu);
@@ -44,7 +55,7 @@ const TestOrdersScreen = () => {
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
-         
+     markOrdersAsSeen() ;    
     socket.emit('getTestOrders');
     socket.on('testOrderUpdated', (data) => {
       setCommandes(data.orders);

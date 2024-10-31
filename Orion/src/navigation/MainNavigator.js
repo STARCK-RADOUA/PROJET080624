@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import socketIOClient from "socket.io-client"; // Import socket.io client
 import { BASE_URL } from '@env';
 import DriverRevenueScreen from '../screens/DriverRevenueScreen';
-import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import NotificationMenu from '../components/NotificationMenu';
 import SettingsScreen from '../screens/SettingsScreen';
@@ -21,42 +20,96 @@ import DriverChatScreenComponent from '../screens/DriverChatScreen';
 import RevenueScreen from '../screens/RevenueScreen';
 import QrScreen from '../screens/QrScreen';
 import HomeScreenApp from '../screens/HomeScreenApp';
+import axios from 'axios';
+import * as Device from 'expo-device';
+// Move socket initialization outside the component to avoid re-initialization
+const socket = socketIOClient(BASE_URL);
 
 const MainNavigator = ({ onLogin }) => {
   const [currentTab, setCurrentTab] = useState("Accueil");
   const [showMenu, setShowMenu] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(false); // Track unread driver messages
-  const [unreadAdminMessages, setUnreadAdminMessages] = useState(false); // Track unread admin messages
-  const [warn, setWarn] = useState(); // Track unread admin messages
-  const [isClientDesactiv, setIsClientDesactiv] = useState(); // Track unread admin messages
-  const [isDriverDesactiv, setIsDriverDesactiv] = useState(); // Track unread admin messages
-
-
+  const [unreadMessages, setUnreadMessages] = useState(false);
+  const [unreadAdminMessages, setUnreadAdminMessages] = useState(false);
+  const [warn, setWarn] = useState();
+  const [isClientDesactiv, setIsClientDesactiv] = useState();
+  const [isDriverDesactiv, setIsDriverDesactiv] = useState();
+  const [userDetail, setUserDetail] = useState();
+  const [cancelledSeen, setCancelledSeen] = useState(true);
+  const [deliveredSeen, setDeliveredSeen] = useState(true);
+  const [inProgressSeen, setInProgressSeen] = useState(true);
+  const [pendingSeen, setPendingSeen] = useState(true);
+  const [spammedSeen, setSpammedSeen] = useState(true);
+  const [testSeen, setTestSeen] = useState(true);
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
   const closeButtonOffset = useRef(new Animated.Value(0)).current;
 
-  // Initialize socket
-  const socket = socketIOClient(BASE_URL);
+  // Helper function for device ID
+  const getDeviceId = async () => {
+    return Device.osBuildId;
+  };
+
+  const getUserDetails = async () => {
+    try {
+      const deviceId = await getDeviceId();
+      const response = await axios.post(`${BASE_URL}/api/sessions/get-user-details`, {
+        deviceId: deviceId,
+      });
+      const clientDetails = response.data;
+      console.log('User details:', clientDetails);
+      setUserDetail(clientDetails.firstName + " " + clientDetails.lastName);
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    }
+  };
 
   useEffect(() => {
-    // Request initial chat messages on connect
-    socket.emit('watchChatMessages');
-    socket.emit('watchLatestWarn'); // Request the latest warn on connect
-    socket.emit('checkActivationStatus'); // Request the latest warn on connect
+    getUserDetails();
+  }, []);
 
-    socket.on('activationStatus', (data) => {
-      setIsClientDesactiv(data.clients) ; 
-      setIsDriverDesactiv(data.drivers) ;    
-      console.log(isClientDesactiv) ;
-      console.log(isDriverDesactiv) ;
+  useEffect(() => {
+    // Emit necessary events and set up listeners only once
+    socket.emit('requestLatestOrders');
+    socket.emit('watchChatMessages');
+    socket.emit('watchLatestWarn');
+    socket.emit('checkActivationStatus');
+
+    socket.on('latestOrders', (zita) => {
+      const { latestOrders } = zita;
+
+      // Update each status only if it's not null
+      if (latestOrders.cancelled && latestOrders.cancelled.seen !== null) {
+        setCancelledSeen(latestOrders.cancelled.seen);
+
+        console.log(zita , 'zita')
+        console.log(cancelledSeen) ; 
+      }
+      if (latestOrders.delivered && latestOrders.delivered.seen !== null) {
+        setDeliveredSeen(latestOrders.delivered.seen);
+      }
+      if (latestOrders.in_progress && latestOrders.in_progress.seen !== null) {
+        setInProgressSeen(latestOrders.in_progress.seen);
+      }
+      if (latestOrders.pending && latestOrders.pending.seen !== null) {
+        setPendingSeen(latestOrders.pending.seen);
+      }
+      if (latestOrders.spammed && latestOrders.spammed.seen !== null) {
+        setSpammedSeen(latestOrders.spammed.seen);
+      }
+      if (latestOrders.test && latestOrders.test.seen !== null) {
+        setTestSeen(latestOrders.test.seen);
+      }
 
 
     });
 
-    // Listen for the updated messages when they are received from the server
+    socket.on('activationStatus', (data) => {
+      if (data.clients !== isClientDesactiv) setIsClientDesactiv(data.clients);
+      if (data.drivers !== isDriverDesactiv) setIsDriverDesactiv(data.drivers);
+    });
+
     socket.on('chatMessagesUpdated', (data) => {
-      const hasUnreadDriver = data.messages.some(message => 
+      const hasUnreadDriver = data.messages.some(message =>
         message.lastMessage.sender !== 'admin' && !message.lastMessage.seen && message.role === "client"
       );
       setUnreadMessages(hasUnreadDriver);
@@ -66,27 +119,23 @@ const MainNavigator = ({ onLogin }) => {
       );
       setUnreadAdminMessages(hasUnreadAdmin);
     });
+
     socket.on('newWarning', (data) => {
-      console.log("dddd")
-      setWarn(data.seen); // Update local warn status
+      setWarn(data.seen);
     });
 
-
-    // Cleanup socket listener
+    // Cleanup listeners on unmount
     return () => {
+      socket.off('latestOrders');
+      socket.off('activationStatus');
       socket.off('chatMessagesUpdated');
       socket.off('newWarning');
-
     };
-  }, [socket]);
+  }, []);
 
   const handleTabChange = (title) => {
-    if (title === "Chat") {
-      setUnreadMessages(false); // Remove red dot when Chat is clicked
-    }
-    if (title === "Chat Livreur") {
-      setUnreadAdminMessages(false); // Remove red dot when Admin Chat is clicked
-    }
+    if (title === "Chat") setUnreadMessages(false);
+    if (title === "Chat Livreur") setUnreadAdminMessages(false);
     setCurrentTab(title);
   };
 
@@ -115,38 +164,43 @@ const MainNavigator = ({ onLogin }) => {
       case 'Chat Client':
         return <ChatHomeScreen />;
       case 'Chat Livreur':
-          return <DriverChatScreenComponent />;
+        return <DriverChatScreenComponent />;
       case 'Analyse':
         return <DriverRevenueScreen />;
       case 'invité':
         return <WarnScreen />;
-        case 'Qr':
+      case 'Qr':
         return <QrScreen />;
-      case "Chiffre d'affaire": // Using double quotes
-        return < RevenueScreen/>;
+      case "Chiffre d'affaire":
+        return <RevenueScreen />;
       default:
         return <HomeScreenApp />;
     }
   };
 
-  // Get platform-specific margin
   const platformSpecificMargin = showMenu
     ? (Platform.OS === 'ios' ? 40 : 40)
     : (Platform.OS !== 'ios' ? 40 : 20);
-
+   
   return (
     <SafeAreaView style={styles.container}>
-      <SideMenu 
-        currentTab={currentTab} 
-        setCurrentTab={handleTabChange} 
-        onLogin={onLogin} 
-        unreadMessages={unreadMessages} 
+      <SideMenu
+        currentTab={currentTab}
+        setCurrentTab={handleTabChange}
+        onLogin={onLogin}
+        unreadMessages={unreadMessages}
         unreadAdminMessages={unreadAdminMessages}
-        warn = {warn} 
-        isClientDesactiv = {isClientDesactiv}
-        isDriverDesactiv = {isDriverDesactiv}
+        warn={warn}
+        isClientDesactiv={isClientDesactiv}
+        isDriverDesactiv={isDriverDesactiv}
+        userDetail={userDetail}
+        deliveredSeen={deliveredSeen} 
+        inProgressSeen={inProgressSeen}
+        pendingSeen={pendingSeen}
+        spammedSeen={spammedSeen}
+        testSeen={testSeen}
+        cancelledSeen={cancelledSeen}
       />
-
       <Animated.View
         style={{
           flex: 1,
@@ -195,16 +249,15 @@ const MainNavigator = ({ onLogin }) => {
               name={showMenu ? "close-outline" : "menu-outline"}
               size={30}
               color="black"
-              style={[styles.menuIcon, { marginTop: platformSpecificMargin }]} // Apply platform-specific margin
+              style={[styles.menuIcon, { marginTop: platformSpecificMargin }]}
             />
           </TouchableOpacity>
-
           {renderScreen()}
         </Animated.View>
       </Animated.View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -213,9 +266,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },
-  menuIcon: {
-    // Dynamic marginTop is handled in-line where the Ionicons component is used
-  },
+  menuIcon: {},
 });
 
 export default MainNavigator;

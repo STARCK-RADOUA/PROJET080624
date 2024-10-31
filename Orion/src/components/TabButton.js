@@ -6,9 +6,10 @@ import * as Device from 'expo-device';
 import { BASE_URL } from '@env';
 
 
-const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, warn,isClientDesactiv , isDriverDesactiv , onLogin }) => {
+const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, warn,isClientDesactiv , isDriverDesactiv, hasUnseenOrders, onLogin }) => {
   const [loading, setLoading] = useState(false);
   const { logout } = useContext(AuthContext);
+
 
   const handleLogout = async () => {
     setLoading(true);
@@ -100,6 +101,16 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages,
          style={styles.notificationIcon}
        />
         )}
+
+
+         {title === "Commandes" && hasUnseenOrders && (
+          <Ionicons
+            name="notifications-outline"
+            size={20}
+            color="red"
+            style={styles.notificationIcon}
+          />)}
+
       </View>
     </TouchableOpacity>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BASE_URLIO } from '@env';
+import { BASE_URLIO , BASE_URL } from '@env';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -7,6 +7,7 @@ import { io } from 'socket.io-client';
 import moment from 'moment';
 import DeliveredOrderModal from '../components/CanceledOrderModal';
 import { format } from 'date-fns';
+import axios from 'axios';
 
 
 const CanceledOrderScreen = () => {
@@ -17,6 +18,17 @@ const CanceledOrderScreen = () => {
   const [commandeSelectionnee, setCommandeSelectionnee] = useState(null);
   const [chargement, setChargement] = useState(true);
 
+  const markOrdersAsSeen = async () => {
+    try {
+      const status = "cancelled" ; 
+      const apiUrl = `${BASE_URL}/api/orders/updat/mark-seen`;
+      const response = await axios.put(apiUrl, { status });
+     console.log('Success', response.data.message);
+    } catch (error) {
+      console.error('Error marking orders as seen:', error);
+      Alert.alert('Error', 'Failed to mark orders as seen.');
+    }
+  };
 
    // Date filter states
    const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -44,7 +56,7 @@ const CanceledOrderScreen = () => {
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
-
+markOrdersAsSeen();
     socket.emit('getCancelledOrders');
 
     socket.on('orderCanceledUpdated', (data) => {
