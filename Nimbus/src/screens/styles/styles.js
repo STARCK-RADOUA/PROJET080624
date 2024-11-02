@@ -227,6 +227,13 @@ marginBottom:10,
         flex: 1,
         justifyContent: 'center',
         marginHorizontal: 5,
+      },  navigateButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f0ae33', // Vert foncé harmonieux
+        padding: 10,
+        borderRadius: 8,
+        justifyContent: 'center',
       },
       navigateButtonWaze: {
         flexDirection: 'row',

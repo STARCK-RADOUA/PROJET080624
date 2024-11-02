@@ -17,6 +17,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showLivredModal, setShowLivredModal] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [expandAddress, setExpandAddress] = useState(false);
 
   if (!order) return null;
 
@@ -285,11 +286,34 @@ console.log('------------------------------------');
     <Text style={styles.sectionTitle}>€{order.exchange.toFixed(2)}</Text>
   </Text>
 
-  <Text style={styles.label}>
-    <Ionicons name="home" size={18} color="#ffbf00" />
-    <Text style={styles.textTitle}> Adresse : </Text>
-    <Text style={styles.textInfo}>{order.address_line}</Text>
-  </Text>
+  <TouchableOpacity onPress={() => setExpandAddress(!expandAddress)} style={styles.expandableSection}>
+
+<Text style={styles.expandableLabel}><Ionicons name="location" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
+
+<Ionicons name={expandAddress ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
+
+</TouchableOpacity>
+
+{expandAddress && (
+<View style={styles.additionalAddressInfo}>
+  {order.building && (
+    <Text style={styles.additionalInfo}><Ionicons name="business" size={16} color="#ffbf00" /> Bâtiment : {order.building}</Text>
+  )}
+  {order.floor && (
+    <Text style={styles.additionalInfo}><Ionicons name="layers" size={16} color="#ffbf00" /> Étage : {order.floor}</Text>
+  )}
+  {order.digicode && (
+    <Text style={styles.additionalInfo}><Ionicons name="key" size={16} color="#ffbf00" /> Digicode : {order.digicode}</Text>
+  )}
+  {order.door_number && (
+    <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
+  )}
+    {order.Adrscomment && (
+    <Text style={styles.additionalInfo}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire : {order.Adrscomment}</Text>
+  )}
+ 
+</View>
+)}
 
   <Text style={styles.label}>
     <Ionicons name="time" size={18} color="#17a112" />
@@ -496,6 +520,36 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 10,
+  },
+  expandableSection: {
+
+    flexDirection: 'row',
+
+    alignItems: 'center',
+
+    marginVertical: 5,
+
+  },
+
+  expandableLabel: {
+
+    fontSize: 16,
+
+    color: '#ffbf00',
+
+  },
+
+  additionalAddressInfo: {
+
+    paddingLeft: 20,
+
+    marginVertical: 5,
+
+  },
+  additionalInfo: {
+    fontSize: 14,
+    color: '#4b1111',
+    marginBottom: 3,
   },
   label: {
     flexDirection: 'row',

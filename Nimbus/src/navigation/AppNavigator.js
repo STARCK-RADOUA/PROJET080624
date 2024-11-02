@@ -32,7 +32,8 @@ export default function AppNavigator() {
         <Stack.Screen
           name="QrcodeGeneratorDriverScreen"
           component={QrcodeGeneratorDriverScreen}
-          options={{ headerShown: true }}
+          options={{ title: 'Parrainage', headerShown: true ,    // This enables the swipe back gesture
+          }} 
         />
         <Stack.Screen
           name="SupportChat"

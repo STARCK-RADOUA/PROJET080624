@@ -162,7 +162,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
                   {order.localisation && (
                     <TouchableOpacity style={styles.wazeButton} onPress={() => openInMaps(order.localisation)}>
                       <Ionicons name="navigate-outline" size={20} color="white" />
-                      <Text style={styles.wazeButtonText}>Voir la localisation dans Google Maps</Text>
+                      <Text style={styles.wazeButtonText}> Google Maps</Text>
                     </TouchableOpacity>)}
                 </View>
               )}
