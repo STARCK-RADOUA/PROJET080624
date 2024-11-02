@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Linking, Image, ScrollView, Animated } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import moment from 'moment';
 
@@ -7,6 +7,13 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
   const [afficherTousProduits, setAfficherTousProduits] = useState(false);
   const [developpe, setDeveloppe] = useState(null);
   const [expandAddress, setExpandAddress] = useState(false);
+
+
+
+  const openInMaps = (location) => {
+    const wazeUrl = `https://www.google.com/maps?q=${location}`;
+    Linking.openURL(wazeUrl);
+  };
 
   if (!order) return null;
 
@@ -68,7 +75,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.label}><Ionicons name="card" size={16} color="#ffbf00" /> Paiement : {order.payment_method}</Text>
               <Text style={styles.label}><Ionicons name="cash" size={16} color="#ffbf00" /> Prix Total : €{order.total_price.toFixed(2)}</Text>
               <Text style={styles.label}><Ionicons name="swap-horizontal" size={16} color="#ffbf00" /> Échange : €{order.exchange.toFixed(2)}</Text>
-              
+
               {/* Adresse expandable section */}
               <TouchableOpacity onPress={() => setExpandAddress(!expandAddress)} style={styles.expandableSection}>
                 <Text style={styles.expandableLabel}><Ionicons name="location" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
@@ -88,6 +95,14 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                   {order.door_number && (
                     <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
                   )}
+                  {order.Adrscomment && (
+                    <Text style={styles.additionalInfo}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire : {order.Adrscomment}</Text>
+                  )}
+                  {order.localisation && (
+                    <TouchableOpacity style={styles.wazeButton} onPress={() => openInMaps(order.localisation)}>
+                      <Ionicons name="navigate-outline" size={20} color="white" />
+                      <Text style={styles.wazeButtonText}>Voir la localisation dans Google Maps</Text>
+                    </TouchableOpacity>)}
                 </View>
               )}
 
@@ -107,7 +122,10 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire du client : {order.comment}</Text>
             )}
             {order.report_comment && (
-              <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="#ff5c5c" /> Commentaire du livreur : {order.report_comment}</Text>
+              <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="#ff5c5c" /> Rapport du livreur : {order.report_comment}</Text>
+            )}
+            {order.drivercomment && (
+              <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="blue" /> Commentaire du livreur : {order.drivercomment}</Text>
             )}
 
             {/* Produits */}
@@ -126,7 +144,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                     {developpe === index && (
                       <View>
                         <Text style={styles.productQuantity}>Qté : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity: "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity : "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
                         <Text style={styles.productServiceType}>Type de service : {item.service_type}</Text>
                       </View>
                     )}
@@ -182,6 +200,20 @@ const styles = StyleSheet.create({
   orderInfo: {
     paddingTop: 20,
     marginBottom: 20,
+  },
+  wazeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#34A853',
+    padding: 8,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+  },
+  wazeButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontWeight: 'bold',
   },
   label: {
     fontSize: 16,

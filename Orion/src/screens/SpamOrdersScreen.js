@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { io } from 'socket.io-client';
 import moment from 'moment';
-import DeliveredOrderModal from '../components/DeliverdOrderModal';
+import DeliveredOrderModal from '../components/CanceledOrderModal';
 import { format } from 'date-fns';
 import axios from 'axios';
 

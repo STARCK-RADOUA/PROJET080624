@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Image,Linking , ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 
 const CanceledOrderModal = ({ visible, onClose, order }) => {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [expandAddress, setExpandAddress] = useState(false);
+
+  const openInMaps = (location) => {
+    const wazeUrl = `https://www.google.com/maps?q=${location}`;
+    Linking.openURL(wazeUrl);
+  };
 
   if (!order) return null;
 
@@ -75,6 +80,14 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
                   {order.door_number && (
                     <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
                   )}
+                    {order.Adrscomment && (
+                    <Text style={styles.additionalInfo}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire : {order.Adrscomment}</Text>
+                  )}
+                  {order.localisation && (
+                    <TouchableOpacity style={styles.wazeButton} onPress={() => openInMaps(order.localisation)}>
+                      <Ionicons name="navigate-outline" size={20} color="white" />
+                      <Text style={styles.wazeButtonText}>Voir la localisation dans Google Maps</Text>
+                    </TouchableOpacity>)}
                 </View>
               )}
                     <Text style={styles.label}>
@@ -82,6 +95,11 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
               </Text>
               
             </View>
+            {order.report_comment && (
+              <Text style={styles.reportText}>
+                <Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Rapport du livreur : {order.report_comment}
+              </Text>
+            )}
 
             {/* Afficher le motif et le commentaire du rapport s'ils existent */}
             {order.report_reason && (
@@ -89,12 +107,7 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
                 <Ionicons name="alert-circle" size={16} color="#ff5c5c" /> Motif : {order.report_reason}
               </Text>
             )}
-            {order.report_comment && (
-              <Text style={styles.reportText}>
-                <Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire du livreur : {order.report_comment}
-              </Text>
-            )}
-
+          
             {/* Produits */}
             <Text style={styles.sectionHeader}>Produits :</Text>
             <View style={styles.productsContainer}>
@@ -214,6 +227,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
+  },
+  wazeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#34A853',
+    padding: 8,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+  },
+  wazeButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontWeight: 'bold',
   },
   imageContainer: {
     width: 60,

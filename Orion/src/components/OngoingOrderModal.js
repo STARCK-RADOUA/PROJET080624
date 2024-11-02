@@ -1,6 +1,6 @@
 import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Animated } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Linking ,  Image, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import axios from 'axios';
@@ -15,6 +15,10 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
   const [driverModalVisible, setDriverModalVisible] = useState(false); // Modal visibility state for driver selection
   const [expandAddress, setExpandAddress] = useState(false);
 
+  const openInMaps = (location) => {
+    const wazeUrl = `https://www.google.com/maps?q=${location}`;
+    Linking.openURL(wazeUrl);
+  };
 
   const socket = io(BASE_URLIO);
 
@@ -149,6 +153,14 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
                   {order.door_number && (
                     <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
                   )}
+                    {order.Adrscomment && (
+                    <Text style={styles.additionalInfo}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire : {order.Adrscomment}</Text>
+                  )}
+                  {order.localisation && (
+                    <TouchableOpacity style={styles.wazeButton} onPress={() => openInMaps(order.localisation)}>
+                      <Ionicons name="navigate-outline" size={20} color="white" />
+                      <Text style={styles.wazeButtonText}>Voir la localisation dans Google Maps</Text>
+                    </TouchableOpacity>)}
                 </View>
               )}
               <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
@@ -274,7 +286,20 @@ const styles = StyleSheet.create({
     marginVertical: 5,
 
   },
-
+  wazeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#34A853',
+    padding: 8,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+  },
+  wazeButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontWeight: 'bold',
+  },
   additionalInfo: {
 
     fontSize: 14,
