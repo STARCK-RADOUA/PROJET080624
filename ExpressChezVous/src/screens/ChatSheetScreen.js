@@ -185,7 +185,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
         />
 
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? undefined : undefined}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Adjust offset for iOS
           style={[styles.inputContainer, { marginBottom: keyboardHeight }]} // Add keyboard height for Android
         >
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     width: '90%',
     backgroundColor: '#f7f5f3ef',
     position: 'absolute',
-    top: SCREEN_HEIGHT * 1.2,
+    top: SCREEN_HEIGHT * 1.18,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
   },
@@ -247,8 +247,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+  
     backgroundColor: '#F2F2F2',
     borderTopWidth: 1,
     borderTopColor: '#E5E5EA',
@@ -257,7 +256,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: 40,
+    height: 50,
     paddingHorizontal: 10,
     backgroundColor: 'white',
     borderRadius: 20,

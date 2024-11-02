@@ -311,11 +311,7 @@ console.log('------------------------------------');
     {order.Adrscomment && (
     <Text style={styles.additionalInfo}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire : {order.Adrscomment}</Text>
   )}
-  {order.localisation && (
-    <TouchableOpacity style={styles.wazeButton} onPress={() => openInMaps(order.localisation)}>
-      <Ionicons name="navigate-outline" size={20} color="white" />
-      <Text style={styles.wazeButtonText}>Voir la localisation dans Google Maps</Text>
-    </TouchableOpacity>)}
+ 
 </View>
 )}
 
@@ -552,7 +548,7 @@ const styles = StyleSheet.create({
   },
   additionalInfo: {
     fontSize: 14,
-    color: '#ccc',
+    color: '#4b1111',
     marginBottom: 3,
   },
   label: {
