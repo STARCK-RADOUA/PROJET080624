@@ -105,12 +105,8 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                     </TouchableOpacity>)}
                 </View>
               )}
-
-              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
-            </View>
-
-            {/* Display Stars if available */}
-            {order.stars && (
+ {/* Display Stars if available */}
+ {order.stars && (
               <View style={styles.starsRow}>
                 <Text style={styles.label}>Évaluation :</Text>
                 {renderStars(order.stars)}
@@ -128,6 +124,10 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="blue" /> Commentaire du livreur : {order.drivercomment}</Text>
             )}
 
+            </View>
+              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+
+           
             {/* Produits */}
             <Text style={styles.sectionHeader}>Produits :</Text>
             <View style={styles.productsContainer}>
@@ -153,8 +153,11 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                 </TouchableOpacity>
               ))}
 
-              {/* Bouton pour afficher plus de produits */}
-              {order.products.length > 3 && (
+              
+            </View>
+            
+          </ScrollView>
+          {order.products.length > 3 && (
                 <TouchableOpacity
                   style={styles.showMoreButton}
                   onPress={() => setAfficherTousProduits(!afficherTousProduits)}
@@ -164,8 +167,6 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                   </Text>
                 </TouchableOpacity>
               )}
-            </View>
-          </ScrollView>
         </Animated.View>
       </View>
     </Modal>
@@ -180,6 +181,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   modalView: {
+    marginVertical : "20%" , 
     width: '90%',
     backgroundColor: '#1f1f1f',
     borderRadius: 20,
