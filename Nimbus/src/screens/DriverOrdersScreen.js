@@ -461,12 +461,12 @@ useEffect(() => {
 
       ) : (
         <View style={styles.disabledView}>
-          <Text style={styles.disabledText}>Please enable availability to view orders.</Text>
-          <TouchableOpacity style={styles.navigateButton} onPress={() => navigate('SupportChat')}>
-            <Text style={styles.navigateButtonText}>Go to CHAT</Text>
-          </TouchableOpacity>
+  <Text style={styles.disabledText}>Veuillez activer la disponibilité .</Text>
+  <TouchableOpacity style={styles.navigateButton} onPress={() => navigate('SupportChat')}>
+    <Text style={styles.navigateButtonText}>Aller au CHAT SUPPORT</Text>
+  </TouchableOpacity>
+</View>
 
-        </View>
       )}
 
       {selectedOrder && <OrderDetailModal visible={!!selectedOrder} onClose={handleCloseModal} order={selectedOrder} />}

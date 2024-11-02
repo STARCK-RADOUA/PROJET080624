@@ -107,7 +107,7 @@ const SupportChatScreen = ({ navigation }) => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Text style={styles.chatTitle}>Support Chat</Text>
+      <Text style={styles.chatTitle}>SUPPORT</Text>
 
       <FlatList
         data={messages}
