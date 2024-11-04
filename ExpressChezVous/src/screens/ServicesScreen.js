@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 40,
         
         borderColor: '#ffffff50',
-        backgroundColor: '#acabab24',
+        backgroundColor: '#6e6e6e4c',
         marginVertical: width * 0.01,
         marginHorizontal: width * 0.02,
            shadowColor: '#3f3b3b',
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 30, // Plus de rayon pour un effet 3D
     elevation: 20,
-    backgroundColor: Platform.OS === 'ios' ? '#f7f1e43d' : '#200b0b75',
+    backgroundColor: Platform.OS === 'ios' ? '#f7f1e43d' : '#3f3d3d92',
     borderWidth: 2,
     borderColor: '#fab828',
   },

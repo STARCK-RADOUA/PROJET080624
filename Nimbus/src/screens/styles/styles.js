@@ -318,7 +318,7 @@ padding : 10 ,
     width: 10,  // size of the red dot
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#f79b9b',
+    backgroundColor: '#c43333',
   },
   navigateText: {
     color: 'white',

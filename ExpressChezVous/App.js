@@ -8,7 +8,7 @@ import { BASE_URLIO } from '@env';
 import { navigate } from './src/utils/navigationRef'; // Import navigate function
 import * as Device from 'expo-device';
 import * as Location from 'expo-location';  // Import expo-location for location fetching
-
+ 
 export default function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const notificationListener = useRef();
