@@ -38,7 +38,7 @@ export default function App() {
       return BackgroundFetch.Result.NewData;
     } catch (error) {
       console.log('Error in background ping task', error);
-      return BackgroundFetch.Result.Failed;
+      return BackgroundFetch?.Result?.Failed || BackgroundFetch.Result.NewData;
     }
   });
 

@@ -100,7 +100,10 @@ useEffect(() => {
         });
   
         
-
+        if (!isTracking ) {
+          
+          startTracking(deviceId);
+        }
 
         socket.emit('watchSupportChatMessagesDriver', deviceId);
 
@@ -275,9 +278,7 @@ useEffect(() => {
     const intervalId = setInterval(async () => {
       console.log("yooo")
 
-      if (!isTracking && orders.length > 0) {
-        startTracking(deviceId);
-      }
+   
       refreshDistances();
       console.log("refrech distance")
 
