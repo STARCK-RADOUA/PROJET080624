@@ -149,7 +149,7 @@ export default function ClientScreen() {
             <ClientCard key={client._id} client={client} onPress={() => handleCardPress(client)} />
           ))
         ) : (
-          <Text>Aucun client disponible</Text>
+          <Text>Aucun client trouvé</Text>
         )}
       </ScrollView>
 

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Image,Linking , ScrollView, Animated } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, Linking, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 
 const CanceledOrderModal = ({ visible, onClose, order }) => {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [expandAddress, setExpandAddress] = useState(false);
+  const [expandReportComment, setExpandReportComment] = useState(false);
+  const [expandMotif, setEmot] = useState(false);
+
 
   const openInMaps = (location) => {
     const wazeUrl = `https://www.google.com/maps?q=${location}`;
@@ -60,7 +63,7 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.label}>Paiement : {order.payment_method}</Text>
               <Text style={styles.label}>Échange : €{order.exchange.toFixed(2)}</Text>
 
-        
+
               {/* Adresse expandable section */}
               <TouchableOpacity onPress={() => setExpandAddress(!expandAddress)} style={styles.expandableSection}>
                 <Text style={styles.expandableLabel}><Ionicons name="location" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
@@ -80,7 +83,7 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
                   {order.door_number && (
                     <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
                   )}
-                    {order.Adrscomment && (
+                  {order.Adrscomment && (
                     <Text style={styles.additionalInfo}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire : {order.Adrscomment}</Text>
                   )}
                   {order.localisation && (
@@ -90,24 +93,31 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
                     </TouchableOpacity>)}
                 </View>
               )}
-                    <Text style={styles.label}>
+              <Text style={styles.label}>
                 Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}
               </Text>
-              
+
             </View>
             {order.report_comment && (
-              <Text style={styles.reportText}>
-                <Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Rapport du livreur : {order.report_comment}
-              </Text>
+              <TouchableOpacity onPress={() => setExpandReportComment(!expandReportComment)} style={styles.expandableSection}>
+                <Text style={styles.expandableLabel}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Rapport du livreur</Text>
+                <Ionicons name={expandReportComment ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
+              </TouchableOpacity>
+            )}{expandReportComment && (
+              <Text style={styles.reportText}>{order.report_comment}</Text>
             )}
 
-            {/* Afficher le motif et le commentaire du rapport s'ils existent */}
             {order.report_reason && (
-              <Text style={styles.reportText}>
-                <Ionicons name="alert-circle" size={16} color="#ff5c5c" /> Motif : {order.report_reason}
-              </Text>
+              <TouchableOpacity onPress={() => setEmot(!expandMotif)} style={styles.expandableSection}>
+                <Text style={styles.expandableLabel}> <Ionicons name="alert-circle" size={16} color="#ff5c5c" />  Motif </Text>
+                <Ionicons name={expandMotif ? "chevron-up" : "chevron-down"} size={20} color="#ff5c5c" />
+              </TouchableOpacity>
             )}
-          
+
+            {expandMotif && (
+              <Text style={styles.reportText}>{order.report_reason}</Text>
+            )}
+
             {/* Produits */}
             <Text style={styles.sectionHeader}>Produits :</Text>
             <View style={styles.productsContainer}>
@@ -124,7 +134,7 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
                   <View style={styles.productDetails}>
                     <Text style={styles.productName}>{item.product?.name || 'Indisponible'}</Text>
                     <Text style={styles.productQuantity}>Qté : {item.quantity}</Text>
-                    <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity: "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
+                    <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity : "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
                   </View>
                 </View>
               ))}
@@ -159,7 +169,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   modalView: {
-    marginVertical : "20%" , 
+    marginVertical: "20%",
     width: '90%',
     backgroundColor: '#1f1f1f',
     borderRadius: 20,
@@ -171,7 +181,7 @@ const styles = StyleSheet.create({
     elevation: 15,
   },
   closeButton: {
-    color: '#ff5c5c', 
+    color: '#ff5c5c',
     marginTop: 20,
     fontWeight: 'bold',
     fontSize: 16,
@@ -192,7 +202,7 @@ const styles = StyleSheet.create({
   },
   expandableLabel: {
     fontSize: 16,
-    color: '#ffbf00',
+    color: 'white',
   },
   additionalAddressInfo: {
     paddingLeft: 20,

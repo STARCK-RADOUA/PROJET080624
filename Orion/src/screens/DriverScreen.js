@@ -151,7 +151,7 @@ export default function DriverScreen() {
             <DriverCard key={driver._id} driver={driver} onPress={() => handleCardPress(driver)} />
           ))
         ) : (
-          <Text>Aucun livreur disponible</Text>
+          <Text>Aucun livreur trouvé</Text>
         )}
       </ScrollView>
 

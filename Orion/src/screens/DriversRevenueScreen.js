@@ -148,7 +148,7 @@ export default function DriversRevenueScreen() {
             />
           ))
         ) : (
-          <Text>Aucun livreur disponible</Text>
+          <Text>Aucun livreur trouvé</Text>
         )}
       </ScrollView>
       

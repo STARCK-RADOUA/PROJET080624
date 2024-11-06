@@ -43,6 +43,22 @@ const AddDriverModal = ({ modalVisible, setModalVisible }) => {
       Alert.alert('Erreur de validation', 'Les points accumulés doivent être un nombre positif');
       return false;
     }
+    
+    // Validate phone number only if it's provided
+    if (phone && !/^\d{10}$/.test(phone)) {
+      Alert.alert('Erreur', 'Le numéro de téléphone doit contenir exactement 10 chiffres.');
+      return false;
+    }
+  
+    // Add password validation only if it has been changed and is not empty
+    if (password && password.trim() !== "") {
+      const passwordd = password;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(passwordd)) {
+        Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.');
+        return false;
+      }
+    }
     return true;
   };
 

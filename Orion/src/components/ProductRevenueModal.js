@@ -124,7 +124,7 @@ export default function ProductRevenueModal({ visible, onClose, product }) {
             />
           )}
 
-          {revenueData ? (
+          {revenueData && revenueData.totalRevenue > 0 ? (
             !pdfDownloaded ? (
               <TouchableOpacity style={styles.button} onPress={downloadPDF} disabled={downloading}>
                 {downloading ? (
@@ -146,10 +146,10 @@ export default function ProductRevenueModal({ visible, onClose, product }) {
             </TouchableOpacity>
           )}
 
-          {revenueData && (
+          {revenueData  && (
             <View style={styles.resultContainer}>
-              <Text>Total des revenus : {revenueData.totalRevenue} MAD</Text>
-              <Text>Total des achats : {revenueData.totalTimesBought}</Text>
+              <Text>Total des revenus : {revenueData.totalRevenue || 0} MAD </Text>
+              <Text>Total des achats : {revenueData.totalTimesBought || 0}</Text>
             </View>
           )}
         </View>

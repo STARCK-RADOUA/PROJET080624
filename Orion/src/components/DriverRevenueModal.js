@@ -138,8 +138,8 @@ export default function DriverRevenueModal({ visible, onClose, driver }) {
             />
           )}
 
-          {revenueData ? (
-            !pdfDownloaded ? (
+          {revenueData && revenueData.totalRevenue > 0 ? (
+            !pdfDownloaded   ? (
               <TouchableOpacity style={styles.button} onPress={downloadPDF} disabled={downloading}>
                 {downloading ? (
                   <ActivityIndicator size="small" color="#FFF" />

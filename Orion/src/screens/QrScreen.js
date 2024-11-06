@@ -169,7 +169,7 @@ const QrScreen = () => {
             </TouchableOpacity>
           ))
         ) : (
-          <Text>No QR codes found</Text>
+          <Text>Aucun Qr trouvé</Text>
         )}
       </ScrollView>
 

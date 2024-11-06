@@ -7,7 +7,10 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
   const [afficherTousProduits, setAfficherTousProduits] = useState(false);
   const [developpe, setDeveloppe] = useState(null);
   const [expandAddress, setExpandAddress] = useState(false);
-
+  const [expandClientComment, setExpandClientComment] = useState(false);
+  const [expandReportComment, setExpandReportComment] = useState(false);
+  const [expandDriverComment, setExpandDriverComment] = useState(false);
+  
 
 
   const openInMaps = (location) => {
@@ -108,6 +111,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
  {/* Display Stars if available */}
  {order.stars && (
               <View style={styles.starsRow}>
+                <Ionicons name="star" size={16} color="#ffbf00" />
                 <Text style={styles.label}>Évaluation :</Text>
                 {renderStars(order.stars)}
               </View>
@@ -115,14 +119,32 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
 
             {/* Display client comment and report_comment if they exist */}
             {order.comment && (
-              <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire du client : {order.comment}</Text>
-            )}
-            {order.report_comment && (
-              <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="#ff5c5c" /> Rapport du livreur : {order.report_comment}</Text>
-            )}
-            {order.drivercomment && (
-              <Text style={styles.commentText}><Ionicons name="chatbubble-ellipses" size={16} color="blue" /> Commentaire du livreur : {order.drivercomment}</Text>
-            )}
+  <TouchableOpacity onPress={() => setExpandClientComment(!expandClientComment)} style={styles.expandableSection}>
+    <Text style={styles.expandableLabel}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire du client</Text>
+    <Ionicons name={expandClientComment ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
+  </TouchableOpacity>
+)}
+{expandClientComment && (
+  <Text style={styles.commentText}>{order.comment}</Text>
+)}
+{order.report_comment && (
+  <TouchableOpacity onPress={() => setExpandReportComment(!expandReportComment)} style={styles.expandableSection}>
+    <Text style={styles.expandableLabel}><Ionicons name="chatbubble-ellipses" size={16} color="#ff5c5c" /> Rapport du livreur</Text>
+    <Ionicons name={expandReportComment ? "chevron-up" : "chevron-down"} size={20} color="#ff5c5c" />
+  </TouchableOpacity>
+)}
+{expandReportComment && (
+  <Text style={styles.commentText}>{order.report_comment}</Text>
+)}
+{order.drivercomment && (
+  <TouchableOpacity onPress={() => setExpandDriverComment(!expandDriverComment)} style={styles.expandableSection}>
+    <Text style={styles.expandableLabel}><Ionicons name="chatbubble-ellipses" size={16} color="blue" /> Commentaire du livreur</Text>
+    <Ionicons name={expandDriverComment ? "chevron-up" : "chevron-down"} size={20} color="blue" />
+  </TouchableOpacity>
+)}
+{expandDriverComment && (
+  <Text style={styles.commentText}>{order.drivercomment}</Text>
+)}
 
             </View>
               <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
@@ -229,7 +251,7 @@ const styles = StyleSheet.create({
   },
   expandableLabel: {
     fontSize: 16,
-    color: '#ffbf00',
+    color: 'white',
   },
   additionalAddressInfo: {
     paddingLeft: 20,
