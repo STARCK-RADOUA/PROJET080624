@@ -17,7 +17,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isDisponible, setDisponible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [number, setEditablenumber] = useState({ ...driver });
   const [historyVisible, setHistoryVisible] = useState(false);
   const [historyData, setHistoryData] = useState([]);
 
@@ -65,9 +64,9 @@ const DriverModal = ({ visible, onClose, driver }) => {
   };
 
   useEffect(() => {
-    setEditableDriver({ ...driver });
-    setEditablenumber("0"+driver.phone );
-    socket.emit('locationUpdateForAdminRequest', { deviceId: driver.deviceId });
+    const updatedDriver = { ...driver, password: " " }; 
+    setEditableDriver(updatedDriver);
+        socket.emit('locationUpdateForAdminRequest', { deviceId: driver.deviceId });
 
     socket.on('locationUpdateForAdmin', ({ deviceId, latitude, longitude, isConnected, isDisponible }) => {
       if (deviceId === driver.deviceId) {
@@ -159,7 +158,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
     }
   
     if (editableDriver.phone && !/^\d{9}$/.test(editableDriver.phone)) {
-      Alert.alert('Erreur', 'Le numéro de téléphone doit contenir exactement 10 chiffres.');
+      Alert.alert('Erreur', 'Le numéro de téléphone doit contenir exactement 9 chiffres.');
       return;
     }
   
@@ -258,7 +257,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
                 <Text style={styles.label}>Mot de passe :</Text>
                 <TextInput
                   style={styles.textInput}
-                 
+                value= {editableDriver.password}
                   onChangeText={(value) => handleInputChange('password', value)}
                 />
               </>
@@ -269,13 +268,15 @@ const DriverModal = ({ visible, onClose, driver }) => {
             )}
 <Text style={styles.label}>Téléphone :</Text>            
 {isEditing ? (
-  // Show the phone number exactly as it comes from the database in editing mode
-  <TextInput
+  <View style={styles.phonecontainer}>
+    <Text  style={styles.countryCode}>+33</Text>
+    <TextInput
     style={styles.textInput}
     value={ editableDriver.phone + "" }
     onChangeText={(value) => handleInputChange('phone', value)}
     keyboardType="phone-pad" 
-  />
+  /></View>
+  
 ) : (
   // Display the phone number exactly as it is from the database in non-edit mode
   <Text style={styles.textValue}>+33 {editableDriver.phone}</Text>
@@ -544,6 +545,7 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 10,
   },
+  phonecontainer: { flexDirection: 'row', alignItems: 'center', }, countryCode: { marginRight: 8, },
   wazeButton: {
     flexDirection: 'row',
     alignItems: 'center',
