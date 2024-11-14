@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef  ,} from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView,Platform , TextInput,KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 import io from 'socket.io-client';
 import { BASE_URLIO  , BASE_URL} from '@env';
 import { useFocusEffect } from '@react-navigation/native';
@@ -111,6 +111,11 @@ const RoomScreen = ({ route }) => {
   
 
   return (
+    <KeyboardAvoidingView
+    style={{ flex: 1 }}
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Ajustez la valeur si nécessaire
+  >
     <View style={styles.container}>
       <ScrollView 
         ref={scrollViewRef} // Assign the reference to ScrollView
@@ -162,6 +167,8 @@ const RoomScreen = ({ route }) => {
 
       </View>
     </View>
+    </KeyboardAvoidingView>
+
   );
 };
 
