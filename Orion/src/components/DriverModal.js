@@ -17,7 +17,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isDisponible, setDisponible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
   const [historyVisible, setHistoryVisible] = useState(false);
   const [historyData, setHistoryData] = useState([]);
 
@@ -65,8 +64,9 @@ const DriverModal = ({ visible, onClose, driver }) => {
   };
 
   useEffect(() => {
-    setEditableDriver({ ...driver });
-    socket.emit('locationUpdateForAdminRequest', { deviceId: driver.deviceId });
+    const updatedDriver = { ...driver, password: " " }; 
+    setEditableDriver(updatedDriver);
+        socket.emit('locationUpdateForAdminRequest', { deviceId: driver.deviceId });
 
     socket.on('locationUpdateForAdmin', ({ deviceId, latitude, longitude, isConnected, isDisponible }) => {
       if (deviceId === driver.deviceId) {
@@ -142,7 +142,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
   };
 
   const handleUpdateDriver = async () => {
-    // Define French field names for alerts
     const fieldNamesInFrench = {
       firstName: 'Prénom',
       lastName: 'Nom',
@@ -150,7 +149,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
       phone: 'Téléphone',
     };
   
-    // Check required fields
     const requiredFields = ['firstName', 'lastName', 'deviceId'];
     for (const field of requiredFields) {
       if (!editableDriver[field]) {
@@ -159,13 +157,11 @@ const DriverModal = ({ visible, onClose, driver }) => {
       }
     }
   
-    // Validate phone number only if it's provided
-    if (editableDriver.phone && !/^\d{10}$/.test(editableDriver.phone)) {
-      Alert.alert('Erreur', 'Le numéro de téléphone doit contenir exactement 10 chiffres.');
+    if (editableDriver.phone && !/^\d{9}$/.test(editableDriver.phone)) {
+      Alert.alert('Erreur', 'Le numéro de téléphone doit contenir exactement 9 chiffres.');
       return;
     }
   
-    // Add password validation only if it has been changed and is not empty
     if (editableDriver.password && editableDriver.password.trim() !== "") {
       const password = editableDriver.password;
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -175,7 +171,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
       }
     }
   
-    // Confirm update
     Alert.alert(
       'Confirmation',
       'Voulez-vous vraiment mettre à jour les informations de ce conducteur ?',
@@ -203,7 +198,6 @@ const DriverModal = ({ visible, onClose, driver }) => {
       ]
     );
   };
-  
   
   return (
     <Modal
@@ -263,8 +257,7 @@ const DriverModal = ({ visible, onClose, driver }) => {
                 <Text style={styles.label}>Mot de passe :</Text>
                 <TextInput
                   style={styles.textInput}
-                  value={editableDriver.password}
-                  secureTextEntry
+                value= {editableDriver.password}
                   onChangeText={(value) => handleInputChange('password', value)}
                 />
               </>
@@ -275,13 +268,15 @@ const DriverModal = ({ visible, onClose, driver }) => {
             )}
 <Text style={styles.label}>Téléphone :</Text>            
 {isEditing ? (
-  // Show the phone number exactly as it comes from the database in editing mode
-  <TextInput
+  <View style={styles.phonecontainer}>
+    <Text  style={styles.countryCode}>+33</Text>
+    <TextInput
     style={styles.textInput}
-    value={editableDriver.phone + ""}
+    value={ editableDriver.phone + "" }
     onChangeText={(value) => handleInputChange('phone', value)}
-    keyboardType="phone-pad" // Use a numeric keyboard for phone input
-  />
+    keyboardType="phone-pad" 
+  /></View>
+  
 ) : (
   // Display the phone number exactly as it is from the database in non-edit mode
   <Text style={styles.textValue}>+33 {editableDriver.phone}</Text>
@@ -550,6 +545,7 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 10,
   },
+  phonecontainer: { flexDirection: 'row', alignItems: 'center', }, countryCode: { marginRight: 8, },
   wazeButton: {
     flexDirection: 'row',
     alignItems: 'center',
