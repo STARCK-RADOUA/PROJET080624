@@ -28,6 +28,8 @@ export const LocationProvider = ({ children }) => {
       console.log(`Background Latitude: ${latitude}, Longitude: ${longitude}`);
       if (socket) {
         socket.emit('driverLocationUpdate', { deviceId: Device.osBuildId , latitude, longitude });
+        socket.emit('driverPing', { deviceId: Device.osBuildId  });
+
       }
     }
   });
