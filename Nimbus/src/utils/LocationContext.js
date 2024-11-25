@@ -58,8 +58,8 @@ export const LocationProvider = ({ children }) => {
     const subscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 20000,
-        distanceInterval: 5,
+        timeInterval: 15000,
+        distanceInterval: 1000,
       },
       (location) => {
         const { latitude, longitude } = location.coords;

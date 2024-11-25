@@ -29,6 +29,9 @@ const LoginScreen = ({ navigation }) => {
       }
       const currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation);
+      console.log('------------------------------------');
+      console.log("location login", currentLocation);
+      console.log('------------------------------------');
     })();
   }, []);
 
