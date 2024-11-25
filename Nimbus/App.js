@@ -3,7 +3,6 @@ import { View, ActivityIndicator ,StyleSheet, AppState } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import * as Location from 'expo-location';
-import NetInfo from '@react-native-community/netinfo'; // Import NetInfo for connectivity
 import io from 'socket.io-client';
 import { LocationProvider } from './src/utils/LocationContext';
 import AppNavigator from './src/navigation/AppNavigator';
@@ -124,27 +123,21 @@ navigate('SystemDownScreen')
     let pingInterval = startPingInterval();
 
     // Handle app state changes
-    const handleAppStateChange = (nextAppState) => {
-      setAppState(nextAppState);
-      if (nextAppState === 'active' && isConnected) {
-        console.log('App is active, restarting ping interval');
-        pingInterval = startPingInterval();
-      } else if (nextAppState === 'background') {
-        console.log('App is in the background, clearing ping interval');
-        clearInterval(pingInterval);
-      }
-    };
+   
+      const handleAppStateChange = (nextAppState) => {
+        setAppState(nextAppState);
+        if (nextAppState === 'active' && isConnected) {
+          console.log('App is active, restarting ping interval');
+          pingInterval = startPingInterval();
+        } else if (nextAppState === 'background') {
+          console.log('App is in the background, clearing ping interval');
+          clearInterval(pingInterval);
+        }
+      };
+    
 
     // Monitor connectivity changes
-    const unsubscribeNetInfo = NetInfo.addEventListener((state) => {
-      setIsConnected(state.isConnected);
-      if (!state.isConnected) {
-        console.log('Driver lost internet connection');
-        socket.emit('driverDisconnected', { deviceId });
-      } else {
-        console.log('Driver reconnected to the internet');
-      }
-    });
+ 
 
     // Monitor push notifications
     registerForPushNotificationsAsync().then((token) => {
@@ -166,11 +159,12 @@ navigate('SystemDownScreen')
       }
     });
 
-    AppState.addEventListener('change', handleAppStateChange);
+    const appStateListener = AppState.addEventListener('change', handleAppStateChange);
 
+    // Clean up the event listener in the return statement
     return () => {
-      AppState.removeEventListener('change', handleAppStateChange);
-      unsubscribeNetInfo();
+      // Removing the event listener correctly
+      appStateListener.remove();
       Notifications.removeNotificationSubscription(notificationListener.current);
       Notifications.removeNotificationSubscription(responseListener.current);
       clearInterval(pingInterval);

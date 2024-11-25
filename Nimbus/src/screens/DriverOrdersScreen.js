@@ -10,7 +10,7 @@ import * as Device from 'expo-device';
 import { LocationContext } from '../utils/LocationContext';
 import { navigate } from '../utils/navigationRef';
 import moment from 'moment';
-import { fetchDriverId, updateDriverAvailability, openGoogleMaps, openWaze, getDeviceId } from '../utils/driverOrderUtils';
+import { fetchDriverId, updateDriverAvailability,updateDriverPause, openGoogleMaps, openWaze, getDeviceId } from '../utils/driverOrderUtils';
 import styles from './styles/styles';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
@@ -24,7 +24,9 @@ const DriverOrdersScreen = ({ navigation }) => {
   const [driverInfo, setDriverInfo] = useState({ firstName: '', lastName: '' });
   const [point, setPoint] = useState({ points_earned: ''});
   const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabledPause, setIsEnabledPause] = useState(false);
   const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
+  const [isSwitchDisabledPause, setIsSwitchDisabledPause] = useState(false);
   const [activeStatusMessage, setActiveStatusMessage] = useState('Fetching status...');
   const { startTracking, stopTracking, isTracking } = useContext(LocationContext);
   const [currentLocation, setCurrentLocation] = useState(null); // Ajout d'un état pour la localisation actuelle
@@ -60,6 +62,7 @@ useEffect(() => {
          setOrders(data.orders || []);
         setLoading(false);
         setIsEnabled(data.active);
+        setIsEnabledPause(data.ispause);
       });
 
     
@@ -303,6 +306,15 @@ useEffect(() => {
     Alert.alert('Attendez !', 'Vous ne pouvez pas quitter tant que les commandes n\'est pas livrée.');
 
   };
+  const toggleSwitchPause = () => {
+
+   
+      const newIsEnabled = !isEnabledPause;
+      setIsEnabledPause(newIsEnabled);
+      updateDriverPause(driverId, newIsEnabled);
+      return;
+   
+  };
 
   const handleCardPress = (order) => setSelectedOrder(order);
   const handleCloseModal = () => setSelectedOrder(null);
@@ -336,7 +348,21 @@ useEffect(() => {
             disabled={isSwitchDisabled}
           />
         </View>
+        
+        <View style={styles.headerv}>
         <Text style={styles.statusText}>{`${driverInfo.firstName} ${driverInfo.lastName}`}</Text>
+       
+        <View style={styles.headerv11}>
+
+        <Text style={styles.statusText1}>{`   I   enPause  `}</Text>
+        <Switch
+            trackColor={{ false: '#7a2424', true: '#b9a80e' }}
+            thumbColor={isEnabledPause ? '#696008' : '#ca6411'}
+            onValueChange={toggleSwitchPause}
+            value={isEnabledPause}
+            disabled={isSwitchDisabledPause}
+          /> </View>
+      </View>
       </View>
 
       {isEnabled ? (

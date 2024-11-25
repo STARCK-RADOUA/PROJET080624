@@ -18,6 +18,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
   const [showLivredModal, setShowLivredModal] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [expandAddress, setExpandAddress] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
 
   if (!order) return null;
 
@@ -286,34 +287,33 @@ console.log('------------------------------------');
     <Text style={styles.sectionTitle}>€{order.exchange.toFixed(2)}</Text>
   </Text>
 
-  <TouchableOpacity onPress={() => setExpandAddress(!expandAddress)} style={styles.expandableSection}>
-
-<Text style={styles.expandableLabel}><Ionicons name="location" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
-
-<Ionicons name={expandAddress ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
-
+  <TouchableOpacity onPress={() => setShowAddressModal(true)} style={styles.expandableSection}>
+  <Text style={styles.expandableLabel}><Ionicons name="location" size={16} color="#ffbf00" /> Adresse : {order.address_line}</Text>
+  <Ionicons name="chevron-down" size={20} color="#ffbf00" />
 </TouchableOpacity>
 
-{expandAddress && (
-<View style={styles.additionalAddressInfo}>
-  {order.building && (
-    <Text style={styles.additionalInfo}><Ionicons name="business" size={16} color="#ffbf00" /> Bâtiment : {order.building}</Text>
-  )}
-  {order.floor && (
-    <Text style={styles.additionalInfo}><Ionicons name="layers" size={16} color="#ffbf00" /> Étage : {order.floor}</Text>
-  )}
-  {order.digicode && (
-    <Text style={styles.additionalInfo}><Ionicons name="key" size={16} color="#ffbf00" /> Digicode : {order.digicode}</Text>
-  )}
-  {order.door_number && (
-    <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
-  )}
-    {order.Adrscomment && (
-    <Text style={styles.additionalInfo}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire : {order.Adrscomment}</Text>
-  )}
- 
-</View>
-)}
+<Modal
+  animationType="slide"
+  transparent={true}
+  visible={showAddressModal}
+  onRequestClose={() => setShowAddressModal(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalView}>
+      <Text style={styles.sectionHeader}>Détails de l'adresse</Text>
+
+      {order.building && <Text style={styles.additionalInfo}><Ionicons name="business" size={16} color="#ffbf00" /> Bâtiment : {order.building}</Text>}
+      {order.floor && <Text style={styles.additionalInfo}><Ionicons name="layers" size={16} color="#ffbf00" /> Étage : {order.floor}</Text>}
+      {order.digicode && <Text style={styles.additionalInfo}><Ionicons name="key" size={16} color="#ffbf00" /> Digicode : {order.digicode}</Text>}
+      {order.door_number && <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>}
+      {order.Adrscomment && <Text style={styles.additionalInfo}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire : {order.Adrscomment}</Text>}
+
+      <TouchableOpacity style={styles.affectButton} onPress={() => setShowAddressModal(false)}>
+        <Text style={styles.affectButtonText}>Fermer</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
   <Text style={styles.label}>
     <Ionicons name="time" size={18} color="#17a112" />
@@ -335,7 +335,7 @@ console.log('------------------------------------');
 
             <View style={styles.productsContainer}>
               {displayedProducts.map((item, index) => (
-                <TouchableOpacity key={index} onPress={() => toggleExpand(index)} style={styles.productContainer}>
+                <TouchableOpacity key={index}  style={styles.productContainer}>
                   <View style={styles.imageContainer}>
                     <Image
                       source={{
@@ -350,12 +350,7 @@ console.log('------------------------------------');
                         <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity: "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
 
 
-                    {expanded === index && (
-                      <View>
-                      <Text style={styles.productQuantity}>Type de service :{item.service_type }</Text>
-
-                      </View>
-                    )}
+                  
                   </View>
                   <Ionicons name={expanded === index ? "chevron-up" : "chevron-down"} size={20} color="#ffbf00" />
                 </TouchableOpacity>

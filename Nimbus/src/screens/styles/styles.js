@@ -31,6 +31,20 @@ marginBottom:10,
 
 
         
+      },  headerv11: {
+       
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.9,
+        shadowRadius: 5,
+        elevation: 5,
+        flexDirection: 'row',           // Maintient l'alignement horizontal
+        justifyContent: 'flex-end',   // Aligne les éléments à gauche
+        alignItems: 'center',   
+     
+
+
+        
       },  
       footer: {
         alignItems: 'center',
@@ -173,6 +187,9 @@ marginBottom:10,
       },
       statusText: {
         color: '#A5A5A5',
+        fontSize: 19,
+      }, statusText1: {
+        color: '#aa9d25',
         fontSize: 19,
       },   statusText3: {
         color: '#ac5e16',

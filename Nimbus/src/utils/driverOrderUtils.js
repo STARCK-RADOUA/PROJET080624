@@ -32,6 +32,17 @@ export const updateDriverAvailability = async (driverId, newIsEnabled) => {
   } catch (error) {
     console.error('Error updating driver availability:', error);
   }
+};export const updateDriverPause = async (driverId, newIsEnabled) => {
+  try {
+    if (driverId) {
+      await axios.post(`${BASE_URL}/api/driver/updatePause`, {
+        driverId,
+        isDisponible: newIsEnabled,
+      });
+    }
+  } catch (error) {
+    console.error('Error updating driver availability:', error);
+  }
 };
 
 export const openGoogleMaps = (location) => {
