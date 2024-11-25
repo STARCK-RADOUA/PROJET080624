@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
-import { Camera, CameraType } from 'expo-camera/legacy';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+
 import { BASE_URL } from '@env';
 
 
 const QrCodeScannerScreen = ({ navigation }) => {
-  const [hasPermission, setHasPermission] = useState(null);
+  const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [qrData, setQrData] = useState(null);
   
-  const [type, setType] = useState(CameraType.back); // Set default camera type to back
+  const [type, setType] = useState('back'); // Utiliser 'back' directement
 
   // Request camera permission
   useEffect(() => {
     (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Erreur', 'L\'accès à la caméra est nécessaire pour scanner les QR codes.');
+      if (!permission) {
+        await requestPermission();
       }
-      setHasPermission(status === 'granted');
     })();
-  }, []);
+  }, [permission]);
 
   // Function to handle scanned QR code
   const handleBarCodeScanned = async ({ data }) => {
@@ -50,26 +49,29 @@ console.log('------------------------------------');
 Alert.alert('Succès', 'QR Code validé avec succès');
       } else {
         Alert.alert('Erreur', result.error || 'Échec de la vérification du QR code');
+        
       }
     } catch (error) {
       Alert.alert('Erreur', 'Impossible de vérifier le QR code');
     }
   };
 
-  if (hasPermission === null) {
+  if (permission === null) {
     return <Text>Demande de permission pour la caméra...</Text>;
   }
-  if (hasPermission === false) {
+  if (permission === false) {
     return <Text>Accès à la caméra refusé</Text>;
   }
 
   return (
     <View style={styles.container}>
-      <Camera
+         <CameraView
         style={styles.camera}
-        type={type}
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-      
+        facing={type}
+        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+        barcodeScannerSettings={{
+          barcodeTypes: ['qr'], // Spécifie que seul le QR code doit être scanné
+        }}
       />
       <Text style={styles.scannerText}>Scannez le QR code</Text>
 

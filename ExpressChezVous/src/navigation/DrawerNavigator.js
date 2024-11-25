@@ -13,8 +13,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import { io } from 'socket.io-client';
 import { BASE_URLIO, BASE_URL } from '@env';
 
+const { width , height} = Dimensions.get('window');
+
 const deviceId = Device.osBuildId;
-const { width, height } = Dimensions.get('window');
 
 const CustomDrawerContent = (props) => {
   const socket = io(BASE_URLIO);
@@ -77,7 +78,7 @@ const CustomDrawerContent = (props) => {
 
       {/* QR Code Button */}
       <TouchableOpacity style={styles.qrButton} onPress={handleQRCodePress}>
-        <Icon name="qrcode-scan" size={200} color="#fff" />
+        <Icon name="qrcode-scan" size={width*0.5} color="#fff" />
         <Text style={styles.qrText}>génère un code QR</Text>
       </TouchableOpacity>
 
@@ -291,7 +292,8 @@ const styles = StyleSheet.create({
   qrButton: {
     flexDirection: 'column',
     alignItems: 'center',
-    width: '90%',
+    width: width*0.6,
+    height: height*0.31,
     marginLeft: "5%",
     backgroundColor: '#b49324', // Transparent gold background
     borderRadius: 30,

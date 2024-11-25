@@ -11,16 +11,16 @@ import * as Device from 'expo-device';
 
 const SplashScreen = ({ navigation }) => {
   const deviceId = Device.osBuildId;
-
+   const socket = io(BASE_URLIO, {
+      query: {
+        deviceId: deviceId,  // Pass the unique deviceId
+      },
+    });
   const [isSystemActive, setIsSystemActive] = useState(true);
 
   useEffect(() => {
     // Initialize socket connection
-    const socket = io(BASE_URLIO, {
-      query: {
-        deviceId: deviceId,  // Pass the unique deviceId
-      },
-    });    // Listen to the socket for the system status
+     // Listen to the socket for the system status
     socket.on('statusSiteDriver', (systemActive) => {
       // Check the system status from the server
       console.log('System status received:', { systemActive });

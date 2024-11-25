@@ -101,7 +101,13 @@ const [uniqueId, setUniqueId] = useState('');
           routes: [{ name: 'Loading' }],
         });
       } else {
-        Alert.alert('Error', data.details);
+        Alert.alert('Error', 'compt deja existant');
+        await AsyncStorage.removeItem('registrationTimestamp');
+
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        });
       }
     });
 
