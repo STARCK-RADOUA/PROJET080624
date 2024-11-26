@@ -247,12 +247,10 @@ console.log('------------------------------------');
     >
       <View style={styles.modalContainer}>
         <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
-          {/* Bouton de fermeture */}
           <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
             <Ionicons name="close-circle" size={37} color="#ff5c5c" />
           </TouchableOpacity>
 
-            {/* Infos sur la commande */}
             <View style={styles.orderInfo}>
   
   <Text style={styles.label}>
@@ -329,7 +327,6 @@ console.log('------------------------------------');
 </View>
 
 
-            {/* Produits */}
             <Text style={styles.sectionHeader}>Produits :</Text>
             <ScrollView>
 
@@ -356,7 +353,6 @@ console.log('------------------------------------');
                 </TouchableOpacity>
               ))}
 
-              {/* Bouton pour afficher plus de produits */}
               {order.products.length > 3 && !showAllProducts && (
                 <TouchableOpacity
                   style={styles.showMoreButton}
@@ -369,7 +365,6 @@ console.log('------------------------------------');
 
 
 
-            {/* Prix Total */}
             
           </ScrollView>
           <View style={styles.totalContainer}>
