@@ -253,7 +253,7 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
                 onPress={() => settHeserviceModalVisible(true)}
               >
                 <Text style={styles.driverSelectText}>
-                {selectedtHeservice ? selectedtHeservice : 'Sélectionner un chauffeur'}
+                {selectedtHeservice ? selectedtHeservice : 'Sélectionner une service'}
                 </Text>
                 <Ionicons name="chevron-down" size={20} color="#ffbf00" />
               </TouchableOpacity>

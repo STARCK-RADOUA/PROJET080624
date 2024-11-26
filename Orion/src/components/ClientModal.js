@@ -1,46 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { Modal,Dimensions, View, Text, TouchableOpacity, StyleSheet, Switch, Alert,Linking, FlatList } from 'react-native';
+import {
+  Modal,
+  Dimensions,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Switch,
+  Alert,
+  Linking,
+  FlatList,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL, BASE_URLIO } from '@env';
 import io from 'socket.io-client';
-const { width , height} = Dimensions.get('window');
-
 import moment from 'moment';
+
+const { width, height } = Dimensions.get('window');
+
 const ClientModal = ({ visible, onClose, client }) => {
-  if (!client) return null;
-
-  const [editableClient, setEditableClient] = useState({ ...client });
-  const [historyVisible, setHistoryVisible] = useState(false); // État pour la modale d'historique
-  const [historyData, setHistoryData] = useState([]); // Stocke les données d'historique
-
-  useEffect(() => {
-    setEditableClient({ ...client });
-  }, [client]);
+  // Initialize hooks at the top level
+  const [editableClient, setEditableClient] = useState(client ? { ...client } : null);
+  const [historyVisible, setHistoryVisible] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
 
   // Connexion Socket.IO pour l'activation/désactivation
   const socket = io(BASE_URLIO);
 
+  useEffect(() => {
+    if (client) {
+      setEditableClient({ ...client });
+    } else {
+      setEditableClient(null);
+    }
+  }, [client]);
+
   const fetchHistory = async () => {
+    if (!client) return;
     try {
       const response = await axios.get(`${BASE_URL}/api/history/${client._id}`);
-      setHistoryData(response.data); 
-      console.log('------------------------------------');
-      console.log(response.data);
-      console.log('------------------------------------');// Remplir les données d'historique
+      setHistoryData(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération de l’historique:', error);
     }
   };
 
   const handleActivateDeactivate = (isActive) => {
-    // Fonction pour activer/désactiver le client
     try {
       setEditableClient((prevClient) => ({
         ...prevClient,
         activated: isActive,
       }));
-      socket.emit('adminActivateDeactivateClient', { clientId: editableClient._id, isActive, deviceId: editableClient.deviceId });
+      socket.emit('adminActivateDeactivateClient', {
+        clientId: editableClient._id,
+        isActive,
+        deviceId: editableClient.deviceId,
+      });
       Alert.alert('Succès', `Client ${isActive ? 'activé' : 'désactivé'} avec succès.`);
     } catch (error) {
       console.error('Erreur lors de l’activation/désactivation du client:', error);
@@ -51,20 +67,18 @@ const ClientModal = ({ visible, onClose, client }) => {
       }));
     }
   };
-  const openInWaze = (location) => {
-    const [latitude, longitude] = location.split(' ');
-    const wazeUrl = `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`;
-    Linking.openURL(wazeUrl);
-  };
+
   const handleToggleLoginStatus = () => {
-    // Fonction pour basculer l'état de connexion du client
     try {
       const newLoginStatus = !editableClient.isLogin;
       setEditableClient((prevClient) => ({
         ...prevClient,
         isLogin: newLoginStatus,
       }));
-      socket.emit('adminToggleLoginStatus', { clientId: editableClient._id, deviceId: editableClient.deviceId });
+      socket.emit('adminToggleLoginStatus', {
+        clientId: editableClient._id,
+        deviceId: editableClient.deviceId,
+      });
       Alert.alert('Succès', `État de connexion ${newLoginStatus ? 'activé' : 'désactivé'} avec succès.`);
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l’état de connexion:', error);
@@ -75,17 +89,40 @@ const ClientModal = ({ visible, onClose, client }) => {
       }));
     }
   };
+
+  const openInWaze = (location) => {
+    const [latitude, longitude] = location.split(' ');
+    const wazeUrl = `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`;
+    Linking.openURL(wazeUrl);
+  };
+
+  // Handle the case where editableClient is null
+  if (!editableClient) return null;
+
   return (
-    <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+    >
       <View style={styles.modalContainer}>
         <View style={styles.modalView}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Ionicons name="close-circle" size={30} color="#333" />
           </TouchableOpacity>
 
-          <Text style={styles.name}>{editableClient.firstName} {editableClient.lastName}</Text>
+          <Text style={styles.name}>
+            {editableClient.firstName} {editableClient.lastName}
+          </Text>
 
-          <TouchableOpacity style={styles.historyButton} onPress={() => { setHistoryVisible(!historyVisible); fetchHistory(); }}>
+          <TouchableOpacity
+            style={styles.historyButton}
+            onPress={() => {
+              setHistoryVisible(!historyVisible);
+              fetchHistory();
+            }}
+          >
             <Ionicons name="time-outline" size={24} color="#5A67D8" />
             <Text style={styles.historyText}>Historique des connexions</Text>
           </TouchableOpacity>
@@ -96,8 +133,12 @@ const ClientModal = ({ visible, onClose, client }) => {
           </View>
 
           <View style={styles.fieldRow}>
-            <Text style={styles.label}>ID de l'appareil:</Text>
-            <Text style={styles.textValue} numberOfLines={1} ellipsizeMode="tail">{editableClient.deviceId}</Text>
+          <View style={styles.fieldColumn}>
+  <Text style={styles.label}>ID de l'appareil:</Text>
+  <Text style={styles.textValue}>
+    {editableClient.deviceId}
+  </Text>
+</View>
           </View>
 
           <View style={styles.fieldRow}>
@@ -117,8 +158,8 @@ const ClientModal = ({ visible, onClose, client }) => {
             <Switch
               value={editableClient.activated}
               onValueChange={handleActivateDeactivate}
-              thumbColor={editableClient.activated ? "#34C759" : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
+              thumbColor={editableClient.activated ? '#34C759' : '#f4f3f4'}
+              trackColor={{ false: '#767577', true: '#81b0ff' }}
             />
           </View>
 
@@ -127,8 +168,8 @@ const ClientModal = ({ visible, onClose, client }) => {
             <Switch
               value={editableClient.isLogin}
               onValueChange={handleToggleLoginStatus}
-              thumbColor={editableClient.isLogin ? "#34C759" : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
+              thumbColor={editableClient.isLogin ? '#34C759' : '#f4f3f4'}
+              trackColor={{ false: '#767577', true: '#81b0ff' }}
             />
           </View>
 
@@ -138,11 +179,20 @@ const ClientModal = ({ visible, onClose, client }) => {
               keyExtractor={(item) => item._id}
               renderItem={({ item }) => (
                 <View style={styles.historyItem}>
-                  <Text style={styles.historyDescription}>{item.description}</Text>
-                  <Text style={styles.historyDate}>{moment(item.dateAction).format('YYYY-MM-DD HH:mm')}</Text>
-                  <TouchableOpacity style={styles.wazeButton} onPress={() => openInWaze(item.location)}>
+                  <Text style={styles.historyDescription}>
+                    {item.description}
+                  </Text>
+                  <Text style={styles.historyDate}>
+                    {moment(item.dateAction).format('YYYY-MM-DD HH:mm')}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.wazeButton}
+                    onPress={() => openInWaze(item.location)}
+                  >
                     <Ionicons name="navigate-outline" size={20} color="white" />
-                    <Text style={styles.wazeButtonText}>Ouvrir dans Waze</Text>
+                    <Text style={styles.wazeButtonText}>
+                      Ouvrir dans Waze
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -159,6 +209,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    // backgroundColor adjusted to ensure modal visibility
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
@@ -167,7 +218,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     elevation: 5,
-    maxHeight: height*0.9,
+    maxHeight: height * 0.9,
   },
   closeButton: {
     alignSelf: 'flex-end',
@@ -244,6 +295,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 5,
     fontWeight: 'bold',
+  },
+  fieldColumn: {
+    marginVertical: 10,
+  },
+  label: {
+    fontWeight: 'bold',
+    color: '#555',
+    marginBottom: 5,
+  },
+  textValue: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 

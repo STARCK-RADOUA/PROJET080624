@@ -194,7 +194,7 @@ const OngoingOrdersScreen = () => {
                   <Text style={styles.location}>{item.address_line}</Text>
                   <View style={styles.rightContainer}>
                     <Text style={styles.price}>€{item.total_price.toFixed(2)}</Text>
-                    <Text style={styles.date}>{moment(item.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+                    <Text style={styles.date}> Créé le :{moment(item.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
                   </View>
                 </View>
               </View>

@@ -9,33 +9,45 @@ import { firebase } from './../services/firebaseConfig';
 import { BASE_URL } from '@env';
 
 const ProductModal = ({ visible, onClose, product }) => {
-  if (!product) return null;
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editableProduct, setEditableProduct] = useState({ ...product });
+const [isEditing, setIsEditing] = useState(false);
+  const [editableProduct, setEditableProduct] = useState(product ? { ...product } : null);
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
-  const [image, setImage] = useState(editableProduct.image_url);
+  const [image, setImage] = useState(product ? product.image_url : null);
   const [uploading, setUploading] = useState(false);
   const [uploadButtonVisible, setUploadButtonVisible] = useState(false);
   const [tHeserviceModalVisible, settHeserviceModalVisible] = useState(false); // Modal visibility state for driver selection
   const [selectedtHeservice, setSelectedtHeservice] = useState(null);
+
   useEffect(() => {
-    axios.get(`${BASE_URL}/api/services`)
-      .then(response => {
+    axios
+      .get(`${BASE_URL}/api/services`)
+      .then((response) => {
         setServiceTypeOptions(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Erreur lors de la récupération des types de service:', error);
       });
   }, []);
 
   useEffect(() => {
-    setEditableProduct({ ...product });
-    setImage(product.image_url);
+    if (product) {
+      setEditableProduct({ ...product });
+      setImage(product.image_url);
+    } else {
+      setEditableProduct(null);
+      setImage(null);
+    }
   }, [product]);
 
+  // Handle the case where editableProduct is null
+  if (!editableProduct) return null;
+
+  
   const handleInputChange = (field, value) => {
+    if (field === 'price') {
+      value = value.replace(',', '.');
+    }
     setEditableProduct((prevProduct) => ({
       ...prevProduct,
       [field]: value,
@@ -94,6 +106,23 @@ const ProductModal = ({ visible, onClose, product }) => {
     }
   };
 
+
+  const handleOptionChange = (index, field, value) => {
+    const updatedOptions = editableProduct.options.map((option, i) => {
+      if (i === index) {
+        // Replace comma with period in price fields
+        if (field === 'price') {
+          value = value.replace(',', '.');
+        }
+        return { ...option, [field]: value };
+      }
+      return option;
+    });
+    setEditableProduct((prevProduct) => ({
+      ...prevProduct,
+      options: updatedOptions,
+    }));
+  };
   const toggleEdit = () => {
     setIsEditing(!isEditing);
   };
@@ -236,6 +265,9 @@ const ProductModal = ({ visible, onClose, product }) => {
             <Ionicons name="close-circle" size={30} color="#fff" />
           </TouchableOpacity>
 
+          <ScrollView contentContainerStyle={styles.formContainer}>
+
+
           <View style={styles.imageContainer}>
             {image ? (
               <Image source={{ uri: image }} style={styles.productImage} />
@@ -330,7 +362,7 @@ const ProductModal = ({ visible, onClose, product }) => {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.optionsContainer}>
+           <View style={styles.optionsContainer}>
             <Text style={styles.optionsTitle}>Options:</Text>
             {editableProduct.options.length > 0 ? (
               editableProduct.options.map((option, index) => (
@@ -340,26 +372,14 @@ const ProductModal = ({ visible, onClose, product }) => {
                       <TextInput
                         style={styles.optionName}
                         value={option.name}
-                        onChangeText={(value) =>
-                          handleInputChange('options', [
-                            ...editableProduct.options.slice(0, index),
-                            { ...option, name: value },
-                            ...editableProduct.options.slice(index + 1),
-                          ])
-                        }
+                        onChangeText={(value) => handleOptionChange(index, 'name', value)}
                         placeholder="Nom de l'option"
                         placeholderTextColor="#999"
                       />
                       <TextInput
                         style={styles.optionPrice}
-                        value={String(option.price)}
-                        onChangeText={(value) =>
-                          handleInputChange('options', [
-                            ...editableProduct.options.slice(0, index),
-                            { ...option, price: parseFloat(value) },
-                            ...editableProduct.options.slice(index + 1),
-                          ])
-                        }
+                        value={option.price.toString()}
+                        onChangeText={(value) => handleOptionChange(index, 'price', value)}
                         keyboardType="numeric"
                         placeholder="Prix de l'option"
                         placeholderTextColor="#999"
@@ -371,7 +391,9 @@ const ProductModal = ({ visible, onClose, product }) => {
                   ) : (
                     <>
                       <Text style={styles.optionName}>{option.name}</Text>
-                      <Text style={styles.optionPrice}>+${option.price ? parseFloat(option.price).toFixed(2) : '0.00'}</Text>
+                      <Text style={styles.optionPrice}>
+                        +{option.price ? `${parseFloat(option.price).toFixed(2)} €` : '0.00 €'}
+                      </Text>
                     </>
                   )}
                 </View>
@@ -386,6 +408,7 @@ const ProductModal = ({ visible, onClose, product }) => {
               </TouchableOpacity>
             )}
           </View>
+
 
           {errorMessage ? (
             <Text style={styles.errorMessage}>{errorMessage}</Text>
@@ -403,6 +426,7 @@ const ProductModal = ({ visible, onClose, product }) => {
           <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteProduct}>
             <Text style={styles.deleteButtonText}>Supprimer</Text>
           </TouchableOpacity>
+          </ScrollView>
         </View>
       </View>
       {rendertHeserviceDropdown()}
@@ -414,9 +438,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    
     backgroundColor: 'rgba(0, 0, 0, 0.85)', // Dark overlay for modal background
   },
   modalView: {
+    marginTop: 40, // Added margin top for spacing
+    marginBottom: 40, // Added margin bottom for spacing
     width: '90%',
     backgroundColor: '#38435a88', // Dark grey background for the modal
     borderRadius: 15,
@@ -427,6 +454,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 5, // Elevation to make the modal appear raised
+  },
+  formContainer: {
+    paddingBottom: 20,
   },
   closeButton: {
     position: 'absolute',

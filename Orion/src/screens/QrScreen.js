@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Modal, ActivityIndicator } from 'react-native';
 import axios from 'axios';
-import { BASE_URL } from '@env'; 
+import { BASE_URL } from '@env';
 import { Ionicons } from '@expo/vector-icons';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; 
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const QrScreen = () => {
   const [qrData, setQrData] = useState([]);
@@ -27,18 +27,18 @@ const QrScreen = () => {
         console.error(error);
       }
     };
-    fetchQrData(); 
+    fetchQrData();
   }, []);
 
   // Unified filter logic: it filters based on both search text and selected type
   const applyFilter = (query, type) => {
     const filtered = qrData.filter(item => {
-      const matchesType = 
-        type === 'tous' || 
-        (type === 'driver' && item.type === 'Driver') || 
+      const matchesType =
+        type === 'tous' ||
+        (type === 'driver' && item.type === 'Driver') ||
         (type === 'client' && item.type === 'Client');
-      
-      const matchesQuery = 
+
+      const matchesQuery =
         item.userInfo.firstName.toLowerCase().includes(query.toLowerCase()) ||
         item.userInfo.lastName.toLowerCase().includes(query.toLowerCase()) ||
         item.userInfo.phone.toString().includes(query) ||
@@ -108,10 +108,7 @@ const QrScreen = () => {
         {['Tous', 'Driver', 'Client'].map((type, index) => (
           <TouchableOpacity
             key={index}
-            style={[
-              styles.listItem,
-              selectedType === type.toLowerCase() && styles.selectedListItem,
-            ]}
+            style={[styles.listItem, selectedType === type.toLowerCase() && styles.selectedListItem]}
             onPress={() => handleTypeChange(type)}
           >
             <Text style={styles.listItemText}>{type}</Text>
@@ -174,259 +171,107 @@ const QrScreen = () => {
       </ScrollView>
 
       {/* QR Code Modal */}
-     
+      {selectedQr && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalView}>
+              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                <Ionicons name="close-circle" size={40} color="black" />
+              </TouchableOpacity>
 
-{selectedQr && (
-  <Modal
-    animationType="slide"
-    transparent={true}
-    visible={isModalVisible}
-    onRequestClose={closeModal}
-  >
-    <View style={styles.modalContainer}>
-      <View style={styles.modalView}>
-        <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-          <Ionicons name="close-circle" size={30} color="black" />
-        </TouchableOpacity>
+              <Text style={styles.modalTitle}>📜 Détails du QR Code</Text>
 
-        <Text style={styles.modalTitle}>📜 Détails du QR Code</Text>
+              <View style={styles.fieldRow}>
+                <Text style={styles.label}>🔢 QR Code:</Text>
+                <Text style={styles.textValue}>{selectedQr.qr}</Text>
+              </View>
 
-<View style={styles.fieldRow}>
-<Text style={styles.label}>🔢 QR Code:</Text>
-<Text style={styles.textValue}>{selectedQr.qr}</Text>
-</View>
+              <View style={styles.fieldRow}>
+                <Text style={styles.label}>⏳ Expire le:</Text>
+                <Text style={styles.textValue}>{new Date(selectedQr.expirationTime).toLocaleString()}</Text>
+              </View>
 
-<View style={styles.fieldRow}>
-<Text style={styles.label}>⏳ Expire le:</Text>
-<Text style={styles.textValue}>{new Date(selectedQr.expirationTime).toLocaleString()}</Text>
-</View>
+              <View style={styles.fieldRow}>
+                <Text style={styles.label}>👨‍💼 Auteur du code de parrainage:</Text>
+                <Text style={styles.textValue}>{selectedQr.userInfo.firstName} {selectedQr.userInfo.lastName}</Text>
+              </View>
 
-<View style={styles.fieldRow}>
-<Text style={styles.label}>👨‍💼 Auteur du code de parrainage:</Text>
-<Text style={styles.textValue}>{selectedQr.userInfo.firstName} {selectedQr.userInfo.lastName}</Text>
-</View>
+              <View style={styles.fieldRow}>
+                <Text style={styles.label}>🛠️ Type de générateur:</Text>
+                <Text style={styles.textValue}>{selectedQr.type}</Text>
+              </View>
 
-<View style={styles.fieldRow}>
-<Text style={styles.label}>🛠️ Type de générateur:</Text>
-<Text style={styles.textValue}>{selectedQr.type}</Text>
-</View>
+              <View style={styles.fieldRow}>
+                <Text style={styles.label}>📞 Téléphone de générateur:</Text>
+                <Text style={styles.textValue}>+33 {selectedQr.userInfo.phone}</Text>
+              </View>
 
-<View style={styles.fieldRow}>
-<Text style={styles.label}>📞 Téléphone de générateur:</Text>
-<Text style={styles.textValue}>+33 {selectedQr.userInfo.phone}</Text>
-</View>
+              <View style={styles.fieldRow}>
+                <Text style={styles.label}>💻 Device ID de générateur:</Text>
+                <Text style={styles.textValue}>{selectedQr.deviceId}</Text>
+              </View>
 
-<View style={styles.fieldRow}>
-<Text style={styles.label}>💻 Device ID de générateur:</Text>
-<Text style={styles.textValue}>{selectedQr.deviceId}</Text>
-</View>
+              <View style={styles.fieldRow}>
+                <Text style={styles.label}>💻 Device ID de Scanneur:</Text>
+                <Text style={styles.textValue}>
+                  {selectedQr.newclientDeviceId ? selectedQr.newclientDeviceId : '❓ Inconnu'}
+                </Text>
+              </View>
 
-<View style={styles.fieldRow}>
-<Text style={styles.label}>💻 Device ID de Scanneur:</Text>
-<Text style={styles.textValue}>
-{selectedQr.newclientDeviceId ? selectedQr.newclientDeviceId : '❓ Inconnu'}
-</Text>
-</View>
+              <View style={styles.fieldRow}>
+                <Text style={styles.label}>🧑‍💼 Scanneur du code:</Text>
+                <Text style={styles.textValue}>
+                  {selectedQr.clientInfo?.firstName ? selectedQr.clientInfo.firstName : '❓ Inconnu'}
+                  {selectedQr.clientInfo?.lastName ? ' ' + selectedQr.clientInfo.lastName : ''}
+                </Text>
+              </View>
 
-<View style={styles.fieldRow}>
-<Text style={styles.label}>🧑‍💼 Scanneur du code:</Text>
-<Text style={styles.textValue}>
-{selectedQr.clientInfo?.firstName ? selectedQr.clientInfo.firstName : '❓ Inconnu'}
-{selectedQr.clientInfo?.lastName ? ' ' + selectedQr.clientInfo.lastName : ''}
-</Text>
-</View>
+              <View style={styles.fieldRow}>
+                <Text style={styles.label}>📞 Téléphone de Scanneur:</Text>
+                <Text style={styles.textValue}>
+                  {selectedQr.clientInfo?.phone ? `+33 ${selectedQr.clientInfo.phone}` : '❓ Inconnu'}
+                </Text>
+              </View>
 
-<View style={styles.fieldRow}>
-<Text style={styles.label}>📞 Téléphone de Scanneur:</Text>
-<Text style={styles.textValue}>
-{selectedQr.clientInfo?.phone ? `+33 ${selectedQr.clientInfo.phone}` : '❓ Inconnu'}
-</Text>
-</View>
-
-
-        
-        <View style={styles.separator} />
-      </View>
-    </View>
-  </Modal>
+            </View>
+          </View>
+        </Modal>
       )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#F9F9F9', // Light background for a clean look
-  },
-  searchInput: {
-    height: 50,
-    borderColor: '#DDD', // Light grey border
-    borderWidth: 1,
-    borderRadius: 12, // Rounded corners for a modern feel
-    paddingHorizontal: 15,
-    fontSize: 16,
-    backgroundColor: '#FFF', // White background for input
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-    marginBottom: 20,
-  },
-  listContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginBottom: 15,
-    backgroundColor: '#EEE', // Subtle background for filter options
-    borderRadius: 25,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-  },
-  listItem: {
-    flex: 1,
-    paddingVertical: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10, // Rounded button
-    marginHorizontal: 5,
-  },
-  selectedListItem: {
-    backgroundColor: '#5A67D8', // Indigo color for selected filter
-  },
-  listItemText: {
-    color: '#555', // Dark grey text
-    fontSize: 14,
-  },
-  sortButton: {
-    backgroundColor: '#5A67D8',
-    borderRadius: 10,
-    padding: 10,
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  sortButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  cardContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  card: {
-    width: Dimensions.get('window').width - 40,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 20,
-    marginVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  qrPlaceholder: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#4A5568', // Dark grey placeholder for QR
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2D3748', // Dark grey text
-    marginBottom: 8,
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: '#718096', // Light grey for subtitles
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.75)', // Dark overlay for modal
-  },
-  modalView: {
-    width: '85%',
-    backgroundColor: '#FFF',
-    borderRadius: 15,
-    padding: 25,
-    alignItems: 'stretch',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  closeButton: {
-    alignSelf: 'flex-end',
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#2B6CB0', // Blue text for title
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  fieldRow: {
-    flexDirection: 'column', // Stack items vertically
-    alignItems: 'flex-start', // Align items to the start of the container
-    marginVertical: 10, // Maintain some space between rows
-  },
-  label: {
-    fontSize: 17,
-    fontWeight: '500',
-    color: '#2b70e7', // Blue color for labels
-    marginBottom: 5, // Add space below the label
-  },
-  textValue: {
-    marginLeft: 20, //
-    fontSize: 16,
-    color: '#1A202C', // Black text for values
-    textAlign: 'left', // Align text to the left
-    marginBottom: 5, // Add space below the value
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#CBD5E0', // Light grey separator
-    marginVertical: 10,
-  },
-  skeletonCard: {
-    width: Dimensions.get('window').width - 40,
-    backgroundColor: '#F1F5F9',
-    borderRadius: 20,
-    padding: 20,
-    marginVertical: 10,
-    alignItems: 'center',
-  },
-  skeletonPlaceholder: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  skeletonText: {
-    width: '70%',
-    height: 20,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 5,
-    marginVertical: 5,
-  },
+  container: { flex: 1, padding: 10, backgroundColor: '#f7f7f7' },
+  searchInput: { height: 40, borderColor: '#ccc', borderWidth: 1, paddingLeft: 10, borderRadius: 5 },
+  listContainer: { flexDirection: 'row', marginVertical: 10 },
+  listItem: { padding: 10, backgroundColor: '#e0e0e0', borderRadius: 5, marginRight: 5 },
+  selectedListItem: { backgroundColor: '#81c784' },
+  listItemText: { color: '#000', fontSize: 16 },
+  sortButton: { padding: 10, backgroundColor: '#4caf50', marginVertical: 10, borderRadius: 5 },
+  sortButtonText: { color: '#fff', fontSize: 16, textAlign: 'center' },
+  cardContainer: { paddingBottom: 10 },
+  card: { flexDirection: 'row', backgroundColor: '#ffffff', padding: 10, marginBottom: 15, borderRadius: 10, borderWidth: 1, borderColor: '#ddd' },
+  cardContent: { flexDirection: 'row', flex: 1 },
+  qrPlaceholder: { backgroundColor: '#2196f3', padding: 10, borderRadius: 10, marginRight: 15 },
+  textContainer: { flex: 1 },
+  cardTitle: { fontSize: 18, fontWeight: 'bold' },
+  cardSubtitle: { fontSize: 14, color: '#666' },
+  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+  modalView: { backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' },
+  closeButton: { position: 'absolute', top: 10, right: 10 },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 15 },
+  fieldRow: { flexDirection: 'row', marginBottom: 10 },
+  label: { fontWeight: 'bold', flex: 1 },
+  textValue: { flex: 2, color: '#333' },
+  skeletonCard: { backgroundColor: '#e0e0e0', padding: 15, borderRadius: 10, marginBottom: 10 },
+  skeletonPlaceholder: { backgroundColor: '#ccc', height: 15, width: '80%', borderRadius: 5, marginBottom: 10 },
+  skeletonText: { backgroundColor: '#ccc', height: 10, width: '60%', borderRadius: 5, marginBottom: 5 },
 });
-
 
 export default QrScreen;

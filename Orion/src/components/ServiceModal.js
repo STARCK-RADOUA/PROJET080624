@@ -8,20 +8,26 @@ import { firebase } from './../services/firebaseConfig';
 import { BASE_URL } from '@env';
 
 const ServiceModal = ({ visible, onClose, service }) => {
-  if (!service) return null;
-
+  // Initialize hooks at the top level
   const [isEditing, setIsEditing] = useState(false);
-  const [editableService, setEditableService] = useState({ ...service });
-  const [image, setImage] = useState(editableService.image);
+  const [editableService, setEditableService] = useState(service ? { ...service } : null);
+  const [image, setImage] = useState(service ? service.image : null);
   const [uploading, setUploading] = useState(false);
   const [uploadButtonVisible, setUploadButtonVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    setEditableService({ ...service });
-    setImage(service.image);
+    if (service) {
+      setEditableService({ ...service });
+      setImage(service.image);
+    } else {
+      setEditableService(null);
+      setImage(null);
+    }
   }, [service]);
 
+  // Handle the case where editableService is null
+  if (!editableService) return null;
   const handleInputChange = (field, value) => {
     setEditableService((prevService) => ({
       ...prevService,
