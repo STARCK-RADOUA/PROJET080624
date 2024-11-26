@@ -20,6 +20,23 @@ export const fetchDriverId = async (deviceId, setDriverId, setDriverInfo,setPoin
     console.error('Error fetching driver ID:', error);
   }
 };
+export const getDistance = async (startLat, startLng, endLat, endLng) => {
+  try {
+    // Envoyer les données dans le corps de la requête
+    const response = await axios.post(`${BASE_URL}/api/driver/get-distance`, {
+      startLat,
+      startLng,
+      endLat,
+      endLng
+    });
+
+    const { distance } = response.data;
+    return { distance };
+  } catch (error) {
+    console.error(error);
+    return { distance: 'que quelques' }; // Retour en cas d'erreur
+  }
+};
 
 export const updateDriverAvailability = async (driverId, newIsEnabled) => {
   try {

@@ -10,7 +10,7 @@ import * as Device from 'expo-device';
 import { LocationContext } from '../utils/LocationContext';
 import { navigate } from '../utils/navigationRef';
 import moment from 'moment';
-import { fetchDriverId, updateDriverAvailability,updateDriverPause, openGoogleMaps, openWaze, getDeviceId } from '../utils/driverOrderUtils';
+import { fetchDriverId, updateDriverAvailability,getDistance,updateDriverPause, openGoogleMaps, openWaze, getDeviceId } from '../utils/driverOrderUtils';
 import styles from './styles/styles';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
@@ -201,24 +201,7 @@ useEffect(() => {
 
   };
 
-  const getDistance = async (startLat, startLng, endLat, endLng) => {
-    const osrmUrl = `http://192.168.8.159:5000/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=false`;
-
-    try {
-      const response = await axios.get(osrmUrl, { timeout: 10000 });
-      const data = response.data;
-
-      if (data.code === 'Ok' && data.routes.length > 0) {
-        const route = data.routes[0];
-        return { distance: (route.distance / 1000).toFixed(2) }; // Convertir en km
-      } else {
-        throw new Error('Error retrieving route data.');
-      }
-    } catch (error) {
-      console.error(error);
-      return { distance: 'que quelques' };
-    }
-  };
+  
 
   const confirmLogout = () => {
     // Affiche une alerte de confirmation avant la déconnexion
@@ -322,7 +305,7 @@ useEffect(() => {
   return (
     <View style={styles.container}>
       <View style={[styles.headerh, {
-        shadowColor: !isEnabled ? '#7a2424' : '#28919b', // Rouge si désactivé, vert sinon
+        shadowColor: !isEnabled ? '#7a2424' : '#28919b', 
       }]}>
         <View style={styles.headerv}>
           <TouchableOpacity style={styles.qr} onPress={() => navigate('QrcodeGeneratorDriverScreen')}>
@@ -351,17 +334,17 @@ useEffect(() => {
         
         <View style={styles.headerv}>
         <Text style={styles.statusText}>{`${driverInfo.firstName} ${driverInfo.lastName}`}</Text>
-       
         <View style={styles.headerv11}>
-
-        <Text style={styles.statusText1}>{`   I   enPause  `}</Text>
+        <Text style={styles.statusText1}>  I   enPause  </Text>
         <Switch
             trackColor={{ false: '#7a2424', true: '#b9a80e' }}
             thumbColor={isEnabledPause ? '#696008' : '#ca6411'}
             onValueChange={toggleSwitchPause}
             value={isEnabledPause}
             disabled={isSwitchDisabledPause}
-          /> </View>
+          /> 
+            
+          </View>
       </View>
       </View>
 
@@ -389,7 +372,7 @@ useEffect(() => {
                         <Text style={styles.orderNumber}>Client #
                           <Text style={{ color: item.client_name ? '#28a745' : '#dc3545', fontWeight: 'bold' }}>
                             {item.client_name ?? 'N/A'}
-                          </Text>
+             -             </Text>
                         </Text>
                         <Text style={styles.distance}>Adresse:  {"\n"}
                           <Text style={{ color: item.address_line ? '#1ca5a5' : '#dc3545', fontWeight: 'bold' }}>
@@ -425,10 +408,9 @@ useEffect(() => {
                             <Ionicons name="send-outline" size={24} color="white" />
                             <Text style={styles.navigateText}></Text>
 
-                            {/* Check each message for unread status */}
                             {messages.map((message, index) => {
                               const hasUnread = message.orderId === item.order_number && !message.lastMessage.seen && message.lastMessage.sender !== "driver";
-                              console.log(message.sender, "hgfg")
+                              console.log(message.sender, "hgfg   wa mahddi ach hadda  ")
                               return (
                                 hasUnread && (
                                   <View key={index} style={styles.unreadIndicator}>
@@ -465,10 +447,9 @@ useEffect(() => {
               <Ionicons name="send-outline" size={30} color="white" />
               {
                 (() => {
-                  // Ensure that supportMessages exists and has at least one message
                   const hasUnread = supportMessages?.length > 0 && !supportMessages[0].lastMessage.seen && supportMessages[0].lastMessage.sender !== "client";
 
-                  console.log(supportMessages?.[0]?.lastMessage?.seen, "bvbvnbb");  // Added optional chaining to prevent errors
+                  console.log(supportMessages?.[0]?.lastMessage?.seen, "bvbvnbb"); 
 
                   return (
                     hasUnread && (
