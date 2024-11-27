@@ -67,7 +67,9 @@ export default function DriversRevenueScreen() {
       driver.firstName.toLowerCase().includes(query.toLowerCase()) ||
       driver.lastName.toLowerCase().includes(query.toLowerCase()) ||
       driver.driverId.toString().includes(query) ||
-      driver.userId.toString().includes(query)
+      driver.userId.toString().includes(query) ||
+      driver.phone.toString().includes(query)
+
     );
     setFilteredDrivers(filtered);
   };
@@ -89,7 +91,7 @@ export default function DriversRevenueScreen() {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Rechercher par nom, téléphone, ID..."
+          placeholder="Rechercher par nom, téléphone ou ID"
           placeholderTextColor="#9ca3af"
           value={searchText}
           onChangeText={handleSearch}

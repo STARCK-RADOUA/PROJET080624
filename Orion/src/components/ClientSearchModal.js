@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
@@ -9,11 +9,18 @@ const ClientSearchModal = ({ visible, onClose, onUserSelect }) => {
   const [users, setUsers] = useState([]);
   const [searchedUsers, setSearchedUsers] = useState([]);
 
+  useEffect(() => {
+    if (visible) {
+      fetchUsers();
+    }
+  }, [visible]);
+
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/users/all`);
       if (response.data && Array.isArray(response.data)) {
         setUsers(response.data);
+        setSearchedUsers(response.data.filter(user => user.userType === 'Client')); // Show all clients initially
       }
     } catch (error) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
@@ -26,11 +33,11 @@ const ClientSearchModal = ({ visible, onClose, onUserSelect }) => {
       setSearchedUsers(
         users.filter(user =>
           `${user.firstName} ${user.lastName}`.toLowerCase().includes(query.toLowerCase()) &&
-          user.userType === 'Client' // Only include clients
+          user.userType === 'Client'
         )
       );
     } else {
-      setSearchedUsers(users.filter(user => user.userType === 'Client')); // Show all clients if no search query
+      setSearchedUsers(users.filter(user => user.userType === 'Client'));
     }
   };
 
@@ -39,7 +46,6 @@ const ClientSearchModal = ({ visible, onClose, onUserSelect }) => {
       animationType="slide"
       transparent={true}
       visible={visible}
-      onShow={fetchUsers} // Fetch users when modal is shown
       onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
@@ -78,19 +84,24 @@ const ClientSearchModal = ({ visible, onClose, onUserSelect }) => {
 };
 
 const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Dark background with higher opacity
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
   },
   modalView: {
     width: screenWidth - 40,
-    backgroundColor: '#2c2c2c', // Dark background for the modal
+    maxHeight: screenHeight * 0.8, // Limit the height of the modal
+    backgroundColor: '#2c2c2c',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
+    marginTop: 30, // Top margin to avoid the modal sticking to the top
+    marginBottom: 30, // Bottom margin for spacing
   },
   closeButton: {
     position: 'absolute',
@@ -101,17 +112,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#1f695a', // White text for better contrast
+    color: '#1f695a',
   },
   modalSearchInput: {
     width: '100%',
     height: 40,
-    backgroundColor: '#4c4c4c', // Darker input background
+    backgroundColor: '#4c4c4c',
     borderRadius: 20,
     paddingHorizontal: 15,
     marginBottom: 15,
     fontSize: 16,
-    color: '#fff', // White text inside the input
+    color: '#fff',
   },
   modalUserList: {
     width: '100%',
@@ -121,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#555', // Darker border color
+    borderBottomColor: '#555',
   },
   avatar: {
     width: 50,
@@ -130,19 +141,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
-    backgroundColor: '#3b3b3b', // Dark background for the avatar
+    backgroundColor: '#3b3b3b',
   },
   avatarText: {
-    color: '#fff', // White text for avatar initials
+    color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
   },
   modalUserName: {
     fontSize: 16,
-    color: '#fff', // White text for the username
+    color: '#fff',
   },
   noUsersText: {
-    color: '#aaa', // Lighter gray for "no users" text
+    color: '#aaa',
     textAlign: 'center',
     paddingTop: 20,
   },

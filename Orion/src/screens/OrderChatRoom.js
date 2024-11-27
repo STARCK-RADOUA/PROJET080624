@@ -63,7 +63,19 @@ const OrderRoomScreen = ({ route }) => {
         </Text>
         <Text style={styles.messageContent}>{message.content}</Text>
         <Text style={styles.messageTime}>
-          {new Date(message.timestamp).toLocaleTimeString()} {/* Show message timestamp */}
+          {message.timestamp
+            ? (() => {
+              const dateObj = new Date(message.timestamp);
+              const year = dateObj.getFullYear();
+              const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+              const day = String(dateObj.getDate()).padStart(2, '0');
+              const hours = String(dateObj.getHours()).padStart(2, '0');
+              const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+              const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+
+              return `${year}-${month}-${day}  ${hours}:${minutes}`;
+            })()
+            : 'No timestamp'}
         </Text>
       </View>
     );

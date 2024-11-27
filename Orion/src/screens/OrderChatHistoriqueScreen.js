@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Alert, ActivityIndicator } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; 
-import { Ionicons } from '@expo/vector-icons'; 
+import { Picker } from '@react-native-picker/picker';
+import { Ionicons } from '@expo/vector-icons';
 import { BASE_URLIO } from '@env';
 import io from 'socket.io-client';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -15,7 +15,7 @@ const ChatScreenComponent = ({ navigation }) => {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state for skeleton
   const [searchText, setSearchText] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all'); 
+  const [selectedStatus, setSelectedStatus] = useState('all');
   const [error, setError] = useState(null);
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
@@ -65,7 +65,7 @@ const ChatScreenComponent = ({ navigation }) => {
 
   const applyFilters = () => {
     const filteredChats = chats.filter((chat) => {
-      const chatDate = new Date(chat.chatCreatedAt); 
+      const chatDate = new Date(chat.chatCreatedAt);
       const formattedStartDate = format(startDate, 'yyyy-MM-dd');
       console.log(formattedStartDate)
       const formattedEndDate = format(endDate, 'yyyy-MM-dd');
@@ -99,15 +99,15 @@ const ChatScreenComponent = ({ navigation }) => {
   const filteredChats = chats
     .filter(chat => {
       let selectesdoned = selectedStatus;
-      if(selectedStatus === 'tous') {
-        selectesdoned='all';
-        
-      }if(selectedStatus === 'livré') {
-        selectesdoned='delivered';
-        
-      }if(selectedStatus === 'en cours') {
+      if (selectedStatus === 'tous') {
+        selectesdoned = 'all';
+
+      } if (selectedStatus === 'livré') {
+        selectesdoned = 'delivered';
+
+      } if (selectedStatus === 'en cours') {
         selectesdoned = 'in_progress'
-        
+
       }
       const isOrderStatusMatch = selectesdoned === 'all' || chat.orderStatus === selectesdoned;
       const searchLower = searchText.toLowerCase();
@@ -115,8 +115,8 @@ const ChatScreenComponent = ({ navigation }) => {
       const clientName = chat.clientFullName.toLowerCase();
       const driverName = chat.driverFullName.toLowerCase();
 
-      return (name.includes(searchLower) || clientName.includes(searchLower) || driverName.includes(searchLower)) 
-              && isOrderStatusMatch;
+      return (name.includes(searchLower) || clientName.includes(searchLower) || driverName.includes(searchLower))
+        && isOrderStatusMatch;
     })
     .sort((a, b) => {
       const aTimestamp = a.lastMessage ? new Date(a.lastMessage.timestamp) : 0;
@@ -138,7 +138,7 @@ const ChatScreenComponent = ({ navigation }) => {
         onChangeText={setSearchText}
       />
 
-<View style={styles.listContainer}>
+      <View style={styles.listContainer}>
         {['Tous', 'En cours', 'Livré'].map((status, index) => (
           <TouchableOpacity
             key={index}
@@ -152,8 +152,8 @@ const ChatScreenComponent = ({ navigation }) => {
           </TouchableOpacity>
         ))}
 
-          {/* Filter Button */}
-          <TouchableOpacity onPress={toggleFilterMenu} style={styles.filterButton}>
+        {/* Filter Button */}
+        <TouchableOpacity onPress={toggleFilterMenu} style={styles.filterButton}>
           <Ionicons name="filter-outline" size={24} color="#fff" />
           <Text style={styles.filterButtonText}>Filter</Text>
         </TouchableOpacity>
@@ -211,17 +211,28 @@ const ChatScreenComponent = ({ navigation }) => {
               </View>
               <View style={styles.chatDetails}>
                 <Text style={[styles.chatName, chat.unread ? styles.unreadChatName : null]}>
-                  {chat.orderId}
+                  Chat de L : {chat.driverFullName} avec C : {chat.clientFullName}
                 </Text>
                 <Text style={styles.chatMessage}>
                   {chat.lastMessage && chat.lastMessage.content ? chat.lastMessage.content : 'Aucun message'}
                 </Text>
               </View>
               <Text style={styles.chatTime}>
-                {chat.lastMessage && chat.lastMessage.timestamp 
-                  ? new Date(chat.lastMessage.timestamp).toLocaleTimeString() 
+                {chat.lastMessage && chat.lastMessage.timestamp
+                  ? (() => {
+                    const dateObj = new Date(chat.lastMessage.timestamp);
+                    const year = dateObj.getFullYear();
+                    const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+                    const hours = String(dateObj.getHours()).padStart(2, '0');
+                    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                    const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+
+                    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                  })()
                   : 'Pas de date'}
               </Text>
+
             </TouchableOpacity>
           ))}
         </ScrollView>

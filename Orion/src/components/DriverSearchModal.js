@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Modal, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { BASE_URL } from '@env';
@@ -9,11 +9,19 @@ const DriverSearchModal = ({ visible, onClose, onUserSelect }) => {
   const [users, setUsers] = useState([]);
   const [searchedUsers, setSearchedUsers] = useState([]);
 
+  useEffect(() => {
+    if (visible) {
+      fetchUsers();
+    }
+  }, [visible]);
+
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/users/all`);
       if (response.data && Array.isArray(response.data)) {
-        setUsers(response.data);
+        const drivers = response.data.filter(user => user.userType === 'Driver'); // Only include drivers
+        setUsers(drivers);
+        setSearchedUsers(drivers); // Initially show all drivers
       }
     } catch (error) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
@@ -25,21 +33,30 @@ const DriverSearchModal = ({ visible, onClose, onUserSelect }) => {
     if (query) {
       setSearchedUsers(
         users.filter(user =>
-          `${user.firstName} ${user.lastName}`.toLowerCase().includes(query.toLowerCase()) &&
-          user.userType === 'Driver' // Only include drivers
+          `${user.firstName} ${user.lastName}`.toLowerCase().includes(query.toLowerCase())
         )
       );
     } else {
-      setSearchedUsers(users.filter(user => user.userType === 'Driver')); // Show all drivers if no search query
+      setSearchedUsers(users); // Show all drivers if no search query
     }
   };
+
+  const renderUserItem = ({ item }) => (
+    <TouchableOpacity style={styles.modalUserItem} onPress={() => onUserSelect(item)}>
+      <View style={[styles.avatar, { backgroundColor: item.avatarColor || '#4682B4' }]}>
+        <Text style={styles.avatarText}>{item.firstName.charAt(0)}</Text>
+      </View>
+      <Text style={styles.modalUserName}>
+        {item.firstName} {item.lastName}/L
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
     <Modal
       animationType="slide"
       transparent={true}
       visible={visible}
-      onShow={fetchUsers} // Fetch users when modal is shown
       onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
@@ -55,22 +72,13 @@ const DriverSearchModal = ({ visible, onClose, onUserSelect }) => {
             value={searchQuery}
             onChangeText={handleSearch}
           />
-          <ScrollView contentContainerStyle={styles.modalUserList}>
-            {searchedUsers.length > 0 ? (
-              searchedUsers.map((user, index) => (
-                <TouchableOpacity key={index} style={styles.modalUserItem} onPress={() => onUserSelect(user)}>
-                  <View style={[styles.avatar, { backgroundColor: user.avatarColor || '#4682B4' }]}>
-                    <Text style={styles.avatarText}>{user.firstName.charAt(0)}</Text>
-                  </View>
-                  <Text style={styles.modalUserName}>
-                    {user.firstName} {user.lastName}/L
-                  </Text>
-                </TouchableOpacity>
-              ))
-            ) : (
-              <Text style={styles.noUsersText}>Aucun chauffeur trouvé</Text>
-            )}
-          </ScrollView>
+          <FlatList
+            data={searchedUsers}
+            renderItem={renderUserItem}
+            keyExtractor={(item) => item._id.toString()}
+            ListEmptyComponent={<Text style={styles.noUsersText}>Aucun chauffeur trouvé</Text>}
+            contentContainerStyle={styles.modalUserList}
+          />
         </View>
       </View>
     </Modal>
@@ -78,6 +86,8 @@ const DriverSearchModal = ({ visible, onClose, onUserSelect }) => {
 };
 
 const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
@@ -87,10 +97,12 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: screenWidth - 40,
+    maxHeight: screenHeight * 0.8, // Restrict modal height to 80% of screen
     backgroundColor: '#2c2c2c', // Dark background for the modal
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
+    marginVertical: 20, // Top and bottom margins
   },
   closeButton: {
     position: 'absolute',
@@ -101,7 +113,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#1f695a', // White text for better contrast
+    color: '#1f695a', // Greenish title color for contrast
   },
   modalSearchInput: {
     width: '100%',
@@ -111,7 +123,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 15,
     fontSize: 16,
-    color: '#fff', // White text inside the input
+    color: '#fff', // White text for the input
   },
   modalUserList: {
     width: '100%',
@@ -142,7 +154,7 @@ const styles = StyleSheet.create({
     color: '#fff', // White text for the username
   },
   noUsersText: {
-    color: '#aaa', // Lighter gray for "no users" text
+    color: '#aaa', // Light gray text for "no users"
     textAlign: 'center',
     paddingTop: 20,
   },
