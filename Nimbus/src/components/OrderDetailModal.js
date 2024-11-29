@@ -115,15 +115,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
         console.log('livred successful');
         console.log('------------------------------------');
 
-        setTimeout(() => {
-const deviceId = Device.osBuildId;
-        const socket = io(BASE_URLIO, {
-          query: { deviceId },
-        });
-
-                 socket.emit('driverConnected', deviceId);
-
-        }, 2 * 60 * 1000); // 50 secondes
+       
   
      
       } else {

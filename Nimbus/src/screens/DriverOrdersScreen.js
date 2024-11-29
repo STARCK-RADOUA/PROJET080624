@@ -93,6 +93,7 @@ useEffect(() => {
         const socket = io(BASE_URLIO, {
           query: { deviceId },
         });
+        socket.emit('driverConnected', deviceId);
 
         socket.emit('watchChatMessagesDriver', deviceId);
         socket.on('OrderchatMessagesDriverUpdated', (data) => {
@@ -190,8 +191,18 @@ useEffect(() => {
     setLocationSubscription(subscription);
   };
   const sortOrdersByDistanceAscending = (orders) => {
-    return orders.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+    return orders.sort((a, b) => {
+      if (a.livred_2min && !b.livred_2min) {
+        return 1;  
+      }
+      if (!a.livred_2min && b.livred_2min) {
+        return -1;
+      }
+  
+      return (a.distance || 0) - (b.distance || 0); 
+    });
   };
+  
   
   
   const refreshDistances = async () => {
@@ -363,7 +374,7 @@ useEffect(() => {
                   </>
                 ) : (
                   <TouchableOpacity onPress={() => handleCardPress(item)}>
-                    <View style={styles.card}>
+                    <View style={item.livred_2min ? styles.card : styles.cardLivred}>
                       <Image
                         source={{ uri: 'https://img.icons8.com/ios-filled/50/000000/order-history.png' }}
                         style={styles.orderIcon}
