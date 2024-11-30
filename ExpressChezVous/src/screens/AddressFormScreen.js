@@ -9,8 +9,8 @@ import { getClient } from '../services/userService'; // Add a function to get us
 
 // Validation schema using Yup
 const addressValidationSchema = Yup.object().shape({
-  address_line: Yup.string().required("L'adresse est requise"),
-  building: Yup.string(),
+  address_line: Yup.string(),
+  building: Yup.string().required("Batiment est requise"),
   floor: Yup.string(),
   door_number: Yup.string(),
   digicode: Yup.string(),
@@ -89,11 +89,11 @@ const AddressFormScreen = ({ navigation, route }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"} // Avoid layout shift when keyboard is visible
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Ajoutez une nouvelle adresse facilement</Text>
+        <Text style={styles.title}>Complétez votre localisation</Text>
 
         <Formik
           initialValues={{
-            address_line: '',
+            address_line: 'adresse',
             building: '',
             floor: '',
             door_number: '',
@@ -106,19 +106,18 @@ const AddressFormScreen = ({ navigation, route }) => {
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
             <>
             <View style={styles.inputContainer}>
-    <Text style={styles.label}>Adresse *</Text>
-    <TextInput
-      style={[styles.input, !locationFetched && styles.disabledInput]}  // Désactiver si la localisation n'est pas récupérée
-      onChangeText={handleChange('address_line')}
-      onBlur={handleBlur('address_line')}
-      value={values.address_line}
-      placeholder="Entrez votre adresse"
-      editable={locationFetched}  // Empêche la saisie si la localisation n'est pas récupérée
-    />
-    {touched.address_line && errors.address_line && (
-      <Text style={styles.error}>{errors.address_line}</Text>
-    )}
-</View>
+                <TextInput
+                  style={[styles.input, !locationFetched && styles.disabledInput, { opacity: 0 }]}  // Invisibilité
+                  onChangeText={handleChange('address_line')}
+                  onBlur={handleBlur('address_line')}
+                  value={values.address_line}
+                  placeholder="Entrez votre adresse"
+                  editable={false}  // Champs non éditables
+                />
+                {touched.address_line && errors.address_line && (
+                  <Text style={styles.error}>{errors.address_line}</Text>
+                )}
+              </View>
 
 <View style={styles.inputContainer}>
     <Text style={styles.label}>Bâtiment</Text>
@@ -130,6 +129,9 @@ const AddressFormScreen = ({ navigation, route }) => {
       placeholder="Nom ou numéro du bâtiment"
       editable={locationFetched}
     />
+      {touched.building && errors.building && (
+                  <Text style={styles.error}>{errors.building}</Text>
+                )}
 </View>
 
 <View style={styles.inputContainer}>

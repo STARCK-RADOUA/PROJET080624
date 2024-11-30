@@ -7,7 +7,7 @@ import { DataContext } from '../navigation/DataContext';
 const PaymentScreen = ({ navigation, route }) => {
   const orderDetails = route.params; // Order details passed from another screen
   const [selectedPayment, setSelectedPayment] = useState(null); // No payment selected by default
-  const [exchangeValue, setExchangeValue] = useState(0); // Initial exchange value
+  const [exchangeValue, setExchangeValue] = useState(""); // Initial exchange value
   const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
   const { sharedData } = useContext(DataContext); // Socket.IO instance storage state
@@ -98,7 +98,7 @@ const PaymentScreen = ({ navigation, route }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            value={`${exchangeValue} €`}
+            value={`${exchangeValue}`}
             keyboardType="numeric"
             onChangeText={(text) => {
               const numericValue = text.replace(/[^0-9]/g, '');
@@ -106,6 +106,8 @@ const PaymentScreen = ({ navigation, route }) => {
             }}
             editable={true}
           />
+                  <Text style={styles.label22}>€</Text>
+
         </View>
       </View>
 
@@ -165,6 +167,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 10,
     color: '#271917',
+  // Bright orange for label
+  }, label22: {
+    fontSize: 25,
+    color: '#db9e57',
   // Bright orange for label
   },
   inputContainer: {

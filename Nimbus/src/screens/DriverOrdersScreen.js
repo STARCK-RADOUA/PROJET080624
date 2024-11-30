@@ -93,7 +93,6 @@ useEffect(() => {
         const socket = io(BASE_URLIO, {
           query: { deviceId },
         });
-        socket.emit('driverConnected', deviceId);
 
         socket.emit('watchChatMessagesDriver', deviceId);
         socket.on('OrderchatMessagesDriverUpdated', (data) => {
@@ -386,8 +385,8 @@ useEffect(() => {
              -             </Text>
                         </Text>
                         <Text style={styles.distance}>Adresse:  {"\n"}
-                          <Text style={{ color: item.address_line ? '#1ca5a5' : '#dc3545', fontWeight: 'bold' }}>
-                            {item.address_line ?? 'Aucune adresse fournie'}
+                          <Text style={{ color: item.building ? '#1ca5a5' : '#dc3545', fontWeight: 'bold' }}>
+                            {item.building ?? 'Aucune adresse fournie'}
                           </Text>
                         </Text>
                         <Text style={styles.distance}>Distance:
@@ -408,29 +407,26 @@ useEffect(() => {
                             <Text style={styles.navigateText}>Waze </Text>
                           </TouchableOpacity>
                           <TouchableOpacity
-                            style={styles.navigateButtonChat}
-                            onPress={() => navigate('RoomScreen', {
-                              clientName: item.client_name,
-                              orderId: item.order_number,
-                              clientId: item.client_id,
-                              driverId: item.driver_id
-                            })}
-                          >
-                            <Ionicons name="send-outline" size={24} color="white" />
-                            <Text style={styles.navigateText}></Text>
+  style={styles.navigateButtonChat}
+  onPress={() => navigate('RoomScreen', {
+    clientName: item.client_name,
+    orderId: item.order_number,
+    clientId: item.client_id,
+    driverId: item.driver_id
+  })}
+>
+  <Ionicons name="send-outline" size={24} color="white" />
+  {messages.some(message => 
+    message.orderId === item.order_number && 
+    !message.lastMessage.seen && 
+    message.lastMessage.sender !== "driver"
+  ) && (
+    <View style={styles.unreadIndicator}>
+      <View style={styles.redButton} />
+    </View>
+  )}
+</TouchableOpacity>
 
-                            {messages.map((message, index) => {
-                              const hasUnread = message.orderId === item.order_number && !message.lastMessage.seen && message.lastMessage.sender !== "driver";
-                              console.log(message.sender, "hgfg   wa mahddi ach hadda  ")
-                              return (
-                                hasUnread && (
-                                  <View key={index} style={styles.unreadIndicator}>
-                                    <View style={styles.redButton} />
-                                  </View>
-                                )
-                              );
-                            })}
-                          </TouchableOpacity>
 
                         </View>
                         <Text style={styles.date}>

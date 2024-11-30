@@ -114,8 +114,13 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
         console.log('------------------------------------');
         console.log('livred successful');
         console.log('------------------------------------');
+        const deviceId = Device.osBuildId;
+        const socket = io(BASE_URLIO, {
+          query: { deviceId },
+        });
+  
+        socket.emit('driverConnected', deviceId);
 
-       
   
      
       } else {

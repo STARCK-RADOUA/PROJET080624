@@ -36,6 +36,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
   const [message, setMessage] = useState('');
   const flatListRef = useRef(null); // Reference to the FlatList
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const inputRef = useRef(null);
 
   const scrollTo = useCallback((destination) => {
     'worklet';
@@ -145,7 +146,9 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
         scrollTo(MAX_TRANSLATE_Y);
       }
     });
-
+    const handleInputClick = () => {
+      inputRef.current?.focus();
+    };
   const rBottomSheetStyle = useAnimatedStyle(() => {
     const borderRadius = interpolate(
       translateY.value,
@@ -194,6 +197,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
             placeholder="Type a message..."
             value={message}
             onChangeText={setMessage}
+            onFocus={handleInputClick}
           />
           <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
             <Text style={styles.sendButtonText}>Send</Text>
