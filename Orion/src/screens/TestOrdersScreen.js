@@ -13,13 +13,15 @@ import axios from 'axios';
 const TestOrdersScreen = () => {
   const [commandes, setCommandes] = useState([]);
   const [commandesFiltrees, setCommandesFiltrees] = useState([]);
-  const [dateFiltre, setDateFiltre] = useState(new Date());
-  const [afficherDatePicker, setAfficherDatePicker] = useState(false);
   const [recherche, setRecherche] = useState('');
   const [commandeSelectionnee, setCommandeSelectionnee] = useState(null);
   const [chargement, setChargement] = useState(true);
 
-   // Date filter states
+
+  const handleCloseModal = () => {
+    setCommandeSelectionnee(null); // This closes the modal
+  };
+  
    const [showStartDatePicker, setShowStartDatePicker] = useState(false);
    const [showEndDatePicker, setShowEndDatePicker] = useState(false);
    const [startDate, setStartDate] = useState(new Date());
@@ -211,7 +213,7 @@ const TestOrdersScreen = () => {
       {commandeSelectionnee && (
         <TestOrderModal
           visible={!!commandeSelectionnee}
-          onClose={fermerModal}
+          onClose={handleCloseModal}  // Passing the onClose function
           order={commandeSelectionnee}
         />
       )}

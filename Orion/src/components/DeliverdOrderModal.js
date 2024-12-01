@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Linking, Image, ScrollView, Animated } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Linking, Image, ScrollView } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import moment from 'moment';
 
@@ -23,23 +23,8 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
   const produitsAffiches = afficherTousProduits ? order.products : order.products.slice(0, 3);
 
   // Animation pour l'entrée du modal
-  const scaleAnim = new Animated.Value(0);
 
-  const animerEntree = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      friction: 7,
-      useNativeDriver: true,
-    }).start();
-  };
 
-  const animerSortie = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0,
-      friction: 7,
-      useNativeDriver: true,
-    }).start(() => onClose());
-  };
 
   const basculerDeveloppe = (index) => {
     setDeveloppe(developpe === index ? null : index);
@@ -60,14 +45,12 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
       animationType="none"
       transparent={true}
       visible={visible}
-      onShow={animerEntree}
-      onRequestClose={animerSortie}
     >
       <View style={styles.modalContainer}>
-        <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
-          <TouchableOpacity style={styles.closeButton} onPress={animerSortie}>
-            <Ionicons name="close-circle" size={38} color="#ff5c5c" />
-          </TouchableOpacity>
+        <View style={[styles.modalView]}>
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+  <Ionicons name="close-circle" size={38} color="#ff5c5c" />
+</TouchableOpacity>
 
           <ScrollView>
             {/* Informations sur la commande */}
@@ -189,7 +172,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
                   </Text>
                 </TouchableOpacity>
               )}
-        </Animated.View>
+        </View>
       </View>
     </Modal>
   );

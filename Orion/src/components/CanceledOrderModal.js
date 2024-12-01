@@ -20,39 +20,21 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
   const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
 
   // Animation pour l'entrée du modal
-  const scaleAnim = new Animated.Value(0);
 
-  const animateIn = () => {
-    console.log(order)
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      friction: 7,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const animateOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0,
-      friction: 7,
-      useNativeDriver: true,
-    }).start(() => onClose());
-  };
-
+  
   return (
     <Modal
       animationType="none"
       transparent={true}
-      visible={visible}
-      onShow={animateIn}
-      onRequestClose={animateOut}
+      visible={visible}  // This controls whether the modal is visible
+   
     >
       <View style={styles.modalContainer}>
-        <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
+        <View style={[styles.modalView]}>
           {/* Bouton de fermeture */}
-          <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
-            <Ionicons name="close-circle" size={30} color="#ff5c5c" />
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+  <Ionicons name="close-circle" size={38} color="#ff5c5c" />
+</TouchableOpacity>
 
           <ScrollView>
             {/* Informations sur la commande */}
@@ -155,7 +137,7 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
             </View>
           </ScrollView>
-        </Animated.View>
+        </View>
       </View>
     </Modal>
   );

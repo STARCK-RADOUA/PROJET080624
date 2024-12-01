@@ -26,24 +26,7 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
 
   const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
 
-  // Animation for modal entry
-  const scaleAnim = new Animated.Value(0);
-
-  const animateIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      friction: 7,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const animateOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0,
-      friction: 7,
-      useNativeDriver: true,
-    }).start(() => onClose()); // Ensure that onClose is called
-  };
+  
 
   // Fetch available drivers when the modal is displayed
   useEffect(() => {
@@ -109,17 +92,14 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
 
   return (
     <Modal
-      animationType="none"
       transparent={true}
       visible={visible}
-      onShow={animateIn}
-      onRequestClose={animateOut}
     >
       <View style={styles.modalContainer}>
-        <Animated.View style={[styles.modalView, { transform: [{ scale: scaleAnim }] }]}>
-          <TouchableOpacity style={styles.closeButton} onPress={animateOut}>
-            <Ionicons s name="close-circle" size={37} color="#ff5c5c" />
-          </TouchableOpacity>
+        <View style={[styles.modalView, ]}>
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+  <Ionicons name="close-circle" size={38} color="#ff5c5c" />
+</TouchableOpacity>
 
           <ScrollView>
             {/* Order Info */}
@@ -227,7 +207,7 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
               <Text style={styles.totalText}>Total : €{order.total_price.toFixed(2)}</Text>
             </View>
           </ScrollView>
-        </Animated.View>
+        </View>
 
         {/* Render Driver Dropdown */}
         {renderDriverDropdown()}

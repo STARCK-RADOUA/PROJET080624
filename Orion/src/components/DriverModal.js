@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical : "30%"
+    marginVertical: "30%", // Adjust this value if needed for better margin from top
   },
   modalView: {
     width: '90%',
@@ -424,6 +424,9 @@ const styles = StyleSheet.create({
     padding: 20,
     elevation: 5,
     maxHeight: height,
+    maxHeight: height * 0.8,  // Limit the height to 80% of the screen height
+    minHeight: height * 0.6,  // Minimum height of 60% of the screen height to prevent collapsing
+    overflow: 'hidden', // Hide overflow content
   },
   closeButton: {
     alignSelf: 'flex-end',
