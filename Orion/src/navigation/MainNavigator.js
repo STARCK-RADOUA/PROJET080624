@@ -137,8 +137,29 @@ const MainNavigator = ({ onLogin }) => {
     if (title === "Chat") setUnreadMessages(false);
     if (title === "Chat Livreur") setUnreadAdminMessages(false);
     setCurrentTab(title);
+  
+    // Close the menu when a tab is clicked
+    Animated.timing(scaleValue, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  
+    Animated.timing(offsetValue, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  
+    Animated.timing(closeButtonOffset, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  
+    setShowMenu(false);
   };
-
+  
   const renderScreen = () => {
     switch (currentTab) {
       case 'Accueil':

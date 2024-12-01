@@ -53,12 +53,10 @@ const HomeScreen = ({ navigation }) => {
           const [driversResponse, productsResponse, ordersResponse] = await Promise.all([
             axios.get(`${BASE_URL}/api/driver/forChart`),
             axios.get(`${BASE_URL}/api/products/getList`),
-            axios.get(`${BASE_URL}/api/orders/order-status-counts`)
           ]);
           
           setDrivers(driversResponse.data);
           setProducts(productsResponse.data);
-          setCommendesStats(ordersResponse.data[0]);
         } catch (error) {
           console.error('Erreur lors de la récupération des données :', error.message);
         }
@@ -71,38 +69,40 @@ const HomeScreen = ({ navigation }) => {
       setSocket(socketInstance);
   
       // Gestion des événements socket
-      socketInstance.emit('getDailyRevenue');
+      socketInstance.emit('getAllHomeSceenData');
+      
       socketInstance.on('dailyRevenue', (data) => {
         if (data && data.dailyRevenue) {
           setDailyRevenue(data.dailyRevenue);
         }
       });
   
-      socketInstance.emit('getTotalProducts');
       socketInstance.on('totalProducts', (data) => {
         setTotalProducts(data.totalProducts);
       });
   
-      socketInstance.emit('getTotalClients');
       socketInstance.on('totalClients', (data) => {
         setTotalClients(data.totalClients);
       });
   
-      socketInstance.emit('getDeliveredOrdersSummary');
       socketInstance.on('deliveredOrdersSummary', (data) => {
         setTotalSum(data.totalSum);
         setTotalCount(data.totalCount);
       });
   
-      socketInstance.emit('getAllOrdersSummary');
       socketInstance.on('AllOrdersSummary', (data) => {
         setAllTotalCount(data.totalCount);
       });
   
-      socketInstance.emit('getTotalSpamOrdersNumber');
       socketInstance.on('spamCountResponse', (data) => {
         setSpammedOrdersNumber(data);
       });
+
+
+      socketInstance.on('orderStatusCounts', (data) => {
+        setCommendesStats(data);
+      });
+  
   
       // Nettoyage du socket à la fin
       return () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import {
   Modal,
   Dimensions,
@@ -35,6 +35,37 @@ const ClientModal = ({ visible, onClose, client }) => {
       setEditableClient(null);
     }
   }, [client]);
+
+  useEffect(() => {
+    const fetchBlockedStatus = async () => {
+      if (!editableClient || !editableClient._id) return;
+  
+      try {
+        // Make an Axios call to get the blocked status of the client
+        const response = await axios.get(`${BASE_URL}/api/clients/statuss`, {
+          params: { clientId: editableClient._id },  // Send the clientId in the request params
+        });
+  
+        const blockedStatus = response.data.blocked; // Assuming the response contains a blocked field
+  
+        // Only update the state if the blocked status has changed
+        if (editableClient.blocked !== blockedStatus) {
+          setEditableClient((prevClient) => ({
+            ...prevClient,
+            blocked: blockedStatus, // Initialize blocked status
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching blocked status:', error);
+      }
+    };
+  
+    // Only trigger fetch if editableClient and its _id are valid
+    if (editableClient && editableClient._id) {
+      fetchBlockedStatus();
+    }
+  }, [editableClient?._id]); // Only run this effect when the client._id changes
+  
 
   const fetchHistory = async () => {
     if (!client) return;
@@ -90,6 +121,35 @@ const ClientModal = ({ visible, onClose, client }) => {
     }
   };
 
+  const handleBlockUnblock = async (isBlocked) => {
+    try {
+      // Send a PATCH request to the backend to update the block status
+      const response = await axios.put(`${BASE_URL}/api/clients/block-unblock/`, {
+        clientId: editableClient._id, // Send the clientId in the request body
+        isBlocked: isBlocked,   
+        
+      });
+  
+      // If the request is successful, update the local state
+      setEditableClient((prevClient) => ({
+        ...prevClient,
+        blocked: isBlocked,
+      }));
+  
+      // Show success message
+      Alert.alert('Succès', `Client ${isBlocked ? 'bloqué' : 'débloqué'} avec succès.`);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du blocage/déblocage du client:', error);
+      Alert.alert('Erreur', 'Échec de la mise à jour du blocage/déblocage.');
+  
+      // If there is an error, revert the block status to its previous state
+      setEditableClient((prevClient) => ({
+        ...prevClient,
+        blocked: !isBlocked,
+      }));
+    }
+  };
+
   const openInWaze = (location) => {
     const [latitude, longitude] = location.split(' ');
     const wazeUrl = `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`;
@@ -133,12 +193,12 @@ const ClientModal = ({ visible, onClose, client }) => {
           </View>
 
           <View style={styles.fieldRow}>
-          <View style={styles.fieldColumn}>
-  <Text style={styles.label}>ID de l'appareil:</Text>
-  <Text style={styles.textValue}>
-    {editableClient.deviceId}
-  </Text>
-</View>
+            <View style={styles.fieldColumn}>
+              <Text style={styles.label}>ID de l'appareil:</Text>
+              <Text style={styles.textValue}>
+                {editableClient.deviceId}
+              </Text>
+            </View>
           </View>
 
           <View style={styles.fieldRow}>
@@ -170,6 +230,17 @@ const ClientModal = ({ visible, onClose, client }) => {
               onValueChange={handleToggleLoginStatus}
               thumbColor={editableClient.isLogin ? '#34C759' : '#f4f3f4'}
               trackColor={{ false: '#767577', true: '#81b0ff' }}
+            />
+          </View>
+
+          {/* New Block/Unblock Switch */}
+          <View style={styles.fieldRow}>
+            <Text style={styles.label}>Bloqué:</Text>
+            <Switch
+              value={editableClient.blocked}
+              onValueChange={handleBlockUnblock}
+              thumbColor={editableClient.blocked ? '#FF3B30' : '#f4f3f4'}
+              trackColor={{ false: '#767577', true: '#FF6347' }}
             />
           </View>
 
@@ -209,7 +280,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor adjusted to ensure modal visibility
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
