@@ -41,7 +41,7 @@ export default function App() {
 }
 
 const AppContent = () => {
-  const { isLoggedIn, login ,logout} = useContext(AuthContext);
+  const { isLoggedIn, login, logout } = useContext(AuthContext);
   const [expoPushToken, setExpoPushToken] = useState('');
   const notificationListener = useRef();
   const responseListener = useRef();
@@ -73,7 +73,7 @@ const AppContent = () => {
     };
   }, [isLoggedIn]);
 
-  return !isLoggedIn ? <LoginScreen onLogin={login} /> : <MainNavigator  onLogin={logout} />;
+  return !isLoggedIn ? <LoginScreen onLogin={login} /> : <MainNavigator onLogin={logout} />;
 };
 
 const styles = StyleSheet.create({
@@ -97,7 +97,7 @@ async function registerForPushNotificationsAsync() {
     }
 
     try {
-      const projectId = 'e7053047-cf1d-400e-b255-1faee969efbb';  // Remplacez par votre projectId réel
+      const projectId = 'e7053047-cf1d-400e-b255-1faee969efbb'; // Remplacez par votre projectId réel
       token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
       console.log('Token généré :', token);
     } catch (error) {
@@ -112,10 +112,7 @@ async function registerForPushNotificationsAsync() {
 
 async function saveAdminPushToken(expoPushToken) {
   try {
-    console.log('------------------------------------');
     console.log('Enregistrement du token : ', expoPushToken);
-    console.log('------------------------------------');
-    
     if (!expoPushToken) {
       console.error('Le token est undefined, arrêt de la fonction.');
       return;

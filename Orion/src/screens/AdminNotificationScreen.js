@@ -7,7 +7,7 @@ import { BASE_URLIO } from '@env';
 // Connexion au serveur via Socket.IO
 const socket = io(BASE_URLIO);
 
-export default function AdminNotificationScreen({ navigation,onRequestClose}) { // Accepting navigation as prop
+export default function AdminNotificationScreen({ navigation,onRequestClose}) {
   const [clients, setClients] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -53,6 +53,16 @@ export default function AdminNotificationScreen({ navigation,onRequestClose}) { 
       setSelectedUsers(selectedUsers.filter(item => item !== user));
     } else {
       setSelectedUsers([...selectedUsers, user]);
+    }
+  };
+
+  const selectAllUsers = () => {
+    if (filteredUsers.length === selectedUsers.length) {
+      // Deselect all users if all are selected
+      setSelectedUsers([]);
+    } else {
+      // Select all users
+      setSelectedUsers(filteredUsers);
     }
   };
 
@@ -133,6 +143,16 @@ export default function AdminNotificationScreen({ navigation,onRequestClose}) { 
               </TouchableOpacity>
             </View>
           </View>
+
+          {/* Button "Sélectionner tout" */}
+          <TouchableOpacity
+            style={styles.selectAllButton}
+            onPress={selectAllUsers}
+          >
+            <Text style={styles.selectAllButtonText}>
+              {selectedUsers.length === filteredUsers.length ? 'Désélectionner tout' : 'Sélectionner tout'}
+            </Text>
+          </TouchableOpacity>
 
           {/* Liste des utilisateurs filtrés */}
           <ScrollView style={styles.userList}>
@@ -229,9 +249,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  selectAllButton: {
+    backgroundColor: '#333',
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  selectAllButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
   userList: {
     marginBottom: 20,
-    height: '70%',
+    height: '50%',
   },
   userItem: {
     flexDirection: 'row',

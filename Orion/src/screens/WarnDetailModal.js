@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, Linking,TouchableOpacity, StyleSheet,Alert, ScrollView, Modal } from 'react-native';
+import { View, Text, Linking,Dimensions,TouchableOpacity, StyleSheet,Alert, ScrollView, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
+const { width, height } = Dimensions.get('window');
 
 
 const WarnDetailModal = ({ warn, onClose }) => {
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: "35%",
+    paddingVertical:height*0.1,
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
   },

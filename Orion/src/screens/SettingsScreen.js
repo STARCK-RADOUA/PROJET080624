@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Switch, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Switch, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
+import { Input } from 'react-native-elements';  // Expo SDK 52 Input component
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 
@@ -11,6 +12,8 @@ const SettingsScreen = () => {
   const [isClientsActive, setIsClientsActive] = useState(true);
   const [isDriversActive, setIsDriversActive] = useState(true);
   const [isSystemActive, setIsSystemActive] = useState(true);
+  const [maxTranche, setMaxTranche] = useState('30');
+  const [actuTranche, setActuTranche] = useState('10');
 
   useEffect(() => {
     socket.emit('statusS');
@@ -19,6 +22,8 @@ const SettingsScreen = () => {
       setIsSystemActive(data.systemActive);
       setIsClientsActive(data.clientsActive);
       setIsDriversActive(data.driversActive);
+      setMaxTranche(data.MAX_TRANCHE );
+      setActuTranche(data.actuTranche );
     });
 
     // Cleanup on unmount
@@ -46,6 +51,12 @@ const SettingsScreen = () => {
     const newStatus = !isDriversActive;
     setIsDriversActive(newStatus);
     socket.emit('toggleDrivers', newStatus); // Emit change to the server
+  };
+
+  // Function to apply tranche values
+  const applyTranches = () => {
+    socket.emit('updateTranches', { maxTranche, actuTranche });
+    alert('Tranches mises à jour');
   };
 
   return (
@@ -100,6 +111,37 @@ const SettingsScreen = () => {
           value={isDriversActive}
         />
       </View>
+
+      {/* Max Tranche and Actu Tranche Input Section */}
+      <View style={styles.settingContainer}>
+        <Text style={styles.settingText}>Max Tranche:</Text>
+        <Input
+          value={maxTranche}
+          onChangeText={setMaxTranche}
+          placeholder="Enter max tranche"
+          keyboardType="numeric"
+          containerStyle={styles.inputContainer}
+          inputStyle={styles.inputStyle}
+        />
+      </View>
+
+      <View style={styles.settingContainer}>
+        <Text style={styles.settingText}>Actu Tranche:</Text>
+        <Input
+          value={actuTranche}
+          onChangeText={setActuTranche}
+          placeholder="Enter actu tranche"
+          keyboardType="numeric"
+          containerStyle={styles.inputContainer}
+          inputStyle={styles.inputStyle}
+        />
+      </View>
+
+      {/* Apply Button */}
+      <TouchableOpacity style={styles.applyButton} onPress={applyTranches}>
+        <Text style={styles.applyButtonText}>Appliquer</Text>
+      </TouchableOpacity>
+
     </ScrollView>
   );
 };
@@ -142,6 +184,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 10,
     color: '#000',
+  },
+  inputContainer: {
+    width: '60%',
+  },
+  inputStyle: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+    backgroundColor: '#f0f0f0',
+  },
+  applyButton: {
+    backgroundColor: '#1976d2',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  applyButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
