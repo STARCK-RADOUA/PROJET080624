@@ -137,39 +137,71 @@ const ShoppingCartScreen = ({ navigation }) => {
   };
   const toggleFreeItem = (itemId) => {
     setOrderItems((prevItems) => {
-      const updatedItems = prevItems.map((item) => {
-        if (item._id === itemId) {
-          const pointsRequired = item.quantity; // Points needed for the quantity of this item
+      // Sort items by their original price
+      const sortedItems = [...prevItems].sort((a, b) => a.product_id.price - b.product_id.price);
   
-          // If the item is already free, toggle it off and return points
+      // Log sorted items for debugging
+      console.log("Sorted Items by Price:", sortedItems.map((item) => item.product_id.price));
+  
+      // Find the cheapest free item
+      const cheapestFreeItem = sortedItems.find((item) => item.free);
+      const updatedItems = prevItems.map((item) => {
+        // If this is the item being toggled
+        if (item._id === itemId) {
+          const pointsRequired = item.quantity;
+  
+          // **Toggling OFF a free item**
           if (item.free) {
-            setUserPointsEarned((prevPoints) => prevPoints + pointsRequired);
-            setMyFreeItem((prev) => prev - 1); // Decrease free items count
-            return { ...item, free: false };
-          } else {
-            // Ensure user has enough points and at least one item remains paid
-            const payableItemsCount = prevItems.filter((i) => !i.free).length;
-            if (userPointsEarned >= pointsRequired && myFreeItem < itemsInTheCart - 1 && payableItemsCount > 1) {
-              setUserPointsEarned((prevPoints) => prevPoints - pointsRequired);
-              setMyFreeItem((prev) => prev + 1); // Increase free items count
-              return { ...item, free: true };
+            // Check if it's the cheapest free item and other more expensive items are still free
+            if (cheapestFreeItem === item && sortedItems.some((i) => i.free && i.product_id.price > item.product_id.price)) {
+              Alert.alert(
+                "Cannot switch off the cheapest item",
+                "You must toggle off more expensive free items before switching off the cheapest free item."
+              );
+              return item; // Prevent toggling off
+            }
+  
+            // Otherwise, allow toggling off
+            setUserPointsEarned((prevPoints) => prevPoints + pointsRequired); // Return points
+            setMyFreeItem((prev) => prev - 1); // Decrease the count of free items
+            return { ...item, free: false }; // Mark item as not free
+          }
+  
+          // **Toggling ON an item to make it free**
+          if (!item.free) {
+            // Ensure only the cheapest item can be made free
+            const cheapestItem = sortedItems.find((i) => !i.free);
+            if (item !== cheapestItem) {
+              Alert.alert(
+                "Choose the cheapest item",
+                "You must apply points to the cheapest item first."
+              );
+              return item; // Prevent making a non-cheapest item free
+            }
+  
+            // Check if the user has enough points to make this item free
+            if (userPointsEarned >= pointsRequired) {
+              setUserPointsEarned((prevPoints) => prevPoints - pointsRequired); // Deduct points
+              setMyFreeItem((prev) => prev + 1); // Increase the count of free items
+              return { ...item, free: true }; // Mark item as free
             } else {
-              // Alert if points are not enough or if all items would become free
               Alert.alert(
                 "Not enough points",
-                "You must pay for at least one item and have enough points for a free item."
+                "You do not have enough points to make this item free."
               );
-              return item;
+              return item; // Prevent toggling if not enough points
             }
           }
         }
-        return item;
+        return item; // Leave all other items unchanged
       });
   
-      calculateTotalPrice(updatedItems);
-      return updatedItems;
+      calculateTotalPrice(updatedItems); // Recalculate the total price
+      return updatedItems; // Update the state with the new items
     });
   };
+  
+  
   
   const deleteItem = async (itemId) => {
     try {
@@ -280,7 +312,6 @@ const ShoppingCartScreen = ({ navigation }) => {
     useCallback(() => {
       // Reset states to their initial values when navigating back
       setExpandedItemId(null);
-      setUserPointsEarned(0);
       setMyFreeItem(0);
       setHasUsedPoints(false);
   
