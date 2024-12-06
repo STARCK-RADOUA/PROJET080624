@@ -1,28 +1,15 @@
-import React, { useCallback, useContext, useImperativeHandle, useState, useEffect } from 'react';
-import { Dimensions, StyleSheet, View, Text , TouchableOpacity, Image } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  Extrapolate,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
-import { ScrollView } from 'react-native-gesture-handler'; // Import ScrollView from gesture-handler
-
-import axios from 'axios';
-import { getClientId } from '../services/userService'; // Import the getClient function
+import React, { useState, useEffect, useContext, forwardRef } from 'react';
+import { Modal, Dimensions, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { DataContext } from '../navigation/DataContext';
+import { getClientId } from '../services/userService';
+import axios from 'axios';
 import { BASE_URL } from '@env';
-const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
-const MAX_TRANSLATE_Y = -SCREEN_HEIGHT / 1.45;
-const { width, height } = Dimensions.get('window');
+import { TouchableWithoutFeedback } from 'react-native';
 
-const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
-  const translateY = useSharedValue(0);
-  const active = useSharedValue(false);
-  const { sharedData } = useContext(DataContext);
-  const serviceName  = sharedData.serviceName;
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+
+const PrductBottomSheetScreen = (props, ref) => {
+  const { item, isVisible, onClose } = props;  // Destructure props here
   const [quantity, setQuantity] = useState(1);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [extras, setExtras] = useState({
@@ -30,68 +17,9 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
     extraCheeseSlice: false,
     extraFries: false,
   });
-
   const [totalPrice, setTotalPrice] = useState(item?.price || 0);
-  const [showFullDescription, setShowFullDescription] = useState(false);
-
-  const toggleDescription = () => {
-    setShowFullDescription(!showFullDescription);
-  };
-  const scrollTo = useCallback((destination) => {
-    'worklet';
-    active.value = destination !== 0;
-    translateY.value = withSpring(destination, { damping: 50 });
-  }, []);
-
-  const isActive = useCallback(() => {
-    return active.value;
-  }, []);
-
-  useImperativeHandle(ref, () => ({ scrollTo, isActive }), [scrollTo, isActive]);
-
-  const context = useSharedValue({ y: 0 });
-  const gesture = Gesture.Pan()
-    .onStart(() => {
-      context.value = { y: translateY.value };
-    })
-    .onUpdate((event) => {
-      translateY.value = event.translationY + context.value.y;
-      translateY.value = Math.max(translateY.value, MAX_TRANSLATE_Y);
-    })
-    .onEnd(() => {
-      if (translateY.value > -SCREEN_HEIGHT / 4) {
-        scrollTo(0);
-      } else {
-        scrollTo(MAX_TRANSLATE_Y);
-      }
-    });
-
-  const rBottomSheetStyle = useAnimatedStyle(() => {
-    const borderRadius = interpolate(
-      translateY.value+100,
-      [MAX_TRANSLATE_Y + 10, MAX_TRANSLATE_Y],
-      [400, 5],
-      Extrapolate.CLAMP
-    );
-
-    return {
-      borderRadius,
-      transform: [{ translateY: translateY.value -80}],
-    };
-  });
-
-  const rImageStyle = useAnimatedStyle(() => {
-    const scaleImage = interpolate(
-      translateY.value,
-      [MAX_TRANSLATE_Y, 0],
-      [1.5, 1],
-      Extrapolate.CLAMP
-    );
-
-    return {
-      transform: [{ scale: scaleImage }],
-    };
-  });
+  const { sharedData } = useContext(DataContext);
+  const serviceName = sharedData.serviceName;
 
   useEffect(() => {
     const checkIfItemIsInCart = async () => {
@@ -115,7 +43,7 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
     if (item) {
       checkIfItemIsInCart();
     }
-  }, [item]);
+  }, [item, serviceName]);
 
   useEffect(() => {
     if (item) {
@@ -174,388 +102,197 @@ const PrductBottomSheetScreen = React.forwardRef(({ item }, ref) => {
         extraCheeseSlice: false,
         extraFries: false,
       });
-      scrollTo(0);
+      onClose();  // Close modal after adding to cart
     } catch (error) {
       console.error('Failed to add item to cart:', error);
     }
   };
 
-  if (!item) {
-    return null;
-  }
+  if (!item) return null;
 
- return (
-  <GestureDetector gesture={gesture}>
-    <Animated.View style={[styles.bottomSheetContainer, rBottomSheetStyle]}>
-      {item.image_url ? (
-        <Animated.Image
-          source={{ uri: item.image_url }}
-          style={[styles.productImage, rImageStyle]}
-          resizeMode="contain"
-        />
-      ) : (
-        <Text style={styles.errorText}>Image not available</Text>
-      )}
-      <View style={styles.line} />
-      <View style={styles.contentContainer}>
-          <View style={styles.container}>
-          
-            <View style={styles.header}>
-              <Text style={styles.heading}>{item.name} </Text>
-              <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
+  return (
+    <Modal visible={isVisible} animationType="fade" transparent={true} onRequestClose={onClose}>
+      <TouchableWithoutFeedback onPress={onClose}>
 
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer}>
+          {item.image_url ? (
+            <Image source={{ uri: item.image_url }} style={styles.productImage} resizeMode="contain" />
+          ) : (
+            <Text style={styles.errorText}>Image not available</Text>
+          )}
+
+          <View style={styles.contentContainer}>
+            <Text style={styles.heading}>{item.name}</Text>
+
+            <View style={styles.quantityContainer2}>
+
+
+            <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
+ <View style={styles.quantityContainer}>
+              <TouchableOpacity onPress={() => handleQuantityChange('decrement')}>
+                <Text style={styles.quantityButton}>-  </Text>
+              </TouchableOpacity>
+              <Text style={styles.quantityText}>{quantity}</Text>
+              <TouchableOpacity onPress={() => handleQuantityChange('increment')}>
+                <Text style={styles.quantityButton}> +</Text>
+              </TouchableOpacity>
             </View>
-            <Text
-        style={styles.menuItemDescription}
-        numberOfLines={showFullDescription ? undefined : 1} // Afficher en 2 lignes par défaut
-      >
-        {item.description}
-      </Text>
-
-      {item.description.length > 41 && ( // Affiche "Voir plus" si le texte est long
-        <TouchableOpacity onPress={toggleDescription}>
-          <Text style={styles.seeMoreText}>
-            {showFullDescription ? 'Voir moins' : 'Voir plus'}
-          </Text>
-        </TouchableOpacity>
-      )}
-
-            <View style={styles.quantityAndLabelContainer}>
-              <Text style={styles.extrasLabel}>Select Extras:</Text>
-              
-              <View style={styles.quantityContainer}>
-                <TouchableOpacity onPress={() => handleQuantityChange('decrement')}>
-                  <Text style={styles.quantityButton}>-</Text>
-                </TouchableOpacity>
-                <Text style={styles.quantityText}>{quantity}</Text>
-                <TouchableOpacity onPress={() => handleQuantityChange('increment')}>
-                  <Text style={styles.quantityButton}>+</Text>
-                </TouchableOpacity>
-                
-              </View>
-
             </View>
-            
-            <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
-
-            <View style={styles.optionContainer}>
-              {item.options?.map((option, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.border,
-                    isAddedToCart && styles.borderDisabled,
-                  ]}
-                  onPress={() => handleExtraChange(option.name)}
-                  disabled={isAddedToCart}
-                >
-                  <View style={styles.optionTextContainer}>
-                    <Text style={styles.optionText}>{option.name}</Text>
-                    <Text style={styles.optionPrice}>+${option.price.toFixed(2)}</Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.checkbox,
-                      extras[option.name] && styles.checkboxChecked,
-                      isAddedToCart && styles.checkboxDisabled,
-                    ]}
-                  >
-                    {extras[option.name] && <Text style={styles.checkboxTick}>✔️</Text>}
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-                    </ScrollView>
-                   
 
 
-          </View>
- 
-       
-        
-      </View>
-      <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              isAddedToCart && styles.buttonDisabled,
-            ]}
-            onPress={handleAddToCart}
-            disabled={isAddedToCart}
-          >
-            <Text style={styles.buttonText}>
-              {isAddedToCart ? 'Added to Cart' : 'Add to Cart'}
+            <Text style={styles.menuItemDescription}>
+              {item.description}
             </Text>
+
+           
+
+            <Text style={styles.extrasLabel}>Select Extras:</Text>
+            {item.options?.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.optionButton}
+                onPress={() => handleExtraChange(option.name)}
+                disabled={isAddedToCart}
+              >
+                <Text style={styles.optionText}>{option.name}</Text>
+                <Text style={styles.optionPrice}>+${option.price.toFixed(2)}</Text>
+              </TouchableOpacity>
+            ))}
+
+            <TouchableOpacity
+              style={[styles.button, isAddedToCart && styles.buttonDisabled]}
+              onPress={handleAddToCart}
+              disabled={isAddedToCart}
+            >
+              <Text style={styles.buttonText}>
+              {isAddedToCart ? 'Ajouté au Panier' : 'Ajouter au Panier'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Fermer</Text>
           </TouchableOpacity>
         </View>
-    </Animated.View>
-  </GestureDetector>
-);
-});
+      </View>
+      </TouchableWithoutFeedback>
+
+    </Modal>
+  );
+};
+
 const styles = StyleSheet.create({
-  bottomSheetContainer: {
-    height: SCREEN_HEIGHT,
-    width: '100%',
-    backgroundColor: '#f7c049ef',
-    position: 'absolute',
-    top: SCREEN_HEIGHT,
-    borderRadius: 35,
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    width: SCREEN_WIDTH * 0.8,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 15,
     elevation: 10,
   },
-  line: {
-    width: 75,
-    height: 4,
-    backgroundColor: '#d6c6c6111',
-    alignSelf: 'center',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  contentContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 30,
-  },
   productImage: {
     width: SCREEN_WIDTH * 0.7,
     height: SCREEN_WIDTH * 0.4,
     alignSelf: 'center',
-    borderRadius: 15, // Rounded corners for the image
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    paddingBottom: 190,
-    elevation: 8,
+    borderRadius: 15,
   },
-  scrollContainer: {
-    width: SCREEN_WIDTH * 0.7,
-    height: SCREEN_WIDTH * 0.30,
-    alignSelf: 'center',
-    borderWidth: 1.5,
-    backgroundColor: '#cfcdcd37',
-    borderColor: '#ffffff50',
-
-    shadowColor: '#3f3b3b',
-    shadowOpacity: 0.5,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 20,
-    elevation: 9, 
-   borderBottomLeftRadius: 50,
-   borderBottomRightRadius: 50,
-   paddingHorizontal: width * 0.12,
+  contentContainer: {
+    paddingTop: 20,
   },
-
+  heading: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#f56b2a',
+  },
+  price: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
   menuItemDescription: {
     fontSize: 16,
     color: '#777',
-    marginBottom: 10,
-    fontWeight: '600',
-    textShadowColor: '#221f1b',
-    textShadowOffset: { width: 0, height: 0.5 },
-    textShadowRadius: 1.9,
-  },
-  price: {
-    fontSize: 27,
-    fontWeight: 'bold',
-    color: '#f3ebebfd',
-    fontWeight: '600',
-    textShadowColor: '#000',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 5,
-
-  },
-  heading: {
-    textAlign: 'start',
-    width: width*0.6,
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#d37604',
-    fontWeight: '600',
-    textShadowColor: '#000',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 5,
-  },
-  container: {
-
-
-    backgroundColor: '#a7907529',
-    
-    borderRadius: 20,
-    padding: height*0.012,
-    width: width*0.9,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: height*0.008,
-
-  
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
-    
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#FF8C00',
-    
-  },
-  heart: {
-    fontSize: 2,
-    color: '#FF8C00',
-  },
-  quantityAndLabelContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    backgroundColor: '#cfcdcd37',
-    borderColor: '#ffffff50',
-marginBottom: height*0.008,
-padding:height*0.008,
-    shadowColor: '#3f3b3b',
-    shadowOpacity: 0.5,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 20,
-    elevation: 9, 
-borderRadius:50,
-   paddingHorizontal: width * 0.08,
-  },
-  extrasLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    fontWeight: '600',
-    textShadowColor: '#d8d2d2',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 5,
+    marginVertical: 10,
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    
+    paddingHorizontal: 10,
+
+  },  quantityContainer2: {
+    flexDirection: 'row',
+alignItems: 'center',
+  justifyContent: 'space-between',
+      paddingHorizontal: 10,
+
   },
   quantityButton: {
-    fontSize: 22,
-    color: '#FF8C00',
+    fontSize: 26,
+    color: '#f56b2a',
   },
   quantityText: {
     fontSize: 20,
     marginHorizontal: 10,
-    
   },
-  optionContainer: {
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-
-
+  extrasLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 15,
   },
-  border: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    paddingVertical: 12,
+  optionButton: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  borderDisabled: {
-    opacity: 0.5,
-  },
-  optionTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
   },
   optionText: {
-    fontSize: 18,
-    color: '#8B4513',
-    marginRight: 10,
-    fontWeight: '600',
-    textShadowColor: '#daaa0f',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 5,
+    fontSize: 16,
+    color: '#333',
   },
   optionPrice: {
-    fontSize: 18,
-    color: '#8B4513',
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderWidth: 2,
-    borderColor: '#FF8C00',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 5,
-  },
-  checkboxChecked: {
-    backgroundColor: '#FF8C00',
-  },
-  checkboxDisabled: {
-    opacity: 0.5,
-  },
-  checkboxTick: {
-    fontSize: 18,
-    color: '#FFFFFF',
-  },
-  seeMoreText: {
-    color: '#FF8C00',
-    fontSize: 17,
-
-    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#f56b2a',
   },
   button: {
-    backgroundColor: '#FF8C00',
-    paddingVertical: 11,
-    borderRadius: 30,
+    backgroundColor: '#f56b2a',
+    padding: 10,
+    borderRadius: 8,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
-    
-  },buttonContainer: {
-   width: width*0.6,
-   backgroundColor: '#fdfbfbc1',
-   alignSelf: 'center',
-   padding:4,
-   borderRadius: 30,
-    
+    marginVertical: 15,
   },
   buttonDisabled: {
-    backgroundColor: '#cccccc',
+    backgroundColor: '#ccc',
   },
   buttonText: {
-    color: 'white',
-    fontSize: 20,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
-    fontWeight: '600',
-    textShadowColor: '#000',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 5,
+  },
+  closeButton: {
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: '#f56b2a',
   },
   errorText: {
     fontSize: 16,
     color: 'red',
     textAlign: 'center',
-    marginTop: 10,
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#999',
-    textAlign: 'right',
-    marginTop: 5,
+    marginTop: 20,
   },
 });
 
-export default PrductBottomSheetScreen;
+export default forwardRef(PrductBottomSheetScreen);

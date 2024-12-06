@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions, Easing } from 'react-native';
-import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import io from 'socket.io-client';
-import NotificationMenu from '../components/NotificationMenu';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 import { DataContext } from '../navigation/DataContext';
 import Header from '../components/Header';
 import { BASE_URL, BASE_URLIO } from '@env';
+
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [isNotificationMenuVisible, setIsNotificationMenuVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);  // Visibility state for bottom sheet
   const slideAnim = useRef(new Animated.Value(width)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -65,8 +66,13 @@ const HomeScreen = ({ navigation }) => {
 
   const onPress = useCallback((item) => {
     setSelectedItem(item);
+    setIsBottomSheetVisible(true);  // Show bottom sheet when an item is selected
     bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2);
   }, []);
+
+  const onClose = () => {
+    setIsBottomSheetVisible(false);  // Close the bottom sheet
+  };
 
   const animateItem = (index) => {
     Animated.sequence([
@@ -124,7 +130,12 @@ const HomeScreen = ({ navigation }) => {
         )}
       </ScrollView>
 
-      <PrductBottomSheetScreen ref={bottomSheetRef} item={selectedItem} />
+      <PrductBottomSheetScreen
+        ref={bottomSheetRef}
+        item={selectedItem}  // Pass the selected item to the bottom sheet
+        isVisible={isBottomSheetVisible}  // Control visibility of the bottom sheet
+        onClose={onClose}  // Close the bottom sheet
+      />
     </View>
   );
 };
@@ -145,7 +156,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
     marginHorizontal: 15,
-
     shadowColor: '#000',
     shadowOpacity: 0.15,
     shadowOffset: { width: 0, height: 5 },
