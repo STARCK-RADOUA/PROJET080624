@@ -8,14 +8,14 @@ import Logout from '../screens/logout';
 import { getClientId } from '../services/userService';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 import { useFocusEffect } from '@react-navigation/native';
 import { io } from 'socket.io-client';
 import { BASE_URLIO, BASE_URL } from '@env';
 
 const { width , height} = Dimensions.get('window');
 
-const deviceId = Device.osBuildId;
+const deviceId = Application.applicationId;
 
 const CustomDrawerContent = (props) => {
   const socket = io(BASE_URLIO);
@@ -102,14 +102,14 @@ const DrawerNavigator = () => {
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
   const getDeviceId = React.useCallback(async () => {
-    const id = Device.osBuildId; // Ensure this is synchronous
+    const id = Application.applicationId; // Ensure this is synchronous
     setDeviceId(id);
   }, []);
   useEffect(() => {
 
     getDeviceId();
 
-    const deviceId = Device.osBuildId;
+    const deviceId = Application.applicationId;
 
     if (deviceId) {
       const socket = io(BASE_URLIO, {

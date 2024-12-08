@@ -3,7 +3,7 @@ import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import io from 'socket.io-client';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 
 const socket = io(`${BASE_URLIO}`); // Replace with your server's URL
 
@@ -14,7 +14,7 @@ const LoadingScreen = ({ navigation }) => {
 
 
   useEffect(() => {
-    const deviceId = Device.osBuildId;
+    const deviceId = Application.applicationId;
 
   
       socket.emit('checkActivation', { deviceId });
@@ -33,7 +33,7 @@ const LoadingScreen = ({ navigation }) => {
   }, [navigation]);
   useEffect(() => {
 
-    const deviceId = Device.osBuildId;
+    const deviceId = Application.applicationId;
 
     const socket1 = io(BASE_URLIO, {
       query: {

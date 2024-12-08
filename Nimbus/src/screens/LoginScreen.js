@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 import * as Location from 'expo-location';
 import io from 'socket.io-client';
 import { BASE_URL, BASE_URLIO } from '@env';
 import { navigate } from '../utils/navigationRef';
 
 const LoginScreen = ({ navigation }) => {
-  const deviceId = Device.osBuildId;
+  const deviceId = Application.applicationId;
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState(null);

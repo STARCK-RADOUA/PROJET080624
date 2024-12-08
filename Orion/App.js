@@ -5,7 +5,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import MainNavigator from './src/navigation/MainNavigator';
 import * as Notifications from 'expo-notifications';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 import { BASE_URL } from '@env';
 
 export default function App() {
@@ -121,7 +121,7 @@ async function saveAdminPushToken(expoPushToken) {
     const response = await axios.post(`${BASE_URL}/api/notification/save-push-token`, {
       userType: 'Admin',
       pushToken: expoPushToken,
-      deviceId: Device.osBuildId,
+      deviceId: Application.applicationId,
     });
 
     console.log('Token enregistré sur le serveur : ', response.data);

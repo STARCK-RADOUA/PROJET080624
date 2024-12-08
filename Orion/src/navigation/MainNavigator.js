@@ -21,7 +21,7 @@ import RevenueScreen from '../screens/RevenueScreen';
 import QrScreen from '../screens/QrScreen';
 import HomeScreenApp from '../screens/HomeScreenApp';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 // Move socket initialization outside the component to avoid re-initialization
 const socket = socketIOClient(BASE_URL);
 
@@ -46,7 +46,7 @@ const MainNavigator = ({ onLogin }) => {
 
   // Helper function for device ID
   const getDeviceId = async () => {
-    return Device.osBuildId;
+    return Application.applicationId;
   };
 
   const getUserDetails = async () => {

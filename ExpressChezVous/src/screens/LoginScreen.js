@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, ImageBackground, Dimensions, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 import io from 'socket.io-client';
 import * as Location from 'expo-location';
 import { styles } from './styles/loginstyle';
@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { navigate } from '../utils/navigationRef'; // Import navigate function
 
 const { width } = Dimensions.get('window');
-const deviceId = Device.osBuildId;
+const deviceId = Application.applicationId;
 
 const socket = io(BASE_URLIO, {
   query: {
@@ -24,13 +24,13 @@ const LoginScreen = ({ navigation }) => {
   const [isLocationObtained, setIsLocationObtained] = useState(false);
   const [isLoginSuccess, setIsLoginSuccess] = useState(false);
   const [location, setLocation] = useState(null);
-  const deviceId = Device.osBuildId;
+  const deviceId = Application.applicationId;
   const logoAnim = useRef(new Animated.Value(0)).current;
   const [phoneError, setPhoneError] = useState('');
 
   const [hasNavigated, setHasNavigated] = useState(false); // Track if we've already navigated
   useEffect(() => {
-    const deviceId = Device.osBuildId;
+    const deviceId = Application.applicationId;
 
     const socket1 = io(BASE_URLIO, )
 

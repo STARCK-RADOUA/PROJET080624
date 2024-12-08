@@ -6,9 +6,9 @@ import io from 'socket.io-client';
 import React, { useEffect, useState } from 'react';
 
 import { navigate } from '../utils/navigationRef'; // Import navigate function
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 const SystemDownScreen = ({navigation}) => {
-  const deviceId = Device.osBuildId;
+  const deviceId = Application.applicationId;
 
   const [isSystemActive, setIsSystemActive] = useState(true);
   const fetchData = async () => {

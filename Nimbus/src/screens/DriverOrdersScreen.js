@@ -6,7 +6,7 @@ import OrderDetailModal from '../components/OrderDetailModal';
 import { BASE_URLIO, BASE_URL } from '@env';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 import { LocationContext } from '../utils/LocationContext';
 import { navigate } from '../utils/navigationRef';
 import moment from 'moment';
@@ -35,7 +35,7 @@ const DriverOrdersScreen = ({ navigation }) => {
   const [messages, setMessages] = useState([]); // State for messages
   const [supportMessages, setsupportMessages] = useState([]); // State for messages
   const socketRef = useRef(null);
-  const deviceId = Device.osBuildId;
+  const deviceId = Application.applicationId;
 const [hasInitialRefreshRun, setHasInitialRefreshRun] = useState(false);
 
 useEffect(() => {
@@ -288,9 +288,9 @@ useEffect(() => {
       refreshDistances();
       console.log("refrech distance")
       startTracking(deviceId);
-      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
+      const socket = io(BASE_URLIO, { query: { deviceId: Application.applicationId } });
       console.log('Sending background ping');
-      socket.emit('driverPing', { deviceId: Device.osBuildId });
+      socket.emit('driverPing', { deviceId: Application.applicationId });
     }, 20000);
 
 

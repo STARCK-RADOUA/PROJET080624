@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { TouchableOpacity, View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../redux/AuthProvider';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 import { BASE_URL } from '@env';
 
 
@@ -13,7 +13,7 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages,
 
   const handleLogout = async () => {
     setLoading(true);
-    const deviceId = Device.osBuildId;
+    const deviceId = Application.applicationId;
 
     try {
       const response = await fetch(`${BASE_URL}/api/clients/logout`, {

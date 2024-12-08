@@ -4,7 +4,7 @@ import * as TaskManager from 'expo-task-manager';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 import { Platform } from 'react-native';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 
 export const LocationContext = createContext();
 
@@ -27,8 +27,8 @@ export const LocationProvider = ({ children }) => {
 
       console.log(`Background Latitude: ${latitude}, Longitude: ${longitude}`);
       if (socket) {
-        socket.emit('driverLocationUpdate', { deviceId: Device.osBuildId , latitude, longitude });
-        socket.emit('driverPing', { deviceId: Device.osBuildId  });
+        socket.emit('driverLocationUpdate', { deviceId: Application.applicationId , latitude, longitude });
+        socket.emit('driverPing', { deviceId: Application.applicationId  });
 
       }
     }

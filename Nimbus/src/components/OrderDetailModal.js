@@ -3,7 +3,7 @@ import { Modal, View,Switch, Text,Alert,TextInput, TouchableOpacity, StyleSheet,
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import { BASE_URLIO, BASE_URL } from '@env';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 import { MaterialIcons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 
@@ -114,7 +114,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
         console.log('------------------------------------');
         console.log('livred successful');
         console.log('------------------------------------');
-        const deviceId = Device.osBuildId;
+        const deviceId = Application.applicationId;
         const socket = io(BASE_URLIO, {
           query: { deviceId },
         });
@@ -135,7 +135,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
   };
   
   const commandeRedestrubier = async () => {
-    const deviceId = Device.osBuildId;
+    const deviceId = Application.applicationId;
 
     const order_number = order.order_number ;
     console.log('------------------------------------');
@@ -205,7 +205,7 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
         console.log('------------------------------------');
         console.log('comande canceled successful');
         console.log('------------------------------------');
-const deviceId = Device.osBuildId;
+const deviceId = Application.applicationId;
         const socket = io(BASE_URLIO, {
           query: { deviceId },
         });

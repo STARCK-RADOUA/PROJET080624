@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 import { BASE_URL, BASE_URLIO } from '@env';
 import io from 'socket.io-client';
 
@@ -15,9 +15,9 @@ const LoginScreen = ({ onLogin }) => {
   const getDeviceId = async () => {
     if (Device.isDevice) {
       console.log(Device.isDevice)
-      setDeviceId(Device.osBuildId);
+      setDeviceId(Application.applicationId);
       console.log('------------------------------------');
-      console.log('Device ID:', Device.osBuildId);
+      console.log('Device ID:', Application.applicationId);
       console.log('------------------------------------');
     } else {
       Alert.alert('Error', 'Must use a physical device for Device ID.');
@@ -26,7 +26,7 @@ const LoginScreen = ({ onLogin }) => {
 
   const autoLogin = async () => {
     const socket = io(`${BASE_URLIO}`);
-    const deviceId = Device.osBuildId;
+    const deviceId = Application.applicationId;
 console.log(deviceId)
     if (deviceId) {
       socket.emit('adminAutoLogin', { deviceId });
@@ -44,7 +44,7 @@ console.log(deviceId)
     }
 
     const socket = io(`${BASE_URLIO}`);
-    const deviceId = Device.osBuildId;
+    const deviceId = Application.applicationId;
 
     if (deviceId) {
       socket.emit('adminRestoreLogin', { deviceId });
