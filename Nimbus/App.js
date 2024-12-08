@@ -110,8 +110,10 @@ navigate('SystemDownScreen')
       console.log('Admin deactivated driver');
       navigate('Login');
     });
-    // Start interval ping when app is active
+
     const startPingInterval = () => {
+
+
       return setInterval(() => {
         if (appState === 'active' && isConnected) {
           console.log('Sending ping in active state');
@@ -129,6 +131,7 @@ navigate('SystemDownScreen')
         if (nextAppState === 'active' && isConnected) {
           console.log('App is active, restarting ping interval');
           pingInterval = startPingInterval();
+          socket.emit('driverConnected', deviceId);
         } else if (nextAppState === 'background') {
           console.log('App is in the background, clearing ping interval');
           clearInterval(pingInterval);
