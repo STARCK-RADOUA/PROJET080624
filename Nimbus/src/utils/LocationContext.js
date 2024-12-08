@@ -77,7 +77,7 @@ export const LocationProvider = ({ children }) => {
     await Location.startLocationUpdatesAsync('BACKGROUND_LOCATION_TASK', {
       accuracy: Location.Accuracy.High,
       timeInterval: 20000,
-      distanceInterval: 50,
+      distanceInterval: 1000, // Met à jour toutes les 10 mètres
     });
 
     setIsTracking(true);

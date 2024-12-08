@@ -134,6 +134,16 @@ useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App is back to foreground - refreshing data');
+        if (!socketRef.current) {
+          socketRef.current = io(BASE_URLIO, {
+            query: { deviceId },
+          });
+    
+          socketRef.current.on('connect', () => {
+            console.log('Socket connected:', deviceId);
+            socketRef.current.emit('driverConnected', deviceId);
+          });
+        } 
         refreshDistances(); // Rafraîchir les distances ou autres données
       }
       setAppState(nextAppState);
@@ -277,8 +287,10 @@ useEffect(() => {
    
       refreshDistances();
       console.log("refrech distance")
-
-
+      startTracking(deviceId);
+      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
+      console.log('Sending background ping');
+      socket.emit('driverPing', { deviceId: Device.osBuildId });
     }, 20000);
 
 
