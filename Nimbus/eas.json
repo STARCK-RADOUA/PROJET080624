@@ -1,6 +1,6 @@
 {
   "cli": {
-    "appVersionSource": "remote"  // ou "local" selon votre préférence
+    "appVersionSource": "remote"  
   },
   "build": {
     "development": {
@@ -13,6 +13,8 @@
     },
     "production": {
       "developmentClient": false,
+      "distribution": "store"
+
     }
   }
 }
