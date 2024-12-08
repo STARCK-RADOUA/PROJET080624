@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, ActivityIndicator ,StyleSheet, AppState } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, AppState } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import * as Location from 'expo-location';
@@ -24,16 +24,16 @@ export default function App() {
   const [appState, setAppState] = useState(AppState.currentState); // Track app state
   const notificationListener = useRef();
   const responseListener = useRef();
-  const socketRef = useRef(null);
+  const socketRef = useRef(socket); // Use socketRef to store socket connection
   const BACKGROUND_PING_TASK = 'background-fetch';
   const [isSystemDown, setIsSystemDown] = useState(false);
   const [loading, setLoading] = useState(false);
+  
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
-      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
       console.log('Sending background ping');
-      socket.emit('driverPing', { deviceId: Device.osBuildId });
+      socketRef.current.emit('driverPing', { deviceId: Device.osBuildId });
       return BackgroundFetch.Result.NewData;
     } catch (error) {
       console.log('Error in background ping task', error);
@@ -52,36 +52,26 @@ export default function App() {
   }, []);
   
   useEffect(() => {
-  
-    // Initialize socket connection
     // Listen to the socket for the system status
-    socket.on('statusSiteDriver', (systemActive) => {
-      // Check the system status from the server
-      setIsSystemDown(!systemActive); // Set system down if status is false
-      console.log('System status received:', { systemActive });
-      console.log('System status received:', { systemActive });
-      console.log('System status received:', { systemActive });
+    socketRef.current.on('statusSiteDriver', (systemActive) => {
+      setIsSystemDown(!systemActive);
+      console.log('System status received:', systemActive);
       setLoading(false);
-       // Stop loading after receiving the status 
-       if (!systemActive) {
-navigate('SystemDownScreen') 
- } 
-
+      if (!systemActive) {
+        navigate('SystemDownScreen');
+      }
     });
 
     return () => {
-      socket.off('statusSiteDriver');
+      socketRef.current.off('statusSiteDriver');
     };
   }, []);
 
-
-
- 
   // Register background fetch task
   async function registerBackgroundTask() {
     try {
       await BackgroundFetch.registerTaskAsync(BACKGROUND_PING_TASK, {
-        minimumInterval: 1*60, // Ping every 5 minutes
+        minimumInterval: 1 * 60, // Ping every minute
         stopOnTerminate: false,
         startOnBoot: true,
       });
@@ -95,7 +85,6 @@ navigate('SystemDownScreen')
     configureNotifications();
     registerBackgroundTask();
 
-   
     socketRef.current = socket;
     socket.emit('toggleSystemDriver'); // For example, emit an event to check system status
 
@@ -103,41 +92,38 @@ navigate('SystemDownScreen')
       console.log('Socket reconnected');
     });
     
-    // Send initial ping
     console.log('Initial ping');
     socket.emit('driverPing', { deviceId });
     socket.on('adminDeactivateDriver', () => {
       console.log('Admin deactivated driver');
       navigate('Login');
     });
-    // Start interval ping when app is active
+
     const startPingInterval = () => {
       return setInterval(() => {
         if (appState === 'active' && isConnected) {
           console.log('Sending ping in active state');
           socket.emit('driverPing', { deviceId });
         }
-      }, 25000); // Ping every 50 seconds
+      }, 25000); // Ping every 25 seconds
     };
 
     let pingInterval = startPingInterval();
 
-    // Handle app state changes
-   
-      const handleAppStateChange = (nextAppState) => {
-        setAppState(nextAppState);
-        if (nextAppState === 'active' && isConnected) {
-          console.log('App is active, restarting ping interval');
-          pingInterval = startPingInterval();
-        } else if (nextAppState === 'background') {
-          console.log('App is in the background, clearing ping interval');
-          clearInterval(pingInterval);
-        }
-      };
-    
+    const handleAppStateChange = (nextAppState) => {
+      setAppState(nextAppState);
+      if (nextAppState === 'active' && isConnected) {
+        console.log('App is active, restarting ping interval');
+        clearInterval(pingInterval); // Clear previous interval before starting a new one
+        pingInterval = startPingInterval();
+      } else if (nextAppState === 'background') {
+        console.log('App is in the background, clearing ping interval');
+        clearInterval(pingInterval);
+      }
+    };
 
-    // Monitor connectivity changes
- 
+    // Monitor app state changes
+    const appStateListener = AppState.addEventListener('change', handleAppStateChange);
 
     // Monitor push notifications
     registerForPushNotificationsAsync().then((token) => {
@@ -159,20 +145,14 @@ navigate('SystemDownScreen')
       }
     });
 
-    const appStateListener = AppState.addEventListener('change', handleAppStateChange);
-
-    // Clean up the event listener in the return statement
     return () => {
-      // Removing the event listener correctly
       appStateListener.remove();
       Notifications.removeNotificationSubscription(notificationListener.current);
       Notifications.removeNotificationSubscription(responseListener.current);
       clearInterval(pingInterval);
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
+      socketRef.current.disconnect();
     };
-  }, []);
+  }, [appState, isConnected]);
 
   return (
     <LocationProvider>
