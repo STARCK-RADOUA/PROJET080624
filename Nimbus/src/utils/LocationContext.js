@@ -42,8 +42,8 @@ export const LocationProvider = ({ children }) => {
       return;
     }
 
-    if (Platform.OS === 'android') {
-      const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+    if (Platform.OS === 'ios') {   
+         const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
       if (backgroundStatus !== 'granted') {
         console.log('Background permission to access location was denied');
         return;
