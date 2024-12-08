@@ -1,15 +1,15 @@
 import { BASE_URL } from '@env';
 
 import axios from 'axios';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 
 // Function to get the device ID
 const getDeviceId = () => {
-  return Device.identifierForVendor; 
+  return DeviceInfo.getUniqueId(); 
 };
 
 export const getDeviceIde = () => {
-  return Device.identifierForVendor; 
+  return DeviceInfo.getUniqueId(); 
 };
 
 

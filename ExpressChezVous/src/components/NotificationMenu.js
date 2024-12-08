@@ -2,7 +2,7 @@ import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, TouchableWithoutFeedback, FlatList, Modal } from 'react-native';
 import io from 'socket.io-client';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import axios from 'axios';
 
 let socket;
@@ -15,7 +15,7 @@ const NotificationMenu = ({ slideAnim, toggleNotificationMenu }) => {
 
   useEffect(() => {
     const getDeviceId = async () => {
-      const id = Device.identifierForVendor;
+      const id = DeviceInfo.getUniqueId();
       setDeviceId(id);
 
       if (!socket) {

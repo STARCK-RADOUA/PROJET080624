@@ -7,10 +7,10 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 import { navigate } from '../utils/navigationRef'; // Import navigate function
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 
 const SplashScreen = ({ navigation }) => {
-  const deviceId = Device.identifierForVendor;
+  const deviceId = DeviceInfo.getUniqueId();
 
   const [isSystemActive, setIsSystemActive] = useState(true);
 

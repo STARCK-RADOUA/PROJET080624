@@ -6,7 +6,7 @@ import { BASE_URLIO, BASE_URL } from '@env';
 import { getClientId } from '../services/userService';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 
 
 const { width, height } = Dimensions.get('window');
@@ -23,7 +23,7 @@ const ClientChatScreen = ({ navigation }) => {
   const flatListRef = useRef(null);  // Reference for FlatList
 
   const getDeviceId = async () => {
-    const id = await Device.identifierForVendor
+    const id = await DeviceInfo.getUniqueId()
     setDeviceId(id);
   };
 

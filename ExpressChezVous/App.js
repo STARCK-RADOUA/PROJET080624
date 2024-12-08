@@ -6,7 +6,7 @@ import AppNavigator from './src/navigation/AppNavigator'; // Updated import path
 import { registerForPushNotificationsAsync, saveDriverPushToken, configureNotifications } from './src/utils/notificationService';
 import { BASE_URLIO } from '@env';
 import { navigate } from './src/utils/navigationRef'; // Import navigate function
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import * as Location from 'expo-location';  // Import expo-location for location fetching
  
 export default function App() {
@@ -14,7 +14,7 @@ export default function App() {
   const notificationListener = useRef();
   const responseListener = useRef();
   const socketRef = useRef(null);
-  const deviceId = Device.identifierForVendor;
+  const deviceId = DeviceInfo.getUniqueId();
   const [isSystemActive, setIsSystemActive] = useState(true);
 
   useEffect(() => {

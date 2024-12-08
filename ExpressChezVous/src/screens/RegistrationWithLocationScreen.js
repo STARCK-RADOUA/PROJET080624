@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Animated, E
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 
@@ -26,7 +26,7 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
 
   useEffect(() => {
     const getDeviceId = async () => {
-      const id = Device.identifierForVendor;
+      const id = DeviceInfo.getUniqueId();
       setDeviceId(id);
     };
     handleGetLocation();

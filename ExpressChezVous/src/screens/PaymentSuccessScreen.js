@@ -10,8 +10,8 @@ import { BASE_URLIO , BASE_URL } from '@env';
 import { updateOrderItems, updateUserPoints } from '../services/orderService';
 import styles from './styles/paymentSuccessStyles';
 import { Platform } from 'react-native';
-import * as Device from 'expo-device';
-const deviceId = Device.identifierForVendor;
+import DeviceInfo from 'react-native-device-info';
+const deviceId = DeviceInfo.getUniqueId();
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 

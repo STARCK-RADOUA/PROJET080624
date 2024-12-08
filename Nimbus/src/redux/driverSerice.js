@@ -2,10 +2,10 @@
 
 import { BASE_URLIO, BASE_URL } from '@env';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 
 const getDeviceId = () => {
-    return Device.identifierForVendor; 
+    return DeviceInfo.getUniqueId(); 
   };
 
   export const getDriverId = async () => {

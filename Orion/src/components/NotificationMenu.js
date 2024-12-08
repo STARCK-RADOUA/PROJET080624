@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal, P
 import DateTimePicker from '@react-native-community/datetimepicker';
 import io from 'socket.io-client';
 import { Ionicons } from '@expo/vector-icons';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import { BASE_URLIO } from '@env';
 import NotificationItem from './NotificationItem';
 import NotificationModal from './NotificationModal';
@@ -30,7 +30,7 @@ const NotificationMenu = () => {
 
   useEffect(() => {
     const getDeviceId = async () => {
-      const id = Device.identifierForVendor;
+      const id = DeviceInfo.getUniqueId();
       setDeviceId(id);
 
       if (!socket) {
