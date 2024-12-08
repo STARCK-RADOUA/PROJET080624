@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import axios from 'axios';
-import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import { BASE_URL, BASE_URLIO } from '@env';
 import { getClient } from '../services/userService';
@@ -29,7 +29,7 @@ const [uniqueId, setUniqueId] = useState('');
 
   useEffect(() => {
     const getDeviceId = async () => {
-      const id = Application.applicationId;
+      const id = Device.identifierForVendor;
       setDeviceId(id);
     };
 

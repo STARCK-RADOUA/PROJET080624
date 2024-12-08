@@ -9,12 +9,12 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { registerForPushNotificationsAsync, saveDriverPushToken, configureNotifications } from './src/utils/notificationService';
 import { BASE_URLIO } from '@env';
 import { navigate } from './src/utils/navigationRef'; // Import navigate function
-import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 
-const deviceId = Application.applicationId;
+const deviceId = Device.identifierForVendor;
 // Initialize socket connection
 const socket = io(BASE_URLIO, { query: { deviceId } });
 
@@ -31,9 +31,9 @@ export default function App() {
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
-      const socket = io(BASE_URLIO, { query: { deviceId: Application.applicationId } });
+      const socket = io(BASE_URLIO, { query: { deviceId: Device.identifierForVendor } });
       console.log('Sending background ping');
-      socket.emit('driverPing', { deviceId: Application.applicationId });
+      socket.emit('driverPing', { deviceId: Device.identifierForVendor });
       return BackgroundFetch.Result.NewData;
     } catch (error) {
       console.log('Error in background ping task', error);

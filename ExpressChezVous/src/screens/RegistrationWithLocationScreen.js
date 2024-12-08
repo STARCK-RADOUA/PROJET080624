@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Animated, E
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 
@@ -26,7 +26,7 @@ const RegistrationWithLocationScreen = ({ navigation }) => {
 
   useEffect(() => {
     const getDeviceId = async () => {
-      const id = Application.applicationId;
+      const id = Device.identifierForVendor;
       setDeviceId(id);
     };
     handleGetLocation();

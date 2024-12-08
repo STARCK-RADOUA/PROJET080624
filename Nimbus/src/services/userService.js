@@ -1,15 +1,15 @@
 import { BASE_URL } from '@env';
 
 import axios from 'axios';
-import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 
 // Function to get the device ID
 const getDeviceId = () => {
-  return Application.applicationId; 
+  return Device.identifierForVendor; 
 };
 
 export const getDeviceIde = () => {
-  return Application.applicationId; 
+  return Device.identifierForVendor; 
 };
 
 

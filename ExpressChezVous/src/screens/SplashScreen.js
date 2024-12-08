@@ -7,10 +7,10 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 import { navigate } from '../utils/navigationRef'; // Import navigate function
-import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 
 const SplashScreen = ({ navigation }) => {
-  const deviceId = Application.applicationId;
+  const deviceId = Device.identifierForVendor;
    const socket = io(BASE_URLIO, {
       query: {
         deviceId: deviceId,  // Pass the unique deviceId

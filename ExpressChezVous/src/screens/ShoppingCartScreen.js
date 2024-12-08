@@ -7,7 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getClientId } from '../services/userService';
 import Header from '../components/Header';
 import io from 'socket.io-client';
-import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import useNotificationMenu from '../services/useNotificationMenu'; 
 import { DataContext } from '../navigation/DataContext';
 import { getUserDetails } from '../services/userService';
@@ -70,7 +70,7 @@ const ShoppingCartScreen = ({ navigation }) => {
   
     fetchData();
   
-    const deviceId = Application.applicationId;
+    const deviceId = Device.identifierForVendor;
     console.log('Device ID:', deviceId);
   }, []);
   
@@ -347,7 +347,7 @@ const ShoppingCartScreen = ({ navigation }) => {
   const handleOrderNow = async () => {
     try {
       if((myFreeItem > 0 && userPoints > 0) || userPoints === 0){
-        const deviceId = Application.applicationId;
+        const deviceId = Device.identifierForVendor;
         const data = {
           totalPrice: totalPrice,
           orderItems: orderItems,

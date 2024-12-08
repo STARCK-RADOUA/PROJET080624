@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Image, Platform, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
-import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import { useFocusEffect } from '@react-navigation/native';
 import { BASE_URLIO, BASE_URL } from '@env';
 import { io } from 'socket.io-client';
-const deviceId = Application.applicationId;
+const deviceId = Device.identifierForVendor;
 
 const socket = io(BASE_URLIO, {
   query: { deviceId },
@@ -19,14 +19,14 @@ const Header = ({ navigation }) => {
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
   const getDeviceId = React.useCallback(async () => {
-    const id = Application.applicationId; // Ensure this is synchronous
+    const id = Device.identifierForVendor; // Ensure this is synchronous
     setDeviceId(id);
   }, []);
   useEffect(() => {
 
     getDeviceId();
 
-    const deviceId = Application.applicationId;
+    const deviceId = Device.identifierForVendor;
 
     if (deviceId) {
       const socket = io(BASE_URLIO, {

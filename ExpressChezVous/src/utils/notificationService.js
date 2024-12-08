@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import axios from 'axios';
 import { BASE_URL } from '@env';
 import { Platform } from 'react-native';
@@ -67,7 +67,7 @@ export async function saveDriverPushToken(expoPushToken) {
     const response = await axios.post(`${BASE_URL}/api/notification/save-push-token`, {
       userType: 'Client',
       pushToken: expoPushToken,
-      deviceId: Application.applicationId,
+      deviceId: Device.identifierForVendor,
     });
 
     console.log('Push token saved on the server:', response.data);
