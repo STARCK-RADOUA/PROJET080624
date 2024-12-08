@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#f56b2a',
+    color: '#f08a17',
   },
   price: {
     fontSize: 24,
@@ -233,12 +233,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
 alignItems: 'center',
   justifyContent: 'space-between',
-      paddingHorizontal: 10,
 
   },
   quantityButton: {
     fontSize: 26,
-    color: '#f56b2a',
+    color: '#e9ab25',
   },
   quantityText: {
     fontSize: 20,
@@ -262,10 +261,10 @@ alignItems: 'center',
   },
   optionPrice: {
     fontSize: 16,
-    color: '#f56b2a',
+    color: '#1c880d',
   },
   button: {
-    backgroundColor: '#f56b2a',
+    backgroundColor: '#e9ab25',
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -285,7 +284,7 @@ alignItems: 'center',
   },
   closeButtonText: {
     fontSize: 18,
-    color: '#f56b2a',
+    color: '#e9ab25',
   },
   errorText: {
     fontSize: 16,
