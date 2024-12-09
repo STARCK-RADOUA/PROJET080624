@@ -7,12 +7,20 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 import { navigate } from '../utils/navigationRef'; // Import navigate function
-import * as Device from 'expo-device';
+import useDeviceId from './useDeviceId';
 
 const SplashScreen = ({ navigation }) => {
-  const deviceId = Device.osBuildId;
 
   const [isSystemActive, setIsSystemActive] = useState(true);
+  const [deviceId, setDeviceId] = useState(null);
+  const deviceIdFromHook = useDeviceId();
+
+  useEffect(() => {
+    // Attendre que deviceId soit prêt (mis à jour)
+    if (deviceIdFromHook) {
+      setDeviceId(deviceIdFromHook);
+    }
+  }, [deviceIdFromHook]);  // Dépendance à deviceIdFromHook
 
   useEffect(() => {
     // Initialize socket connection

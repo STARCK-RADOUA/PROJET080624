@@ -6,7 +6,7 @@ import OrderDetailModal from '../components/OrderDetailModal';
 import { BASE_URLIO, BASE_URL } from '@env';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import useDeviceId from './useDeviceId';
 import { LocationContext } from '../utils/LocationContext';
 import { navigate } from '../utils/navigationRef';
 import moment from 'moment';
@@ -18,7 +18,6 @@ import { useFocusEffect } from '@react-navigation/native';
 const DriverOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [deviceId1, setDeviceId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [driverId, setDriverId] = useState(null);
   const [driverInfo, setDriverInfo] = useState({ firstName: '', lastName: '' });
@@ -35,9 +34,17 @@ const DriverOrdersScreen = ({ navigation }) => {
   const [messages, setMessages] = useState([]); // State for messages
   const [supportMessages, setsupportMessages] = useState([]); // State for messages
   const socketRef = useRef(null);
-  const deviceId = Device.osBuildId;
 const [hasInitialRefreshRun, setHasInitialRefreshRun] = useState(false);
+const [deviceId, setDeviceId] = useState(null);
+  const deviceIdFromHook = useDeviceId();
 
+  useEffect(() => {
+    // Attendre que deviceId soit prêt (mis à jour)
+    if (deviceIdFromHook) {
+      setDeviceId(deviceIdFromHook);
+    }
+  }, [deviceIdFromHook]);  // Dépendance à deviceIdFromHook
+  
 useEffect(() => {
   if (orders.length > 0 && !hasInitialRefreshRun) {
     refreshDistances(); // Exécuter une fois immédiatement si des commandes sont présentes
@@ -288,9 +295,9 @@ useEffect(() => {
       refreshDistances();
       console.log("refrech distance")
       startTracking(deviceId);
-      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
+      const socket = io(BASE_URLIO, { query: { deviceId: deviceId } });
       console.log('Sending background ping');
-      socket.emit('driverPing', { deviceId: Device.osBuildId });
+      socket.emit('driverPing', { deviceId: deviceId });
     }, 20000);
 
 

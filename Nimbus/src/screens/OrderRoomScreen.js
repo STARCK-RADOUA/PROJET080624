@@ -14,6 +14,7 @@ const RoomScreen = ({ route }) => {
   const [chatId, setChatId] = useState(null);
   const socket = io(BASE_URL);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
       setKeyboardHeight(e.endCoordinates.height);

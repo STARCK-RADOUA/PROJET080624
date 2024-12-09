@@ -4,7 +4,7 @@ import * as TaskManager from 'expo-task-manager';
 import io from 'socket.io-client';
 import { BASE_URLIO } from '@env';
 import { Platform } from 'react-native';
-import * as Device from 'expo-device';
+import useDeviceId from './useDeviceId';
 
 export const LocationContext = createContext();
 
@@ -13,6 +13,15 @@ export const LocationProvider = ({ children }) => {
   const [locationSubscription, setLocationSubscription] = useState(null);
   const [socket, setSocket] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null); // Ajout d'un état pour la localisation actuelle
+  const [deviceId, setDeviceId] = useState(null);
+  const deviceIdFromHook = useDeviceId();
+
+  useEffect(() => {
+    // Attendre que deviceId soit prêt (mis à jour)
+    if (deviceIdFromHook) {
+      setDeviceId(deviceIdFromHook);
+    }
+  }, [deviceIdFromHook]);  // Dépendance à deviceIdFromHook
 
   // Define background task for location updates
   TaskManager.defineTask('BACKGROUND_LOCATION_TASK', async ({ data, error }) => {
@@ -27,8 +36,8 @@ export const LocationProvider = ({ children }) => {
 
       console.log(`Background Latitude: ${latitude}, Longitude: ${longitude}`);
       if (socket) {
-        socket.emit('driverLocationUpdate', { deviceId: Device.osBuildId , latitude, longitude });
-        socket.emit('driverPing', { deviceId: Device.osBuildId  });
+        socket.emit('driverLocationUpdate', { deviceId: deviceId , latitude, longitude });
+        socket.emit('driverPing', { deviceId: deviceId });
 
       }
     }

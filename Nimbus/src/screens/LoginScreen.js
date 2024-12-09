@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import useDeviceId from './useDeviceId';
 import * as Location from 'expo-location';
 import io from 'socket.io-client';
 import { BASE_URL, BASE_URLIO } from '@env';
 import { navigate } from '../utils/navigationRef';
 
 const LoginScreen = ({ navigation }) => {
-  const deviceId = Device.osBuildId;
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState(null);
+  const [deviceId, setDeviceId] = useState(null);
+  const deviceIdFromHook = useDeviceId();
 
+  useEffect(() => {
+    // Attendre que deviceId soit prêt (mis à jour)
+    if (deviceIdFromHook) {
+      setDeviceId(deviceIdFromHook);
+    }
+  }, [deviceIdFromHook]);  // Dépendance à deviceIdFromHook
+  
   const socket = io(BASE_URLIO, {
     query: {
       deviceId: deviceId,

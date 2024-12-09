@@ -9,16 +9,17 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { registerForPushNotificationsAsync, saveDriverPushToken, configureNotifications } from './src/utils/notificationService';
 import { BASE_URLIO } from '@env';
 import { navigate } from './src/utils/navigationRef'; // Import navigate function
-import * as Device from 'expo-device';
+import useDeviceId from './useDeviceId';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 
-const deviceId = Device.osBuildId;
-// Initialize socket connection
-const socket = io(BASE_URLIO, { query: { deviceId } });
 
 export default function App() {
+  const deviceId = useDeviceId();
+  // Initialize socket connection
+  const socket = io(BASE_URLIO, { query: { deviceId } });
+
   const [expoPushToken, setExpoPushToken] = useState('');
   const [isConnected, setIsConnected] = useState(true);
   const [appState, setAppState] = useState(AppState.currentState); // Track app state
@@ -28,12 +29,15 @@ export default function App() {
   const BACKGROUND_PING_TASK = 'background-fetch';
   const [isSystemDown, setIsSystemDown] = useState(false);
   const [loading, setLoading] = useState(false);
+  
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
-      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
+      const deviceId =  useDeviceId();
+
+      const socket = io(BASE_URLIO, { query: { deviceId: deviceId } });
       console.log('Sending background ping');
-      socket.emit('driverPing', { deviceId: Device.osBuildId });
+      socket.emit('driverPing', { deviceId: deviceId });
       return BackgroundFetch.Result.NewData;
     } catch (error) {
       console.log('Error in background ping task', error);

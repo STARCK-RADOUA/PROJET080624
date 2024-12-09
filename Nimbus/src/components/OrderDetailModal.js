@@ -3,7 +3,7 @@ import { Modal, View,Switch, Text,Alert,TextInput, TouchableOpacity, StyleSheet,
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import { BASE_URLIO, BASE_URL } from '@env';
-import * as Device from 'expo-device';
+import useDeviceId from './useDeviceId';
 import { MaterialIcons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 
@@ -19,7 +19,16 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
   const [isChecked, setIsChecked] = useState(false);
   const [expandAddress, setExpandAddress] = useState(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
+  const [deviceId, setDeviceId] = useState(null);
+  const deviceIdFromHook = useDeviceId();
 
+  useEffect(() => {
+    // Attendre que deviceId soit prêt (mis à jour)
+    if (deviceIdFromHook) {
+      setDeviceId(deviceIdFromHook);
+    }
+  }, [deviceIdFromHook]);  // Dépendance à deviceIdFromHook
+  
   if (!order) return null;
 
   const displayedProducts = showAllProducts ? order.products : order.products.slice(0, 3);
@@ -114,7 +123,6 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
         console.log('------------------------------------');
         console.log('livred successful');
         console.log('------------------------------------');
-        const deviceId = Device.osBuildId;
         const socket = io(BASE_URLIO, {
           query: { deviceId },
         });
@@ -135,7 +143,6 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
   };
   
   const commandeRedestrubier = async () => {
-    const deviceId = Device.osBuildId;
 
     const order_number = order.order_number ;
     console.log('------------------------------------');
@@ -205,7 +212,6 @@ const OrderDetailModal = ({ visible, onClose, order }) => {
         console.log('------------------------------------');
         console.log('comande canceled successful');
         console.log('------------------------------------');
-const deviceId = Device.osBuildId;
         const socket = io(BASE_URLIO, {
           query: { deviceId },
         });

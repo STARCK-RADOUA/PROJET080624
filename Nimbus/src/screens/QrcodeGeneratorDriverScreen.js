@@ -5,22 +5,27 @@ import { getDriverId, getDeviceIde } from '../services/userService'; // Remplace
 import { Ionicons } from '@expo/vector-icons';
 import * as ScreenCapture from 'expo-screen-capture'; 
 import { BASE_URL, BASE_URLIO } from '@env';
-import * as Device from 'expo-device';
+import useDeviceId from './useDeviceId';
 
 const QrcodeGeneratorDriverScreen = () => {
   const [qrData, setQrData] = useState(null);
   const [expiration, setExpiration] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30); 
-  const [deviceId, setDeviceId] = useState('');
+  const [deviceId, setDeviceId] = useState(null);
+  const deviceIdFromHook = useDeviceId();
+
+  useEffect(() => {
+    // Attendre que deviceId soit prêt (mis à jour)
+    if (deviceIdFromHook) {
+      setDeviceId(deviceIdFromHook);
+    }
+  }, [deviceIdFromHook]);  // Dépendance à deviceIdFromHook
   
-  const getDeviceId = async () => {
-    setDeviceId(Device.osBuildId);
-    // Set deviceId using expo-device's osBuildId
-  };
+ 
   // Fonction pour générer le QR code
   const generateQRCode = async () => {
-    try { const deviceId = Device.osBuildId;
+    try { 
         console.log('------------------------------------');
         console.log('Device ID:', deviceId);
         console.log('------------------------------------');
@@ -47,7 +52,6 @@ const QrcodeGeneratorDriverScreen = () => {
 
   // Empêcher la capture d'écran
   useEffect(() => {
-    getDeviceId();
     const preventScreenCapture = async () => {
       await ScreenCapture.preventScreenCaptureAsync();
     };
@@ -59,7 +63,6 @@ const QrcodeGeneratorDriverScreen = () => {
 
   // Régénérer le QR code toutes les 30 secondes
   useEffect(() => {
-    getDeviceId();
     generateQRCode();
     const interval = setInterval(generateQRCode, 30 * 1000);
     const countdown = setInterval(() => {

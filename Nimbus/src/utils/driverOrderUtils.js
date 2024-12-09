@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { Linking, Alert } from 'react-native';
-import * as Device from 'expo-device';
+import useDeviceId from './useDeviceId';
 import { BASE_URL } from '@env';
 
 export const getDeviceId = async (setDeviceId) => {
-  setDeviceId(Device.osBuildId);
+  const deviceId = useDeviceId();
+
+  setDeviceId(deviceId);
 };
 
 export const fetchDriverId = async (deviceId, setDriverId, setDriverInfo,setPoint, setActiveStatusMessage) => {

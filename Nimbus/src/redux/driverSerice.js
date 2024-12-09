@@ -2,10 +2,12 @@
 
 import { BASE_URLIO, BASE_URL } from '@env';
 import axios from 'axios';
-import * as Device from 'expo-device';
+import useDeviceId from './useDeviceId';
 
 const getDeviceId = () => {
-    return Device.osBuildId; 
+  const deviceId = useDeviceId();
+
+  return deviceId; 
   };
 
   export const getDriverId = async () => {
