@@ -291,7 +291,7 @@ useEffect(() => {
       const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
       console.log('Sending background ping');
       socket.emit('driverPing', { deviceId: Device.osBuildId });
-    }, 20000);
+    }, 60000);
 
 
 

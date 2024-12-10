@@ -119,7 +119,7 @@ navigate('SystemDownScreen')
           console.log('Sending ping in active state');
           socket.emit('driverPing', { deviceId });
         }
-      }, 25000); // Ping every 50 seconds
+      }, 100000); // Ping every 50 seconds
     };
 
     let pingInterval = startPingInterval();

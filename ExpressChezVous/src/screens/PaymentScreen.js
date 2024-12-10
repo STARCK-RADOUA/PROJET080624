@@ -186,6 +186,8 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 22,
     fontWeight: 'bold',
+    width: width * 0.2,
+
     color: '#f0b330', // Futuristic orange for input text
     textAlign: 'center',
   },
