@@ -47,9 +47,25 @@ const PaymentScreen = ({ navigation, route }) => {
       { cancelable: true }
     );
   };
+
+
+  const stTPe = () => {
+    setExchangeValue('0');
+  };
+
   const handlePayment = async () => {
     if (!selectedPayment) {
       return;
+    }
+   
+    if (selectedPayment === 'cash' && parseFloat(exchangeValue) > orderDetails.data.newOrder.newOrder.totalPrice) {
+      Alert.alert('Erreur', `L'échange est insuffisant. Vous devez fournir au moins le prix du commande qui :  ${orderDetails.data.newOrder.newOrder.totalPrice}€.`);
+      return;
+    }
+  
+    // If selected payment method is card, set exchange value to 0
+    if (selectedPayment === 'TPE') {
+      setExchangeValue('0'); // Automatically set exchange to 0 for card payment
     }
 
     setLoading(true);
@@ -120,8 +136,11 @@ const PaymentScreen = ({ navigation, route }) => {
 
       <TouchableOpacity
         style={[styles.paymentOption, selectedPayment === 'card' && styles.selectedOption]}
-        onPress={() => setSelectedPayment('card')}
-      >
+        onPress={() => {
+          setSelectedPayment('card');
+          setExchangeValue('0'); // Set exchange value to 0
+        }}
+              >
         <Text style={styles.paymentText}>TPE Machine</Text>
       </TouchableOpacity>
 
