@@ -202,7 +202,21 @@ const ShoppingCartScreen = ({ navigation }) => {
   };
   
   
+  const duplicateItem = async (itemId) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/api/order-items/duplicate/${itemId}`);
+      const duplicatedItem = response.data.item;
+      console.log(duplicatedItem) ;
   
+      setOrderItems((prevItems) => [...prevItems, duplicatedItem]); // Add the duplicated item to the cart
+      calculateTotalPrice([...orderItems, duplicatedItem]); // Recalculate total price
+      calculateItemsInTheCart([...orderItems, duplicatedItem]); // Update total items
+    } catch (error) {
+      console.error('Failed to duplicate item:', error.message || error);
+      Alert.alert('Error', 'Failed to duplicate item.');
+    }
+  };
+
   const deleteItem = async (itemId) => {
     try {
       const payableItemsCount = orderItems.filter(item => !item.free).length;
@@ -475,6 +489,12 @@ alert("vous devez avoir au moins un item gratuit")
                     <TouchableOpacity onPress={() => updateQuantity(item._id, -1)}>
                       <MaterialIcons name="keyboard-arrow-down" size={24} color="brown" />
                     </TouchableOpacity>
+                    <TouchableOpacity
+    onPress={() => duplicateItem(item._id)}
+    style={styles.duplicateButton}
+  >
+    <MaterialIcons name="content-copy" size={24} color="green" />
+  </TouchableOpacity>
                     {expandedItemId === item._id && (
                       <TouchableOpacity
                         onPress={() => deleteItem(item._id)}
@@ -561,6 +581,10 @@ const styles = StyleSheet.create({
     textShadowColor: '#ffa726',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 5,
+  },
+  duplicateButton: {
+    marginTop: 5,
+    alignItems: 'center',
   },
   menuItemDescription: {
     color: '#8e8e93',
