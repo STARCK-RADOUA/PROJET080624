@@ -14,6 +14,10 @@
     },
     "notification": {
       "icon": "./assets/notification-icon.png",
+      "ios": {
+        "icon": "./assets/notification-icon.png", 
+        "badge": "./assets/notification-icon.png"           
+      },
       "color": "#000000"
     },
     "ios": {
