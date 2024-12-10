@@ -6,70 +6,52 @@ import { BASE_URLIO } from '@env';
 import { DataContext } from '../navigation/DataContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { navigate } from '../utils/navigationRef'; // Import navigate function
+import { Image as ExpoImage } from 'expo-image'; // Import expo-image
 
 const { width, height } = Dimensions.get('window');
 
 // Dynamic background colors based on service index
-const getBackgroundColor = (index) => {
-  // Couleurs pour Android
-  const androidColors = ['#8b580bb1', '#794007', '#683308', '#683907', '#664508', '#6b4c0d'];
 
-  // Couleurs pour iOS
-  const iosColors =  ['#8b580bb1', '#794007', '#683308', '#683907', '#664508', '#6b4c0d'];
-
-  // Choix de la palette en fonction de la plateforme
-  const colors = Platform.OS === 'android' ? androidColors : iosColors;
-
-  return colors[index % colors.length];
-};
 
 const ServicesScreen = ({ navigation }) => {
   const [services, setServices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasNavigated, setHasNavigated] = useState(false); // Track if we've already navigated
-  const animations = useRef([]); 
+  const animations = useRef([]);
   const { setSharedData } = useContext(DataContext);
-  const [isContentReady, setIsContentReady] = useState(false); // Nouvel état pour contrôler l'affichage
-// Précharger les images avant affichage
-const prefetchImages = async (services) => {
-  const imagePrefetches = services.map(service => Image.prefetch(service.image));
-  await Promise.all(imagePrefetches);
-};
+  const [isContentReady, setIsContentReady] = useState(false);
+
+  // Précharger les images avant affichage
+  const prefetchImages = async (services) => {
+    const imagePrefetches = services.map(service => ExpoImage.prefetch(service.image));
+    await Promise.all(imagePrefetches);
+  };
 
   // Check order status and navigate to PaymentSuccessScreen if needed
   const checkOrderStatus = async () => {
     try {
       const storedOrder = await AsyncStorage.getItem('orderStatus');
-      console.log('Stored order value:', storedOrder); 
-  
       if (storedOrder && !hasNavigated) { // Only proceed if we haven't navigated already
-        const parsedOrder = JSON.parse(storedOrder); 
-        const { orderId, orderStatus } = parsedOrder;
-  
-        console.log('Parsed Order ID:', orderId);
-        console.log('Parsed Order Status:', orderStatus);
-  
+        const parsedOrder = JSON.parse(storedOrder);
+        const { orderStatus } = parsedOrder;
         if (orderStatus === 'in_progress' || orderStatus === 'pending') {
-          console.log('Navigating to PaymentSuccessScreen');
           setHasNavigated(true); // Prevent further navigation
           navigate('PaymentSuccessScreen');
         }
-      } else {
-        console.log('No stored order found or already navigated.');
       }
     } catch (error) {
-      console.error('Error parsing stored order:', error);  
+      console.error('Error parsing stored order:', error);
     }
   };
 
   useEffect(() => {
     checkOrderStatus();
-  }, []); // Ensure this runs once when the component is mounted
+  }, []);
 
   useEffect(() => {
     const socket = io(BASE_URLIO);
 
-    socket.on('servicesUpdated', async({ services }) => {
+    socket.on('servicesUpdated', async ({ services }) => {
       setServices(services);
       setIsLoading(false);
 
@@ -79,8 +61,7 @@ const prefetchImages = async (services) => {
 
         InteractionManager.runAfterInteractions(() => {
           triggerAnimations();
-          setIsContentReady(true); // Met à jour l'état pour indiquer que le contenu est prêt
-
+          setIsContentReady(true);
         });
       }
     });
@@ -92,18 +73,15 @@ const prefetchImages = async (services) => {
 
   const triggerAnimations = () => {
     animations.current.forEach((anim, index) => {
-      if (anim) {
-        Animated.timing(anim, {
-          toValue: 1,
-          duration: 800,
-          delay: index * 200,
-          useNativeDriver: true,
-        }).start();
-      }
+      Animated.timing(anim, {
+        toValue: 1,
+        duration: 800,
+        delay: index * 200,
+        useNativeDriver: true,
+      }).start();
     });
   };
 
-  
   const handleServicePress = (serviceName, serviceTest, id) => {
     setSharedData({ serviceName, serviceTest, id });
     navigation.navigate('Home', { serviceName, serviceTest, id });
@@ -111,38 +89,36 @@ const prefetchImages = async (services) => {
 
   return (
     <ImageBackground
-      source={require('../assets/8498789sd.png')} 
+      source={require('../assets/8498789sd.png')}
       style={styles.backgroundImage}
     >
       {/* Header Section with Icons */}
       <View style={styles.header}>
-      <Image 
-  source={require('../assets/images/8498789.png')} 
-  style={styles.userIcon}
-/>
-  <Text style={styles.searchPlaceholder}>De quoi avez-vous besoin ?</Text>
-  <Ionicons name="cart-outline" size={28} color="#fff" style={styles.cartIcon} />
-</View>
+        <Image
+          source={require('../assets/images/8498789.png')}
+          style={styles.userIcon}
+        />
+        <Text style={styles.searchPlaceholder}>De quoi avez-vous besoin ?</Text>
+        <Ionicons name="cart-outline" size={28} color="#fff" style={styles.cartIcon} />
+      </View>
 
-{/* Section Localisation */}
-<View style={styles.locationContainer}>
-  <Text style={styles.headerText}>  Découvrez Nos {"\n"}   Services Premium</Text>
+      {/* Section Localisation */}
+      <View style={styles.locationContainer}>
+        <Text style={styles.headerText}>Découvrez Nos {"\n"} Services Premium</Text>
+        <Ionicons name="shield-checkmark-outline" size={50} color="#09881e" />
+      </View>
 
-  <Ionicons name="shield-checkmark-outline" size={50} color="#09881e" />
-  
-</View>
-
-{isLoading || !isContentReady ? (
-  <View style={styles.loadingContainer}>
-    <ActivityIndicator size="large" color="#ffffff" />
-    <Text style={styles.loadingText}>Chargement des services...</Text>
-  </View>
+      {isLoading || !isContentReady ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#ffffff" />
+          <Text style={styles.loadingText}>Chargement des services...</Text>
+        </View>
       ) : (
         <View style={styles.servicesContainer}>
           {services.map((service, index) => {
             const scale = animations.current[index]?.interpolate({
               inputRange: [0, 1],
-              outputRange: [0.5, 1], 
+              outputRange: [0.5, 1],
             });
 
             const opacity = animations.current[index]?.interpolate({
@@ -159,17 +135,12 @@ const prefetchImages = async (services) => {
                 key={index}
                 style={[
                   styles.serviceItem,
-                  { backgroundColor: getBackgroundColor(index) },
+                  { backgroundColor: Platform.OS === 'android' ? '#271a061f' : '#1b110239' },
                   animatedStyles,
                 ]}
               >
                 <TouchableOpacity onPress={() => handleServicePress(service.name, service.test, service._id)}>
-                  {Platform.OS === 'android' && (
-                    <View style={styles.shadowImageContainer}>
-                      <Image source={{ uri: service.image }} style={styles.shadowImage} />
-                    </View>
-                  )}
-                  <Image source={{ uri: service.image }} style={styles.serviceImage} />
+                  <ExpoImage source={{ uri: service.image }} style={styles.serviceImage} contentFit="contain" />
                   <Text style={styles.serviceText}>{service.name}</Text>
                 </TouchableOpacity>
               </Animated.View>
@@ -180,6 +151,7 @@ const prefetchImages = async (services) => {
     </ImageBackground>
   );
 };
+
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
@@ -306,8 +278,8 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 40,
         borderBottomRightRadius: 40,
         
-        borderColor: '#ffffff50',
-        backgroundColor: '#6e6e6e4c',
+        borderColor: '#ffffff32',
+        backgroundColor: '#6e6e6e13',
         marginVertical: width * 0.01,
         marginHorizontal: width * 0.02,
            shadowColor: '#3f3b3b',
@@ -328,9 +300,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#333333', // Couleur sombre pour contraster avec les images
     margin: width * 0.06,
     marginBottom: width * 0.05,
-
-    borderWidth: 2,
-    borderColor: '#7c570699', // Une couleur dorée pour un effet luxueux
+    borderColor: '#7c570614', // Une couleur dorée pour un effet luxueux
     shadowColor: '#000',
     shadowOpacity: 0.7,
     shadowOffset: { width: 0, height: 8 },
@@ -366,12 +336,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 30, // Plus de rayon pour un effet 3D
     elevation: 20,
-    backgroundColor: Platform.OS === 'ios' ? '#f7f1e43d' : '#3f3d3d92',
+    backgroundColor: Platform.OS === 'ios' ? '#55545324' : '#3f3d3d92',
     borderWidth: 2,
-    borderColor: '#fab828',
+    borderColor: '#f7ab08dd',
   },
   serviceText: {
     textAlign: 'center',
+    width: width*0.4,
     fontSize: 18, // Augmentation légère pour une meilleure lisibilité
     color: '#f3ebebfd',
     fontWeight: '600',
