@@ -8,7 +8,7 @@ import { getClientId } from '../services/userService';
 import Header from '../components/Header';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
-import useNotificationMenu from '../services/useNotificationMenu'; 
+import useNotificationMenu from '../services/useNotificationMenu';
 import { DataContext } from '../navigation/DataContext';
 import { getUserDetails } from '../services/userService';
 
@@ -37,7 +37,7 @@ const ShoppingCartScreen = ({ navigation }) => {
   const [isDataFetched, setIsDataFetched] = useState(false); // New state to track if data fetching is done
   const [isSystemPoint, setIsSystemPoint] = useState(false); // New state to track if data fetching is done
 
-  
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,7 +45,7 @@ const ShoppingCartScreen = ({ navigation }) => {
       setUserPointsEarned(user.points_earned);
       setUserPoints(user.points_earned);
     };
-  
+
     const fetchOrderItems = async () => {
       try {
         const clientId = await getClientId();
@@ -61,24 +61,24 @@ const ShoppingCartScreen = ({ navigation }) => {
         setError('Failed to fetch order items. Please check the console for details.');
       }
     };
-  
+
     const fetchData = async () => {
       await fetchUserData();
       await fetchOrderItems();
       setIsDataFetched(true); // Mark data fetching as completed
     };
-  
+
     fetchData();
-  
+
     const deviceId = Device.osBuildId;
     console.log('Device ID:', deviceId);
   }, []);
-  
+
   useEffect(() => {
     socket.on('servicesUpdated', async ({ services }) => {
       const filteredServices = services.filter(service => service._id === sharedData.id);
       console.log("Service data is", filteredServices);
-  
+
       if (!filteredServices[0]?.isSystemPoint && isDataFetched) { // Ensure data fetching is done
         setIsSystemPointModalVisible(true);
         setIsSystemPoint(true);
@@ -92,18 +92,18 @@ const ShoppingCartScreen = ({ navigation }) => {
         setItemsInTheCart(0);
         setError('');
         setHasUsedPoints(false);
-  
+
         const user = await getUserDetails();
         setUserPointsEarned(user.points_earned); // Reset points
         await fetchOrderItems(); // Re-fetch order items if necessary
       }
     });
-  
+
     return () => {
       socket.off('servicesUpdated');
     };
   }, [isDataFetched]);
- 
+
   const fetchOrderItems = async () => {
     try {
       const clientId = await getClientId();
@@ -127,7 +127,7 @@ const ShoppingCartScreen = ({ navigation }) => {
     const total = items.reduce((sum, item) => {
       // Check if the item is free; if it's not free, multiply its price by its quantity
       return sum + (item.free ? 0 : item.product_id.price * item.quantity);
-    }, 0); 
+    }, 0);
     setTotalPrice(total);
   };
 
@@ -139,17 +139,17 @@ const ShoppingCartScreen = ({ navigation }) => {
     setOrderItems((prevItems) => {
       // Sort items by their original price
       const sortedItems = [...prevItems].sort((a, b) => a.product_id.price - b.product_id.price);
-  
+
       // Log sorted items for debugging
       console.log("Sorted Items by Price:", sortedItems.map((item) => item.product_id.price));
-  
+
       // Find the cheapest free item
       const cheapestFreeItem = sortedItems.find((item) => item.free);
       const updatedItems = prevItems.map((item) => {
         // If this is the item being toggled
         if (item._id === itemId) {
           const pointsRequired = item.quantity;
-  
+
           // **Toggling OFF a free item**
           if (item.free) {
             // Check if it's the cheapest free item and other more expensive items are still free
@@ -160,13 +160,13 @@ const ShoppingCartScreen = ({ navigation }) => {
               );
               return item; // Prevent toggling off
             }
-  
+
             // Otherwise, allow toggling off
             setUserPointsEarned((prevPoints) => prevPoints + pointsRequired); // Return points
             setMyFreeItem((prev) => prev - 1); // Decrease the count of free items
             return { ...item, free: false }; // Mark item as not free
           }
-  
+
           // **Toggling ON an item to make it free**
           if (!item.free) {
             // Ensure only the cheapest item can be made free
@@ -178,36 +178,38 @@ const ShoppingCartScreen = ({ navigation }) => {
               );
               return item; // Prevent making a non-cheapest item free
             }
-  
-            // Check if the user has enough points to make this item free
-            if (userPointsEarned >= pointsRequired) {
+
+            // Ensure the user has enough points and conditions are met for toggling the item to free
+            const payableItemsCount = prevItems.filter((i) => !i.free).length;
+            if (userPointsEarned >= pointsRequired && myFreeItem < itemsInTheCart - 1 && payableItemsCount > 1) {
               setUserPointsEarned((prevPoints) => prevPoints - pointsRequired); // Deduct points
-              setMyFreeItem((prev) => prev + 1); // Increase the count of free items
+              setMyFreeItem((prev) => prev + 1); // Increase free items count
               return { ...item, free: true }; // Mark item as free
             } else {
               Alert.alert(
-                "Not enough points",
-                "You do not have enough points to make this item free."
+                "Not enough points or too many free items",
+                "You do not have enough points or you cannot have more than one free item without paying for others."
               );
-              return item; // Prevent toggling if not enough points
+              return item; // Prevent toggling if not enough points or conditions are not met
             }
           }
         }
         return item; // Leave all other items unchanged
       });
-  
+
       calculateTotalPrice(updatedItems); // Recalculate the total price
       return updatedItems; // Update the state with the new items
     });
   };
-  
-  
+
+
+
   const duplicateItem = async (itemId) => {
     try {
       const response = await axios.post(`${BASE_URL}/api/order-items/duplicate/${itemId}`);
       const duplicatedItem = response.data.item;
-      console.log(duplicatedItem) ;
-  
+      console.log(duplicatedItem);
+
       setOrderItems((prevItems) => [...prevItems, duplicatedItem]); // Add the duplicated item to the cart
       calculateTotalPrice([...orderItems, duplicatedItem]); // Recalculate total price
       calculateItemsInTheCart([...orderItems, duplicatedItem]); // Update total items
@@ -289,70 +291,70 @@ const ShoppingCartScreen = ({ navigation }) => {
     try {
       // Construct the URL for the GET request
       const url = `${BASE_URL}/api/services/${sharedData.id}`;
-  
+
       // Make the GET request to the server
       const response = await axios.get(url);
-  
+
       // Check if isSystemPoint is true, then initiate certain values to 0
       if (!response.data.isSystemPoint) {
         setUserPointsEarned(0);
         setUserPoints(0);
-    
+
         setMyFreeItem(0);
         setItemsInTheCart(0);
         setHasUsedPoints(false);
         console.log('isSystemPoint is true. Values set to 0.');
       }
-  
+
       // Return the service data (in case you need it elsewhere)
       return response.data.isSystemPoint;
     } catch (error) {
       // Log the error to the console
       console.error('Error fetching service:', error.response ? error.response.data : error.message);
-  
+
       // Throw the error for further handling
       throw error;
     }
   };
 
-  
+
 
   useFocusEffect(
 
 
 
 
-    
+
     useCallback(() => {
       // Reset states to their initial values when navigating back
       setExpandedItemId(null);
       setMyFreeItem(0);
       setHasUsedPoints(false);
-  
+
       const fetchData = async () => {
         try {
           const user = await getUserDetails();
           setUserPointsEarned(user.points_earned); // Reset points to the user's initial value
           await fetchOrderItems(); // Re-fetch the order items if necessary
-  
+
           // Fetch service data to check isSystemPoint and reset values if needed
           await getServiceById();
         } catch (error) {
           console.error('Error in useFocusEffect:', error);
         }
       };
-  
+
       fetchData();
-  
+
       return () => {
         // Optional cleanup logic
       };
     }, []) // Empty dependency array means this effect will run every time the screen comes into focus
   );
-  
-  
 
-  
+
+
+
 
   const handleItemPress = (itemId) => {
     setExpandedItemId((prevId) => (prevId === itemId ? null : itemId));
@@ -360,19 +362,19 @@ const ShoppingCartScreen = ({ navigation }) => {
 
   const handleOrderNow = async () => {
     try {
-      if((myFreeItem > 0 && userPoints > 0) || userPoints === 0){
+      if ((myFreeItem > 0 && userPoints > 0) || userPoints === 0) {
         const deviceId = Device.osBuildId;
         const data = {
           totalPrice: totalPrice,
           orderItems: orderItems,
           deviceId: deviceId,
         };
-        setSharedData({ dicrPoints : userPointsEarned , firstPoints : userPoints , orders :orderItems ,  serviceName: serviceName, serviceTest: serviceTest, id: serviceId });
+        setSharedData({ dicrPoints: userPointsEarned, firstPoints: userPoints, orders: orderItems, serviceName: serviceName, serviceTest: serviceTest, id: serviceId });
         navigation.navigate('AdressForm', { newOrder: data });
-      }else{
-alert("vous devez avoir au moins un item gratuit")
+      } else {
+        alert("vous devez avoir au moins un item gratuit")
       }
-     
+
     } catch (error) {
       console.error('Failed to place the order:', error);
       setError('Failed to place the order. Please check the console for details.');
@@ -389,24 +391,24 @@ alert("vous devez avoir au moins un item gratuit")
   };
 
   const handleOkClick = () => {
-      setExpandedItemId(null);
-      setTotalPrice(0);
-      setUserPointsEarned(0);
-      setMyFreeItem(0);
-      setItemsInTheCart(0);
-      setError('');
-      setHasUsedPoints(false);
-       // Fetch data again if necessary
-       const fetchData = async () => {
-        try {
-          
-          await fetchOrderItems();  // Re-fetch the order items if necessary
-        } catch (error) {
-          console.error('Error in useFocusEffect:', error);
-        }
-      };
-  
-      fetchData();
+    setExpandedItemId(null);
+    setTotalPrice(0);
+    setUserPointsEarned(0);
+    setMyFreeItem(0);
+    setItemsInTheCart(0);
+    setError('');
+    setHasUsedPoints(false);
+    // Fetch data again if necessary
+    const fetchData = async () => {
+      try {
+
+        await fetchOrderItems();  // Re-fetch the order items if necessary
+      } catch (error) {
+        console.error('Error in useFocusEffect:', error);
+      }
+    };
+
+    fetchData();
     setIsSystemPointModalVisible(false); // Close the modal
   };
 
@@ -438,80 +440,92 @@ alert("vous devez avoir au moins un item gratuit")
     return () => backHandler.remove(); // Cleanup backHandler on unmount
   }, [isSystemPointModalVisible]);
 
- 
+
   return (
     <View style={styles.container}>
       <Header navigation={navigation} />
-      
+
       {error ? (
         <Text style={styles.errorText}>{error}</Text>
       ) : (
         <>
-        {isSystemPointModalVisible && (
-              <View style={styles.pointsCounter1}>
-                <Text style={styles.systemtest}>Les points sont désactivés pour l'instant.Merci!</Text>
-              </View>
-             
+          {isSystemPointModalVisible && (
+            <View style={styles.pointsCounter1}>
+              <Text style={styles.systemtest}>Les points sont désactivés pour l'instant.Merci!</Text>
+            </View>
+
           )}
-          <ScrollView 
+          <ScrollView
             style={styles.menuList}
             onScroll={handleScroll}  // Attach the scroll event
             scrollEventThrottle={16} // Control how often the scroll event is fired (16ms for smooth tracking)
           >
-            {orderItems.map((item, index) => (
-              <TouchableOpacity key={index} style={styles.menuItem} onPress={() => handleItemPress(item._id)}>
-                <View style={styles.itemContainer}>
-                  <Image source={{ uri: item.product_id.image_url }} style={styles.menuItemImage} />
-                  <View style={styles.menuItemDetails}>
-                    <Text style={styles.menuItemName}>{item.product_id.name}</Text>
-
-                    <View style={styles.priceSwitchContainer}>
-                      <Text style={styles.priceText}>€{item.free ? 0 : item.price.toFixed(2)}</Text>
-                      {shouldShowSwitch() && (
-                        <Switch
-                          style={styles.switchButton}
-                          value={item.free}
-                          onValueChange={() => toggleFreeItem(item._id)}
-                          disabled={shouldDisableSwitch(item)}
-                        />
-                      )}
-                    </View>
-                    
-                    <Text style={styles.menuItemDescription}>
-                      {item.selected_options.map(option => option.name).join(', ')}
-                    </Text>
-                  </View>
-                  <View style={styles.rightContainer}>
-                    <TouchableOpacity onPress={() => updateQuantity(item._id, 1)}>
-                      <MaterialIcons name="keyboard-arrow-up" size={24} color="brown" />
-                    </TouchableOpacity>
-                    <Text style={styles.quantityText}>{item.quantity}</Text>
-                    <TouchableOpacity onPress={() => updateQuantity(item._id, -1)}>
-                      <MaterialIcons name="keyboard-arrow-down" size={24} color="brown" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-    onPress={() => duplicateItem(item._id)}
-    style={styles.duplicateButton}
-  >
-    <MaterialIcons name="content-copy" size={24} color="green" />
-  </TouchableOpacity>
-                    {expandedItemId === item._id && (
-                      <TouchableOpacity
-                        onPress={() => deleteItem(item._id)}
-                        style={styles.deleteButton}
-                        disabled={!item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints} 
-                      >
-                        <MaterialIcons 
-                          name="delete" 
-                          size={24} 
-                          color={(!item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints) ? "grey" : "red"} 
-                        />
-                      </TouchableOpacity>
+          {orderItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.menuItem}
+              onPress={() => handleItemPress(item._id)}
+            >
+              <View style={styles.itemContainer}>
+                {/* Image */}
+                <Image source={{ uri: item.product_id.image_url }} style={styles.menuItemImage} />
+          
+                {/* Item Details */}
+                <View style={styles.menuItemDetails}>
+                  <Text style={styles.menuItemName}>{item.product_id.name}</Text>
+          
+                  <Text style={styles.menuItemDescription}>
+                    {item.selected_options.map(option => option.name).join(', ')}
+                  </Text>
+          
+                  <View style={styles.priceSwitchContainer}>
+                    <Text style={styles.priceText}>€{item.free ? 0 : item.price.toFixed(2)}</Text>
+                    {shouldShowSwitch() && (
+                      <Switch
+                        style={styles.switchButton}
+                        value={item.free}
+                        onValueChange={() => toggleFreeItem(item._id)}
+                        disabled={shouldDisableSwitch(item)}
+                      />
                     )}
                   </View>
                 </View>
-              </TouchableOpacity>
-            ))}
+          
+                {/* Right Controls */}
+                <View style={styles.actionContainer}>
+                  <TouchableOpacity onPress={() => updateQuantity(item._id, 1)}>
+                    <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
+                  </TouchableOpacity>
+                  <Text style={styles.quantityText}>{item.quantity}</Text>
+                  <TouchableOpacity onPress={() => updateQuantity(item._id, -1)}>
+                    <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                  </TouchableOpacity>
+          
+                  <View style={styles.iconGroup}>
+                    <TouchableOpacity onPress={() => duplicateItem(item._id)} style={styles.actionIcon}>
+                      <MaterialIcons name="content-copy" size={24} color="#4CAF50" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => deleteItem(item._id)}
+                      style={styles.actionIcon}
+                      disabled={!item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints}
+                    >
+                      <MaterialIcons
+                        name="delete"
+                        size={24}
+                        color={
+                          !item.free && orderItems.filter(item => !item.free).length === 1 && hasUsedPoints
+                            ? "grey"
+                            : "#F44336"
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+          
           </ScrollView>
           {/* Show/hide the order button based on scroll */}
           {isOrderButtonVisible && (
@@ -531,7 +545,7 @@ alert("vous devez avoir au moins un item gratuit")
         </>
       )}
 
-     
+
     </View>
   );
 };
@@ -548,68 +562,80 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 5,
-    marginVertical: 5,
+    borderRadius: 15,
+    padding: 10,
+    marginVertical: 8,
     marginHorizontal: 15,
     shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 5 },
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 8,
+    elevation: 4,
   },
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     width: '100%',
   },
   menuItemImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 12,
+    width: 60,
+    height: 60,
+    borderRadius: 10,
   },
   menuItemDetails: {
     flex: 1,
-    marginLeft: 15,
+    marginHorizontal: 10,
+    justifyContent: 'space-between',
   },
   menuItemName: {
-    fontSize: 19,
+    fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 5,
-    fontWeight: '600',
-    textShadowColor: '#ffa726',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 5,
+    marginBottom: 3,
   },
+  menuItemDescription: {
+    fontSize: 12,
+    color: '#888',
+  },
+  priceSwitchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 5,
+  },
+  priceText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#E65100',
+  },
+  switchButton: {
+    transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }],
+  },
+  actionContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quantityText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555',
+    marginVertical: 5,
+  },
+  iconGroup: {
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  actionIcon: {
+    marginHorizontal: 5,
+  },
+ 
   duplicateButton: {
     marginTop: 5,
     alignItems: 'center',
   },
-  menuItemDescription: {
-    color: '#8e8e93',
-    marginBottom: 6,
-    fontSize: 14,
-  },
-  priceSwitchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  priceText: {
-     fontSize: 17,
-    fontWeight: 'bold',
-    color: '#ffa726',
-    fontWeight: '600',
-    textShadowColor: '#b46f07',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 5,
-  },
-  switchButton: {
-    transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
-    alignSelf: 'flex-start',
-    marginLeft: 8,
-  },
+ 
+  
   rightContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -642,7 +668,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 18,
-  },  pointsCounter1: {
+  }, pointsCounter1: {
     borderRadius: 20,
     alignItems: 'center',
 
