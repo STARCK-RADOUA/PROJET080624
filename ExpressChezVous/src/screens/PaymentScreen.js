@@ -49,19 +49,21 @@ const PaymentScreen = ({ navigation, route }) => {
   };
 
 
-  const stTPe = () => {
-    setExchangeValue('0');
-  };
+  const stcASH = () => {
+    setSelectedPayment('cash') ;
+    if (parseFloat(exchangeValue) < orderDetails.data.newOrder.newOrder.totalPrice) {
+      Alert.alert('Erreur', `L'échange est insuffisant. Vous devez fournir au moins le prix du commande qui :  ${orderDetails.data.newOrder.newOrder.totalPrice}€.`);
+      setExchangeValue(0) ; 
+      setSelectedPayment(null) ;
+    }
+    };
 
   const handlePayment = async () => {
     if (!selectedPayment) {
       return;
     }
    
-    if (selectedPayment === 'cash' && parseFloat(exchangeValue) > orderDetails.data.newOrder.newOrder.totalPrice) {
-      Alert.alert('Erreur', `L'échange est insuffisant. Vous devez fournir au moins le prix du commande qui :  ${orderDetails.data.newOrder.newOrder.totalPrice}€.`);
-      return;
-    }
+ 
   
     // If selected payment method is card, set exchange value to 0
     if (selectedPayment === 'TPE') {
@@ -109,6 +111,15 @@ const PaymentScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Type de Paiement</Text>
 
+      {/* Modern Label for Total Price */}
+      <View style={styles.totalPriceContainer}>
+        <Text style={styles.totalPriceLabel}>Total à Payer</Text>
+        <Text style={styles.totalPriceValue}>
+          {orderDetails.data.newOrder.newOrder.totalPrice} €
+        </Text>
+      </View>
+
+
       <View style={styles.exchangeContainer}>
         <Text style={styles.label}>Échange</Text>
         <View style={styles.inputContainer}>
@@ -119,6 +130,7 @@ const PaymentScreen = ({ navigation, route }) => {
             onChangeText={(text) => {
               const numericValue = text.replace(/[^0-9]/g, '');
               setExchangeValue(numericValue || '');
+              setSelectedPayment(null)
             }}
             editable={true}
           />
@@ -129,7 +141,9 @@ const PaymentScreen = ({ navigation, route }) => {
 
       <TouchableOpacity
         style={[styles.paymentOption, selectedPayment === 'cash' && styles.selectedOption]}
-        onPress={() => setSelectedPayment('cash')}
+        onPress={() =>{ 
+          stcASH() ;
+        }  }
       >
         <Text style={styles.paymentText}>Cash Payment</Text>
       </TouchableOpacity>
@@ -261,6 +275,28 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 5,
     
+  },
+  totalPriceContainer: {
+    backgroundColor: '#2c3e50', // Dark background for the price label
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 20,
+    alignItems: 'center',
+    width: width * 0.8,
+    elevation: 5,
+  },
+  totalPriceText: {
+    color: '#f39c12', // Bright gold color for price text
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  } ,
+    totalPriceValue: {
+    color: '#ffffff', // White color for the value
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginTop: 5, // Adds some space between the label and the value
   },
 });
 
