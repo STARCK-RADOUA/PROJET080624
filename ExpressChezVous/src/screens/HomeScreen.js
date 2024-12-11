@@ -13,10 +13,12 @@ const HomeScreen = ({ navigation }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [isNotificationMenuVisible, setIsNotificationMenuVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);  // Visibility state for bottom sheet
+  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const slideAnim = useRef(new Animated.Value(width)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const shimmerAnim = useRef(new Animated.Value(0)).current; // Shimmer animation
   const bottomSheetRef = useRef(null);
   const { sharedData } = useContext(DataContext);
   const serviceName = sharedData.serviceName;
@@ -38,6 +40,7 @@ const HomeScreen = ({ navigation }) => {
           }
           return prevItems;
         });
+        setIsLoading(false); // Data loaded
       }
     });
 
@@ -46,6 +49,18 @@ const HomeScreen = ({ navigation }) => {
       socket.current.disconnect();
     };
   }, [serviceName]);
+
+  useEffect(() => {
+    // Start the shimmer animation loop
+    Animated.loop(
+      Animated.timing(shimmerAnim, {
+        toValue: 1,
+        duration: 1500,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, [shimmerAnim]);
 
   const toggleNotificationMenu = () => {
     if (isNotificationMenuVisible) {
@@ -66,12 +81,12 @@ const HomeScreen = ({ navigation }) => {
 
   const onPress = useCallback((item) => {
     setSelectedItem(item);
-    setIsBottomSheetVisible(true);  // Show bottom sheet when an item is selected
+    setIsBottomSheetVisible(true);
     bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2);
   }, []);
 
   const onClose = () => {
-    setIsBottomSheetVisible(false);  // Close the bottom sheet
+    setIsBottomSheetVisible(false);
   };
 
   const animateItem = (index) => {
@@ -79,7 +94,6 @@ const HomeScreen = ({ navigation }) => {
       Animated.timing(opacityAnim, {
         toValue: 1,
         duration: 500,
-        delay: index * 200,
         easing: Easing.bounce,
         useNativeDriver: true,
       }),
@@ -96,12 +110,39 @@ const HomeScreen = ({ navigation }) => {
     ]).start();
   };
 
+  // Shimmer translation
+  const translateX = shimmerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-width, width],
+  });
+
   return (
     <View style={styles.container}>
       <Header navigation={navigation} />
 
       <ScrollView style={styles.menuList}>
-        {menuItems && Array.isArray(menuItems) && menuItems.length === 0 ? (
+        {isLoading ? (
+          // Render Skeleton Loader
+          Array.from({ length: 6 }).map((_, index) => (
+            <View key={index} style={styles.menuItem}>
+              <View style={styles.imageSkeleton} />
+              <View style={styles.textSkeletonContainer}>
+                <View style={styles.textSkeletonLineShort} />
+                <View style={styles.textSkeletonLineMedium} />
+                <View style={styles.textSkeletonLineLong} />
+              </View>
+              <View style={styles.iconSkeleton} />
+              <Animated.View
+                style={[
+                  styles.shimmerOverlay,
+                  {
+                    transform: [{ translateX }],
+                  },
+                ]}
+              />
+            </View>
+          ))
+        ) : menuItems && Array.isArray(menuItems) && menuItems.length === 0 ? (
           <Text style={styles.noProductsText}>No products available</Text>
         ) : (
           menuItems.map((item, index) => (
@@ -132,9 +173,9 @@ const HomeScreen = ({ navigation }) => {
 
       <PrductBottomSheetScreen
         ref={bottomSheetRef}
-        item={selectedItem}  // Pass the selected item to the bottom sheet
-        isVisible={isBottomSheetVisible}  // Control visibility of the bottom sheet
-        onClose={onClose}  // Close the bottom sheet
+        item={selectedItem}
+        isVisible={isBottomSheetVisible}
+        onClose={onClose}
       />
     </View>
   );
@@ -161,6 +202,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     shadowRadius: 10,
     elevation: 5,
+    overflow: 'hidden', // Ensure shimmer doesn't overflow
+  },
+  touchableArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   menuItemImage: {
     width: 60,
@@ -178,7 +225,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     marginBottom: 5,
-    fontWeight: '600',
     textShadowColor: '#ffa726',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 5,
@@ -194,9 +240,8 @@ const styles = StyleSheet.create({
   },
   menuItemPrice: {
     fontSize: 17,
-    fontWeight: 'bold',
-    color: '#ffa726',
     fontWeight: '600',
+    color: '#ffa726',
     textShadowColor: '#b46f07',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 5,
@@ -207,9 +252,48 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#999',
   },
-  touchableArea: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  // Skeleton Styles
+  imageSkeleton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#e0e0e0',
+  },
+  textSkeletonContainer: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  textSkeletonLineShort: {
+    width: '40%',
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#e0e0e0',
+    marginBottom: 6,
+  },
+  textSkeletonLineMedium: {
+    width: '60%',
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#e0e0e0',
+    marginBottom: 6,
+  },
+  textSkeletonLineLong: {
+    width: '80%',
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#e0e0e0',
+  },
+  iconSkeleton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#e0e0e0',
+    marginLeft: 10,
+  },
+  shimmerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    // Gradient effect can be simulated with linear gradient or animated view
   },
 });
 

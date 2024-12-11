@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, forwardRef } from 'react';
-import { Modal, Dimensions, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { Modal, Dimensions, StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { DataContext } from '../navigation/DataContext';
 import { getClientId } from '../services/userService';
 import axios from 'axios';
@@ -9,7 +9,7 @@ import { TouchableWithoutFeedback } from 'react-native';
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const PrductBottomSheetScreen = (props, ref) => {
-  const { item, isVisible, onClose } = props;  // Destructure props here
+  const { item, isVisible, onClose } = props;
   const [quantity, setQuantity] = useState(1);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [extras, setExtras] = useState({
@@ -20,6 +20,7 @@ const PrductBottomSheetScreen = (props, ref) => {
   const [totalPrice, setTotalPrice] = useState(item?.price || 0);
   const { sharedData } = useContext(DataContext);
   const serviceName = sharedData.serviceName;
+  const [isImageLoading, setIsImageLoading] = useState(true); // Image loading state
 
   useEffect(() => {
     const checkIfItemIsInCart = async () => {
@@ -102,7 +103,7 @@ const PrductBottomSheetScreen = (props, ref) => {
         extraCheeseSlice: false,
         extraFries: false,
       });
-      onClose();  // Close modal after adding to cart
+      onClose(); // Close modal after adding to cart
     } catch (error) {
       console.error('Failed to add item to cart:', error);
     }
@@ -113,71 +114,71 @@ const PrductBottomSheetScreen = (props, ref) => {
   return (
     <Modal visible={isVisible} animationType="fade" transparent={true} onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
-
-      <View style={styles.modalBackground}>
-        <View style={styles.modalContainer}>
-          {item.image_url ? (
-            <Image source={{ uri: item.image_url }} style={styles.productImage} resizeMode="contain" />
-          ) : (
-            <Text style={styles.errorText}>Image not available</Text>
-          )}
-
-          <View style={styles.contentContainer}>
-            <Text style={styles.heading}>{item.name}</Text>
-
-            <View style={styles.quantityContainer2}>
-
-
-            <Text style={styles.price}>${totalPrice.toFixed(2)}</Text>
- <View style={styles.quantityContainer}>
-              <TouchableOpacity onPress={() => handleQuantityChange('decrement')}>
-                <Text style={styles.quantityButton}>-  </Text>
-              </TouchableOpacity>
-              <Text style={styles.quantityText}>{quantity}</Text>
-              <TouchableOpacity onPress={() => handleQuantityChange('increment')}>
-                <Text style={styles.quantityButton}> +</Text>
-              </TouchableOpacity>
-            </View>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <View style={styles.imageContainer}>
+              {isImageLoading && (
+                <ActivityIndicator size="large" color="#e9ab25" style={styles.activityIndicator} />
+              )}
+              <Image
+                source={{ uri: item.image_url, cache: 'force-cache' }}
+                style={styles.productImage}
+                resizeMode="contain"
+                onLoadStart={() => setIsImageLoading(true)}
+                onLoadEnd={() => setIsImageLoading(false)}
+              />
             </View>
 
+            <View style={styles.contentContainer}>
+              <Text style={styles.heading}>{item.name}</Text>
 
-            <Text style={styles.menuItemDescription}>
-              {item.description}
-            </Text>
+              <View style={styles.quantityContainer2}>
+                <Text style={styles.price}>€{totalPrice.toFixed(2)}</Text>
+                <View style={styles.quantityContainer}>
+                  <TouchableOpacity onPress={() => handleQuantityChange('decrement')}>
+                    <Text style={styles.quantityButton}>-</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.quantityText}>{quantity}</Text>
+                  <TouchableOpacity onPress={() => handleQuantityChange('increment')}>
+                    <Text style={styles.quantityButton}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-           
+              <Text style={styles.menuItemDescription}>
+                {item.description}
+              </Text>
 
-            <Text style={styles.extrasLabel}>Select Extras:</Text>
-            {item.options?.map((option, index) => (
+              <Text style={styles.extrasLabel}>Select Extras:</Text>
+              {item.options?.map((option, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.optionButton}
+                  onPress={() => handleExtraChange(option.name)}
+                  disabled={isAddedToCart}
+                >
+                  <Text style={styles.optionText}>{option.name}</Text>
+                  <Text style={styles.optionPrice}>+€{option.price.toFixed(2)}</Text>
+                </TouchableOpacity>
+              ))}
+
               <TouchableOpacity
-                key={index}
-                style={styles.optionButton}
-                onPress={() => handleExtraChange(option.name)}
+                style={[styles.button, isAddedToCart && styles.buttonDisabled]}
+                onPress={handleAddToCart}
                 disabled={isAddedToCart}
               >
-                <Text style={styles.optionText}>{option.name}</Text>
-                <Text style={styles.optionPrice}>+${option.price.toFixed(2)}</Text>
+                <Text style={styles.buttonText}>
+                  {isAddedToCart ? 'Ajouté au Panier' : 'Ajouter au Panier'}
+                </Text>
               </TouchableOpacity>
-            ))}
+            </View>
 
-            <TouchableOpacity
-              style={[styles.button, isAddedToCart && styles.buttonDisabled]}
-              onPress={handleAddToCart}
-              disabled={isAddedToCart}
-            >
-              <Text style={styles.buttonText}>
-              {isAddedToCart ? 'Ajouté au Panier' : 'Ajouter au Panier'}
-              </Text>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Fermer</Text>
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Fermer</Text>
-          </TouchableOpacity>
         </View>
-      </View>
       </TouchableWithoutFeedback>
-
     </Modal>
   );
 };
@@ -200,10 +201,20 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 10,
   },
-  productImage: {
-    width: SCREEN_WIDTH * 0.7,
+  imageContainer: {
+    position: 'relative',
+    width: '100%',
     height: SCREEN_WIDTH * 0.4,
-    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activityIndicator: {
+    position: 'absolute',
+    zIndex: 1,
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
     borderRadius: 15,
   },
   contentContainer: {
@@ -228,12 +239,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-
-  },  quantityContainer2: {
+  },
+  quantityContainer2: {
     flexDirection: 'row',
-alignItems: 'center',
-  justifyContent: 'space-between',
-
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   quantityButton: {
     fontSize: 26,
