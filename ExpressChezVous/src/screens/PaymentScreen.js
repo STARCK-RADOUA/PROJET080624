@@ -58,7 +58,7 @@ const PaymentScreen = ({ navigation, route }) => {
       return;
     }
    
-    if (selectedPayment === 'cash' && parseFloat(exchangeValue) > orderDetails.data.newOrder.newOrder.totalPrice) {
+    if (selectedPayment === 'cash' && parseFloat(exchangeValue) < orderDetails.data.newOrder.newOrder.totalPrice) {
       Alert.alert('Erreur', `L'échange est insuffisant. Vous devez fournir au moins le prix du commande qui :  ${orderDetails.data.newOrder.newOrder.totalPrice}€.`);
       return;
     }
