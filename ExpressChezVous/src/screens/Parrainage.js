@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity ,Dimensions} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { getClientId, getDeviceIde } from '../services/userService';
 import { Ionicons } from '@expo/vector-icons';
 import * as ScreenCapture from 'expo-screen-capture'; // Import ScreenCapture
 import { BASE_URL, BASE_URLIO } from '@env';
+const { width, height } = Dimensions.get('window');
 
 const Parrainage = () => {
   const [qrData, setQrData] = useState(null);
@@ -63,6 +64,12 @@ const Parrainage = () => {
 
   return (
     <View style={styles.container}>
+       <View style={styles.infoContainer}>
+        <Ionicons name="information-circle-outline" size={30} color="#e9ab25" />
+        <Text style={styles.infoText}>
+          Si vous invitez un autre client via le QR code, vous gagnerez un point. Vous pouvez acheter n'importe quel produit, mais vous devez en acheter un payant.
+        </Text>
+      </View>
     <Text style={styles.parrainage }> Parrainage</Text>
       <View style={styles.qrContainer}>
         {expiration ? (
@@ -86,12 +93,7 @@ const Parrainage = () => {
       </View>
 
       {/* Futuristic Styled Message */}
-      <View style={styles.infoContainer}>
-        <Ionicons name="information-circle-outline" size={30} color="#e9ab25" />
-        <Text style={styles.infoText}>
-          Si vous invitez un autre client via le QR code, vous gagnerez un point. Vous pouvez acheter n'importe quel produit, mais vous devez en acheter un payant.
-        </Text>
-      </View>
+   
     </View>
   );
 };
@@ -99,7 +101,6 @@ const Parrainage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f3d4ab2b',
     padding: 20,
@@ -170,14 +171,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 10,
     elevation: 10,
-    width: '90%',
+    width: width*0.95,
+    height: height*0.15,
   },
   infoText: {
     color: '#333',
     fontSize: 14,
     fontWeight: '600',
-    marginLeft: 1,
     textAlign: 'center',
+    width: width*0.75,
+
   }, 
    parrainage : {
     fontSize: 35,

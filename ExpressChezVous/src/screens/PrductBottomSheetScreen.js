@@ -133,10 +133,11 @@ const PrductBottomSheetScreen = (props, ref) => {
               <Text style={styles.heading}>{item.name}</Text>
 
               <View style={styles.quantityContainer2}>
+              
                 <Text style={styles.price}>€{totalPrice.toFixed(2)}</Text>
                 <View style={styles.quantityContainer}>
                   <TouchableOpacity onPress={() => handleQuantityChange('decrement')}>
-                    <Text style={styles.quantityButton}>-</Text>
+                    <Text style={styles.quantityButton2}>-</Text>
                   </TouchableOpacity>
                   <Text style={styles.quantityText}>{quantity}</Text>
                   <TouchableOpacity onPress={() => handleQuantityChange('increment')}>
@@ -219,6 +220,8 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingTop: 20,
+    
+    
   },
   heading: {
     fontSize: 28,
@@ -241,19 +244,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   quantityContainer2: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'space-between',
+    
+
     marginTop: 10,
   },
   quantityButton: {
-    fontSize: 26,
+    fontSize: 30,
     color: '#e9ab25',
+    fontWeight: 'bold',
+
+  }, quantityButton2: {
+    fontSize: 38,
+    color: '#e9ab25',
+    fontWeight: 'bold',
+
   },
   quantityText: {
     fontSize: 20,
     marginHorizontal: 10,
   },
+   
   extrasLabel: {
     fontSize: 18,
     fontWeight: 'bold',

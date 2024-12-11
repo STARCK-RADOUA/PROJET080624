@@ -55,29 +55,14 @@ const HomeScreen = ({ navigation }) => {
     Animated.loop(
       Animated.timing(shimmerAnim, {
         toValue: 1,
-        duration: 1500,
+        duration: 5500,
         easing: Easing.linear,
         useNativeDriver: true,
       })
     ).start();
   }, [shimmerAnim]);
 
-  const toggleNotificationMenu = () => {
-    if (isNotificationMenuVisible) {
-      Animated.timing(slideAnim, {
-        toValue: width,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setIsNotificationMenuVisible(false));
-    } else {
-      setIsNotificationMenuVisible(true);
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  };
+ 
 
   const onPress = useCallback((item) => {
     setSelectedItem(item);

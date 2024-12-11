@@ -123,17 +123,29 @@ const PaymentScreen = ({ navigation, route }) => {
 
       <View style={styles.exchangeContainer}>
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            value={`${exchangeValue}`}
-            keyboardType="numeric"
-            onChangeText={(text) => {
-              const numericValue = text.replace(/[^0-9]/g, '');
-              setExchangeValue(numericValue || '');
-              setSelectedPayment(null)
-            }}
-            editable={true}
-          />
+       <TextInput
+  style={styles.input}
+  value={`${exchangeValue}`}
+  keyboardType="decimal-pad"
+  onChangeText={(text) => {
+    // Votre logique de traitement
+    let normalizedText = text.replace(',', '.');
+
+// Autoriser uniquement les chiffres et un seul point décimal
+normalizedText = normalizedText.replace(/[^0-9.]/g, '');
+
+// Empêcher plusieurs points décimaux
+const parts = normalizedText.split('.');
+if (parts.length > 2) {
+  normalizedText = parts[0] + '.' + parts.slice(1).join('');
+}
+
+setExchangeValue(normalizedText || '');
+setSelectedPayment(null);
+  }}
+  editable={true}
+/>
+
                   <Text style={styles.label22}>€</Text>
 
         </View>
@@ -182,7 +194,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 37,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 5,
     textAlign: 'center',
     color: '#e9ab25',
     fontWeight: '900',
@@ -191,7 +203,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 5,
   },
   exchangeContainer: {
-    marginBottom: 30,
+    marginBottom: 10,
     alignItems: 'center',
     width: '100%',
    
@@ -216,7 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#262e315a', // Dark background for input container
     borderRadius: 12,
     paddingHorizontal: 15,
-    marginVertical: 5,
+    marginVertical: 10,
     width: width * 0.5,
     justifyContent: 'center',
   },
@@ -231,7 +243,7 @@ const styles = StyleSheet.create({
   paymentOption: {
     width: width * 0.8,
     paddingVertical: 15,
-    marginVertical: 12,
+    marginVertical: 5,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: '#e9ab25', // Bright orange for border

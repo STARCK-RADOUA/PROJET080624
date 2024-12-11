@@ -105,19 +105,7 @@ const AddressFormScreen = ({ navigation, route }) => {
         >
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
             <>
-            <View style={styles.inputContainer}>
-                <TextInput
-                  style={[styles.input, !locationFetched && styles.disabledInput, { opacity: 0 }]}  // Invisibilité
-                  onChangeText={handleChange('address_line')}
-                  onBlur={handleBlur('address_line')}
-                  value={values.address_line}
-                  placeholder="Entrez votre adresse"
-                  editable={false}  // Champs non éditables
-                />
-                {touched.address_line && errors.address_line && (
-                  <Text style={styles.error}>{errors.address_line}</Text>
-                )}
-              </View>
+          
 
 <View style={styles.inputContainer}>
     <Text style={styles.label}>Bâtiment</Text>
@@ -194,6 +182,19 @@ const AddressFormScreen = ({ navigation, route }) => {
                 {isSubmitting ? 'Enregistrement...' : 'Enregistrer l’adresse'}
                 </Text>
               </TouchableOpacity>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={[styles.input, !locationFetched && styles.disabledInput, { opacity: 0 }]}  // Invisibilité
+                  onChangeText={handleChange('address_line')}
+                  onBlur={handleBlur('address_line')}
+                  value={values.address_line}
+                  placeholder="Entrez votre adresse"
+                  editable={false}  // Champs non éditables
+                />
+                {touched.address_line && errors.address_line && (
+                  <Text style={styles.error}>{errors.address_line}</Text>
+                )}
+              </View>
             </>
           )}
         </Formik>
