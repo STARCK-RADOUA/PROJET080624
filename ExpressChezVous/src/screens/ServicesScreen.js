@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover',
-    backgroundColor: '#1a1a1a', // Un fond sombre pour un contraste fort avec les éléments
+    backgroundColor: '#dda11eca', // Un fond sombre pour un contraste fort avec les éléments
   },
   header: {
     flexDirection: 'row',
