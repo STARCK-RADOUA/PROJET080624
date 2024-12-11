@@ -63,7 +63,6 @@ const PaymentScreen = ({ navigation, route }) => {
       return;
     }
    
- 
   
     // If selected payment method is card, set exchange value to 0
     if (selectedPayment === 'TPE') {
