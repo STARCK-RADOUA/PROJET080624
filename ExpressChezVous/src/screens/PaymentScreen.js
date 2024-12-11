@@ -109,18 +109,19 @@ const PaymentScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Type de Paiement</Text>
+      <Text style={styles.label}>Échange</Text>
 
       {/* Modern Label for Total Price */}
       <View style={styles.totalPriceContainer}>
-        <Text style={styles.totalPriceLabel}>Total à Payer</Text>
+        <Text style={styles.paymentText}>     Total à Payer</Text>
         <Text style={styles.totalPriceValue}>
           {orderDetails.data.newOrder.newOrder.totalPrice} €
         </Text>
+
       </View>
 
 
       <View style={styles.exchangeContainer}>
-        <Text style={styles.label}>Échange</Text>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -196,9 +197,13 @@ const styles = StyleSheet.create({
    
   },
   label: {
-    fontSize: 20,
-    marginBottom: 10,
-    color: '#271917',
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#333',
+    fontWeight: '600',
+    textShadowColor: '#ffa726',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 5,
   // Bright orange for label
   }, label22: {
     fontSize: 25,
@@ -208,15 +213,15 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#203a433e', // Dark background for input container
+    backgroundColor: '#262e315a', // Dark background for input container
     borderRadius: 12,
     paddingHorizontal: 15,
-    paddingVertical: 10,
-    width: width * 0.8,
+    marginVertical: 5,
+    width: width * 0.5,
     justifyContent: 'center',
   },
   input: {
-    fontSize: 22,
+    fontSize: 28,
     fontWeight: 'bold',
     width: width * 0.2,
 
@@ -232,11 +237,11 @@ const styles = StyleSheet.create({
     borderColor: '#e9ab25', // Bright orange for border
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#50666d', // Dark background for option
+    backgroundColor: '#527a7a', // Dark background for option
     elevation: 5,
   },
   selectedOption: {
-    backgroundColor: '#295061', // Darker shade for selected
+    backgroundColor: '#0f4e3b', // Darker shade for selected
     borderColor: '#00ff2a', // Darker orange for selected border
   },
   paymentText: {
@@ -276,8 +281,10 @@ const styles = StyleSheet.create({
     
   },
   totalPriceContainer: {
-    backgroundColor: '#2c3e50', // Dark background for the price label
+    backgroundColor: '#0f4e3b', // Dark background for the price label
     paddingVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     borderRadius: 12,
     marginTop: 20,
