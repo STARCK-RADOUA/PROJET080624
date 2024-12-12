@@ -76,7 +76,7 @@ const CanceledOrderModal = ({ visible, onClose, order }) => {
                 </View>
               )}
               <Text style={styles.label}>
-                Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}
+                Date : {moment(order.created_at).format('YYYY-MM-DD HH:mm')}
               </Text>
 
             </View>

@@ -17,6 +17,7 @@ const TestOrdersScreen = () => {
   const [commandeSelectionnee, setCommandeSelectionnee] = useState(null);
   const [chargement, setChargement] = useState(true);
 
+  const [sortAscending, setSortAscending] = useState(true); // State to track sorting order
 
   const handleCloseModal = () => {
     setCommandeSelectionnee(null); // This closes the modal
@@ -28,6 +29,20 @@ const TestOrdersScreen = () => {
    const [endDate, setEndDate] = useState(new Date());
    const [showFilterMenu, setShowFilterMenu] = useState(false);
 
+
+   
+  const sortOrdersByTime = () => {
+    const sortedOrders = [...commandes].sort((a, b) => 
+      sortAscending 
+        ? new Date(b.created_at) - new Date(a.created_at) // Descending order
+        : new Date(a.created_at) - new Date(b.created_at) // Ascending order
+    );
+  
+    setCommandes(sortedOrders);
+    setCommandesFiltrees(sortedOrders); // Ensure filtered orders are also updated
+    setSortAscending(!sortAscending); // Toggle the sorting order
+  };
+  
    const markOrdersAsSeen = async () => {
     try {
       const status = "test" ; 
@@ -129,6 +144,13 @@ const TestOrdersScreen = () => {
         onChangeText={filtrerCommandesParRecherche}
       />
 
+<TouchableOpacity onPress={sortOrdersByTime} style={styles.sortButton}>
+  <Ionicons name="arrow-up" size={24} color="black" />
+  <Ionicons name="arrow-down" size={24} color="black" />
+  <Text style={styles.sortButtonText}>Trier par date</Text>
+</TouchableOpacity>
+     
+
       <View style={styles.filterContainer}>
         <TouchableOpacity onPress={toggleFilterMenu} style={styles.datePicker}>
           <Ionicons name="calendar-outline" size={24} color="white" />
@@ -194,7 +216,7 @@ const TestOrdersScreen = () => {
                   <Text style={styles.location}>{item.address_line}</Text>
                   <View style={styles.rightContainer}>
                     <Text style={styles.price}>€{item.total_price.toFixed(2)}</Text>
-                    <Text style={styles.date}>Créé a : {moment(item.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+                    <Text style={styles.date}>Créé a : {moment(item.created_at).format('YYYY-MM-DD HH:mm')}</Text>
                   </View>
                 </View>
               </View>
@@ -386,6 +408,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F0CD',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 20, // Add some space from the search bar
+  },
+  sortButtonText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#333',
+  }
 });
 
 export default TestOrdersScreen;

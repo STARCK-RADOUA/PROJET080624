@@ -145,7 +145,7 @@ const InProgreesgOrdersScreen = () => {
 <TouchableOpacity onPress={sortOrdersByTime} style={styles.sortButton}>
   <Ionicons name="arrow-up" size={24} color="black" />
   <Ionicons name="arrow-down" size={24} color="black" />
-  <Text style={styles.sortButtonText}>Sort by Time</Text>
+  <Text style={styles.sortButtonText}>Trier par date</Text>
 </TouchableOpacity>
       <View style={styles.filterContainer}>
         <TouchableOpacity onPress={toggleFilterMenu} style={styles.datePicker}>
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   sortButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f3b13e',
+    backgroundColor: '#F5F0CD',
     padding: 10,
     borderRadius: 10,
     marginBottom: 20, // Add some space from the search bar

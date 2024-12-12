@@ -130,7 +130,7 @@ const DeliveredOrderModal = ({ visible, onClose, order }) => {
 )}
 
             </View>
-              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.created_at).format('YYYY-MM-DD HH:mm')}</Text>
 
            
             {/* Produits */}

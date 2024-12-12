@@ -36,6 +36,7 @@ const CanceledOrderScreen = () => {
    const [startDate, setStartDate] = useState(new Date());
    const [endDate, setEndDate] = useState(new Date());
    const [showFilterMenu, setShowFilterMenu] = useState(false);
+   const [sortAscending, setSortAscending] = useState(true); // State to track sorting order
 
      // Filter chats by date range
      const applyFilters = () => {
@@ -96,6 +97,19 @@ markOrdersAsSeen();
     setCommandesFiltrees(filtrees);
   };
 
+  
+  const sortOrdersByTime = () => {
+    const sortedOrders = [...commandes].sort((a, b) => 
+      sortAscending 
+        ? new Date(b.created_at) - new Date(a.created_at) // Descending order
+        : new Date(a.created_at) - new Date(b.created_at) // Ascending order
+    );
+  
+    setCommandes(sortedOrders);
+    setCommandesFiltrees(sortedOrders); // Ensure filtered orders are also updated
+    setSortAscending(!sortAscending); // Toggle the sorting order
+  };
+  
   const afficherTout = () => {
     setCommandesFiltrees(commandes); // Afficher toutes les commandes lorsque "Afficher tout" est pressé
   };
@@ -130,6 +144,13 @@ markOrdersAsSeen();
         value={recherche}
         onChangeText={filtrerCommandesParRecherche}
       />
+
+<TouchableOpacity onPress={sortOrdersByTime} style={styles.sortButton}>
+  <Ionicons name="arrow-up" size={24} color="black" />
+  <Ionicons name="arrow-down" size={24} color="black" />
+  <Text style={styles.sortButtonText}>Trier par date</Text>
+</TouchableOpacity>
+     
 
       <View style={styles.filterContainer}>
         <TouchableOpacity onPress={toggleFilterMenu}style={styles.datePicker}>
@@ -391,6 +412,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F0CD',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 20, // Add some space from the search bar
+  },
+  sortButtonText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#333',
+  }
 });
 
 export default CanceledOrderScreen;

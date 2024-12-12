@@ -1,6 +1,6 @@
 import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, Linking ,ScrollView, Animated } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, Linking, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import axios from 'axios';
@@ -14,6 +14,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
   const [expanded, setExpanded] = useState(null);
   const [driverModalVisible, setDriverModalVisible] = useState(false); // Modal visibility state for driver selection
   const [expandAddress, setExpandAddress] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const openInMaps = (location) => {
     const wazeUrl = `https://www.google.com/maps?q=${location}`;
@@ -38,6 +39,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
 
   const handleAffectOrder = () => {
     if (selectedDriver) {
+      setLoading(true);
       axios.put(`${BASE_URL}/api/orders/affect-order`, {
         orderId: order.order_number,
         driverId: selectedDriver
@@ -47,7 +49,9 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
           socket.emit('watchOrderStatuss', { order_id: order.order_number });
           onClose(); // Close the modal after assignment
         })
-        .catch(error => console.error('Erreur lors de l\'affectation de la commande :', error.message));
+        .catch(error => {
+          console.error('Erreur lors de l\'affectation de la commande :', error.message); setLoading(false);
+        });
     }
   };
 
@@ -93,13 +97,13 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
       animationType="none"
       transparent={true}
       visible={visible}
-     
+
     >
       <View style={styles.modalContainer}>
         <View style={[styles.modalView]}>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-  <Ionicons name="close-circle" size={38} color="#ff5c5c" />
-</TouchableOpacity>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Ionicons name="close-circle" size={38} color="#ff5c5c" />
+          </TouchableOpacity>
           <ScrollView>
             {/* Order Info */}
             <View style={styles.orderInfo}>
@@ -133,7 +137,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
                   {order.door_number && (
                     <Text style={styles.additionalInfo}><Ionicons name="home" size={16} color="#ffbf00" /> Numéro de porte : {order.door_number}</Text>
                   )}
-                    {order.Adrscomment && (
+                  {order.Adrscomment && (
                     <Text style={styles.additionalInfo}><Ionicons name="chatbubble-ellipses" size={16} color="#ffbf00" /> Commentaire : {order.Adrscomment}</Text>
                   )}
                   {order.localisation && (
@@ -164,7 +168,7 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
                     {expanded === index && (
                       <View>
                         <Text style={styles.productQuantity}>Quantité : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity: "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity : "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
                       </View>
                     )}
                   </View>
@@ -196,11 +200,17 @@ const InProgressOrderModal = ({ visible, onClose, order }) => {
             </TouchableOpacity>
 
             {/* Button to assign the order */}
-            {selectedDriver && (
-              <TouchableOpacity style={styles.affectButton} onPress={handleAffectOrder}>
-                <Text style={styles.affectButtonText}>Affecter la commande à {drivers.find(driver => driver.driver_id === selectedDriver)?.firstName}</Text>
+            {selectedDriver && !loading && (
+              <TouchableOpacity
+                style={styles.affectButton}
+                onPress={handleAffectOrder}
+              >
+                <Text style={styles.affectButtonText}>
+                  Affecter la commande à {drivers.find(driver => driver.driver_id === selectedDriver)?.firstName}
+                </Text>
               </TouchableOpacity>
             )}
+
 
             {/* Total Price */}
             <View style={styles.totalContainer}>
@@ -224,7 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   modalView: {
-    marginVertical : "20%" , 
+    marginVertical: "20%",
     width: '90%',
     backgroundColor: '#1f1f1f',
     borderRadius: 20,

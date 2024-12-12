@@ -14,7 +14,7 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
   const [expanded, setExpanded] = useState(null);
   const [driverModalVisible, setDriverModalVisible] = useState(false); // Modal visibility state for driver selection
   const [expandAddress, setExpandAddress] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const openInMaps = (location) => {
     const wazeUrl = `https://www.google.com/maps?q=${location}`;
     Linking.openURL(wazeUrl);
@@ -39,6 +39,7 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
 
   const handleAffectOrder = () => {
     if (selectedDriver) {
+      setLoading(true);
       axios.put(`${BASE_URL}/api/orders/affect-order`, {
         orderId: order.order_number,
         driverId: selectedDriver
@@ -48,7 +49,7 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
           socket.emit('watchOrderStatuss', { order_id: order.order_number });
           onClose(); // Close the modal after assignment
         })
-        .catch(error => console.error('Erreur lors de l\'affectation de la commande :', error.message));
+        .catch(error => { console.error('Erreur lors de l\'affectation de la commande :', error.message); setLoading(false);});
     }
   };
 
@@ -143,7 +144,7 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
                     </TouchableOpacity>)}
                 </View>
               )}
-              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.created_at).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
             {/* Products */}
@@ -196,11 +197,16 @@ const PendingOrderModal = ({ visible, onClose, order }) => {
             </TouchableOpacity>
 
             {/* Button to assign the order */}
-            {selectedDriver && (
-              <TouchableOpacity style={styles.affectButton} onPress={handleAffectOrder}>
-                <Text style={styles.affectButtonText}>Affecter la commande à {drivers.find(driver => driver.driver_id === selectedDriver)?.firstName}</Text>
-              </TouchableOpacity>
-            )}
+            {selectedDriver && !loading && (
+  <TouchableOpacity 
+    style={styles.affectButton} 
+    onPress={handleAffectOrder}
+  >
+    <Text style={styles.affectButtonText}>
+      Affecter la commande à {drivers.find(driver => driver.driver_id === selectedDriver)?.firstName}
+    </Text>
+  </TouchableOpacity>
+)}
 
             {/* Total Price */}
             <View style={styles.totalContainer}>

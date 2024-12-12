@@ -16,6 +16,7 @@ const OngoingOrdersScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(true); // Loading state
+  const [sortAscending, setSortAscending] = useState(true); // State to track sorting order
 
    // Date filter states
    const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -50,6 +51,19 @@ const OngoingOrdersScreen = () => {
       Alert.alert('Error', 'Failed to mark orders as seen.');
     }
   };
+
+  const sortOrdersByTime = () => {
+    const sortedOrders = [...orders].sort((a, b) => 
+      sortAscending 
+        ? new Date(b.created_at) - new Date(a.created_at) // Descending order
+        : new Date(a.created_at) - new Date(b.created_at) // Ascending order
+    );
+  
+    setOrders(sortedOrders);
+    setFilteredOrders(sortedOrders); // Ensure filtered orders are also updated
+    setSortAscending(!sortAscending); // Toggle the sorting order
+  };
+  
 
   useEffect(() => {
     markOrdersAsSeen() ;
@@ -126,6 +140,13 @@ const OngoingOrdersScreen = () => {
         onChangeText={filterOrdersBySearch}
       />
 
+
+<TouchableOpacity onPress={sortOrdersByTime} style={styles.sortButton}>
+  <Ionicons name="arrow-up" size={24} color="black" />
+  <Ionicons name="arrow-down" size={24} color="black" />
+  <Text style={styles.sortButtonText}>Trier par date</Text>
+</TouchableOpacity>
+
       <View style={styles.filterContainer}>
         <TouchableOpacity onPress={toggleFilterMenu} style={styles.datePicker}>
           <Ionicons name="calendar-outline" size={24} color="black" />
@@ -194,7 +215,7 @@ const OngoingOrdersScreen = () => {
                   <Text style={styles.location}>{item.address_line}</Text>
                   <View style={styles.rightContainer}>
                     <Text style={styles.price}>€{item.total_price.toFixed(2)}</Text>
-                    <Text style={styles.date}> Créé le :{moment(item.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+                    <Text style={styles.date}> Créé le :{moment(item.created_at).format('YYYY-MM-DD HH:mm')}</Text>
                   </View>
                 </View>
               </View>
@@ -401,6 +422,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
+  
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F0CD',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 20, // Add some space from the search bar
+  },
+  sortButtonText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#333',
+  }
 });
 
 export default OngoingOrdersScreen;

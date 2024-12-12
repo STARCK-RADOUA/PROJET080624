@@ -72,7 +72,7 @@ const TestOrderModal = ({ visible, onClose, order }) => {
                     </TouchableOpacity>)}
                 </View>
               )}
-              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.delivery_time).format('YYYY-MM-DD HH:mm')}</Text>
+              <Text style={styles.label}><Ionicons name="time" size={16} color="#ffbf00" /> Date : {moment(order.created_at).format('YYYY-MM-DD HH:mm')}</Text>
             </View>
 
             {/* Produits */}

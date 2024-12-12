@@ -15,6 +15,7 @@ const SpamOrdersScreen = () => {
   const [recherche, setRecherche] = useState('');
   const [commandeSelectionnee, setCommandeSelectionnee] = useState(null);
   const [chargement, setChargement] = useState(true);
+  const [sortAscending, setSortAscending] = useState(true); // State to track sorting order
 
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
@@ -48,6 +49,19 @@ const SpamOrdersScreen = () => {
     setShowFilterMenu(!showFilterMenu);
   };
 
+  
+  const sortOrdersByTime = () => {
+    const sortedOrders = [...commandes].sort((a, b) => 
+      sortAscending 
+        ? new Date(b.created_at) - new Date(a.created_at) // Descending order
+        : new Date(a.created_at) - new Date(b.created_at) // Ascending order
+    );
+  
+    setCommandes(sortedOrders);
+    setCommandesFiltrees(sortedOrders); // Ensure filtered orders are also updated
+    setSortAscending(!sortAscending); // Toggle the sorting order
+  };
+  
   useEffect(() => {
     const socket = io(BASE_URLIO);
     markOrdersAsSeen() ;
@@ -119,6 +133,13 @@ const SpamOrdersScreen = () => {
         value={recherche}
         onChangeText={filtrerCommandesParRecherche}
       />
+
+<TouchableOpacity onPress={sortOrdersByTime} style={styles.sortButton}>
+  <Ionicons name="arrow-up" size={24} color="black" />
+  <Ionicons name="arrow-down" size={24} color="black" />
+  <Text style={styles.sortButtonText}>Trier par date</Text>
+</TouchableOpacity>
+     
 
       <View style={styles.filterContainer}>
         <TouchableOpacity onPress={toggleFilterMenu} style={styles.datePicker}>
@@ -383,6 +404,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F0CD',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 20, // Add some space from the search bar
+  },
+  sortButtonText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#333',
+  }
 });
 
 export default SpamOrdersScreen;
