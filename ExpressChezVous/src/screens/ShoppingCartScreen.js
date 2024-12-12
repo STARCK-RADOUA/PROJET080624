@@ -155,8 +155,8 @@ const ShoppingCartScreen = ({ navigation }) => {
             // Check if it's the cheapest free item and other more expensive items are still free
             if (cheapestFreeItem === item && sortedItems.some((i) => i.free && i.product_id.price > item.product_id.price)) {
               Alert.alert(
-                "Cannot switch off the cheapest item",
-                "You must toggle off more expensive free items before switching off the cheapest free item."
+                "Impossible de désactiver l'article le moins cher",
+                "Vous devez désactiver les articles gratuits les plus chers avant de désactiver l'article gratuit le moins cher."
               );
               return item; // Prevent toggling off
             }
@@ -173,8 +173,8 @@ const ShoppingCartScreen = ({ navigation }) => {
             const cheapestItem = sortedItems.find((i) => !i.free);
             if (item !== cheapestItem) {
               Alert.alert(
-                "Choose the cheapest item",
-                "You must apply points to the cheapest item first."
+                "Choisissez l'article le moins cher",
+                "Vous devez d’abord appliquer des points à l’article le moins cher."
               );
               return item; // Prevent making a non-cheapest item free
             }
@@ -187,8 +187,8 @@ const ShoppingCartScreen = ({ navigation }) => {
               return { ...item, free: true }; // Mark item as free
             } else {
               Alert.alert(
-                "Not enough points or too many free items",
-                "You do not have enough points or you cannot have more than one free item without paying for others."
+                "Pas assez de points ou trop d'articles gratuits",
+                "Vous n'avez pas assez de points ou vous ne pouvez pas avoir plus d'un article gratuit sans payer pour d'autres."
               );
               return item; // Prevent toggling if not enough points or conditions are not met
             }
@@ -215,7 +215,7 @@ const ShoppingCartScreen = ({ navigation }) => {
       calculateItemsInTheCart([...orderItems, duplicatedItem]); // Update total items
     } catch (error) {
       console.error('Failed to duplicate item:', error.message || error);
-      Alert.alert('Error', 'Failed to duplicate item.');
+      Alert.alert('Error', 'Échec de la duplication de larticle');
     }
   };
 
@@ -226,7 +226,7 @@ const ShoppingCartScreen = ({ navigation }) => {
 
       // If points were used and there's only 1 payable item left, prevent deletion
       if (hasUsedPoints && !itemToDelete.free && payableItemsCount === 1) {
-        Alert.alert("Cannot delete", "You need to keep at least one payable item in the cart.");
+        Alert.alert("Impossible de supprimer", "Vous devez conserver au moins un article payant dans le panier.");
         return;
       }
 
@@ -265,7 +265,7 @@ const ShoppingCartScreen = ({ navigation }) => {
             if (pointsNeeded > 0 && userPointsEarned >= pointsNeeded) {
               setUserPointsEarned(prevPoints => prevPoints - pointsNeeded);
             } else if (pointsNeeded > 0 && userPointsEarned < pointsNeeded) {
-              Alert.alert("Not enough points", "You don't have enough points to increase the quantity for free.");
+              Alert.alert("Pas assez de points", "Vous n'avez pas assez de points pour augmenter la quantité gratuitement.");
               return item; // Return without changing quantity
             } else if (pointsNeeded < 0) {
               setUserPointsEarned(prevPoints => prevPoints - pointsNeeded);
@@ -538,7 +538,7 @@ const ShoppingCartScreen = ({ navigation }) => {
                 onPress={handleOrderNow}
                 disabled={orderItems.length === 0}
               >
-                <Text style={styles.orderButtonText}>Order Now - €{totalPrice.toFixed(2)}</Text>
+                <Text style={styles.orderButtonText}>Commandez - €{totalPrice.toFixed(2)}</Text>
               </TouchableOpacity>
             </View>
           )}
