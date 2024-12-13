@@ -69,6 +69,8 @@ const HomeScreen = ({ navigation }) => {
       setSocket(socketInstance);
   
       // Gestion des événements socket
+      socketInstance.emit('getDailyRevenue');
+
       socketInstance.emit('getAllHomeSceenData');
       
       socketInstance.on('dailyRevenue', (data) => {
