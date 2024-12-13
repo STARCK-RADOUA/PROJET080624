@@ -76,12 +76,23 @@ const CustomDrawerContent = (props) => {
         />
       </DrawerContentScrollView>
 
-      {/* QR Code Button */}
-      <TouchableOpacity style={styles.qrButton} onPress={handleQRCodePress}>
-        <Icon name="qrcode-scan" size={width*0.5} color="#fff" />
-        <Text style={styles.qrText}>génère un code QR</Text>
-      </TouchableOpacity>
-
+      <TouchableOpacity 
+  style={[
+    styles.qrButton, 
+    {
+      width: width * 0.5,   // Reduced width for smaller screens
+      height: height * 0.25, // Reduced height for smaller screens
+    }
+  ]} 
+  onPress={handleQRCodePress}
+>
+  <Icon 
+    name="qrcode-scan" 
+    size={width * 0.25} // Reduced icon size
+    color="#fff" 
+  />
+  <Text style={styles.qrText}>génère un code QR</Text>
+</TouchableOpacity>
       {/* Logout Button at Bottom */}
       <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Logout')}>
         <Icon name="logout" size={24} color="#fff" />

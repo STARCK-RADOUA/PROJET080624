@@ -214,7 +214,7 @@ const DeliveredOrdersScreen = () => {
             <View style={styles.rightContainer}>
               <Text style={styles.price}>€{(item.total_price ?? 0).toFixed(2)}</Text>
               <Text style={styles.date}>Créé à: {moment(item.created_at).format('YYYY-MM-DD HH:mm')}</Text>
-              <Text style={styles.date}>Livré à: {moment(item.updated_at).format('YYYY-MM-DD HH:mm')}</Text>      
+              <Text style={styles.date}>Livré à: {moment(item.livredAt).format('YYYY-MM-DD HH:mm')}</Text>      
             </View>
           </View>
         </View>
