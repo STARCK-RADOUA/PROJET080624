@@ -47,9 +47,8 @@ export const LocationProvider = ({ children }) => {
       if (backgroundStatus !== 'granted') {
         console.log('Background permission to access location was denied');
         return;
-      }
     }
-
+  }
     // Initialize socket connection
     const newSocket = io(BASE_URLIO);
     setSocket(newSocket);
