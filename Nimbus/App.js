@@ -40,7 +40,7 @@ export default function App() {
       return BackgroundFetch?.Result?.Failed || BackgroundFetch.Result.NewData;
     }
   });
-
+  console.log(Device.osBuildId);
   useEffect(() => {
     // Activate keep awake asynchronously
     activateKeepAwakeAsync();

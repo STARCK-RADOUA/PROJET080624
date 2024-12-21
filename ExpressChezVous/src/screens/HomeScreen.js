@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions, Easing } from 'react-native';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
@@ -15,10 +15,6 @@ const HomeScreen = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Loading state
-  const slideAnim = useRef(new Animated.Value(width)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const shimmerAnim = useRef(new Animated.Value(0)).current; // Shimmer animation
   const bottomSheetRef = useRef(null);
   const { sharedData } = useContext(DataContext);
   const serviceName = sharedData.serviceName;
@@ -50,56 +46,15 @@ const HomeScreen = ({ navigation }) => {
     };
   }, [serviceName]);
 
-  useEffect(() => {
-    // Start the shimmer animation loop
-    Animated.loop(
-      Animated.timing(shimmerAnim, {
-        toValue: 1,
-        duration: 5500,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, [shimmerAnim]);
-
- 
-
-  const onPress = useCallback((item) => {
+  const onPress = (item) => {
     setSelectedItem(item);
     setIsBottomSheetVisible(true);
     bottomSheetRef.current?.scrollTo(-SCREEN_HEIGHT / 2);
-  }, []);
+  };
 
   const onClose = () => {
     setIsBottomSheetVisible(false);
   };
-
-  const animateItem = (index) => {
-    Animated.sequence([
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 500,
-        easing: Easing.bounce,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1.1,
-        friction: 2,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 2,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  // Shimmer translation
-  const translateX = shimmerAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-width, width],
-  });
 
   return (
     <View style={styles.container}>
@@ -117,31 +72,13 @@ const HomeScreen = ({ navigation }) => {
                 <View style={styles.textSkeletonLineLong} />
               </View>
               <View style={styles.iconSkeleton} />
-              <Animated.View
-                style={[
-                  styles.shimmerOverlay,
-                  {
-                    transform: [{ translateX }],
-                  },
-                ]}
-              />
             </View>
           ))
         ) : menuItems && Array.isArray(menuItems) && menuItems.length === 0 ? (
           <Text style={styles.noProductsText}>No products available</Text>
         ) : (
           menuItems.map((item, index) => (
-            <Animated.View
-              key={item.id || index}
-              style={[
-                styles.menuItem,
-                {
-                  transform: [{ scale: scaleAnim }],
-                  opacity: opacityAnim,
-                },
-              ]}
-              onLayout={() => animateItem(index)}
-            >
+            <View key={item.id || index} style={styles.menuItem}>
               <TouchableOpacity onPress={() => onPress(item)} style={styles.touchableArea}>
                 <Image source={{ uri: item.image_url }} style={styles.menuItemImage} />
                 <View style={styles.menuItemText}>
@@ -154,7 +91,7 @@ const HomeScreen = ({ navigation }) => {
                 </View>
                 <MaterialIcons name="keyboard-arrow-right" size={24} color="#ffa726" />
               </TouchableOpacity>
-            </Animated.View>
+            </View>
           ))
         )}
       </ScrollView>
@@ -277,11 +214,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#e0e0e0',
     marginLeft: 10,
-  },
-  shimmerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    // Gradient effect can be simulated with linear gradient or animated view
   },
 });
 

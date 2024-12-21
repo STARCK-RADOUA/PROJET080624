@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator, Animated, StyleSheet } from 'react-native';
 import { getDeviceIde } from '../services/userService';
 import io from 'socket.io-client';
+import * as Device from 'expo-device';
 
-const socket = io(`${BASE_URLIO}`);
 
 const AnimatedLetter = ({ letter, index }) => {
   const letterAnim = useRef(new Animated.Value(0)).current;
@@ -47,8 +47,7 @@ const ServicesScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
-    setLoading(true);
-    const deviceId = await getDeviceIde();
+    const deviceId = Device.osBuildId;
 
     try {
       const response = await fetch(`${BASE_URL}/api/clients/logout`, {
@@ -56,15 +55,12 @@ const ServicesScreen = ({ navigation }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ deviceId }),
+        body: JSON.stringify({ deviceId }), // Envoi du deviceId dans le corps de la requête
       });
-
+    
       const data = await response.json();
-
+      
       if (response.ok) {
-        if (socket.connected) {
-          socket.disconnect();
-        }
         navigation.replace('Login');
       } else {
         Alert.alert('Logout Failed', data.errors ? data.errors.join(', ') : data.message);
@@ -74,6 +70,7 @@ const ServicesScreen = ({ navigation }) => {
     } finally {
       setLoading(false);
     }
+    
   };
 
   return (
