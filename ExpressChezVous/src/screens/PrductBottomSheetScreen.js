@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, forwardRef } from 'react';
-import { Modal, Dimensions, StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { Modal, Dimensions, StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator  , Alert} from 'react-native';
 import { DataContext } from '../navigation/DataContext';
 import { getClientId } from '../services/userService';
 import axios from 'axios';
@@ -46,19 +46,30 @@ const PrductBottomSheetScreen = (props, ref) => {
     }
   }, [item, serviceName]);
 
+
   useEffect(() => {
     if (item) {
-      const basePrice = item.price;
+      const isWholesale = quantity >= item.quantityJamla;
+      const basePrice = isWholesale ? item.priceJamla : item.price;
       const extraPrice = Object.keys(extras)
         .filter(extra => extras[extra])
         .reduce((sum, extra) => {
           const extraCost = item.options?.find(opt => opt.name === extra)?.price || 0;
           return sum + extraCost;
         }, 0);
-
+  
       setTotalPrice((basePrice + extraPrice) * quantity);
+  
+      // Show alert when wholesale price starts being applied
+      if (isWholesale && quantity === item.quantityJamla) {
+        Alert.alert(
+          'Prix Jamla Activé',
+          `Vous commencez à acheter au prix de gros (€${item.priceJamla.toFixed(2)} par unité).`
+        );
+      }
     }
   }, [quantity, extras, item]);
+  
 
   const handleQuantityChange = (type) => {
     if (type === 'increment') {
@@ -146,6 +157,10 @@ const PrductBottomSheetScreen = (props, ref) => {
                 </View>
               </View>
 
+              <Text style={styles.menuItemPrice}>
+  Jusqu'à {item.quantityJamla || 0} pièces : €{(item.priceJamla || 0).toFixed(2)} par unité
+</Text>
+
               <Text style={styles.menuItemDescription}>
                 {item.description}
               </Text>
@@ -174,9 +189,16 @@ const PrductBottomSheetScreen = (props, ref) => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>Fermer</Text>
-            </TouchableOpacity>
+            <TouchableOpacity 
+  onPress={() => {
+    setQuantity(1);  // Reset quantity to 1
+    onClose();       // Call the onClose function
+  }} 
+  style={styles.closeButton}
+>
+  <Text style={styles.closeButtonText}>Fermer</Text>
+</TouchableOpacity>
+
           </View>
         </View>
       </TouchableWithoutFeedback>

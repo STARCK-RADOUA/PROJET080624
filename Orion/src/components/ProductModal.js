@@ -336,12 +336,57 @@ const [isEditing, setIsEditing] = useState(false);
                 placeholderTextColor="#999"
               />
             ) : (
-              <Text style={styles.price}>${editableProduct.price ? parseFloat(editableProduct.price).toFixed(2) : '0.00'}</Text>
+              <Text style={styles.price}>{editableProduct.price ? parseFloat(editableProduct.price).toFixed(2) : '0.00'} €</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
               <Ionicons name="create-outline" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
+
+          <View style={styles.fieldRow}>
+            {isEditing ? (
+              <TextInput
+                style={styles.editInput}
+                value={String(editableProduct.quantityJamla)}
+                onChangeText={(value) => handleInputChange('quantityJamla', value)}
+                keyboardType="numeric"
+                placeholder="Quantité du grox"
+                placeholderTextColor="#999"
+              />
+            ) : (
+              <>
+              <Text style={styles.price}>Quantité du grox :</Text>
+              <Text style={styles.price}>{editableProduct.quantityJamla ? parseFloat(editableProduct.quantityJamla) : '0'}</Text>
+              </>
+            )}
+            <TouchableOpacity onPress={toggleEdit}>
+              <Ionicons name="create-outline" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+
+
+          <View style={styles.fieldRow}>
+            {isEditing ? (
+              <TextInput
+                style={styles.editInput}
+                value={String(editableProduct.priceJamla)}
+                onChangeText={(value) => handleInputChange('priceJamla', value)}
+                keyboardType="numeric"
+                placeholder="Prix de grox"
+                placeholderTextColor="#999"
+              />
+            ) : (
+              <>
+              <Text style={styles.price}>Prix de grox :</Text>
+              <Text style={styles.price}>{editableProduct.priceJamla ? parseFloat(editableProduct.priceJamla) : '0'} €</Text>
+              </>
+            )}
+            <TouchableOpacity onPress={toggleEdit}>
+              <Ionicons name="create-outline" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
 
           <View style={styles.fieldRow}>
             {isEditing ? (

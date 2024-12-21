@@ -22,6 +22,10 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
   const [uploading, setUploading] = useState(false);
   const [tHeserviceModalVisible, settHeserviceModalVisible] = useState(false); // Modal visibility state for driver selection
   const [selectedtHeservice, setSelectedtHeservice] = useState(null);
+  const [priceJamla, setpriceJamla] = useState('');
+  const [quantityJamla, setquantityJamla] = useState('');
+
+
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -127,6 +131,8 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
       name: productName,
       description,
       price: parseFloat(price),
+      priceJamla : parseFloat(priceJamla) ,
+      quantityJamla : parseFloat(quantityJamla) ,
       image_url: imageUrl,
       service_type: serviceType,
       is_active: isActive,
@@ -150,6 +156,8 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
     setProductName('');
     setDescription('');
     setPrice('');
+    setquantityJamla(''),
+    setpriceJamla(''),
     setServiceType('');
     setIsActive(true);
     setOptions([{ name: '', price: '' }]);
@@ -241,6 +249,28 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
                 value={price}
                 onChangeText={setPrice}
                 placeholder="Entrez le prix du produit"
+                keyboardType="numeric"
+              />
+            </View>
+
+            <View>
+              <Text style={styles.label}>Quantité de grox</Text>
+              <TextInput
+                style={styles.input}
+                value={quantityJamla}
+                onChangeText={setquantityJamla}
+                placeholder="Entrez le quantité du produit"
+                keyboardType="numeric"
+              />
+            </View>
+
+            <View>
+              <Text style={styles.label}>Prix ​​de gros</Text>
+              <TextInput
+                style={styles.input}
+                value={priceJamla}
+                onChangeText={setpriceJamla}
+                placeholder="Entrez le prix de grox"
                 keyboardType="numeric"
               />
             </View>

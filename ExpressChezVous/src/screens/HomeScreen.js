@@ -148,6 +148,9 @@ const HomeScreen = ({ navigation }) => {
                   <Text style={styles.menuItemName}>{item.name}</Text>
                   <Text style={styles.menuItemDescription}>{item.description}</Text>
                   <Text style={styles.menuItemPrice}>€{item.price.toFixed(2)}</Text>
+                  <Text style={styles.menuItemPrice}>
+  Jusqu'à {item.quantityJamla || 0} pièces : €{(item.priceJamla || 0).toFixed(2)} par unité
+</Text>
                 </View>
                 <MaterialIcons name="keyboard-arrow-right" size={24} color="#ffa726" />
               </TouchableOpacity>

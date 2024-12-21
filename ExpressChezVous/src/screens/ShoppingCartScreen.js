@@ -125,11 +125,22 @@ const ShoppingCartScreen = ({ navigation }) => {
 
   const calculateTotalPrice = (items) => {
     const total = items.reduce((sum, item) => {
-      // Check if the item is free; if it's not free, multiply its price by its quantity
-      return sum + (item.free ? 0 : item.product_id.price * item.quantity);
+      // Check if the item is free
+      if (item.free) {
+        return sum; // If free, skip the item (add 0 to total)
+      }
+  
+      // Check if the wholesale price applies based on quantity
+      const isWholesale = item.quantity >= item.product_id.quantityJamla;
+      const basePrice = isWholesale ? item.product_id.priceJamla : item.product_id.price;
+  
+      // Add the price multiplied by the quantity to the total
+      return sum + (basePrice * item.quantity);
     }, 0);
+  
     setTotalPrice(total);
   };
+  
 
   const calculateItemsInTheCart = (items) => {
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0); // Count total items based on quantity
@@ -271,11 +282,18 @@ const ShoppingCartScreen = ({ navigation }) => {
               setUserPointsEarned(prevPoints => prevPoints - pointsNeeded);
             }
           }
+             // Check if the wholesale price applies
+             const isWholesale = newQuantity >= item.product_id.quantityJamla;
+             const basePrice = isWholesale ? item.product_id.priceJamla : item.product_id.price;
+     
+             // Calculate the total price based on the updated quantity
+             const totalItemPrice = basePrice * newQuantity;
+     
 
           return {
             ...item,
             quantity: newQuantity,
-            price: item.product_id.price * newQuantity // Correctly multiply the price by the quantity
+            price: totalItemPrice // Correctly multiply the price by the quantity
           };
         }
         return item;
