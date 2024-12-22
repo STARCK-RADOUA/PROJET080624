@@ -84,10 +84,13 @@ const HomeScreen = ({ navigation }) => {
                 <View style={styles.menuItemText}>
                   <Text style={styles.menuItemName}>{item.name}</Text>
                   <Text style={styles.menuItemDescription}>{item.description}</Text>
-                  <Text style={styles.menuItemPrice}>€{item.price.toFixed(2)}</Text>
-                  <Text style={styles.menuItemPrice}>
-  Jusqu'à {item.quantityJamla || 0} pièces : €{(item.priceJamla || 0).toFixed(2)} par unité
-</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.menuItemPrice}>€{item.price.toFixed(2)}</Text>
+                    <Text style={styles.menuItemQuantity}>
+                      Jusqu'à {item.quantityJamla || 0} pièces : €{(item.priceJamla || 0).toFixed(2)} par unité
+                    </Text>
+                  </View>
+
                 </View>
                 <MaterialIcons name="keyboard-arrow-right" size={24} color="#ffa726" />
               </TouchableOpacity>
@@ -214,6 +217,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#e0e0e0',
     marginLeft: 10,
+  },
+  menuItemQuantity: {
+    fontSize: 14,
+    color: '#555',
+    textAlign: 'right',
   },
 });
 
