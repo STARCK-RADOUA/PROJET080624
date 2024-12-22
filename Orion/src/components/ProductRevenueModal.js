@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 import { format } from 'date-fns';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as FileSystem from 'expo-file-system';

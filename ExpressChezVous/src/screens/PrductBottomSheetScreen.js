@@ -3,7 +3,7 @@ import { Modal, Dimensions, StyleSheet, View, Text, TouchableOpacity, Image, Act
 import { DataContext } from '../navigation/DataContext';
 import { getClientId } from '../services/userService';
 import axios from 'axios';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 import { TouchableWithoutFeedback } from 'react-native';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -124,7 +124,7 @@ const PrductBottomSheetScreen = (props, ref) => {
 
   return (
     <Modal visible={isVisible} animationType="fade" transparent={true} onRequestClose={onClose}>
-      <TouchableWithoutFeedback onPress={onClose}>
+      <TouchableWithoutFeedback>
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <View style={styles.imageContainer}>

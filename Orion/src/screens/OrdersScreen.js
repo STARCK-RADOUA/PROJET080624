@@ -10,7 +10,7 @@ import InProgreesgOrdersScreen from './InProgressOrderScreen';
 import TestOrdersScreen from './TestOrdersScreen';
 import SpamOrdersScreen from './SpamOrdersScreen';
 import socketIOClient from "socket.io-client";
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 const socket = socketIOClient(BASE_URL);
 

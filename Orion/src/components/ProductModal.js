@@ -6,7 +6,7 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { firebase } from './../services/firebaseConfig';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 const ProductModal = ({ visible, onClose, product }) => {
 const [isEditing, setIsEditing] = useState(false);

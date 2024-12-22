@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import { BASE_URL } from '@env'; // Make sure BASE_URL is set in your environment
 
 // Global socket instance
-const socket = io(BASE_URL); // Reuse the same socket globally
+const socket = io(BASE_URLIO); // Reuse the same socket globally
 
 const OrderRoomScreen = ({ route }) => {
   const { chatId, clientFullName, driverFullName } = route.params; // Get the passed params

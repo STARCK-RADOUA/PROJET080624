@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Animated, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import socketIOClient from "socket.io-client"; // Import socket.io client
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 import DriverRevenueScreen from '../screens/DriverRevenueScreen';
 import SearchScreen from '../screens/SearchScreen';
 import NotificationMenu from '../components/NotificationMenu';

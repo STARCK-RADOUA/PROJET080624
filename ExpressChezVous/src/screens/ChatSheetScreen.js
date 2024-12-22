@@ -20,13 +20,13 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { io } from 'socket.io-client';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 import { getClientId } from '../services/userService';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50;
 
-const socket = io(BASE_URL); // Initialize socket globally
+const socket = io(BASE_URLIO); // Initialize socket globally
 
 const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
   const translateY = useSharedValue(0);

@@ -6,7 +6,7 @@ import MainNavigator from './src/navigation/MainNavigator';
 import * as Notifications from 'expo-notifications';
 import axios from 'axios';
 import * as Device from 'expo-device';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 export default function App() {
   useEffect(() => {

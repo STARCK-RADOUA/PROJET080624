@@ -15,13 +15,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 import io from 'socket.io-client';
 import moment from 'moment';
 
 const { width, height } = Dimensions.get('window');
 
-const socket = io(BASE_URL);
+const socket = io(BASE_URLIO);
 
 const DriverModal = ({ visible, onClose, driver }) => {
   // Initialize hooks at the top level

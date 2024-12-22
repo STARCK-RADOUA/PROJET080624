@@ -115,7 +115,7 @@ const PaymentScreen = ({ navigation, route }) => {
       <View style={styles.totalPriceContainer}>
         <Text style={styles.paymentText}>     Total à Payer</Text>
         <Text style={styles.totalPriceValue}>
-          {orderDetails.data.newOrder.newOrder.totalPrice} €
+          {orderDetails.data.newOrder.newOrder.totalPrice.toFixed(2)} €
         </Text>
 
       </View>

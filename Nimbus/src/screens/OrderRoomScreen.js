@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet,   Keyboard,  ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Import des icônes
 import io from 'socket.io-client';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 
@@ -12,7 +12,7 @@ const RoomScreen = ({ route }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [chatId, setChatId] = useState(null);
-  const socket = io(BASE_URL);
+  const socket = io(BASE_URLIO);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {

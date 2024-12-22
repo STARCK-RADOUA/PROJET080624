@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Linking, Alert } from 'react-native';
 import * as Device from 'expo-device';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 export const getDeviceId = async (setDeviceId) => {
   setDeviceId(Device.osBuildId);

@@ -341,8 +341,10 @@ console.log('------------------------------------');
                   <View style={styles.productDetails}>
                     <Text style={styles.productName}>{item.product?.name || 'Indisponible'}</Text>
                     <Text style={styles.productQuantity}>Quantité : {item.quantity}</Text>
-                        <Text style={styles.productPrice}>€{!item.isFree ? item.priceDA.toFixed(2) * item.quantity: "Gratuit     €" + item.priceDA.toFixed(2) * item.quantity}</Text>
 
+                        <Text style={styles.productPrice}>€{!item.isFree ? order.total_price.toFixed(2): "Gratuit     €" + order.total_price.toFixed(2) }</Text>
+
+                        <Text style={styles.productPrice2}>prix sans promo: €{item.priceDA.toFixed(2) * item.quantity} </Text>
 
                   
                   </View>
@@ -611,6 +613,9 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     color: '#21b64a',
+  }, productPrice2: {
+    fontSize: 12,
+    color: '#b62621',
   },
   showMoreButton: {
     marginTop: 10,

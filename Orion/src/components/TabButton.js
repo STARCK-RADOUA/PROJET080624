@@ -3,7 +3,7 @@ import { TouchableOpacity, View, Text, ActivityIndicator, StyleSheet, Alert } fr
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../redux/AuthProvider';
 import * as Device from 'expo-device';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 
 const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages, warn,isClientDesactiv , isDriverDesactiv, hasUnseenOrders, onLogin }) => {

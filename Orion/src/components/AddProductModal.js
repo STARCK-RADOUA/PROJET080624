@@ -6,7 +6,7 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { firebase } from './../services/firebaseConfig';
 import * as FileSystem from 'expo-file-system';
-import { BASE_URL } from '@env';
+import { BASE_URL, BASE_URLIO } from '@env';
 
 const AddProductModal = ({ modalVisible, setModalVisible }) => {
   const [productName, setProductName] = useState('');
