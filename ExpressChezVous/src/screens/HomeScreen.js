@@ -84,11 +84,14 @@ const HomeScreen = ({ navigation }) => {
                 <View style={styles.menuItemText}>
                   <Text style={styles.menuItemName}>{item.name}</Text>
                   <Text style={styles.menuItemDescription}>{item.description}</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ flexDirection: 'row', justifyContent : 'space-between', alignItems: 'center' }}>
                     <Text style={styles.menuItemPrice}>€{item.price.toFixed(2)}</Text>
                     <Text style={styles.menuItemQuantity}>
-                      Jusqu'à {item.quantityJamla || 0} pièces : €{(item.priceJamla || 0).toFixed(2)} par unité
-                    </Text>
+  {item.quantityJamla > 0 
+    ? ` ${item.quantityJamla} pièces(${(item.priceJamla || 0).toFixed(2)} €)`
+    : 'Pas de vente en gros'}
+</Text>
+
                   </View>
 
                 </View>
