@@ -382,13 +382,13 @@ const AddProductModal = ({ modalVisible, setModalVisible }) => {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
+    backgroundColor: 'grey', 
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(56, 67, 90, 0.85)', // Semi-transparent dark background
     paddingVertical: '20%',
   },
   modalView: {
-    backgroundColor: '#38435a88', // Darker modal background
+    backgroundColor: '#ffffff', // Light background for modal
     borderRadius: 12,
     paddingTop: 20,
     paddingBottom: 20,
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#E2E8F0', // Light grey for labels
+    color: 'black', // Light grey for labels
     textAlign: 'left',
   },
   input: {
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#5A67D8', // Primary border color
     marginBottom: 12,
-    backgroundColor: '#38435A', // Dark input background
+    backgroundColor: '#ffffff', // Dark input background
     color: '#FFFFFF', // White text
   },
   switchContainer: {
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   optionsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#5A67D8', // Primary theme color for the title
+    color: 'black', // Primary theme color for the title
     marginBottom: 10,
   },
   optionContainer: {
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
   },
   optionInput: {
     width: '40%',
-    backgroundColor: '#38435A', // Matching input style
+    backgroundColor: '#ffffff', // Matching input style
     color: '#fff',
     borderColor: '#5A67D8', // Border matching the theme
   },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import io from 'socket.io-client';
-import { BASE_URL } from '@env'; // Make sure BASE_URL is set in your environment
+import { BASE_URLIO } from '@env'; // Make sure BASE_URL is set in your environment
 
 // Global socket instance
 const socket = io(BASE_URLIO); // Reuse the same socket globally

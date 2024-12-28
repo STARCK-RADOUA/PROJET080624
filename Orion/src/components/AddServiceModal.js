@@ -208,11 +208,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(56, 67, 90, 0.85)', // Updated background with transparency
+    backgroundColor: 'grey', 
     paddingVertical: '20%',
   },
   modalView: {
-    backgroundColor: '#2c2c2c63', // Darker modal background for contrast
+    backgroundColor: '#ffffff', // Light background for modal
     borderRadius: 12,
     paddingTop: 20,
     paddingBottom: 20,
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#E2E8F0', // Light grey for labels
+    color: 'black', // Light grey for labels
     textAlign: 'left',
   },
   input: {
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#5A67D8', // Primary border color
     marginBottom: 12,
-    backgroundColor: '#38435A', // Dark background for input field
+    backgroundColor: '#fff', // Dark background for input field
     color: '#FFFFFF', // White text for inputs
   },
   switchContainer: {

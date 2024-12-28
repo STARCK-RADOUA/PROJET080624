@@ -262,7 +262,7 @@ const [isEditing, setIsEditing] = useState(false);
       <View style={styles.modalContainer}>
         <View style={styles.modalView}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close-circle" size={30} color="#fff" />
+            <Ionicons name="close-circle" size={30} color="black" />
           </TouchableOpacity>
 
           <ScrollView contentContainerStyle={styles.formContainer}>
@@ -304,7 +304,7 @@ const [isEditing, setIsEditing] = useState(false);
               <Text style={styles.name}>{editableProduct.name}</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="#fff" />
+              <Ionicons name="create-outline" size={20} color="black" />
             </TouchableOpacity>
           </View>
 
@@ -321,7 +321,7 @@ const [isEditing, setIsEditing] = useState(false);
               <Text style={styles.description}>{editableProduct.description}</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="#fff" />
+              <Ionicons name="create-outline" size={20} color="black" />
             </TouchableOpacity>
           </View>
 
@@ -339,7 +339,7 @@ const [isEditing, setIsEditing] = useState(false);
               <Text style={styles.price}>{editableProduct.price ? parseFloat(editableProduct.price).toFixed(2) : '0.00'} €</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="#fff" />
+              <Ionicons name="create-outline" size={20} color="black" />
             </TouchableOpacity>
           </View>
 
@@ -360,7 +360,7 @@ const [isEditing, setIsEditing] = useState(false);
               </>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="#fff" />
+              <Ionicons name="create-outline" size={20} color="black" />
             </TouchableOpacity>
           </View>
 
@@ -383,7 +383,7 @@ const [isEditing, setIsEditing] = useState(false);
               </>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="#fff" />
+              <Ionicons name="create-outline" size={20} color="black" />
             </TouchableOpacity>
           </View>
 
@@ -403,7 +403,7 @@ const [isEditing, setIsEditing] = useState(false);
               <Text style={styles.serviceType}>Type de service: {editableProduct.service_type}</Text>
             )}
             <TouchableOpacity onPress={toggleEdit}>
-              <Ionicons name="create-outline" size={20} color="#fff" />
+              <Ionicons name="create-outline" size={20} color="black" />
             </TouchableOpacity>
           </View>
 
@@ -483,16 +483,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    
-    backgroundColor: 'rgba(0, 0, 0, 0.85)', // Dark overlay for modal background
+    backgroundColor: 'grey', 
+
   },
   modalView: {
     marginTop: 40, // Added margin top for spacing
     marginBottom: 40, // Added margin bottom for spacing
     width: '90%',
-    backgroundColor: '#38435a88', // Dark grey background for the modal
+    backgroundColor: '#ffff', // Dark grey background for the modal
     borderRadius: 15,
-    padding: 25,
+    padding: 15,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     width: '85%',
     fontSize: 16,
     paddingVertical: 5,
-    color: '#FFF', // White text color
+    color: 'black', // White text color
   },
   name: {
     fontSize: 24,
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
   },
   optionName: {
     fontSize: 16,
-    color: '#FFF', // White text for option name
+    color: 'black', // White text for option name
     width: '40%',
   },
   optionPrice: {

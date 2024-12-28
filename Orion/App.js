@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
-import { SafeAreaView, StyleSheet, Platform } from 'react-native';
+import { SafeAreaView, StyleSheet, Platform  , View , Text} from 'react-native';
 import { AuthContext, AuthProvider } from './src/redux/AuthProvider';
 import LoginScreen from './src/screens/LoginScreen';
 import MainNavigator from './src/navigation/MainNavigator';
@@ -7,8 +7,23 @@ import * as Notifications from 'expo-notifications';
 import axios from 'axios';
 import * as Device from 'expo-device';
 import { BASE_URL, BASE_URLIO } from '@env';
+import NetInfo from '@react-native-community/netinfo'; // Import NetInfo
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function App() {
+    const [isConnected, setIsConnected] = useState(true); // State to track internet connection
+  
+  useEffect(() => {
+    // Monitor network connection status
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe(); // Unsubscribe from NetInfo listener when the component unmounts
+    };
+  }, []);
+
   useEffect(() => {
     // Configurer les notifications pour le foreground
     Notifications.setNotificationHandler({
@@ -30,6 +45,9 @@ export default function App() {
       });
     }
   }, []);
+  if (!isConnected) {
+    return <DisconnectedScreen />;
+  }
 
   return (
     <AuthProvider>
@@ -80,6 +98,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  NoInternetcontainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5', // Soft light background color
+    paddingHorizontal: 20,
+  },
+  iconWrapper: {
+    marginBottom: 20, // Space between the icon and the title
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badge: {
+    position: 'absolute',
+    bottom: -5,
+    right: -5,
+    width: 12,
+    height: 12,
+    backgroundColor: '#FF5252', // Bright red for alert
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#F5F5F5', // Matches background for a clean look
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#424242', // Neutral dark color for readability
+    marginBottom: 10,
+  },
+  message: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#616161', // Muted gray for secondary text
+    lineHeight: 24,
+  },
 });
 
 async function registerForPushNotificationsAsync() {
@@ -129,3 +182,22 @@ async function saveAdminPushToken(expoPushToken) {
     console.error('Erreur lors de l\'enregistrement du token : ', error.response ? error.response.data : error.message);
   }
 }
+
+const DisconnectedScreen = () => {
+  return (
+    <View style={styles.NoInternetcontainer}>
+    
+    <View style={styles.iconWrapper}>
+      <MaterialIcons name="wifi-off" size={50} color="#FFB74D" />
+      <View style={styles.badge} />
+    </View>
+    <Text style={styles.title}>Ouups !</Text>
+    <Text style={styles.message}>
+    Aucune connexion Internet n'a été trouvée, 
+      {'\n'}
+      Veuillez vérifier vos paramètres Internet
+    </Text>
+  </View>
+  );
+};
+

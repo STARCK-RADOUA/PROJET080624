@@ -123,7 +123,7 @@ const DisconnectedScreen = () => {
     </View>
     <Text style={styles.title}>Ouups !</Text>
     <Text style={styles.message}>
-    Aucune connexion Internet n'a été trouvée, zetyui!p$
+    Aucune connexion Internet n'a été trouvée, 
       {'\n'}
       Veuillez vérifier vos paramètres Internet
     </Text>

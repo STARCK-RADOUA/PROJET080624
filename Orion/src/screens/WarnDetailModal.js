@@ -51,25 +51,25 @@ const WarnDetailModal = ({ warn, onClose }) => {
         <ScrollView contentContainerStyle={styles.modalContent}>
           <Text style={styles.modalTitle}>{warn.firstName} {warn.lastName}</Text>
           <Text style={styles.modalText}>Device ID: {warn.deviceId}</Text>
-          <Text style={styles.modalText}>Phone: +33 {warn.phone}</Text>
-          <Text style={styles.modalText}>Password: **{warn.password}**</Text>
-          <Text style={styles.modalText}>Location: {warn.location}</Text>
+          <Text style={styles.modalText}>Tele: +33 {warn.phone}</Text>
+          <Text style={styles.modalText}>Mot passe: **{warn.password}**</Text>
+          <Text style={styles.modalText}>Localisation: {warn.location}</Text>
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.button}
               onPress={() => showMapOptions(warn.location)}
             >
               <Ionicons name="navigate-outline" size={24} color="white" />
-              <Text style={styles.buttonText}>Navigate</Text>
+              <Text style={styles.buttonText}>Naviger</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.modalTimestamp}>Created: {moment(warn.created_at).format('DD MMM YYYY, h:mm a')}</Text>
-          <Text style={styles.modalTimestamp}>Updated: {moment(warn.updated_at).format('DD MMM YYYY, h:mm a')}</Text>
+          <Text style={styles.modalTimestamp}>Cree le: {moment(warn.created_at).format('DD MMM YYYY, h:mm a')}</Text>
+          <Text style={styles.modalTimestamp}>Met a jour: {moment(warn.updated_at).format('DD MMM YYYY, h:mm a')}</Text>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={onClose}
           >
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={styles.closeButtonText}>Fermer</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -83,12 +83,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical:height*0.1,
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    backgroundColor: 'grey',
   },
   modalContent: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#ffffff',
     padding: 20,
-    marginHorizontal: 20,
+    marginHorizontal: 10,
     borderRadius: 10,
     shadowColor: '#5A67D8',
     shadowOffset: { width: 0, height: 5 },
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 18,
     marginBottom: 15,
-    color: '#dddddd',
+    color: 'blacke',
   },
   buttonRow: {
     flexDirection: 'row',

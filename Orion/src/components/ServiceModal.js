@@ -250,11 +250,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'grey',
   },
   modalView: {
     width: '90%',
-    backgroundColor: '#38435a88',
+    backgroundColor: '#fff',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
@@ -319,12 +319,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 10,
-    color: '#dacfcf',
+    color: 'black',
   },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#dad4d4',
+    color: '#black',
   },
   textValue: {
     fontSize: 16,

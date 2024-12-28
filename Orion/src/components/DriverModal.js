@@ -413,9 +413,10 @@ const DriverModal = ({ visible, onClose, driver }) => {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
+    backgroundColor: 'grey', 
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: "30%", // Adjust this value if needed for better margin from top
+    paddingVertical: '20%',
   },
   modalView: {
     width: '90%',
