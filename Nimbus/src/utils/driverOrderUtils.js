@@ -34,7 +34,7 @@ export const getDistance = async (startLat, startLng, endLat, endLng) => {
     return { distance };
   } catch (error) {
     console.error(error);
-    return { distance: 'que quelques' }; // Retour en cas d'erreur
+    return { distance: 'XX' }; // Retour en cas d'erreur
   }
 };
 

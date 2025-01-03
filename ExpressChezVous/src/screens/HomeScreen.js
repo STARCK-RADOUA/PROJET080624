@@ -89,7 +89,7 @@ const HomeScreen = ({ navigation }) => {
                     <Text style={styles.menuItemQuantity}>
                       {item.quantityJamla > 0
                         ? ` ${item.quantityJamla} pièces(${(item.priceJamla || 0).toFixed(2)} €)`
-                        : 'Pas de vente en gros'}
+                        : ' '}
                     </Text>
 
                   </View>

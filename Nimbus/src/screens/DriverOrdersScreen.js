@@ -144,7 +144,6 @@ useEffect(() => {
             socketRef.current.emit('driverConnected', deviceId);
           });
         } 
-        refreshDistances(); // Rafraîchir les distances ou autres données
       }
       setAppState(nextAppState);
     });
@@ -190,6 +189,11 @@ useEffect(() => {
        console.log(`Updated location: Latitude: ${latitude}, Longitude: ${longitude}`);
        console.log('------------sub------------------------');
        console.log(locationSubscription);
+       const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
+      console.log('Sending background ping');
+      socket.emit('driverPing', { deviceId: Device.osBuildId });
+      socket.emit('driverLocationUpdate', { deviceId: Device.osBuildId, latitude, longitude });
+
        }
       
       },
@@ -288,9 +292,7 @@ useEffect(() => {
       refreshDistances();
       console.log("refrech distance")
       startTracking(deviceId);
-      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
-      console.log('Sending background ping');
-      socket.emit('driverPing', { deviceId: Device.osBuildId });
+      
     }, 20 * 1000);
 
 
