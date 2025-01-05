@@ -65,6 +65,7 @@ useEffect(() => {
         setIsEnabledPause(data.ispause);
       });
 
+
     
 
      
@@ -75,6 +76,8 @@ useEffect(() => {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
+        setTimeout(() =>   refreshDistances(), 5000);
+
       }
     };
   }, [deviceId]);
@@ -144,6 +147,8 @@ useEffect(() => {
             socketRef.current.emit('driverConnected', deviceId);
           });
         } 
+        setTimeout(() =>   refreshDistances(), 5000);
+
       }
       setAppState(nextAppState);
     });
