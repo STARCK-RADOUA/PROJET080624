@@ -20,7 +20,7 @@ const LoginScreen = ({ onLogin }) => {
       console.log('Device ID:', Device.osBuildId);
       console.log('------------------------------------');
     } else {
-      Alert.alert('Error', 'Must use a physical device for Device ID.');
+      Alert.alert('Erreur', 'Vous devez utiliser un périphérique physique pour ID de périphérique.');
     }
   };
 
@@ -32,7 +32,7 @@ console.log(deviceId)
       socket.emit('adminAutoLogin', { deviceId });
 
       socket.on('adminloginSuccess', () => {
-        Alert.alert('Login Successful', 'Welcome!');
+        Alert.alert('Connexion réussie', 'Bienvenu!');
         onLogin();
       });
     }
@@ -50,7 +50,7 @@ console.log(deviceId)
       socket.emit('adminRestoreLogin', { deviceId });
 
       socket.on('adminRestoreSuccess', () => {
-        Alert.alert('Welcome', 'To your platform admin : ) ');
+        Alert.alert('Bienvenu!', 'sur votre plateforme administrateur : ) ');
       });
     }
   };
@@ -69,14 +69,14 @@ console.log(deviceId)
       });
 
       if (response.status === 200) {
-        Alert.alert('Login Successful', 'Welcome!');
+        Alert.alert('Connexion réussie', 'Bienvenu!');
         onLogin();
       } 
       if (response.status === 2000) {
         Alert.alert('Nouveau mot de passe envoyé', 'Nouveau mot de passe envoyé à votre adresse e-mail en raison d’un changement d’appareil. Veuillez utiliser ce mot de passe pour vous connecter.');
       }
     } catch (error) {
-      Alert.alert('Login Failed', error.response?.data?.message || 'An error occurred');
+      Alert.alert('La connexion a échoué', error.response?.data?.message || 'Une erreur est produite');
     }
   };
 
@@ -94,10 +94,10 @@ console.log(deviceId)
             />
           </TouchableOpacity>
           <View style={styles.formContainer}>
-            <Text style={styles.title}>Sign in to your platform</Text>
+            <Text style={styles.title}>Connectez-vous à votre plateforme</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Your phone</Text>
+              <Text style={styles.label}>Votre téléphone</Text>
               <TextInput
                 placeholder="+33 6 00 00 00 00"
                 value={phone}
@@ -108,7 +108,7 @@ console.log(deviceId)
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Your password</Text>
+              <Text style={styles.label}>Votre mot de passe</Text>
               <TextInput
                 placeholder="••••••••"
                 value={password}
@@ -119,24 +119,12 @@ console.log(deviceId)
             </View>
 
             <View style={styles.optionsContainer}>
-              <TouchableOpacity
-                style={styles.customCheckboxContainer}
-                onPress={() => setRememberMe(!rememberMe)}
-              >
-                <MaterialIcons
-                  name={rememberMe ? "check-box" : "check-box-outline-blank"}
-                  size={24}
-                  color={rememberMe ? "#007bff" : "#ccc"}
-                />
-                <Text style={styles.rememberMeText}>Remember me</Text>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Text style={styles.forgotPasswordText}>Lost Password?</Text>
-              </TouchableOpacity>
+              
+            
             </View>
 
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              <Text style={styles.loginButtonText}>Login to your account</Text>
+              <Text style={styles.loginButtonText}>Connectez-vous à votre compte</Text>
             </TouchableOpacity>
           </View>
         </View>

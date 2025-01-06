@@ -28,13 +28,13 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages,
       if (response.status === 200) {
         await logout();
         onLogin();
-        Alert.alert('Logout Successful', 'You have been logged out.');
+        Alert.alert('Déconnexion réussie', 'Vous avez été déconnecté.');
       } else {
         Alert.alert('Logout Failed', data.errors ? data.errors.join(', ') : data.message);
       }
     } catch (error) {
       console.error('Logout error:', error);
-      Alert.alert('Error', 'Something went wrong during logout.');
+      Alert.alert('Erreur', 'Une erreur est produite lors de la déconnexion.');
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ const TabButton = ({ currentTab, setCurrentTab, title, iconName, unreadMessages,
 
   return (
     <TouchableOpacity onPress={() => {
-      if (title === "LogOut") {
+      if (title === "Se déconnecter") {
         handleLogout();
       } else {
         setCurrentTab(title);

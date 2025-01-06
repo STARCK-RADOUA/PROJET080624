@@ -63,7 +63,7 @@ const SettingsScreen = () => {
     <ScrollView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title}>Paramètres</Text>
         <Icon name="settings-outline" type="ionicon" color="#000" />
       </View>
 
@@ -71,7 +71,7 @@ const SettingsScreen = () => {
       <View style={styles.settingContainer}>
         <View style={styles.settingRow}>
           <Icon name="power-outline" type="ionicon" color={isSystemActive ? "#1976d2" : "#ff5252"} />
-          <Text style={styles.settingText}>Activate Entire System</Text>
+          <Text style={styles.settingText}>Activer le système</Text>
         </View>
         <Switch
           trackColor={{ false: '#767577', true: '#1976d2' }}
@@ -86,7 +86,7 @@ const SettingsScreen = () => {
       <View style={styles.settingContainer}>
         <View style={styles.settingRow}>
           <Icon name="people-outline" type="ionicon" color={isClientsActive ? "#1976d2" : "#ff5252"} />
-          <Text style={styles.settingText}>Activate All Clients</Text>
+          <Text style={styles.settingText}>Activer tous les clients</Text>
         </View>
         <Switch
           trackColor={{ false: '#767577', true: '#1976d2' }}
@@ -101,7 +101,7 @@ const SettingsScreen = () => {
       <View style={styles.settingContainer}>
         <View style={styles.settingRow}>
           <Icon name="car-outline" type="ionicon" color={isDriversActive ? "#1976d2" : "#ff5252"} />
-          <Text style={styles.settingText}>Activate All Drivers</Text>
+          <Text style={styles.settingText}>Activer tous les liverurs</Text>
         </View>
         <Switch
           trackColor={{ false: '#767577', true: '#1976d2' }}

@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/4gVJP0fdoZw00-aLyy3w--transformed.webp",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -24,6 +24,7 @@
       }
     },
     "android": {
+      "networkSecurityConfig": "./android/app/src/main/res/xml/network_security_config.xml",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -38,7 +39,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "e7053047-cf1d-400e-b255-1faee969efbb"
+        "projectId": "6f7de4ab-8fc7-438c-a2d9-75dab3a17baa"
       }
     },
     "runtimeVersion": {

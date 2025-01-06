@@ -36,7 +36,7 @@ const SideMenu = ({ currentTab, setCurrentTab, onLogin, unreadMessages,unreadAdm
 
       {/* Logout Button */}
       <View style={styles.logoutButtonContainer}>
-        {TabButton({ currentTab, setCurrentTab, title: "LogOut", iconName: "log-out-outline", onLogin })}
+        {TabButton({ currentTab, setCurrentTab, title: "Se déconnecter", iconName: "log-out-outline", onLogin })}
       </View>
     </View>
   );

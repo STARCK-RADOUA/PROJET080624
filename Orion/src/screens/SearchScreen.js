@@ -82,12 +82,12 @@ export default function SearchScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Search Database</Text>
+      <Text style={styles.title}>Rechercher dans la base de données</Text>
       <View style={styles.inputContainer}>
 
       <TextInput
         style={styles.searchInput}
-        placeholder="Enter keyword or phrase..."
+        placeholder="Entrez un mot-clé ou une phrase..."
         value={query}
         onChangeText={setQuery}
         onSubmitEditing={handleSearch}
@@ -98,12 +98,12 @@ export default function SearchScreen() {
       </View>
 
       <TouchableOpacity style={styles.filterButton} onPress={() => setShowFilterMenu(!showFilterMenu)}>
-        <Text style={styles.filterButtonText}>Filter Results</Text>
+        <Text style={styles.filterButtonText}>Filtrer les résultats</Text>
       </TouchableOpacity>
       {showFilterMenu && (
         <View style={styles.filterMenu}>
           <TouchableOpacity onPress={() => setShowStartDatePicker(true)} style={styles.dateButton}>
-            <Text style={styles.dateButtonText}>Start Date: {startDate.toDateString()}</Text>
+            <Text style={styles.dateButtonText}>Date de début: {startDate.toDateString()}</Text>
           </TouchableOpacity>
           {showStartDatePicker && (
             <DateTimePicker
@@ -118,7 +118,7 @@ export default function SearchScreen() {
             />
           )}
           <TouchableOpacity onPress={() => setShowEndDatePicker(true)} style={styles.dateButton}>
-            <Text style={styles.dateButtonText}>End Date: {endDate.toDateString()}</Text>
+            <Text style={styles.dateButtonText}>Date de fin: {endDate.toDateString()}</Text>
           </TouchableOpacity>
           {showEndDatePicker && (
             <DateTimePicker
@@ -133,18 +133,18 @@ export default function SearchScreen() {
             />
           )}
           <TouchableOpacity onPress={applyFilters} style={styles.applyFilterButton}>
-            <Text style={styles.applyFilterButtonText}>Apply Filters</Text>
+            <Text style={styles.applyFilterButtonText}>Appliquer les filtres</Text>
           </TouchableOpacity>
         </View>
       )}
       {loading && <ActivityIndicator size="large" color="#007BFF" style={styles.loader} />}
-      <Text style={styles.resultCounter}>Results: {results.length}</Text>
+      <Text style={styles.resultCounter}>Résultats : {results.length}</Text>
       <FlatList
         data={results}
         keyExtractor={(item) => item._id}
         renderItem={renderResultItem}
         contentContainerStyle={styles.resultsContainer}
-        ListEmptyComponent={!loading && <Text style={styles.noResultsText}>No results found</Text>}
+        ListEmptyComponent={!loading && <Text style={styles.noResultsText}>Aucun résultat trouvé</Text>}
       />
     </View>
   );
