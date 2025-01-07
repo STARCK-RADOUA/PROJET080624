@@ -101,7 +101,7 @@ export default function App() {
       socket.disconnect();
     };
   }, []);
-
+ 
   if (!isConnected) {
     return <DisconnectedScreen />;
   }

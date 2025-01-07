@@ -14,6 +14,7 @@ import * as Device from 'expo-device';
 const deviceId = Device.osBuildId;
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
+import NetInfo from '@react-native-community/netinfo'; // Import NetInfo
 
 const socket = io(BASE_URLIO, {
   query: { deviceId },
@@ -38,9 +39,28 @@ const PaymentSuccessScreen = ({ route }) => {
   const navigation = useNavigation();
   const [duration, setDuration] = useState(null);
   const [distance, setDistance] = useState(null);
+  const [isConnected, setIsConnected] = useState(true); // State to track internet connection
 
   const [messages, setMessages] = useState([]); // State for messages
   const socketRef = React.useRef(null);
+  useEffect(() => {
+    // Monitor network connection status
+    const unsubscribe = NetInfo.addEventListener(async(state) => {
+      setIsConnected(state.isConnected);
+      if (!state.isConnected) {
+        await saveStateToStorage(orderId, orderStatus, orders, nezPoint);
+     }
+     if (!isConnected) {
+      await saveStateToStorage(orderId, orderStatus, orders, nezPoint);
+     }
+    });
+  
+  
+
+    return () => {
+      unsubscribe(); // Unsubscribe from NetInfo listener when the component unmounts
+    };
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -239,6 +259,7 @@ console.log('------------------------------------');
         }
       }
     });
+  
     return () => {
       socket.off('orderStatusUpdates');  
       };
@@ -275,6 +296,7 @@ console.log('------------------------------------');
 
   // Animation for delivery image
   useEffect(() => {
+    
     if (orderStatus !== 'pending') {
 
       const animateDeliveryImage = () => {
