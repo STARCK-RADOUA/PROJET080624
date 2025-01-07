@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, ActivityIndicator ,StyleSheet, AppState } from 'react-native';
+import { View, ActivityIndicator ,StyleSheet, AppState , Image , Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import * as Location from 'expo-location';
@@ -13,6 +13,8 @@ import * as Device from 'expo-device';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import NetInfo from '@react-native-community/netinfo'; // Import NetInfo
+
 
 const deviceId = Device.osBuildId;
 // Initialize socket connection
@@ -28,6 +30,8 @@ export default function App() {
   const BACKGROUND_PING_TASK = 'background-fetch';
   const [isSystemDown, setIsSystemDown] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isConnectedI, setIsConnectedI] = useState(true); // State to track internet connection
+  
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
@@ -48,6 +52,17 @@ export default function App() {
     return () => {
       // Deactivate keep awake
       deactivateKeepAwake();
+    };
+  }, []);
+
+  useEffect(() => {
+    // Monitor network connection status
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnectedI(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe(); // Unsubscribe from NetInfo listener when the component unmounts
     };
   }, []);
   
@@ -177,6 +192,11 @@ navigate('SystemDownScreen')
     };
   }, []);
 
+  
+  if (!isConnectedI) {
+    return <DisconnectedScreen />;
+  }
+
   return (
     <LocationProvider>
       <View style={styles.container}>
@@ -187,8 +207,66 @@ navigate('SystemDownScreen')
   );
 }
 
+const DisconnectedScreen = () => {
+  return (
+    <View style={styles.containerI}>
+    <View style={styles.iconWrapper}>
+      <View style={styles.badge} />
+    </View>
+    <Text style={styles.title}>Ouups !</Text>
+    <Text style={styles.message}>
+    Aucune connexion Internet n'a été trouvée, 
+      {'\n'}
+      Veuillez vérifier vos paramètres Internet
+    </Text>
+  </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  image: {
+    width: 200,
+    height: 200,
+    marginTop: 20,
+  },
+  containerI: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  iconWrapper: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 12,
+    height: 12,
+    backgroundColor: '#FFB74D',
+    borderRadius: 6,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#FFB74D',
+    marginBottom: 10,
+  },
+  message: {
+    fontSize: 16,
+    color: '#757575',
+    textAlign: 'center',
+    marginBottom: 20,
+  }
 });
