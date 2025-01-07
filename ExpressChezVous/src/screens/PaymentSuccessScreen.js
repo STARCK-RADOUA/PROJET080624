@@ -220,8 +220,10 @@ const PaymentSuccessScreen = ({ route }) => {
         setShowExitButton(true);
     // Clear all data once cancelled  
              await clearAllData(); // Clear all data once cancelled  
-             navigation.navigate('Services', {});
-            }
+             navigation.reset({
+              index: 0,
+              routes: [{ name: 'Services' }],
+            });              }
             if (status === 'pending') {
 
         setIsChatDisabled(true);
