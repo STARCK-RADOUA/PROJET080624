@@ -21,6 +21,8 @@ const SplashScreen = ({ navigation }) => {
         deviceId: deviceId,  // Pass the unique deviceId
       },
     });    // Listen to the socket for the system status
+    socket.emit('toggleSystemDriver'); // For example, emit an event to check system status
+
     socket.on('statusSiteDriver', (systemActive) => {
       // Check the system status from the server
       console.log('System status received:', { systemActive });
