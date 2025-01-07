@@ -86,7 +86,6 @@ const ShoppingCartScreen = ({ navigation }) => {
       } else {
         // Reset all values if system point is active
         setExpandedItemId(null);
-        setTotalPrice(0);
         setUserPointsEarned(0);
         setMyFreeItem(0);
         setItemsInTheCart(0);
@@ -554,7 +553,7 @@ const ShoppingCartScreen = ({ navigation }) => {
               <TouchableOpacity
                 style={[styles.orderButton, orderItems.length === 0 && styles.disabledOrderButton]}
                 onPress={handleOrderNow}
-                disabled={orderItems.length === 0}
+                disabled={orderItems.length === 0 || totalPrice == 0}
               >
                 <Text style={styles.orderButtonText}>Commandez - €{totalPrice.toFixed(2)}</Text>
               </TouchableOpacity>
