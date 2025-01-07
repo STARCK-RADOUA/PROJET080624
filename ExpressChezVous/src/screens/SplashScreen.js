@@ -20,6 +20,8 @@ const SplashScreen = ({ navigation }) => {
 
   useEffect(() => {
     // Initialize socket connection
+    socket.emit('toggleSystemDriver');
+
      // Listen to the socket for the system status
     socket.on('statusSiteDriver', (systemActive) => {
       // Check the system status from the server
