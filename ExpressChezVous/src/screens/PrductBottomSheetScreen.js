@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useContext, forwardRef } from 'react';
+import React, { useState, useEffect,useCallback, useContext, forwardRef } from 'react';
 import { Modal, Dimensions, StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator  , Alert} from 'react-native';
 import { DataContext } from '../navigation/DataContext';
 import { getClientId } from '../services/userService';
 import axios from 'axios';
 import { BASE_URL, BASE_URLIO } from '@env';
 import { TouchableWithoutFeedback } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -21,7 +22,34 @@ const PrductBottomSheetScreen = (props, ref) => {
   const { sharedData } = useContext(DataContext);
   const serviceName = sharedData.serviceName;
   const [isImageLoading, setIsImageLoading] = useState(true); // Image loading state
-
+  useFocusEffect(
+    useCallback(() => {
+      const checkIfItemIsInCart = async () => {
+        try {
+          const clientId = await getClientId();
+          const url = `${BASE_URL}/api/order-items/${clientId}/${serviceName}/order-items`;
+  
+          const response = await axios.get(url);
+          const addedItem = response.data.find(orderItem => orderItem.product_id._id === item?._id);
+  
+          if (addedItem) {
+            setIsAddedToCart(true);
+          } else {
+            setIsAddedToCart(false);
+          }
+        } catch (error) {
+          console.error('Error checking if item is in cart:', error);
+        }
+      };
+  
+      if (item) {
+        checkIfItemIsInCart();
+      }
+      return () => {
+        // Actions à effectuer lorsque l'écran perd le focus, si nécessaire
+      };
+    }, [item, serviceName])
+  );
   useEffect(() => {
     const checkIfItemIsInCart = async () => {
       try {
