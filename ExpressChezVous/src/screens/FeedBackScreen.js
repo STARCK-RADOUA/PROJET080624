@@ -20,8 +20,8 @@ const FeedbackScreen = ({ route, navigation }) => {
     // Input validation
     if (!feedback || rating === 0) {
       Alert.alert(
-        'Validation Error',
-        'Please provide both feedback and a rating before submitting.',
+        'Erreur de validation',
+        'Veuillez fournir à la fois vos commentaires et une évaluation avant de soumettre.',
         [{ text: 'OK' }]
       );
       return; // Stop execution if validation fails
@@ -40,8 +40,8 @@ const FeedbackScreen = ({ route, navigation }) => {
   
       // Show success alert
       Alert.alert(
-        'Success',
-        'Thank you! Your feedback has been submitted successfully.',
+        'Succès',
+        'Merci! Votre avis a été envoyé avec succès.',
         [{ text: 'OK' }]
       );
   
@@ -60,8 +60,8 @@ const FeedbackScreen = ({ route, navigation }) => {
   
       // Show error alert
       Alert.alert(
-        'Error',
-        'An error occurred while sending your feedback. Please try again later.',
+        'Erreur',
+        'Une erreur est produite lors envoi de vos commentaires. Veuillez réessayer ultérieurement.',
         [{ text: 'OK' }]
       );
     }
