@@ -225,7 +225,7 @@ const ShoppingCartScreen = ({ navigation }) => {
       calculateItemsInTheCart([...orderItems, duplicatedItem]); // Update total items
     } catch (error) {
       console.error('Failed to duplicate item:', error.message || error);
-      Alert.alert('Error', 'Échec de la duplication de larticle');
+      Alert.alert('Erreur', 'Échec de la duplication de larticle');
     }
   };
 

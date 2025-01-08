@@ -193,7 +193,7 @@ const PrductBottomSheetScreen = (props, ref) => {
                 {item.description}
               </Text>
 
-              <Text style={styles.extrasLabel}>Select Extras:</Text>
+              <Text style={styles.extrasLabel}>Sélectionnez les extras :</Text>
               {item.options?.map((option, index) => (
                 <TouchableOpacity
                   key={index}

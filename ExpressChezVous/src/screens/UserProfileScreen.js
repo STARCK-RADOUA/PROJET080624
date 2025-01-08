@@ -275,7 +275,7 @@ const UserProfileScreen = ({ navigation }) => {
               <View style={styles.row}>
 
                 <TextInput
-                  placeholder="Current Password"
+                  placeholder="Mot de passe actuel"
                   value={currentPassword}
                   onChangeText={setCurrentPassword}
                   secureTextEntry
@@ -306,7 +306,7 @@ const UserProfileScreen = ({ navigation }) => {
               style={styles.modalInput}
               editable={isCurrentPasswordValid}
             />
-                  <Text style={styles.modalTitle2}>Confirmee le mot de pass</Text>
+                  <Text style={styles.modalTitle2}>Confirmer le mot de pass</Text>
 
             <TextInput
               placeholder="Confirmer le nouveau mot de passe"

@@ -14,7 +14,7 @@ const TabNavigator = () => {
         name="HomeScreen"
         component={HomeScreen}
         options={{
-          title: 'Home',
+          title: 'Accueil',
           tabBarActiveTintColor: 'orange',
           tabBarInactiveTintColor: 'black',
           tabBarIcon: ({ color, size }) => (
@@ -27,7 +27,7 @@ const TabNavigator = () => {
         name="ShoppingCartScreen"
         component={ShoppingCartScreen}
         options={{
-          title: 'Orders',
+          title: 'Commandes',
           tabBarActiveTintColor: 'orange',
           tabBarInactiveTintColor: 'black',
           tabBarIcon: ({ color, size }) => (
