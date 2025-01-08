@@ -35,7 +35,7 @@ const PaymentSuccessScreen = ({ route }) => {
   const { sharedData } = useContext(DataContext);
   const [nezPoint, setNezPoint] = useState(sharedData?.dicrPoints);
   const [firstpoints, setFirstPoints] = useState(sharedData?.firstPoints);
-  const [orders, setOrders] = useState(sharedData?.orders);
+  const [orders, setOrders] = useState([]);
   const navigation = useNavigation();
   const [duration, setDuration] = useState(null);
   const [distance, setDistance] = useState(null);
@@ -44,6 +44,8 @@ const PaymentSuccessScreen = ({ route }) => {
   const [messages, setMessages] = useState([]); // State for messages
   const socketRef = React.useRef(null);
   useEffect(() => {
+    retrieveStateFromStorage();
+    setOrders(sharedData?.orders)
     // Monitor network connection status
     const unsubscribe = NetInfo.addEventListener(async(state) => {
       setIsConnected(state.isConnected);
