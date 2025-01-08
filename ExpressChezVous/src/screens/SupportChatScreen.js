@@ -111,7 +111,7 @@ const ClientChatScreen = ({ navigation }) => {
 
   const renderMessage = ({ item }) => (
     <View style={item.sender === 'client' ? styles.messageContainerClient : styles.messageContainerAdmin}>
-      <Text style={styles.sender}>{item.sender === 'client' ? 'You' : 'Admin'}</Text>
+      <Text style={styles.sender}>{item.sender === 'client' ? 'Moi' : 'Admin'}</Text>
       <Text style={styles.content}>{item.content}</Text>
       <Text style={styles.timestamp}>{formatTimestamp(item.timestamp)}</Text>
     </View>
@@ -123,7 +123,7 @@ const ClientChatScreen = ({ navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.chatTitleContainer}>
-        <Text style={styles.chatTitleText}>Chat {chatId ? 'Active' : 'Connecting...'}</Text>
+        <Text style={styles.chatTitleText}>Chat {chatId ? 'Actif' : 'Connexion...'}</Text>
       </View>
 
       <FlatList
@@ -140,7 +140,7 @@ const ClientChatScreen = ({ navigation }) => {
           style={styles.textInput}
           value={newMessage}
           onChangeText={setNewMessage}
-          placeholder="Type a message..."
+          placeholder="Tapez un message..."
           placeholderTextColor="#aaa"
         />
         <TouchableOpacity style={styles.sendButton} onPress={sendMessage} disabled={!chatId}>
