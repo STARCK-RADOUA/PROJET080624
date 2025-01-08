@@ -77,8 +77,8 @@ const CustomDrawerContent = (props) => {
       </DrawerContentScrollView>
 
       <TouchableOpacity style={styles.qrButton} onPress={handleQRCodePress}>
-        <Icon name="qrcode-scan" size={width*0.5} color="#fff" />
-        <Text style={styles.qrText}>génère un code QR</Text>
+        <Icon name="qrcode-scan" size={width*0.09} color="#ada2a2" />
+        <Text style={styles.qrText}>   génère un code QR</Text>
       </TouchableOpacity>
       {/* Logout Button at Bottom */}
       <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Logout')}>
@@ -288,29 +288,21 @@ const styles = StyleSheet.create({
     color: '#ccc', // Lighter grey for points label
   },
   qrButton: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
     width: width*0.6,
-    height: height*0.31,
+    height: height*0.1,
     marginLeft: "5%",
-    backgroundColor: '#b49324', // Transparent gold background
     borderRadius: 30,
     marginTop: 20,
     padding: 10,
-    bottom: 70,
-    shadowColor: '#e2bb2f',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 10,
-    borderWidth: 2,        // Thickness of the border
-    borderColor: '#2dc453', 
+    bottom: height*0.1,
+          // Thickness of the border
   },
   qrText: {
-    color: '#313130', // Gold for the QR text
+    color: '#d1d1ce', // Gold for the QR text
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 5,
   },
   logoutButton: {
     position: 'absolute',
