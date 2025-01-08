@@ -83,7 +83,7 @@ const CustomDrawerContent = (props) => {
       {/* Logout Button at Bottom */}
       <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Logout')}>
         <Icon name="logout" size={24} color="#fff" />
-        <Text style={styles.logoutText}>Logout</Text>
+        <Text style={styles.logoutText}>Déconnexion</Text>
       </TouchableOpacity>
     </ImageBackground>
   );
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     position: 'absolute',
     bottom: 10,
-    left: "45%",
+    left: "40%",
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#d4af37', // Gold background for the logout button
@@ -318,8 +318,7 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     color: '#1f1f1f', // Dark text on the gold button
-    fontSize: 18,
-    marginLeft: 10,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   redButton: {
