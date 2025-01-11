@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import PrductBottomSheetScreen from './PrductBottomSheetScreen';
 import { DataContext } from '../navigation/DataContext';
 import Header from '../components/Header';
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URLIO } from '@env';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 

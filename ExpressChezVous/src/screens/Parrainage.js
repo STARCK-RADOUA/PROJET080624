@@ -4,7 +4,7 @@ import QRCode from 'react-native-qrcode-svg';
 import { getClientId, getDeviceIde } from '../services/userService';
 import { Ionicons } from '@expo/vector-icons';
 import * as ScreenCapture from 'expo-screen-capture'; // Import ScreenCapture
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URL } from '@env';
 const { width, height } = Dimensions.get('window');
 
 const Parrainage = () => {

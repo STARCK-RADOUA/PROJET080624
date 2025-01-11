@@ -34,9 +34,10 @@
       "permissions": [
         "CAMERA",
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
-    
-      ],
+        "ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       [
@@ -51,7 +52,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "45d377ef-5a79-42d4-8c70-64c57e628942"
+        "projectId": "8e72c0d6-cfb4-4b3f-a6a9-d831d2d0e640"
       }
     },
     "runtimeVersion": "1.0.0",

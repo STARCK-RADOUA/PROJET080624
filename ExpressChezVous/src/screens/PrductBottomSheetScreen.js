@@ -3,7 +3,7 @@ import { Modal, Dimensions, StyleSheet, View, Text, TouchableOpacity, Image, Act
 import { DataContext } from '../navigation/DataContext';
 import { getClientId } from '../services/userService';
 import axios from 'axios';
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URL } from '@env';
 import { TouchableWithoutFeedback } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 

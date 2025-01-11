@@ -1,4 +1,4 @@
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URL } from '@env';
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';

@@ -8,7 +8,6 @@ import { getClientId } from '../services/userService';
 import Header from '../components/Header';
 import io from 'socket.io-client';
 import * as Device from 'expo-device';
-import useNotificationMenu from '../services/useNotificationMenu';
 import { DataContext } from '../navigation/DataContext';
 import { getUserDetails } from '../services/userService';
 

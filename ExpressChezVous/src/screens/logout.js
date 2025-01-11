@@ -1,8 +1,6 @@
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URL } from '@env';
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator, Animated, StyleSheet } from 'react-native';
-import { getDeviceIde } from '../services/userService';
-import io from 'socket.io-client';
 import * as Device from 'expo-device';
 
 

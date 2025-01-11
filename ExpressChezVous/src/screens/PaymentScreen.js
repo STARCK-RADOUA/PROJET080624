@@ -11,7 +11,6 @@ const PaymentScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
   const { sharedData } = useContext(DataContext); // Socket.IO instance storage state
-  const serviceName = sharedData.serviceName;
   const serviceTest = sharedData.serviceTest;
   const serviceId = sharedData.id;
 

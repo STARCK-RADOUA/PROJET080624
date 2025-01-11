@@ -1,4 +1,4 @@
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URL } from '@env';
 
 import axios from 'axios';
 import * as Device from 'expo-device';

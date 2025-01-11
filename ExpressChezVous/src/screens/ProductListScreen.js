@@ -1,2 +1,0 @@
-
-// ProductListScreen.js

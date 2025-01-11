@@ -1,10 +1,8 @@
-import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity,ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import * as Location from 'expo-location';  // Import expo-location for location fetching
 import { Formik } from 'formik';
-import * as Yup from 'yup';
-import axios from 'axios';
+import * as Yup from 'yup'
 import { getClient } from '../services/userService'; // Add a function to get user ID
 
 // Validation schema using Yup

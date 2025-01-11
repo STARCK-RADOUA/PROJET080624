@@ -1,8 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
-import ReceiptScreen from '../screens/ReceiptScreen';
 import ShoppingCartScreen from '../screens/ShoppingCartScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
 

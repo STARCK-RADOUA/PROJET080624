@@ -20,7 +20,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { io } from 'socket.io-client';
-import { BASE_URL, BASE_URLIO } from '@env';
+import {  BASE_URLIO } from '@env';
 import { getClientId } from '../services/userService';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');

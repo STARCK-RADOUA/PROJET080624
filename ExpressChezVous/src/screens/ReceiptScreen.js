@@ -1,4 +1,4 @@
-import { BASE_URL, BASE_URLIO } from '@env';
+import { BASE_URLIO } from '@env';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, Modal, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
@@ -6,7 +6,6 @@ import io from 'socket.io-client';
 import * as Device from 'expo-device';
 import Header from '../components/Header';
 import useNotificationMenu from '../services/useNotificationMenu'; // Import the custom hook
-import NotificationMenu from '../components/NotificationMenu';
 
 const { width, height } = Dimensions.get('window');
 const socket = io(`${BASE_URLIO}`);

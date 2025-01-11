@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { View, Text, Image, SafeAreaView, TouchableOpacity, Animated, BackHandler, Alert, Dimensions, AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Svg, { Circle } from 'react-native-svg';
 import BottomSheet from './ChatSheetScreen'; 
 import io from 'socket.io-client';
 import { useNavigation } from '@react-navigation/native';
@@ -20,9 +19,7 @@ const socket = io(BASE_URLIO, {
   query: { deviceId },
 });
 const PaymentSuccessScreen = ({ route }) => {
-  const totalTimeInSeconds = 5 * 60;
   const [progress, setProgress] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(5);
   const [orderStatus, setOrderStatus] = useState('pending');
   const [orderId, setOrderID] = useState(route?.params?.data?.order_id || '');
   const [clientId, setClientId] = useState('');
@@ -34,7 +31,6 @@ const PaymentSuccessScreen = ({ route }) => {
   const bottomSheetRef = useRef(null);
   const { sharedData } = useContext(DataContext);
   const [nezPoint, setNezPoint] = useState(sharedData?.dicrPoints);
-  const [firstpoints, setFirstPoints] = useState(sharedData?.firstPoints);
   const [orders, setOrders] = useState([]);
   const navigation = useNavigation();
   const [duration, setDuration] = useState(null);

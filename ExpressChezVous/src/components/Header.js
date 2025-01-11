@@ -3,7 +3,7 @@ import { View, Image, Platform, StyleSheet, Dimensions, TouchableOpacity } from 
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import * as Device from 'expo-device';
 import { useFocusEffect } from '@react-navigation/native';
-import { BASE_URLIO, BASE_URL } from '@env';
+import { BASE_URLIO } from '@env';
 import { io } from 'socket.io-client';
 const deviceId = Device.osBuildId;
 

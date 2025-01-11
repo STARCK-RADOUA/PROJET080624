@@ -2,17 +2,12 @@ import { BASE_URL, BASE_URLIO } from '@env';
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image,TextInput, TouchableOpacity, StyleSheet, Modal, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
-import io from 'socket.io-client';
 import Header from '../components/Header';
-import useNotificationMenu from '../services/useNotificationMenu';
-import NotificationMenu from '../components/NotificationMenu';
 import { getClient , getUserDetails} from '../services/userService';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
-const socket = io(`${BASE_URLIO}`);
 
 const UserProfileScreen = ({ navigation }) => {
-  const { isNotificationMenuVisible, slideAnim, toggleNotificationMenu } = useNotificationMenu();
   
   const [phoneNumber, setPhoneNumber] = useState('');
   const [firstName, setFirstName] = useState('');

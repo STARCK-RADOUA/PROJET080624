@@ -4,14 +4,12 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // QR Code icon
 import TabNavigator from './TabNavigator';
 import SupportChat from '../screens/SupportChatScreen';
-import Logout from '../screens/logout';
 import { getClientId } from '../services/userService';
 import { useNavigation } from '@react-navigation/native';
-import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import * as Device from 'expo-device';
 import { useFocusEffect } from '@react-navigation/native';
 import { io } from 'socket.io-client';
-import { BASE_URLIO, BASE_URL } from '@env';
+import { BASE_URLIO } from '@env';
 
 const { width , height} = Dimensions.get('window');
 
