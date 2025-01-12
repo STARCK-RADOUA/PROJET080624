@@ -146,6 +146,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
       });
       // Do not optimistically add the message to the UI. The real-time listener will do that when confirmed by the server.
       setMessage('');
+      Keyboard.dismiss(); // Add this line to hide the keyboard after sending
     }
   };
 
@@ -180,9 +181,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
         scrollTo(MAX_TRANSLATE_Y);
       }
     });
-  const handleInputClick = () => {
-    inputRef.current?.focus();
-  };
+
   const rBottomSheetStyle = useAnimatedStyle(() => {
     const borderRadius = interpolate(
       translateY.value,
