@@ -20,7 +20,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { io } from 'socket.io-client';
-import {  BASE_URLIO } from '@env';
+import { BASE_URLIO } from '@env';
 import { getClientId } from '../services/userService';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -37,6 +37,7 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
   const flatListRef = useRef(null); // Reference to the FlatList
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const inputRef = useRef(null);
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
   const scrollTo = useCallback((destination) => {
     'worklet';
@@ -95,6 +96,39 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
     };
   }, [orderId, driverId]);
 
+
+  useEffect(() => {
+    const keyboardWillShow = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    );
+
+    const keyboardWillHide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardWillShow.remove();
+      keyboardWillHide.remove();
+    };
+  }, []);
+
+
+
+  const handleInputFocus = () => {
+    setIsInputFocused(true);
+  };
+
+  const handleInputBlur = () => {
+    setIsInputFocused(false);
+  };
+
+
   // Function to scroll to the bottom of the FlatList
   const scrollToBottom = () => {
     if (flatListRef.current) {
@@ -146,9 +180,9 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
         scrollTo(MAX_TRANSLATE_Y);
       }
     });
-    const handleInputClick = () => {
-      inputRef.current?.focus();
-    };
+  const handleInputClick = () => {
+    inputRef.current?.focus();
+  };
   const rBottomSheetStyle = useAnimatedStyle(() => {
     const borderRadius = interpolate(
       translateY.value,
@@ -188,16 +222,18 @@ const BottomSheet = React.forwardRef(({ orderId, clientId, driverId }, ref) => {
         />
 
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? undefined : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Adjust offset for iOS
-          style={[styles.inputContainer, { marginBottom: keyboardHeight }]} // Add keyboard height for Android
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          style={[styles.inputContainer, { marginBottom: keyboardHeight }]}
         >
           <TextInput
-            style={styles.input}
+            ref={inputRef}
+            style={[styles.input, isInputFocused && styles.inputFocused]}
             placeholder="Type a message..."
             value={message}
             onChangeText={setMessage}
-            onFocus={handleInputClick}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
           />
           <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
             <Text style={styles.sendButtonText}>Send</Text>
@@ -217,6 +253,9 @@ const styles = StyleSheet.create({
     top: SCREEN_HEIGHT * 1.18,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
+    zIndex: 9999, // Increased to be higher than parent components
+    elevation: 25, // Increased to be higher than parent's maximum elevationQ
+    shadowColor: '#000', // Add shadow properties for iOS
   },
   line: {
     width: 75,
@@ -251,7 +290,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  
+
     backgroundColor: '#F2F2F2',
     borderTopWidth: 1,
     borderTopColor: '#E5E5EA',
@@ -277,6 +316,9 @@ const styles = StyleSheet.create({
   sendButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },inputFocused: {
+    borderColor: '#FEA202',
+    borderWidth: 2,
   },
 });
 export default BottomSheet;

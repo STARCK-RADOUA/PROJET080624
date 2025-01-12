@@ -26,6 +26,8 @@ const styles = StyleSheet.create({
    shadowColor: '#070707',
    shadowOffset: { width: 1, height: 5 },
    shadowOpacity: 0.9,
+   zIndex: 10, // Added explicit z-index
+
   },
   chatIcon: {
     width: 40,
@@ -82,6 +84,7 @@ const styles = StyleSheet.create({
     elevation: 8,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    zIndex: 8, // Added explicit z-index
 
 
   },
