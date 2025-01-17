@@ -35,9 +35,16 @@ export default function App() {
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
-      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
-      console.log('Sending background ping');
-      socket.emit('driverPing', { deviceId: Device.osBuildId });
+      console.log('Sending background ping suure');
+      const deviceId = Device.osBuildId;
+
+      const response = await fetch(`${BASE_URLIO}/api/driver/ping`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deviceId }),
+      });
+      console.log('Background ping success:', response.status);
+
       return BackgroundFetch.Result.NewData;
     } catch (error) {
       console.log('Error in background ping task', error);
