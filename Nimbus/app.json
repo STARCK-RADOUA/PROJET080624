@@ -6,7 +6,7 @@
     "runtimeVersion": "1.0.0",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -21,7 +21,6 @@
       "color": "#000000"
     },
     "ios": {
-      "supportsTablet": true,
       "bundleIdentifier": "com.riderhard.nimbus",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We need your location to provide real-time tracking.",
