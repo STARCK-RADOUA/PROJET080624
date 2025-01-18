@@ -14,6 +14,7 @@ import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import NetInfo from '@react-native-community/netinfo'; // Import NetInfo
+import axios from 'axios';
 
 
 const deviceId = Device.osBuildId;
@@ -35,10 +36,17 @@ export default function App() {
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
-      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
-      console.log('Sending background ping');
-      socket.emit('driverPing', { deviceId: Device.osBuildId });
-      
+      const response = await axios.post(`${BASE_URLIO}/api/driver/ping`, 
+        {
+          deviceId: Device.osBuildId,
+        },
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+        
+      );
+      console.log('Background ping success:', response.status);
+
       return BackgroundFetch.Result.NewData;
     } catch (error) {
       console.log('Error in background ping task', error);
@@ -97,7 +105,7 @@ navigate('SystemDownScreen')
   async function registerBackgroundTask() {
     try {
       await BackgroundFetch.registerTaskAsync(BACKGROUND_PING_TASK, {
-        minimumInterval: 1*60, // Ping every 5 minutes
+        minimumInterval: 5 * 60, // Ping every 5 minutes
         stopOnTerminate: false,
         startOnBoot: true,
       });
