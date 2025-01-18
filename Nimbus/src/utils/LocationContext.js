@@ -24,11 +24,12 @@ export const LocationProvider = ({ children }) => {
       const { locations } = data;
       const { latitude, longitude } = locations[0].coords;
       setCurrentLocation({ latitude, longitude }); // Mise à jour de la localisation actuelle dans le contexte
+      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
 
       console.log(`Background Latitude: ${latitude}, Longitude: ${longitude}`);
       if (socket) {
         socket.emit('driverLocationUpdate', { deviceId: Device.osBuildId , latitude, longitude });
-        socket.emit('driverPing', { deviceId: Device.osBuildId  });
+       // socket.emit('driverPing', { deviceId: Device.osBuildId  });
 
       }
     }

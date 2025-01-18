@@ -120,7 +120,10 @@ navigate('SystemDownScreen')
     
     // Send initial ping
     console.log('Initial ping');
-    socket.emit('driverPing', { deviceId });
+
+
+
+    //  socket.emit('driverPing', { deviceId });
     socket.on('adminDeactivateDriver', () => {
       console.log('Admin deactivated driver');
       navigate('Login');

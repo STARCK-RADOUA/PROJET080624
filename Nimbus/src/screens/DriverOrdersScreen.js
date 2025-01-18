@@ -195,9 +195,9 @@ useEffect(() => {
        console.log('------------sub------------------------');
        console.log(locationSubscription);
        const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
-      console.log('Sending background ping');
-      socket.emit('driverPing', { deviceId: Device.osBuildId });
-      socket.emit('driverLocationUpdate', { deviceId: Device.osBuildId, latitude, longitude });
+  //    console.log('Sending background ping');
+     // socket.emit('driverPing', { deviceId: Device.osBuildId });
+     // socket.emit('driverLocationUpdate', { deviceId: Device.osBuildId, latitude, longitude });
 
        }
       
