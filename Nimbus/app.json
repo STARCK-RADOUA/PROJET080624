@@ -27,7 +27,7 @@
         "NSLocationAlwaysUsageDescription": "We need your location to provide continuous tracking even when the app is in the background.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs to track your location at all times.",
         "UIBackgroundModes": ["location", "fetch", "remote-notification"]
-
+        
 
       },
       "runtimeVersion": "1.0.0"

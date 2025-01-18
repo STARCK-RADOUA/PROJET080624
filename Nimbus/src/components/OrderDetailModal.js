@@ -342,9 +342,9 @@ console.log('------------------------------------');
                     <Text style={styles.productName}>{item.product?.name || 'Indisponible'}</Text>
                     <Text style={styles.productQuantity}>Quantité : {item.quantity}</Text>
 
-                        <Text style={styles.productPrice}>€{!item.isFree ? order.total_price.toFixed(2): "Gratuit     €" + order.total_price.toFixed(2) }</Text>
+                        <Text style={styles.productPrice}>€{!item.isFree ? item.product.price.toFixed(2): "Gratuit     €" + item.product.price.toFixed(2) }</Text>
 
-                        <Text style={styles.productPrice2}>prix sans promo: €{item.priceDA.toFixed(2) * item.quantity} </Text>
+                        <Text style={styles.productPrice2}>prix sans promo: €{item.priceDA.toFixed(2) *item.quantity} </Text>
 
                   
                   </View>

@@ -35,23 +35,16 @@ export default function App() {
   // Define the background task
   TaskManager.defineTask(BACKGROUND_PING_TASK, async () => {
     try {
-      console.log('Sending background ping via HTTP');
-      const response = await fetch(`${BASE_URLIO}/api/driver/ping`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          deviceId: Device.osBuildId,
-        }),
-      });
-      console.log('Background ping success:', response.status);
-  
+      const socket = io(BASE_URLIO, { query: { deviceId: Device.osBuildId } });
+      console.log('Sending background ping');
+      socket.emit('driverPing', { deviceId: Device.osBuildId });
+      
       return BackgroundFetch.Result.NewData;
     } catch (error) {
       console.log('Error in background ping task', error);
-      return BackgroundFetch.Result.Failed;
+      return BackgroundFetch?.Result?.Failed || BackgroundFetch.Result.NewData;
     }
   });
-  
   console.log(Device.osBuildId);
   useEffect(() => {
     // Activate keep awake asynchronously
