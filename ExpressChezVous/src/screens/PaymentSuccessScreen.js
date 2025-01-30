@@ -225,6 +225,14 @@ const PaymentSuccessScreen = ({ route }) => {
             if (status === 'pending') {
 
         setIsChatDisabled(true);
+        if (Array.isArray(orders)) {
+          const items = orders.map(order => ({
+            _id: order._id,
+            free: order.free,
+            quantity: order.quantity
+          }));
+        await updateOrderItems(items);
+        }
         
     
             }

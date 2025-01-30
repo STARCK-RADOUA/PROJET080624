@@ -4,6 +4,7 @@
 node_modules/
 dzd/
 
+bb/
 # Expo
 .expo/
 dist/
